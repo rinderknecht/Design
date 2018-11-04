@@ -1,0 +1,3 @@
+<!ELEMENT numbers (num+)>
+<!ELEMENT num (num*)>
+<!ATTLIST num val CDATA #REQUIRED>

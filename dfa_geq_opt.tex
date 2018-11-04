@@ -1,0 +1,34 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{xspace}
+\usepackage{vaucanson-g}
+\usepackage{pst-eps}
+
+%\ShowGrid
+
+\input{token}
+\input{grammar}
+\input{dfa_macros}
+
+\begin{document}
+
+\TeXtoEPS
+\VCDraw{%
+\begin{VCPicture}{(0,0)(6,0)}
+% States
+\State[1]{(0,0)}{A}
+\Initial{A}
+\FinalState[2]{(3,0)}{B}
+\nput{-90}{B}{\large \itoken{relop}{GT}}
+\FinalState[3]{(6,0)}{C}
+\nput{0}{C}{\large \itoken{relop}{GE}}
+% Edges
+\EdgeL{A}{B}{\exc{>}}
+\EdgeL{B}{C}{\exc{=}}
+\end{VCPicture}
+}
+\endTeXtoEPS
+
+\end{document}

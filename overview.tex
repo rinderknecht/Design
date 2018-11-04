@@ -1,0 +1,544 @@
+The function of a compiler is to translate texts written in a source
+language into texts written in a target language. Usually, the source
+language is a programming language, and the corresponding texts are
+programs. The target language is often an assembly
+language, \emph{i.e.,} a language closer to the machine language (the
+language understood by the processor) than the source language. Some
+programming languages are compiled into a bytecode language instead of
+assembly. Bytecode is usually more abstract than an assembly language
+and is either interpreted by another program, called
+\emph{virtual machine} (VM), or compiled to assembly.
+
+\section*{Compilation chain}
+
+From an engineering point of view, the compiler is one link in a chain
+of tools, as shown in \fig~\vref{fig:compilation_chain}.
+\begin{figure}
+\centering
+\includegraphics[bb=71 587 405 721]{compilation_chain}
+\caption{Compilation chain\label{fig:compilation_chain}}
+\end{figure}
+Let us consider the example of the \emph{C language}. A widely used
+ open\hyp{}source compiler is GNU GCC. In reality, GCC includes a
+ complete compilation chain, not just a C~compiler:
+\begin{itemize*}
+
+  \item to only preprocess the sources: \texttt{gcc -E prog.c}
+  (standard output) (the C~preprocessor \texttt{ccpp} can also be
+  called directly);
+
+  \item to preprocess and compile: \texttt{gcc -S prog.c}
+  (output \texttt{prog.s});
+
+  \item to preprocess, compile and assemble: \texttt{gcc -c prog.c}
+  (out: \texttt{prog.o});
+
+  \item to preprocess, compile, assemble and link: \texttt{gcc -o prog
+    prog.c} (output \texttt{prog}). Linking can be directly called
+    using~\texttt{ld}.
+
+\end{itemize*}
+There are two parts to compilation: \emph{analysis} and
+\emph{synthesis}.
+\begin{enumerate*}
+ 
+  \item The analysis part breaks up the source program into
+  constituent pieces of an intermediary representation of the
+  program.
+
+  \item The synthesis part constructs the target program from this
+  intermediary representation.
+
+\end{enumerate*}
+Here, we shall concern ourselves only with analysis, which can itself
+be divided into three successive stages:
+\begin{enumerate*}
+
+  \item \emph{linear analysis,} in which the stream of characters
+    making up the source program is read and grouped
+    into \emph{lexemes}, that is, sequences of characters having a
+    collective meaning; sets of lexemes with a common interpretation
+    are called \emph{tokens} (note that `token' is often used when
+    `lexeme' would be correct, but the confusion is minimal);
+
+  \item \emph{hierarchical analysis,} in which tokens are grouped
+    hierarchically into nested collections (trees) with a collective
+    meaning;
+
+  \item \emph{semantic analysis,} in which certain checks are
+    performed on the previous hierarchy to ensure that the components
+    of a program fit together meaningfully.
+
+\end{enumerate*}
+In the following, we shall focus on linear and hierarchical analysis.
+
+\paragraph{Lexical analysis}
+\label{lexing_eg}
+
+In a compiler, linear analysis is called \emph{lexical analysis} or
+\emph{scanning}. During lexical analysis, the characters in the
+assignment statement
+\begin{verbatim}
+position := initial + rate*60
+\end{verbatim}
+\noindent would be grouped into the following lexemes and tokens (see
+facing table). The blanks separating the characters of these tokens
+are normally eliminated.
+\begin{center}
+\begin{tabular}{l|>{\tt}l}
+\toprule
+  \multicolumn{1}{c}{\textsc{Token}}
+& \multicolumn{1}{c}{\textsc{Lexeme}}\\
+\midrule
+identifier & position\\
+assignment symbol & :=\\
+identifier & initial\\
+plus sign & +\\
+identifier & rate\\
+multiplication sign & *\\
+number & 60\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Syntax analysis}
+
+Hierarchical analysis is called \emph{parsing} or \emph{syntax
+analysis}. It involves grouping the tokens of the source program into
+grammatical phrases that are used by the compiler to synthesise the
+output. Usually, the grammatical phrases of the source are represented
+by a \emph{parse tree} such as in \fig~\vref{fig:parse_tree_eg}.
+\begin{figure}
+\centering
+\includegraphics[bb=71 603 338 721]{parse_tree_eg}
+\caption{Parse tree of \texttt{position := initial + rate * 60}\label{fig:parse_tree_eg}}
+\end{figure}
+In the expression \texttt{initial + rate * 60}, the phrase
+\texttt{rate * 60} is a logical unit because the usual conventions of
+arithmetic expressions tell us that multiplication is performed prior
+to addition. Thus, because the expression \texttt{initial + rate} is
+followed by a \verb+*+, it is \emph{not} grouped into the same
+subtree. The hierarchical structure of a program is usually expressed
+by \emph{recursive rules}. For instance, an expression can be defined
+by a set of cases as follows:
+\begin{enumerate*}
+
+  \item any \emph{identifier} is an expression;\label{rule_id_is_expr}
+
+  \item any \emph{number} is an expression;\label{rule_num_is_expr}
+
+  \item if \emph{expression}\(_1\) and \emph{expression}\(_2\) are
+  expressions, then so are
+   \begin{enumerate*}
+ 
+     \item \emph{expression}\(_1\) \verb|+|
+       \emph{expression}\(_2\), \label{rule_add_is_expr}
+
+     \item \emph{expression}\(_1\) \verb|*|
+       \emph{expression}\(_2\), \label{rule_mult_is_expr}
+
+     \item (\emph{expression}).
+
+   \end{enumerate*}
+
+\end{enumerate*}
+Rules~\ref{rule_id_is_expr} and~\ref{rule_num_is_expr} are
+non-recursive base rules, while the others define expressions in terms
+of operators applied to other expressions:
+\begin{itemize*}
+
+  \item \texttt{initial} and \texttt{rate} are identifiers, therefore,
+  by rule~\ref{rule_id_is_expr}, \texttt{initial} and \texttt{rate}
+  are expressions;
+
+  \item \texttt{60} is a number, thus, by rule~\ref{rule_num_is_expr},
+    we infer that \texttt{60} is an expression.
+
+\end{itemize*}
+Next, by rule~\ref{rule_mult_is_expr}, we infer that \texttt{rate *
+60} is an expression. Finally, by rule~\ref{rule_add_is_expr}, we
+conclude that \texttt{initial + rate * 60} is an
+expression. Similarly, many programming languages define statements
+recursively by rules such as:
+\begin{itemize}
+
+  \item if \emph{identifier} is an identifier and
+    \emph{expression} is an expression, then we can form the statement
+    \begin{center}
+      \emph{identifier} \texttt{:=} \emph{expression}
+    \end{center}
+
+  \item if \emph{expression} is an expression and \emph{statement} is
+    a statement, then we can create the statements
+    \begin{center}
+     \tt while (\emph{expression}) do \emph{statement}\\
+     if (\emph{expression}) then \emph{statement}
+    \end{center}
+
+\end{itemize}
+Let us keep in mind that the distinction between lexical and syntactic
+analysis is somewhat arbitrary. For instance, we could define the
+integer numbers by means of the following recursive rules:
+\begin{itemize*}
+
+  \item a \emph{digit} is a \emph{number} (base rule),
+
+  \item a \emph{number} followed by a \emph{digit} is a
+  \emph{number} (recursive rule).
+
+\end{itemize*}
+Imagine now that the lexer does \emph{not} recognise numbers, only
+digits. The parser therefore would use the previous recursive rules to
+group in a parse tree the digits which form a number. For instance,
+the parse tree for the number \texttt{1234}, following these rules, is
+shown in \fig~\vref{fig:num_parse_tree}.
+\begin{figure}
+\centering
+\subfloat[Parse tree\label{fig:num_parse_tree}]{
+  \includegraphics[bb=71 602 218 721]{num_parse_tree}}
+\quad
+\subfloat[Abstract syntax tree\label{fig:ast_eg}]{
+  \includegraphics[bb=71 602 187 721]{ast_eg}
+}
+\caption{Parse tree vs. abstract syntax tree}
+\end{figure}
+Notice how that tree actually is almost a list: the structure,
+\emph{i.e.,} the embedding of trees, is indeed not meaningful
+here. For example, there is no obvious meaning to the separation
+of~\texttt{12} (same subtree at the leftmost part) in the number
+\texttt{1234}. Therefore, pragmatically, the best division between the
+lexer and the parser is the one that simplifies the overall task of
+analysis. One factor in determining the distinction is whether a
+source language construct is inherently recursive or not: lexical
+constructs do not require recursion, while syntactic constructs often
+do. For instance, recursion is not necessary to recognise identifiers,
+which are typically strings of letters and digits beginning with a
+letter: we can read the input stream until a character that is neither
+a digit nor a letter is found, then these read characters are grouped
+into an identifier token.
+
+On the other hand, this kind of linear scan is not powerful enough to
+analyse expressions or statements, like matching parentheses in
+expressions, or matching braces in block statements: a nesting
+structure is compulsory, as seen earlier
+in \fig~\vref{fig:parse_tree_eg}. The
+representation internal to the compiler of this syntactic structure is 
+called an \emph{abstract syntax tree} (or simply
+\emph{syntax tree}), an example of which can be seen in
+\fig~\vref{fig:ast_eg}. It is a compressed version of the parse tree, where
+only the most important elements are retained for the semantic
+analysis.
+
+\paragraph{Semantic analysis}
+
+The semantic analysis checks the syntax tree for meaningless
+constructs and completes it for the synthesis. An important part of
+semantic analysis is devoted to \emph{type checking}, \emph{i.e.,}
+checking properties on how the data in the program is combined. For
+instance, many programming languages require an error to be issued if
+an array is indexed with a floating-point number (called
+\emph{float}). Some languages allow such floats and integers to be
+mixed in arithmetic expressions, some do not, because internal
+representation of integers and floats is very different, as is the
+cost of their corresponding arithmetic operations. In
+\fig~\vref{fig:ast_eg}, let us assume that all identifiers were declared as
+being floats, that is, they are of type float. Typechecking then
+compares the type of \texttt{rate}, which is a float, with that
+of~\texttt{60}, which is an integer.
+
+Let us assume that our language permits these two types of operands
+for the multiplication (`\texttt{*}'). Then the analyser must insert a
+special node in the syntax tree which represents a \emph{type cast}
+from integer to float for the constant~\texttt{60}. At the level of
+the programming language, a type cast is the identity function (also
+called a non\hyp{}operation in this context), so the value is not
+changed, but the type of the result is different from the type of the
+argument. This way the synthesis will know that the assembly code for
+such a conversion has to be generated. The semantic analysis issues no
+error and produces an
+\emph{annotated syntax tree} for the synthesis, displayed in
+\fig~\vref{fig:annotated_ast_eg}.
+\begin{figure}
+\centering
+\includegraphics{annotated_ast_eg}
+\caption{An annotated abstract syntax tree\label{fig:annotated_ast_eg}}
+\end{figure}
+
+\paragraph{Phases}
+
+Conceptually, a compiler operates in \emph{phases}, each transforming
+the program from one representation to another. This decomposition is
+shown in \fig~\vref{fig:phases}.
+\begin{figure}
+\centering
+\includegraphics[bb=71 618 408 721]{phases}
+\caption{Decomposition of a compiler into phases\label{fig:phases}}
+\end{figure}
+The first row makes up the analysis and the second is the synthesis.
+
+\section*{Symbol table}
+
+\Fig~\vref{fig:phases} does not depict another component which is
+connected to all the phases: the \emph{symbol table manager}. A symbol
+table is a two\hyp{}column table whose first column contains
+identifiers collected in the program and the second column contains
+any interesting information, called \emph{attributes}, about their
+corresponding identifier. Example of identifier attributes are
+\begin{itemize*}
+  \item the allocated storage,
+
+  \item the type, 
+
+  \item the \emph{scope} (\emph{i.e.,} where in the program it is
+    valid),
+
+  \item in case of procedures names, the number and type of the
+    parameters, the method of passing each argument (\emph{e.g.,} by
+    reference) and the result type, if any.
+
+\end{itemize*}
+When an identifier in the source program is detected by the lexer,
+this identifier is entered into the symbol table. However, some
+attributes of an identifier cannot normally be determined during
+lexical analysis. For example, in a \Pascal declaration like
+\begin{verbatim}
+var position, initial, rate: real;
+\end{verbatim}
+the type \texttt{real} is not known when \texttt{position},
+\texttt{initial} and \texttt{rate} are recognised by the lexical
+analyser. The remaining phases enter information about the identifiers
+into the symbol table and use this information. For example, the
+semantic analyser needs to know the type of the identifiers to
+generate intermediate code.
+
+\section*{Error detection and reporting}
+
+Another compiler component that was omitted
+from \fig~\vref{fig:phases} because it is also connected to all the
+phases is the \emph{error handler}. Indeed, each phase can encounter
+errors, so each phase must somehow deal with these errors. Here are
+some examples:
+\begin{itemize*}
+
+  \item the lexical analysis finds an error if a series of characters
+  do not form a token;
+
+  \item the syntax analysis finds an error if the relative position of
+  a group of tokens is not described by the grammar (abstract syntax);
+
+  \item the semantic analysis finds an error if the program contains
+  the addition of an integer and an array.
+
+\end{itemize*}
+
+\section*{Lexing}
+
+Let us revisit the analysis phase and its sub-phases, following up on
+a previous example. Consider the following character string:
+\begin{center}
+\(\longleftarrow\)
+\texttt{
+  \begin{tabular}{|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|@{\,}c@{\,}|}
+    \hline
+    p&o&s&i&t&i&o&n&\phantom{=}&:&=&\phantom{=}&i&n&i&t&i&a&l&
+    \phantom{=}&+&\phantom{=}&r&a&t&e&\phantom{=}&*&\phantom{=}&6&0\\
+    \hline
+  \end{tabular}
+}
+\(\longleftarrow\)
+\end{center}
+First, as we stated in section~\vref{lexing_eg}, lexical analysis
+recognises the tokens of this character string, which can be stored in
+a file. Lexing results in a stream of tokens like
+\begin{center}
+\raggedleft
+\boxedToken{ID}{position} \boxedToken{SYM}{:=}
+\boxedToken{ID}{initial} \boxedToken{OP}{+} \boxedToken{ID}{rate}
+\boxedToken{OP}{*} \boxedToken{NUM}{60}
+\end{center}
+where \tokenName{ID} (\emph{identifier}), \tokenName{SYM}
+(\emph{symbol}), \tokenName{OP} (\emph{operator}) and \tokenName{NUM}
+(\emph{number}) are the token names and between brackets are the
+\emph{lexemes}. The lexer also outputs or updates a symbol table (Even
+if the table is named `symbol table' it actually contains information
+about identifiers only.) like
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+Identifier & Attributes\\
+\hline
+\hline
+\texttt{position} & \ldots\\ 
+\hline
+\texttt{initial} & \ldots\\
+\hline
+\texttt{rate} & \ldots\\
+\hline
+\end{tabular}
+\end{center}
+The attributes often include the position of the corresponding
+identifier in the original string, like the position of the first
+character either counting from the start of the string or through the
+line and column numbers.
+
+\section*{Parsing}
+
+The parser takes this token stream and outputs the corresponding
+syntax tree and/or report errors. In \fig~\vref{fig:ast_eg}, we gave a
+simplified version of this syntax tree. A refined version is given in
+the facing column. Also, if the language requires variable
+definitions, the syntax analyser can complete the symbol table with
+the type of the identifiers.
+\begin{center}
+  \includegraphics[bb=71 619 218 721]{refined_ast_eg}
+\end{center}
+The parse tree can be considered as a \emph{trace} of the syntax
+analysis process: it summarises all the recognition work done by the
+parser. It depends on the syntax rules (\emph{i.e.,} the grammar) and
+the input stream of tokens.
+\begin{center}
+\includegraphics[bb=71 605 377 721]{refined_parse_tree_eg}
+\end{center}
+
+\section*{Semantic analysis}
+
+The semantic analysis considers the syntax tree and checks certain
+properties depending on the language, typically it makes sure that the
+valid syntactic constructs also have a certain meaning (with respect
+to the rules of the language). We saw in \fig~\vref{fig:annotated_ast_eg} that
+this phase can annotate or even add nodes to the syntax tree. It can
+as well update the symbol table with the information newly gathered in
+order to facilitate the code generation and/or optimisation. Assuming
+that our toy language accepts that an integer is mixed with floats in
+arithmetic operations, the semantic analysis can insert a type cast
+node. A new version of the annotated syntax tree is proposed in \fig~\vref{fig:refined_annotated_ast_eg}.
+\begin{figure}[b]
+\centering
+\includegraphics[bb=71 629 270 721]{refined_annotated_ast_eg}
+\caption{Refined annotated abstract syntax tree\label{fig:refined_annotated_ast_eg}}
+\end{figure}
+Note that the new node is not a token, just a (semantic) tag for the
+code generator.
+
+\section*{The synthesis phase}
+
+The purpose of the synthesis phase is to use all the information
+gathered by the analysis phase in order to produce the code in the
+target language. Given the annotated syntax tree and the symbol table,
+the first sub-phase consists in producing a program in some
+artificial, intermediary, language. Such a language should be
+independent of the target language, while containing features common
+to the \emph{family} the target language belongs to. For instance, if
+the target language is the PowerPC G4 microprocessor, the intermediary
+language should be like an assembly of the IBM RISC family. If we want
+\emph{to port a compiler} from one platform to another, \emph{i.e.,}
+make it generate code for a different OS or processor, such
+intermediary language comes handy: if the new platform share some
+features with the first one, we only have to rewrite the code
+generator component of the compiler --~not the whole compiler.  It may
+be interesting to have the same intermediary language for different
+source languages, allowing the sharing of the synthesis. We can think
+of an intermediary language as an assembly for an \emph{abstract
+  machine} (or processor). For instance, our example could lead to the
+code
+\begin{verbatim}
+temp1 := inttoreal(60)
+temp2 := id_rate * temp1
+temp3 := id_initial + temp2
+id_position := temp3
+\end{verbatim}
+Another point of view is to consider the intermediary code as a tiny
+subset of the source language, as it retains some high-level features
+from it, like, in our example, variables (instead of explicit storage
+information, like memory addresses or register numbers), operator
+names etc. This point of view enables optimisations that otherwise
+would be harder to achieve (because too many aspects would depend
+closely on many details of the target architecture). This kind of assembly is called \emph{three-address code}. It has
+several properties:
+\begin{itemize*}
+
+  \item each instruction has at most one operator (in addition to the
+  assignment);
+
+  \item each instruction can have at most three operands;
+
+  \item some instructions can have less than three operands, for
+    instance, the first and last instruction;
+
+  \item the result of an operation must be linked to a variable;.
+
+\end{itemize*}
+As a consequence, the compiler must order well the code for the
+subexpressions, \emph{e.g.,} the second instruction must come before
+the third one because the multiplication has priority on addition.
+
+\paragraph{Code optimisation}
+\label{opt_code}
+
+The code optimisation phase attempts to improve the intermediate code,
+so that faster-running target code will result. The code optimisation
+produces intermediate code: the output language is the same as the
+input language. For instance, this phase would find out that our
+little program would be more efficient this way:
+\begin{verbatim}
+temp1 := id_rate * 60.0
+id_position := id_initial + temp1
+\end{verbatim}
+\noindent This simple optimisation is based on the fact that type
+casting can be performed at compile-time instead of run-time, but it
+would be an unnecessary concern to integrate it in the code generation
+phase.
+
+\paragraph{Code generation}
+
+The code generation is the last phase of a compiler. It consists in
+the generation of target code, usually relocatable assembly code, from
+the optimised intermediate code. A crucial aspect is the assignment of
+variables to registers. For example, the translation of code above
+could be
+\begin{verbatim}
+MOVF id_rate, R2
+MULF #60.0, R2
+MOVF id_initial, R1
+ADDF R2, R1
+MOVF R1, id_position
+\end{verbatim}
+The first and second operands specify respectively a source and a
+destination. The~\texttt{F} in each instruction tells us that the
+instruction is dealing with floating-point numbers. This code moves
+the contents of the address \texttt{id\_rate} into
+register~\texttt{2}, then multiplies it with the float 60.0. The
+\texttt{\#} signifies that \texttt{60.0} is a constant. The third
+instruction moves \texttt{id\_initial} into register~\texttt{1} and
+adds to it the value previously computed in
+register~\texttt{2}. Finally, the value in register \texttt{1} is
+moved to the address of \texttt{id\_position}.
+
+\paragraph{From phases to passes}
+
+An implementation of the analysis is called a \emph{front-end} and an
+implementation of the synthesis \emph{back-end}. A \emph{pass}
+consists in reading an input file and writing an output file. It is
+possible to group several phases into one pass in order to interleave
+their activity.
+\begin{itemize}
+
+  \item On the one hand, this can lead to a greater efficiency since
+    interactions with the file system are much slower than with
+    internal memory.
+
+  \item On the other hand, this architecture leads to a greater
+    complexity of the compiler --~something the software engineer
+    always fears.
+
+\end{itemize}
+Sometimes it is difficult to group different phases into one pass. For
+example, the interface between the lexer and the parser is often a
+single token. There is not a lot of activity to interleave: the parser
+requests a token to the lexer which computes it and gives it back to
+the parser. In the meantime, the parser had to wait. Similarly, it is
+difficult to generate the target code if the intermediate code is not
+fully generated first. Indeed, some languages allow the programmer the
+use of variables without a prior declaration, so we cannot generate
+immediately the target code because this requires the knowledge of the
+variable type.

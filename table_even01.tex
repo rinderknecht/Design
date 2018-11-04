@@ -1,0 +1,23 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{hhline}
+
+\begin{document}
+
+\TeXtoEPS
+\framebox{
+\(\begin{array}{r@{}l||c|c}
+\multicolumn{2}{c||}{\mathcal{D}} & 0 & 1\\
+\hhline{==::==}
+\# \rightarrow & q_0 & q_2 & q_1\\
+               & q_1 & q_3 & q_0\\
+               & q_2 & q_0 & q_3\\
+               & q_3 & q_1 & q_2
+\end{array}\)
+}
+\endTeXtoEPS
+
+\end{document}

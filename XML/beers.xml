@@ -1,0 +1,18 @@
+<?xml version='1.0'?>
+<Beers>
+  <table xmlns='http://www.w3.org/1999/xhtml'>
+    <!-- default namespace is now XHTML -->
+    <th><td>Name</td><td>Origin</td><td>Description</td></th>
+    <tr>
+      <!-- Unbinding XHTML namespace inside table cells -->
+      <td><brandName xmlns="">Huntsman</brandName></td>
+      <td><origin xmlns="">Bath, UK</origin></td>
+      <td><details xmlns="">
+            <class>Bitter</class>
+            <hop>Fuggles</hop>
+            <pro>Wonderful hop, good summer beer</pro>
+            <con>Fragile; excessive variance pub to pub</con>
+          </details></td>
+    </tr>
+  </table>
+</Beers>

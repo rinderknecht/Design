@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<escaping>
+  <amp>&amp;</amp>
+  <lt>&lt;</lt>
+  <quot>&quot;</quot>
+  <quot attr="&quot;">"</quot>
+  <apos attr='&apos;'>&apos;</apos>
+  <apos>'</apos>
+  <gt>&gt;</gt>
+  <gt attr="&gt;">></gt>
+  <other>&#100;</other>
+  <other>&#x00E7;</other>
+</escaping>

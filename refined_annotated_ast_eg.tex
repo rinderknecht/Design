@@ -1,0 +1,29 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\input{token}
+
+\usepackage{xspace} % Required by common.tex
+\usepackage{pstricks,pst-tree,pst-eps}
+
+\newcommand{\mknode}[2]{\TR{\token{#1}{#2}}}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=20pt,nodesep=2pt,treesep=15pt]{\mknode{SYM}{:=}}{
+  \mknode{ID}{position}
+  \pstree{\mknode{OP}{+}}{
+    \mknode{ID}{initial}
+    \pstree{\mknode{OP}{*}}{
+      \mknode{ID}{rate}
+      \pstree{\TR{\textbf{\textsf{int\_to\_float}}}}{
+        \mknode{NUM}{60}
+      }
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}

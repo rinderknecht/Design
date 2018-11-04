@@ -1,0 +1,35 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath,amssymb}
+\usepackage{mathpartir}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\framebox[0.9\columnwidth]{\vbox{%
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\begin{gather*}
+\inferrule{}{\fun{bal}_0(\fun{ext}()) \rightarrow \fun{true}(0)};
+\\
+\inferrule
+  {\fun{bal}_0(t_1) \twoheadrightarrow \fun{true}(h_1)
+   \and\!\!\!\!
+   \fun{bal}_0(t_2) \twoheadrightarrow \fun{true}(h_2)
+   \and\!\!\!\!
+   |h_1 - h_2| \leqslant 1}
+  {\fun{bal}_0(\fun{int}(x,t_1,t_2)) \twoheadrightarrow 
+                                    \fun{true}(1 + \max\{h_1,h_2\})}\,;
+\\
+\inferrule
+  {}
+  {\fun{bal}_0(t) \rightarrow \fun{false}()}.
+\end{gather*}}}
+\endTeXtoEPS
+
+\end{document}

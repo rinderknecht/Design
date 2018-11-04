@@ -1,0 +1,30 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath,amssymb}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\Tcircle{\(4\)}
+\qquad
+\pstree[nodesep=1pt,levelsep=17pt,treesep=14pt,linestyle=none]{\TR{\(\downarrow\)}}{
+  \Tf[linestyle=solid,framesize=6pt]
+  \Tf[linestyle=solid,framesize=6pt]
+  \Tf[linestyle=solid,framesize=6pt]
+  \Tf[linestyle=solid,framesize=6pt]
+}
+\raisebox{-3pt}{\hphantom{\(\twoheadrightarrow\)}}\hspace*{11pt}
+\pstree[nodesep=1pt,levelsep=17pt,treesep=14pt,linestyle=none]{\TR{\(\uparrow\)}}{
+  \Tf[linestyle=solid,framesize=6pt]
+  \Tf[linestyle=solid,framesize=6pt]
+  \Tf[linestyle=solid,framesize=6pt]
+  \Tf[linestyle=solid,framesize=6pt]
+}
+\endTeXtoEPS
+
+\end{document}

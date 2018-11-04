@@ -1,0 +1,32 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath,amssymb}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\Tcircle{\(4\)}
+\qquad\hspace*{0pt}
+\pstree[nodesep=1pt,levelsep=17pt,treesep=14pt,linestyle=none]{\TR{\(\downarrow\!\!{\scriptstyle 4}\)}}{
+  \Tn
+  \Tn
+  \TR{\(\emq\)}
+  \Tn
+  \Tn
+}
+\hspace*{4pt}\raisebox{-20pt}{\(\rightarrow\)}\hspace*{8pt}
+\pstree[nodesep=1pt,levelsep=17pt,treesep=14pt,linestyle=none]{\TR{\(\uparrow\!\!{\scriptstyle 4}\)}}{
+  \Tn
+  \Tn
+  \TR{\(\emq\)}
+  \Tn
+  \Tn
+}
+\endTeXtoEPS
+
+\end{document}

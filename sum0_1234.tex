@@ -1,0 +1,75 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesepA=0pt,levelsep=20pt,treesep=14pt]{\TR{\fbox{\fun{sum}\(_0\)}}}{
+  \psset{nodesepB=2pt,levelsep=17pt}
+  \pstree[nodesepA=2pt]{\TR{\texttt{|}}}{
+    \TR{\(1\)}
+    \pstree{\TR{\texttt{|}}}{
+      \TR{\(2\)}
+      \pstree{\TR{\texttt{|}}}{
+        \TR{\(3\)}
+        \pstree{\TR{\texttt{|}}}{
+          \TR{\(4\)}
+          \TR{\texttt{[]}}
+        }
+      }
+    }
+  }
+}
+\hspace{-19pt}\raisebox{-3pt}{\(\xrightarrow{\gamma}\)}\hspace{7pt}
+\pstree[nodesepA=0pt,levelsep=20pt,treesep=14pt]{\TR{\fbox{\fun{sum}\(_0\)}}}{
+  \psset{nodesepB=2pt,levelsep=17pt}
+  \TR{\(1\)}
+  \pstree[nodesepA=2pt]{\TR{\texttt{|}}}{
+    \TR{\(2\)}
+    \pstree{\TR{\texttt{|}}}{
+      \TR{\(3\)}
+      \pstree{\TR{\texttt{|}}}{
+        \TR{\(4\)}
+        \TR{\texttt{[]}}
+      }
+    }
+  }
+}
+\hspace{-18pt}\raisebox{-3pt}{\(\xrightarrow{\epsilon}\)}\hspace{10pt}
+\pstree[nodesepA=0pt,levelsep=20pt,treesep=14pt]{\TR{\fbox{\fun{sum}\(_0\)}}}{
+  \psset{nodesepB=2pt,levelsep=17pt}
+  \TR{\(3\)}
+  \pstree[nodesepA=2pt]{\TR{\texttt{|}}}{
+    \TR{\(3\)}
+    \pstree{\TR{\texttt{|}}}{
+      \TR{\(4\)}
+      \TR{\texttt{[]}}
+    }
+  }
+}
+\hspace{-12pt}\raisebox{-3pt}{\(\xrightarrow{\epsilon}\)}\hspace{8pt}
+\pstree[nodesepA=0pt,levelsep=20pt,treesep=14pt]{\TR{\fbox{\fun{sum}\(_0\)}}}{
+  \psset{nodesepB=2pt,levelsep=17pt}
+  \TR{\(6\)}
+  \pstree[nodesepA=2pt]{\TR{\texttt{|}}}{
+    \TR{\(4\)}
+    \TR{\texttt{[]}}
+  }
+}
+\hspace{-2pt}\raisebox{-3pt}{\(\xrightarrow{\epsilon}\)}\hspace{5pt}
+\pstree[nodesepB=2pt,levelsep=20pt,treesep=14pt]{\TR{\fbox{\fun{sum}\(_0\)}}}{
+  \TR{\(10\)}
+  \TR{\texttt{[]}}
+}
+\hspace{0pt}\raisebox{-3pt}{\(\xrightarrow{\delta}\)}\hspace{0pt}
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\(10\)}}{}
+\endTeXtoEPS
+
+\end{document}

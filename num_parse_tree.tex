@@ -1,0 +1,32 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{pstricks,pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=22pt,nodesep=2pt]{\TR{\emph{number}}}{
+  \pstree{\TR{\emph{number}}}{
+    \pstree{\TR{\emph{number}}}{
+      \pstree{\TR{\emph{number}}}{
+        \pstree{\TR{\emph{digit}}}{
+          \TR{\texttt{1}}
+        }
+      }
+      \pstree{\TR{\emph{digit}}}{
+        \TR{\texttt{2}}
+      }
+    }
+    \pstree{\TR{\emph{digit}}}{
+      \TR{\texttt{3}}
+    }
+  }
+  \pstree{\TR{\emph{digit}}}{
+    \TR{\texttt{4}}
+  }
+}
+\endTeXtoEPS
+
+\end{document}

@@ -1,0 +1,37 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath,amssymb}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\(
+\boxed{
+\begin{array}{@{}r@{\;}c@{\;}l@{}}
+\fun{i2w}([2,3,1,4])
+& \xrightarrow{\smash{\xi}} & \fun{i2w}([2,3,1,4],\el,\el)\\
+& \xrightarrow{\smash{\upsilon}} & \fun{i2w}([3,1,4],\el,[2])\\
+& \xrightarrow{\smash{\sigma}} & \fun{i2w}([3,1,4],[2],\el)\\
+& \xrightarrow{\smash{\upsilon}} & \fun{i2w}([1,4],[2],[3])\\
+& \xrightarrow{\smash{\tau}} & \fun{i2w}([1,4],\el,[2,3])\\
+& \xrightarrow{\smash{\upsilon}} & \fun{i2w}([4],\el,[1,2,3])\\
+& \xrightarrow{\smash{\sigma}} & \fun{i2w}([4],[1],[2,3])\\
+& \xrightarrow{\smash{\sigma}} & \fun{i2w}([4],[2,1],[3])\\
+& \xrightarrow{\smash{\sigma}} & \fun{i2w}([4],[3,2,1],\el)\\
+& \xrightarrow{\smash{\upsilon}} & \fun{i2w}(\el,[3,2,1],[4])\\
+& \xrightarrow{\smash{\rho}} & \fun{i2w}(\el,[2,1],[3,4])\\
+& \xrightarrow{\smash{\rho}} & \fun{i2w}(\el,[1],[2,3,4])\\
+& \xrightarrow{\smash{\rho}} & \fun{i2w}(\el,\el,[1,2,3,4])\\
+& \xrightarrow{\smash{\pi}} & [1,2,3,4].
+\end{array}}
+\)
+\endTeXtoEPS
+
+\end{document}
+
+

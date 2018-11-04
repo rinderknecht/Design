@@ -1,0 +1,68 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath}% Needed for \! to work
+
+\input{commands}
+
+\begin{document}
+
+
+\TeXtoEPS
+%\psset{showbbox=true}
+\pstree[nodesep=2pt,levelsep=30pt,treesep=12pt,arrows=->,xbbr=-2]{\Tp}{
+  \pstree{\TR{\(\el,\el\)}\nbput{\(\xi\)}}{
+    \pstree[arrows=->>]{\TR{\(\el,[a]\)}\nbput{\(\upsilon\)}}{
+      \pstree{\TR{\([a],[b]\)}\nbput[npos=0.6]{\(\phi\lambda_0\!\!\!\!\)}}{
+        \pstree[arrows=->]{\TR{\([c],[a,b]\)}\nbput[npos=0.7]{\(\tau\lambda_1\!\!\!\)}}{
+          \pstree{\TR{\(\el,[c,a,b]\)}\nbput{\(\rho\)}}{
+            \TR{\([c,a,b]\)}\nbput{\(\pi\)}
+          }
+        }
+        \psset{arrows=->}
+        \pstree{\TR{\([a],[c,b]\)}\nbput[npos=0.5]{\(\upsilon\!\)}}{
+          \pstree{\TR{\(\el,[a,c,b]\)}\nbput{\(\rho\)}}{
+            \TR{\([a,c,b]\)}\nbput{\(\pi\)}
+          }
+        }
+        \psset{arrows=->>}
+        \pstree[arrows=->]{\TR{\([a],[b,c]\)}\naput[npos=0.7]{\(\!\!\!\sigma\lambda_0\)}}{
+          \pstree{\TR{\(\el,[a,b,c]\)}\nbput{\(\rho\)}}{
+            \TR{\([a,b,c]\)}\nbput{\(\pi\)}
+          }
+        }
+      }
+      \psset{arrows=->}
+      \pstree{\TR{\([b],[a]\)}\naput[npos=0.6]{\(\!\!\!\psi\)}}{
+        \psset{arrows=->>}
+        \pstree[arrows=->]{\TR{\([c],[b,a]\)}\nbput[npos=0.7]{\(\tau\lambda_1\!\!\!\)}}{
+          \pstree{\TR{\(\el,[c,b,a]\)}\nbput{\(\rho\)}}{
+            \TR{\([c,b,a]\)}\nbput{\(\pi\)}
+          }
+        }
+        \psset{arrows=->}
+        \pstree{\TR{\([b],[c,a]\)}\nbput[npos=0.5]{\(\upsilon\!\)}}{
+          \pstree{\TR{\(\el,[b,c,a]\)}\nbput{\(\rho\)}}{
+            \TR{\([b,c,a]\)}\nbput{\(\pi\)}
+          }
+        }
+        \psset{arrows=->>}
+        \pstree[arrows=->]{\TR{\([b],[a,c]\)}\naput[npos=0.7]{\(\!\!\!\sigma\lambda_0\)}}{
+          \pstree{\TR{\(\el,[b,a,c]\)}\nbput{\(\rho\)}}{
+            \TR{\([b,a,c]\)}\nbput{\(\pi\)}
+          }
+        }
+      }
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}
+
+          \pstree{\TR{\(\)}\nbput{\(\rho\)}}{
+            \TR{\(\)}\nbput{\(\pi\)}
+          }
+

@@ -1,0 +1,236 @@
+\section{Cutting}
+\label{sec:cutting}
+\index{stack!cutting}
+
+\index{cut@\fun{cut/2}|(} Let us consider the problem of cutting a
+stack~\(s\) at the~\(k\)th place. Obviously, the result is a pair of
+stacks. More precisely, let \(\pair{t}{u}\) be the value of
+\(\fun{cut}(s,k)\), such that \(\fun{cat}(t,u) \twoheadrightarrow
+s\)\index{cat@\fun{cat/2}} and \(t\)~contains \(k\)~items, that is to
+say, \(\fun{len}(t) \twoheadrightarrow k\). In particular, if~\(k =
+0\), then \(t = \el\); invalid inputs lead to unspecified
+behaviours. For instance, \(\fun{cut}([4,2],0) \twoheadrightarrow
+\pair{\el}{[4,2]}\) and \(\fun{cut}([5,3,6,0,2],3) \twoheadrightarrow
+\pair{[5,3,6]}{[0,2]}\), but, for the sake of simplicity, nothing is
+said about \(\fun{cut}([0],7)\) and \(\fun{cut}([0],-1)\). We derive
+two cases: \(k = 0\) or else the stack is not empty. The former is
+easy to guess:
+\begin{equation*}
+\fun{cut}(s,0)           \rightarrow \pair{\el}{s};\qquad
+\fun{cut}(\cons{x}{s},k) \rightarrow \fbcode{CCCCCC}\,.
+\end{equation*}
+A big\hyp{}step design\index{design!big-step $\sim$} uses some
+sub\-structural recursive calls to set the structure of the value in
+the right\hyp{}hand side. Because \fun{cut/2} takes two arguments, we
+expect a lexicographic order\index{induction!lexicographic order}
+(definition~\eqref{def:lexico}, page~\pageref{def:lexico}):
+\begin{equation*}
+\fun{cut}(s_0,k_0) \succ \fun{cut}(s_1,k_1)
+:\Leftrightarrow 
+\text{\(s_0 \succ s_1\) or (\(s_0 = s_1\) and \(k_0 > k_1\))}.
+\end{equation*}
+Using the proper subterm order\index{induction!proper subterm order}
+(section~\ref{par:well-founded}, page~\pageref{par:well-founded}) on
+stacks for (\(\succ\)),
+\begin{equation*}
+\fun{cut}(\cons{x}{s},k) \succ \fun{cut}(s,j);\quad
+\fun{cut}(\cons{x}{s},k) \succ \fun{cut}(\cons{x}{s},j),\;
+\text{if \(k > j\)}.
+\end{equation*}
+In the latter case, we can set \(j=k-1\), but the value of
+\(\fun{cut}(s,j)\) needs to be projected into \(\pair{t}{u}\) so
+\(x\)~is injected in and yields \(\pair{\cons{x}{t}}{u}\). This can be
+achieved with an auxiliary
+function~\fun{push/2}\index{push@\fun{push/2}}:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\fun{cut}(s,0) & \rightarrow & \pair{\el}{s};
+& \fun{push}(x,\pair{t}{u}) & \rightarrow & \pair{\cons{x}{t}}{u}.\\
+\fun{cut}(\cons{x}{s},k) & \rightarrow 
+& \fun{push}(x,\fun{cut}(s,k-1)).
+\end{array}
+\end{equation*}
+
+
+\paragraph{Inference systems}
+\label{par:infsys}
+\index{inference system}
+
+When the value of a recursive call needs to be destructured, it is
+convenient to use an extension of our language to avoid creating
+auxiliary functions like \fun{push/2}:
+\begin{mathpar}
+\inferrule*{}{\fun{cut}(s,0) \rightarrow \pair{\el}{s}}
+\;\TirName{Nil}
+\qquad
+\inferrule
+  {\fun{cut}(s,k-1)         \twoheadrightarrow \pair{t}{u}}
+  {\fun{cut}(\cons{x}{s},k) \twoheadrightarrow \pair{\cons{x}{t}}{u}}
+\,\TirName{Pref}
+\end{mathpar}
+The new construct is called an \emph{inference rule}\index{inference
+  system!rule} because it means: `For the value of
+\(\fun{cut}(\cons{x}{s},k)\) to be \(\pair{\cons{x}{t}}{u}\), we infer
+that the value of \(\fun{cut}(s,k-1)\) must be \(\pair{t}{u}\).' This
+interpretation corresponds to an upwards reading of the rule
+\TirName{Pref} (\emph{prefix}). Just as we compose horizontally
+rewrite rules, we compose inference rules vertically, stacking them,
+as in
+\begin{mathpar}
+\inferrule
+  {\inferrule{
+     \inferrule{\fun{cut}([0,2],0) \rightarrow \pair{\el}{[0,2]}}
+               {\fun{cut}([6,0,2],1) \twoheadrightarrow \pair{[6]}{[0,2]}}}
+      {\fun{cut}([3,6,0,2],2) \twoheadrightarrow \pair{[3,6]}{[0,2]}}}
+  {\fun{cut}([5,3,6,0,2],3) \twoheadrightarrow \pair{[5,3,6]}{[0,2]}}
+\end{mathpar}
+When determining the cost of \(\fun{cut}(s,k)\), we take into account
+the hidden function \fun{push/2}, so \(\Call{\fun{cut}([5,3,6,0,2],3)}
+= 7\). In general, \index{cut@$\C{\fun{cut}}{n}$} \(\C{\fun{cut}}{k} =
+2k + 1\).
+
+Beyond simplifying programs, what makes this formalism interesting is
+that it enables two kinds of interpretation: logical and
+computational. The computational reading, called
+\emph{inductive}\index{inference system!inductive reading} in some
+contexts, has just been illustrated. The logical understanding
+considers inference rules as logical implications of the form \(P_1
+\wedge P_2 \wedge \ldots \wedge P_n \Rightarrow C\), written
+\begin{equation*}
+\inferrule
+  {P_1 \\ P_2 \\ \ldots \\ P_n}
+  {C}
+\end{equation*}
+The propositions~\(P_i\) are called \emph{premises}\index{inference
+  system!rule!premise} and \(C\)~is the \emph{conclusion}. In the case
+of \TirName{Pref}, there is only one premise. When premises are
+lacking, as in \TirName{Nil}, then \(C\)~is called an \emph{axiom} and
+no horizontal line is drawn. The composition of inference rules is a
+\emph{derivation}. In the case of \fun{cut/2}, all derivations are
+isomorphic to a stack, whose top is the conclusion.
+
+The logical reading of rule \TirName{Pref} is: `If \(\fun{cut}(s,k-1)
+\twoheadrightarrow \pair{t}{u}\), then we have
+\(\fun{cut}(\cons{x}{s},k) \twoheadrightarrow
+\pair{\cons{x}{t}}{u}\).'  This top\hyp{}down reading qualifies as
+\emph{deductive}\index{inference system!deductive reading}. The
+previous derivation then can be regarded as the proof of the theorem
+\(\fun{cut}([5,3,6,0,2],3) \twoheadrightarrow \pair{[5,3,6]}{[0,2]}\).
+
+
+\paragraph{Induction on proofs}
+\index{induction!$\sim$ on proofs}
+
+A single formalism with such a dual interpretation is powerful because
+a definition by means of inference rules enables the proof of theorems
+about a function by \emph{induction on the structure of the proof}. As
+we have done previously, structural induction can be applied to stacks
+considered as a data type (objects). Since, in the case of
+\fun{cut/2}, derivations are stacks in themselves, so can induction be
+applied to their structure (as meta\hyp{}objects). 
+
+Let us illustrate this elegant inductive technique with a proof of the
+\emph{soundness}\index{soundness} of
+\fun{cut/2}\index{cut@\fun{cut/2}}.
+
+\mypar{Soundness}
+\label{par:cut_sound}
+
+The concept of soundness or \emph{correctness} \citep{McCarthy_1962,
+  Floyd_1967, Hoare_1971,
+  Dijkstra_1976}\index{correctness|see{soundness}} is a binary
+relationship, so we always ought to speak of the soundness of a
+program with respect to its
+\emph{specification}\index{specification}. A specification is a
+logical description of the expected properties of the output of a
+program, given some assumptions on its input. In the case of
+\(\fun{cut}(s,k)\), we already mentioned what to expect: the value
+must be a pair \(\pair{t}{u}\) such that the catenation of
+\(t\)~and~\(u\) is~\(s\) and the length of~\(t\) is~\(k\).
+
+Formally, let \(\pred{CorCut}{s,k}\)\index{CorCut@\predName{CorCut}|(}
+be the proposition
+\begin{quote}
+  \textsl{If \(\fun{cut}(s,k) \twoheadrightarrow \pair{t}{u}\), then
+    \(\fun{cat}(t,u) \twoheadrightarrow s\) and \(\fun{len}(t)
+    \twoheadrightarrow k\),}
+\end{quote}
+where the function \fun{len/1}\index{len@\fun{len/1}|(} is defined in
+equation~\eqref{eq:len} \vpageref{eq:len}.
+
+Let us suppose the antecedent of the implication to be true, otherwise
+the theorem is vacuously true, so there exists a derivation~\(\Delta\)
+whose conclusion is \(\fun{cut}(s,k) \twoheadrightarrow
+\pair{t}{u}\). This derivation is a (meta) stack whose top is the
+conclusion in question, which makes it possible to reckon by induction
+on its structure, that is, we assume that \predName{CorCut} holds for
+the immediate sub\-derivation of~\(\Delta\) (the induction hypothesis)
+and then proceed to prove that \predName{CorCut} holds for the entire
+derivation. This is the immediate subterm induction we use when
+reasoning on a stack as an object: we assume the theorem to hold
+for~\(s\) and then move to prove it for~\(\cons{x}{s}\).
+
+A case by case analysis on the kind of rule that can end~\(\Delta\)
+guides the proof. To avoid clashes between variables in the theorem
+and in the inference system, we will overline the latter ones, like
+\(\overline{s}\), \(\overline{t}\) etc. which may differ from
+\(s\)~and~\(t\) in \predName{CorCut}.
+\begin{itemize}
+
+\item \emph{Case where \(\Delta\) ends with \TirName{Nil}.} There are
+  no premises, as~\TirName{Nil} is an axiom. In this case, we have to
+  establish \predName{CorCut} without induction. The matching of
+  \(\fun{cut}(s,k) \twoheadrightarrow \pair{t}{u}\) against
+  \(\fun{cut}(\overline{s},0) \rightarrow \pair{\el}{\overline{s}}\)
+  yields \(\overline{s} = s\), \(0=k\), \(\el=t\) and
+  \(\overline{s}=u\). Therefore, \index{cat@\fun{cat/2}}
+  \(\fun{cat}(t,u) = \fun{cat}(\el,s) \xrightarrow{\smash{\alpha}}
+  s\), which proves half of the conjunction. Moreover
+  \(\fun{len}(t) = \fun{len}(\el) \xrightarrow{\smash{a}} 0\). This is
+  consistent with \(k=0\), so \(\pred{CorCut}{s,0}\) is
+  true.\index{CorCut@\predName{CorCut}|)}
+
+  \item \emph{Case where \(\Delta\) ends with \TirName{Pref}.} The
+    shape of~\(\Delta\) is thus as follows:
+    \begin{mathpar}
+      \inferrule*[right=Pref]
+        {\inferrule*
+           {\inferrule*[vdots=1.5em]{}{ }}
+           {\fun{cut}(\overline{s},\overline{k}-1)
+            \twoheadrightarrow \pair{\overline{t}}{\overline{u}}}
+        }
+        {\fun{cut}(\cons{\overline{x}}{\overline{s}},\overline{k})
+         \twoheadrightarrow
+         \pair{\cons{\overline{x}}{\overline{t}}}{\overline{u}}}
+    \end{mathpar}
+    The matching of \(\fun{cut}(s,k) \twoheadrightarrow \pair{t}{u}\)
+    against the conclusion yields \(\cons{\overline{x}}{\overline{s}}
+    = s\), \(\overline{k} = k\), \(\cons{\overline{x}}{\overline{t}} =
+    t\) and \(\overline{u} = u\). The induction hypothesis in this
+    case is that the theorem holds for the sub\-derivation,
+    therefore\index{cat@\fun{cat/2}|(} \(\fun{cat}(\overline{t},
+    \overline{u}) \twoheadrightarrow \overline{s}\) and
+    \(\fun{len}(\overline{t}) \twoheadrightarrow \overline{k} -
+    1\).\index{len@\fun{len/1}|)} The induction principle requires
+    that we establish now
+    \(\fun{cat}(\cons{\overline{x}}{\overline{t}}, \overline{u})
+    \twoheadrightarrow \cons{\overline{x}}{\overline{s}}\) and
+    \(\fun{len}(\cons{\overline{x}}{\overline{t}}) \twoheadrightarrow
+    \overline{k}\). From the definition of \fun{cat/2} and part of the
+    hypothesis, we easily deduce
+    \(\fun{cat}(\cons{\overline{x}}{\overline{t}}, \overline{u})
+    \xrightarrow{\smash{\beta}}
+    \cons{\overline{x}}{\fun{cat}(\overline{t}, \overline{u})}
+    \twoheadrightarrow \cons{\overline{x}}{\overline{s}}\). Now the
+    other part: \(\fun{len}(\cons{\overline{x}}{\overline{t}})
+    \xrightarrow{\smash{b}} 1 + \fun{len}(\overline{t})
+    \twoheadrightarrow 1 + (\overline{k} - 1) =
+    \overline{k}\).\index{cat@\fun{cat/2}|)}\hfill\(\Box\)
+
+\end{itemize}
+
+\paragraph{Exercise}
+
+Write an equivalent definition of \fun{cut/2} in tail
+form.\index{functional language!tail form}
+\index{cut@\fun{cut/2}|)}

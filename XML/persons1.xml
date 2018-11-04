@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE persons SYSTEM "persons.dtd">
+
+<persons>
+  <names>
+    <name>Alan Turing</name>
+    <name>Kurt Gödel</name>
+    <name>Donald Knuth</name>
+    <name>Robin Milner</name>
+  </names>
+  <notes>
+    <note>Defined a simple theoretical model of computers</note>
+    <note>Proved the incompleteness of arithmetics</note>
+    <note>Prolific author and creator of TeX</note>
+    <note>Proposed a model of concurrency</note>
+  </notes>
+</persons>

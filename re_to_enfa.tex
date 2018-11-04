@@ -1,0 +1,91 @@
+\section{From regular expressions to \eNFA{s}}
+
+We left behind the regular expressions when we informally introduced
+the transition diagrams for token recognition. Now let us show that
+regular expressions when used in lexers to specify tokens can be
+converted to \eNFA{s}, and therefore to DFAs. This proves that regular
+languages are recognisable languages. Actually, it is possible to
+prove that any \eNFA can be converted to a regular expression denoting
+the same language, but we will not do so. Therefore, keep in mind that
+the regular languages are the same as the recognisable languages. In
+other words, the choice of using a regular expression or a finite
+automaton is only a matter of convenience.
+
+The construction we present here to build an \eNFA from a regular
+expression is called \emph{Thompson's construction}. Let us first
+associate an \eNFA to the basic regular expressions.
+\begin{itemize}
+
+  \item For the expression \(\epsilon\), construct the following NFA,
+    where~\(i\) and~\(f\) are new states:
+  \begin{center}
+    \includegraphics[bb=48 710 135 730]{thompson_epsilon}
+  \end{center}
+
+  \item For \(a \in \Sigma\), construct the following NFA, where~\(i\)
+    and~\(f\) are new states:
+  \begin{center}
+    \includegraphics[bb=48 710 135 730]{thompson_symbol}
+  \end{center}
+
+\end{itemize}
+Now let us associate NFAs to complex regular expressions. In the
+following, let us assume that~\(N(s)\) and~\(N(t)\) are the NFAs for
+regular expressions \(s\)~and~\(t\).
+\begin{itemize}
+
+  \item For the regular expression \(st\), construct the following NFA
+    \(N(st)\), where no new state is created:
+\begin{center}
+\includegraphics[bb=65 660 295 714]{thompson_conc}
+\end{center}
+  The final state of \(N(s)\) becomes a normal state, as well as the
+  initial state of \(N(t)\). This way only remains a unique initial
+  state~\(i\) and a unique final state~\(f\).
+
+  \item For the regular expression \(s\) \disj \(t\), construct the
+  following NFA \(N(s \, \text{\disj} \, t)\)
+\begin{center} 
+\includegraphics[bb=65 590 272 715,scale=0.9]{thompson_disj}
+\end{center}
+where \(i\) and \(f\) are new states. Initial and final
+states of \(N(s)\) and \(N(t)\) become normal.
+
+  \item For the regular expression \(s\)\kleene, construct the following
+    NFA \(N(s\text{\kleene})\), where~\(i\) and~\(f\) are new
+    states:
+\begin{center}
+\includegraphics[bb=50 620 255 718]{thompson_kleene}
+\end{center}
+Note that we added two \(\epsilon\) transitions and that the initial
+and final states of \(N(s)\) become normal states.
+
+\end{itemize}
+How do we apply these simple rules when we have a complex regular
+expression, having many level of nested parentheses and other
+constructs? Actually, the abstract syntax tree of the regular
+expression directs the application of the rules. If the syntax tree
+has the shape shown in \fig~\vref{fig:re_ast_conc},
+\begin{figure}[b]
+\centering
+\subfloat[\(s \cdot t\)\label{fig:re_ast_conc}]{
+  \includegraphics{re_ast_conc}
+}
+\qquad
+\subfloat[\(s \,\text{\disj}\, t\)\label{fig:re_ast_disj}]{
+\includegraphics{re_ast_disj}
+}
+\qquad
+\subfloat[\(s\text{\kleene}\)\label{fig:re_ast_kleene}]{
+\includegraphics{re_ast_kleene}
+}
+\caption{Three tree patterns for three regular expressions}
+\end{figure}
+then we construct first \(N(s)\), \(N(t)\) and finally \(N(s \cdot
+t)\). If the syntax tree has the shape found in
+\fig~\vref{fig:re_ast_disj}, then we construct first \(N(s)\),
+\(N(t)\) and finally \(N (s \, \text{\disj} \, t)\). If the syntax
+tree has the shape shown in \fig~\vref{fig:re_ast_kleene}, then we
+construct first \(N(s)\) and finally \(N(s\text{\kleene})\). These
+pattern matchings are applied first at the root of the abstract syntax
+tree of the regular expression.

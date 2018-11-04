@@ -1,0 +1,57 @@
+In order to interpret the meaning of the term \((n+1)/2\) in
+equation~\eqref{eq:delta_En_In}, we need to backtrack. Since the
+difference between \(\Expected{E_n}\) and~\(\Expected{I_n}\) lies with
+the leaves, we might be interested in the average number of
+leaves. First, let us recall formula~\eqref{eq:Nn_l_d} defining
+\(\mathcal{N}_n(l,d)\), that is, the number nodes at level~\(l\) with
+degree~\(d\) amongst all Catalan trees with \(n\)~edges:
+\begin{equation*}
+\mathcal{N}_n(l,d) = \frac{2l+d}{2n-d}\binom{2n-d}{n+l}.
+\end{equation*}
+Clearly, the number of leaves is thus
+\begin{equation}
+\mathcal{N}_n(l,0) = \frac{l}{n} \binom{2n}{n+l}.
+\label{eq:Catalan_leaves}
+\end{equation}
+Next, let us recall equation~\eqref{eq:N_n_l_d}:
+\begin{equation*}
+\sum_{d=0}^{n}\mathcal{N}_n(l,d) = \frac{2l+1}{2n+1}\binom{2n+1}{n-l}.
+\end{equation*}
+Then, the number of inner nodes is
+\begin{equation*}
+  \sum_{d=1}^{n}\mathcal{N}_n(l,d) =
+    \sum_{d=0}^{n}\mathcal{N}_n(l,d) - \mathcal{N}_n(l,0).
+\end{equation*}
+Reusing equations~\eqref{eq:N_n_l_d} and~\eqref{eq:Catalan_leaves},
+and temporary replacing the binomials by their definitions in terms of
+the factorial function, we recognise
+\begin{equation*}
+\sum_{d=1}^{n}\mathcal{N}_n(l,d) = \frac{l+1}{n} \binom{2n}{n+l+1} 
+                               = \mathcal{N}_n(l+1,0).
+\end{equation*}
+In other words, when considering all Catalan trees with \(n\)~edges,
+the number of leaves at level~\(l+1\) equals the number of inner nodes
+at level~\(l\). Now, let us come back to the path lengths with this
+additional information:
+\begin{align*}
+\Expected{I_n} \cdot C_n
+  &:= \sum_{l=0}^{n} l \sum_{d=1}^{n}\mathcal{N}_n(l,d)
+    = \sum_{l=0}^{n} l \cdot \mathcal{N}_n(l+1,0)\\
+   &=   \sum_{l=0}^{n} (l+1) \mathcal{N}_n(l+1,0)
+      - \sum_{l=0}^{n} \mathcal{N}_n(l+1,0)\\
+   &=   \sum_{l=1}^{n+1} l \cdot \mathcal{N}_n(l,0)
+      - \sum_{l=1}^{n+1} \mathcal{N}_n(l,0)\\
+   &=   \sum_{l=0}^{n} l \cdot \mathcal{N}_n(l,0)
+      - \sum_{l=0}^{n} \mathcal{N}_n(l,0)
+    = \Expected{E_n} \cdot C_n - \sum_{l=0}^{n} \mathcal{N}_n(l,0).
+\end{align*}
+Equivalently,
+\begin{equation*}
+\Expected{E_n} 
+  = \Expected{I_n} + \frac{1}{C_n} \sum_{l=0}^{n} \mathcal{N}_n(l,0).
+\end{equation*}
+The sum \(\sum_{l=0}^{n} \mathcal{N}_n(l,0)\) counts the number of
+leaves in all Catalan trees with \(n\)~edges. By identifying this last
+equation with~\eqref{eq:delta_En_In}, we draw that \((n+1)/2\) is the
+average number of leaves in a Catalan tree with \(n\)~edges, that is
+to say, half the nodes are leaves, in average. 

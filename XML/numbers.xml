@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE numbers SYSTEM "numbers.dtd">
+<numbers>
+  <num/>
+  <num>18</num>
+  <num>-1</num>
+  <num>3</num>
+  <num>5</num>
+  <num/>
+  <num>23</num>
+  <foo>hello</foo>
+  <num>-3</num>
+  <num>2</num>
+  <num/>
+  <num>7</num>
+  <num>4</num>
+  <num></num>
+</numbers>

@@ -1,0 +1,1585 @@
+\chapter{Insertion Sort}
+\label{chap:insertion}
+\index{tri!$\sim$ par insertions|(}
+
+If we have a stack of totally ordered, distinct keys, it is easy to
+insert one more key so the stack remains ordered by comparing it with
+the first on top, then, if necessary, with the second, the third
+etc. For example, inserting~\(1\) into \([3,5]\) requires
+comparing~\(1\) with~\(3\) and results in \([1,3,5]\), without
+relating~\(1\) to~\(5\). The algorithm called \emph{insertion sort}
+\citep{Knuth_1998}\index{sorting|see{insertion sort}}\index{insertion
+  sort} consists in inserting thusly keys one by one in a stack
+originally empty. The playful analogy is that of sorting a hand in a
+card game: each card, from left to right, is moved leftwards until it
+reaches its place.
+
+\section{Straight insertion}
+\label{sec:straight_ins}
+\index{insertion sort!straight $\sim$|(}
+
+Let~\(\fun{ins}(s,x)\)\index{ins@\fun{ins/2}} (not to be confused with
+the function of same name and arity in section~\ref{sec:opt_sort}) be
+the increasingly ordered stack resulting from the straight insertion
+of~\(x\) into the stack~\(s\). Function \fun{ins/2} can be defined
+assuming a minimum and a maximum function,
+\fun{min/2}\index{min@\fun{min/2}} and
+\fun{max/2}\index{max@\fun{max/2}}:
+\begin{equation*}
+\fun{ins}(x,\el)         \rightarrow [x];\qquad
+\fun{ins}(x,\cons{y}{s}) \rightarrow
+   \cons{\fun{min}(x,y)}{\fun{ins}(\fun{max}(x,y),s)}.
+\end{equation*}
+Temporarily, let us restrict ourselves to sorting natural numbers in
+increasing order. We need to provide definitions to calculate the
+minimum and maximum:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+  \fun{max}(0,y) & \rightarrow & y; & \fun{min}(0,y) & \rightarrow & 0;\\
+  \fun{max}(x,0) & \rightarrow & x; & \fun{min}(x,0) & \rightarrow & 0;\\
+  \fun{max}(x,y) & \rightarrow & 1 + \fun{max}(x-1,y-1).
+& \fun{min}(x,y) & \rightarrow & 1 + \fun{min}(x-1,y-1).
+\end{array}
+\end{equation*}
+While this approach fits in our functional language, it is both
+inefficient and bulky, hence it is worth extending our language so
+rewrite rules are selected by pattern matching only if some optional
+associated comparison holds. We can then
+define~\fun{isrt/1}\index{isrt@\fun{isrt/1}|(} (\emph{insertion sort})
+and redefine~\fun{ins/2}\index{ins@\fun{ins/2}|(} as
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+  \fun{ins}(\cons{y}{s},x)
+& \xrightarrow{\smash{\kappa}}
+& \cons{y}{\fun{ins}(s,x)}, \,\text{if \(x \succ y\)};
+& \fun{isrt}(\el) 
+& \xrightarrow{\smash{\mu}}
+& \el;\\
+  \fun{ins}(s,x)
+& \xrightarrow{\smash{\lambda}}
+& \cons{x}{s}.
+& \fun{isrt}(\cons{x}{s})
+& \xrightarrow{\smash{\nu}} 
+& \fun{ins}(\fun{isrt}(s),x).
+\end{array}
+\end{equation*}
+Let us consider a short example in \fig~\vref{fig:isrt_312}.
+\begin{figure}
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{isrt}([3,1,2])
+& \xrightarrow{\smash{\nu}} & \fun{ins}(\fun{isrt}([1,2]),3)\\
+& \xrightarrow{\smash{\nu}}
+& \fun{ins}(\fun{ins}(\fun{isrt}([2]),1),3)\\
+& \xrightarrow{\smash{\nu}}
+& \fun{ins}(\fun{ins}(\fun{ins}(\fun{isrt}(\el),2),1),3)\\
+& \xrightarrow{\smash{\mu}}
+& \fun{ins}(\fun{ins}(\fun{ins}(\el,2),1),3)\\
+& \xrightarrow{\smash{\lambda}}
+& \fun{ins}(\fun{ins}([2],1),3)\\
+& \xrightarrow{\smash{\lambda}}
+& \fun{ins}([1,2],3)\\
+& \xrightarrow{\smash{\kappa}}
+& [1|\fun{ins}([2],3)]\\
+& \xrightarrow{\smash{\kappa}}
+& [1,2|\fun{ins}(\el,3)]\\
+& \xrightarrow{\smash{\lambda}}
+& [1,2,3].
+\end{array}}
+\end{equation*}
+\caption{\(\fun{isrt}([3,1,2]) \twoheadrightarrow [1,2,3]\)
+\label{fig:isrt_312}\index{insertion sort!straight $\sim$!example}}
+\end{figure}
+\index{isrt@\fun{isrt/1}|)}
+\index{ins@\fun{ins/2}|)}
+
+Let \(\C{\fun{isrt}}{n}\)\index{isrt@$\C{\fun{isrt}}{n}$|(} be the cost
+of sorting by straight insertion \(n\)~keys, and \(\C{\fun{ins}}{i}\)
+the cost of inserting one key in a stack of length~\(i\). We directly
+derive from the functional program the following recurrences:
+\begin{equation*}
+\C{\fun{isrt}}{0}   \eqn{\smash{\mu}} 1;\qquad
+\C{\fun{isrt}}{i+1} \eqn{\smash{\nu}} 1 + \C{\fun{ins}}{i} +
+  \C{\fun{isrt}}{i}.
+\end{equation*}
+The latter equation assumes that the length of \(\fun{isrt}(s)\) is
+the same as~\(s\) and the length of \(\fun{ins}(s,x)\) is the same as
+\(\cons{x}{s}\). We deduce
+\begin{equation}
+\C{\fun{isrt}}{n} = 1 + n + \sum_{i=0}^{n-1}\C{\fun{ins}}{i}.
+\label{eq:cost_isrt}
+\end{equation}
+A look up at the definition of~\fun{ins/2} reveals that
+\(\C{\fun{ins}}{i}\) cannot be expressed only in terms of~\(i\)
+because it depends on the relative order of all the keys. Instead, we
+resort to the minimum, maximum and average
+costs.\index{isrt@$\C{\fun{isrt}}{n}$|)}
+
+\addcontentsline{toc}{subsection}{Cost}
+\paragraph{Minimum cost}
+\index{insertion sort!straight $\sim$!minimum cost} 
+
+The best case does not exert rule~\(\kappa\), which is recursive,
+whilst \(\lambda\)~rewrites to a value. In other words, in
+rule~\(\nu\), each key~\(x\) to be inserted in a non\hyp{}empty,
+sorted stack \(\fun{isrt}(s)\)\index{isrt@\fun{isrt/1}} would be lower
+than or equal to the top of the stack. This rule also inserts the keys
+in reverse order:
+\begin{equation}
+\fun{isrt}([x_1,\dots,x_n]) \twoheadrightarrow 
+\fun{ins}(\fun{ins}(\dots(\fun{ins}(\el,x_n)\dots),x_2),x_1).
+\label{inv_isrt}
+\end{equation}
+As a consequence, \emph{the minimum cost results from the input stack
+  being already increasingly sorted,} that is, the keys in the result
+are increasing, but may be repeated. Then \(\B{\fun{ins}}{n} =
+\len{\lambda} = 1\)\index{ins@$\B{\fun{ins}}{n}$} and
+  equation~\eqref{eq:cost_isrt} implies that straight insertion sort
+  has a linear cost in the best case:
+\begin{equation*}
+\B{\fun{isrt}}{n} = 2n+1 \sim 2n.
+\end{equation*}
+
+\paragraph{Maximum cost}
+\index{insertion sort!straight $\sim$!maximum cost} 
+
+The worst case must exert rule~\(\kappa\) as much as possible, which
+implies that \emph{the worst case happens when the input is a stack
+  decreasingly sorted}. We have\index{ins@$\W{\fun{ins}}{n}$|(}
+\begin{equation*}
+\W{\fun{ins}}{n} = \len{\kappa^n\lambda} = n + 1.
+\end{equation*}
+Substituting maximum costs in equation~\eqref{eq:cost_isrt} then
+implies that straight insertion sort has a quadratic cost in the worst
+case:
+\begin{equation*}
+\W{\fun{isrt}}{n} = \frac{1}{2}{n^2} + \frac{3}{2}{n} + 1
+\sim \frac{1}{2}{n^2}.
+\end{equation*}
+Another way is to take the length of the longest trace:
+\begin{equation*}
+\W{\fun{isrt}}{n}
+ = \left\lvert\nu^n\mu \prod_{i=0}^{n-1}\kappa^i\lambda\right\rvert
+ = \len{\nu^n\mu} + \sum_{i=0}^{n-1}\len{\kappa^i\lambda}
+ = \frac{1}{2}{n^2} + \frac{3}{2}{n} + 1.
+\end{equation*}
+This cost should not be surprising because
+\fun{isrt/1}\index{isrt@\fun{isrt/1}} and
+\fun{rev\(_0\)/1}\index{rev0@\fun{rev\(_0\)/1}}, in
+section~\ref{sec:reversal}, yield the same kind of partial rewrite, as
+seen by comparing~\eqref{inv_isrt}, \vpageref{inv_isrt},
+and~\eqref{eq:rev0} \vpageref{eq:rev0}, and also \(\C{\fun{cat}}{n} =
+\W{\fun{ins}}{n}\),\index{cat@$\C{\fun{cat}}{n}$}\index{ins@$\W{\fun{ins}}{n}$}
+where \(n\)~is the size of their first argument. Hence
+\(\W{\fun{isrt}}{n} = \W{\fun{rev}_0}{n}\).
+\index{rev0@$\W{\fun{rev}_0}{n}$}\index{ins@$\W{\fun{ins}}{n}$|)}
+\index{isrt@$\W{\fun{isrt}}{n}$}
+
+\paragraph{Average cost}
+\label{par:ave_isrt}
+\index{insertion sort!straight $\sim$!average cost}
+
+The average cost obeys equation~\eqref{eq:cost_isrt} because all
+permutations \((x_1,\dots,x_n)\) are equally likely, hence
+\begin{equation}
+\M{\fun{isrt}}{n} = 1 + n + \sum_{i=0}^{n-1}\M{\fun{ins}}{i}.
+\label{eq:mean_isrt}
+\end{equation}
+Without loss of generality,
+\(\M{\fun{ins}}{i}\)\index{ins@$\M{\fun{ins}}{n}$|(} is the cost of
+inserting the key \(i+1\) into all permutations of \((1,\dots,i)\),
+divided by \(i+1\). (This is how the set of
+permutations\index{permutation} of a given length is inductively built
+on page~\pageref{par:permutations}.)  The partial
+evaluation~\eqref{inv_isrt}\index{functional
+  language!evaluation!partial $\sim$} on page~\pageref{inv_isrt} has
+length \(\len{\nu^n\mu}=n+1\). The trace for inserting in an empty
+stack is~\(\mu\). If the stack has length~\(i\), inserting on top has
+trace~\(\lambda\); just after the first key, \(\kappa\lambda\)
+etc. until after the last key, \(\kappa^i\lambda\). Therefore, the
+average cost for inserting one key is, for \(i \geqslant 0\),
+\begin{equation}
+\M{\fun{ins}}{i} = \frac{1}{i+1}\sum_{j=0}^{i}\len{\kappa^j\lambda}
+                 = \frac{i}{2}+1.
+\label{eq:ins}
+\end{equation}
+The average cost for inserting \(n\)~keys in an empty stack is
+therefore \(\sum_{i=0}^{n-1}\M{\fun{ins}}{i} = \frac{1}{4}n^2 +
+\frac{3}{4}n\). Finally, from equation~\eqref{eq:mean_isrt}, the
+average cost of sorting \(n\)~keys by straight insertion is
+\begin{equation*}
+\M{\fun{isrt}}{n} = \frac{1}{4}n^2 + \frac{7}{4}n + 1.
+\end{equation*}
+\index{ins@$\M{\fun{ins}}{n}$|)}
+
+\paragraph{Assessment}
+\index{permutation!inversion|(}
+\index{insertion sort!inversion|see{permutation}}
+
+Despite the average cost being asymptotically equivalent to~\(50\%\)
+of the maximum cost, it is nevertheless quadratic. On a positive note,
+straight insertion is quite efficient when the data is short or nearly
+sorted \citep{CookKim_1980}. It is a typical example of an
+\emph{adaptive sorting algorithm}
+\citep{EstivillWood_1992,MoffatPetersson_1992}\index{insertion
+  sort!adaptive}. The natural measure of sortedness for insertion sort
+is the number of inversions. Indeed, the partial
+evaluation~\eqref{inv_isrt}, \vpageref{inv_isrt} shows that the keys
+are inserted in reverse order. Thus, in rule~\(\kappa\), we know that
+the key \(x\)~was originally before~\(y\), but \(x \succ
+y\). Therefore, one application of \emph{rule~\(\kappa\) removes one
+  inversion from the input.} As a corollary, the average number of
+inversions in a random permutation of \(n\)~objects is
+\begin{equation*}
+\belowdisplayskip=-4pt
+\sum_{j=0}^{n-1}\frac{1}{j+1}\sum_{i=0}^{j}\len{\kappa^i} =
+\frac{n(n-1)}{4}.
+\end{equation*}
+\index{permutation!inversion|)}
+
+\paragraph{Exercises}
+\begin{enumerate*}
+
+  \item A sorting algorithm that preserves the relative order of equal
+    keys is said \emph{stable}. Is
+    \fun{isrt/1}\index{isrt@\fun{isrt/1}} stable?
+
+  \item Prove \(\fun{len}(\cons{x}{s}) \equiv
+    \fun{len}(\fun{ins}(x,s))\).\index{len@\fun{len/1}}
+
+  \item Prove \(\fun{len}(s) \equiv \fun{len}(\fun{isrt}(s))\).
+
+  \item Traditionally, textbooks about the analysis of algorithms
+    assess the cost of sorting procedures by counting the comparisons,
+    not the function calls. Doing so allows one to compare with the
+    same measure different sorting algorithms as long as they perform
+    comparisons, even if they are implemented in different programming
+    languages. (There are sorting techniques that do not rely on
+    comparisons.) Let
+    \(\OB{\fun{isrt}}{n}\)\index{isrt@$\OB{\fun{isrt}}{n}$},
+    \(\OW{\fun{isrt}}{n}\)\index{isrt@$\OW{\fun{isrt}}{n}$} and
+    \(\OM{\fun{isrt}}{n}\)\index{isrt@$\OM{\fun{isrt}}{n}$} be the
+    minimum, maximum and average numbers of comparisons needed to sort
+    by straight insertion a stack of length~\(n\). Establish that
+    \begin{equation*}
+      \OB{\fun{isrt}}{n} = n - 1; \quad
+      \OW{\fun{isrt}}{n} = \frac{1}{2}n(n - 1); \quad
+      \OM{\fun{isrt}}{n} = \frac{1}{4}n^2 + \frac{3}{4}n - H_n,
+    \end{equation*}
+    where \(H_n := \sum_{k=1}^n{1/k}\) is the \(n\)th \emph{harmonic
+      number}\index{harmonic@$H_n$|see{harmonic
+        number}}\index{harmonic number} and, by convention, \(H_0 :=
+    0\). \emph{Hint:} the use of rule~\(\lambda\) implies a comparison
+    if, and only if, \(s\)~is not empty.
+
+\end{enumerate*}
+
+\addcontentsline{toc}{subsection}{Soundness}
+\paragraph{Ordered stacks}
+
+As we did for the proof of the soundness\index{insertion
+  sort!soundness|(} of \fun{cut/2}\index{cut@\fun{cut/2}}
+\vpageref{par:cut_sound}, we need to express the characteristic
+properties we expect on the output of \fun{isrt/1}, and relate them to
+some assumptions on the input, first informally, then formally. We
+would say that `The stack \(\fun{isrt}(s)\)\index{isrt@\fun{isrt/1}}
+is totally, increasingly ordered and contains all the keys in~\(s\),
+but no more.'  This captures all what is expected from any sorting
+program.
+
+Let us name \(\pred{Ord}{s}\)\index{Ord@\predName{Ord}|(} the
+proposition `The stack~\(s\) is sorted increasingly.' To define
+formally this concept, let us use \emph{inductive logic
+  definitions}\index{induction!definition by $\sim$}. We employed this
+technique to formally define stacks, on page~\pageref{def:stack}, in a
+way that generates a simple well\hyp{}founded order used by structural
+induction, to wit, \(\cons{x}{s} \succ x\) and \(\cons{x}{s} \succ
+s\). Here, we similarly propose that, for \(\pred{Ord}{s}\) to hold,
+\(\pred{Ord}{t}\) must hold with~\(s \succ t\). We defined \fun{cut/2}
+in section~\ref{sec:cutting}, \vpageref{sec:cutting}, using the same
+technique and relying on inference rules. All three cases, namely,
+data structure, proposition and function, are instances of inductive
+definitions. Let us constructively define \(\predName{Ord}\) by the
+axioms \(\TirName{Ord}_0\) and \(\TirName{Ord}_1\), and the inference
+rule \(\TirName{Ord}_2\):\label{def:Ord}
+\begin{mathpar}
+\inferrule*{}{\pred{Ord}{\el}}
+\;\TirName{Ord}_0
+\qquad
+\inferrule*{}{\pred{Ord}{[x]}}
+\;\TirName{Ord}_1
+\qquad
+\inferrule
+  {x \prec y \and \pred{Ord}{\cons{y}{s}}}
+  {\pred{Ord}{\cons{x,y}{s}}}
+\,\TirName{Ord}_2
+\end{mathpar}
+Note that this system is parameterised by the well\hyp{}founded order
+(\(\prec\)) on the keys such that \(x \prec y :\Leftrightarrow y \succ
+x\). Rule \(\TirName{Ord}_2\) could equivalently be \((x \prec y
+\mathrel{\wedge} \pred{Ord}{\cons{y}{s}}) \Rightarrow
+\pred{Ord}{\cons{x,y}{s}}\) or \(x \prec y \Rightarrow
+(\pred{Ord}{\cons{y}{s}} \Rightarrow \pred{Ord}{\cons{x,y}{s}})\) or
+\(x \prec y \Rightarrow \pred{Ord}{\cons{y}{s}} \Rightarrow
+\pred{Ord}{\cons{x,y}{s}}\). Because the set of ordered stacks is
+exactly generated by this system, if the statement
+\(\pred{Ord}{\cons{x,y}{s}}\) holds, then, necessarily,
+\(\TirName{Ord}_2\) has been used to produce it, hence \(x \prec y\)
+and \(\pred{Ord}{\cons{y}{s}}\) are true as well. This usage of an
+inductive definition is called an \emph{inversion
+  lemma}\index{induction!inversion lemma} and can be understood as
+inferring necessary conditions for a putative formula, or as
+\emph{case analysis on inductive definitions}.\index{Ord@\predName{Ord}|)}
+
+
+\paragraph{Equivalent stacks}
+\index{stack!equivalence}
+
+The second part of our informal definition above was: `The stack
+\(\fun{isrt}(s)\)\index{isrt@\fun{isrt/1}} contains all the keys
+in~\(s\), but no more.'  In order to provide a general criterion
+matching this concept, we should abstract it as: `The stack~\(s\)
+contains all the keys in the stack~\(t\), but no more.' Permutations
+allow us to clarify the meaning with a mathematical phrasing: `Stacks
+\(s\)~and~\(t\) are permutations of each other,' which we note \(s
+\approx t\) and \(t \approx s\). Since the role of~\(s\) do not differ
+in any way from that of~\(t\), we expect the relation \((\approx)\) to
+be symmetric: \(s \approx t \Rightarrow t \approx s\). Moreover, we
+expect it to be \emph{transitive} as well: \(s \approx u\) and \(u
+\approx t\) imply \(s \approx t\). Also, we want (\(\approx\)) to be
+\emph{reflexive}, that is, \(s \approx s\). By definition, a binary
+relation which is reflexive, symmetric and transitive is an
+\emph{equivalence relation}\index{equivalence!$\sim$ relation}.
+
+The relation (\(\approx\)) can be defined in different ways. The idea
+here consists in defining a permutation as a series of
+\emph{transpositions}\index{transposition}, namely, exchanges of
+adjacent keys. This approach is likely to work here because insertion
+can be thought of as adding a key on top of a stack and then
+performing a series of transpositions until the total order is
+restored.
+\begin{mathpar}
+\inferrule*{}{\el \approx \el}
+\;\TirName{Pnil}
+\qquad
+\inferrule*{}{\cons{x,y}{s} \approx \cons{y,x}{s}}
+\;\TirName{Swap}\\
+\inferrule
+  {s \approx t}
+  {\cons{x}{s} \approx \cons{x}{t}}
+\,\TirName{Push}
+\qquad
+\inferrule
+  {s \approx u \and u \approx t}
+  {s \approx t}
+\,\TirName{Trans}
+\end{mathpar}
+We recognise \TirName{Pnil} and \TirName{Swap} as axioms, the latter
+being synonymous with transposition. Rule \TirName{Trans} is
+transitivity and offers an example with two premises, so a derivation
+using it becomes a \emph{binary tree}\index{tree!binary
+  $\sim$|see{binary tree}}\index{binary tree}, as shown in
+\fig~\vref{fig:proof_trees}.
+\begin{figure}
+\centering
+\subfloat[Extended tree\label{fig:perm_proof}]{
+  \includegraphics[bb=135 672 369 723]{proof}}
+\qquad
+\subfloat[Pruned tree\label{fig:312eq231}]{
+  \includegraphics[bb=70 670 131 723]{312eq231}}
+\caption{Proof tree of \({[}3,1,2{]} \protect\approx {[}2,3,1{]}\)
+\label{fig:proof_trees}}
+\end{figure}
+As an exception to the convention about tree layouts, proof
+trees\index{tree!proof $\sim$} have their root at the bottom of the
+figure.
+
+We must now prove the \emph{reflexivity} of~\((\approx)\),
+namely\index{Refl@\predName{Refl}|(} \(\pred{Refl}{s} \colon s \approx
+s\), by induction\index{induction!example|(} on the structure of the
+proof. The difference with the proof of the soundness of
+\fun{cut/2}\index{cut@\fun{cut/2}}, \vpageref{par:cut_sound}, is that,
+due to \TirName{Trans} having two premises, the induction hypothesis
+applies to both of them. Also, the theorem is not explicitly an
+implication. First, we start by proving \predName{Refl} on the axioms
+(the leaves of the proof trees) and proceed with the induction on the
+proper inference rules, to wit, reflexivity is conserved while moving
+towards the root of the proof tree.
+\begin{itemize}
+
+  \item Axiom \TirName{Pnil} proves \(\pred{Refl}{\el}\).
+    Axiom~\TirName{Swap} proves \(\pred{Refl}{\cons{x,x}{s}}\).
+
+  \item Let us assume now that \predName{Refl}~holds for the premise
+    in \TirName{Push}, namely, \(s = t\). Clearly, the conclusion
+    implies \(\pred{Refl}{\cons{x}{s}}\).
+
+  \item Let us assume that \predName{Refl}~holds for the \emph{two}
+    antecedents in \TirName{Push}, that is, \(s=u=t\). The conclusion
+    leads to
+    \(\pred{Refl}{s}\)\index{Refl@\predName{Refl}|)}.\hfill\(\Box\)
+
+\end{itemize}
+
+Let us prove the \emph{symmetry} of~\((\approx)\) using the same
+technique. Let\index{Sym@\predName{Sym}} \(\pred{Sym}{s,t}\colon s
+\approx t \Rightarrow t \approx s\). We deal with an implication here,
+so let us suppose that \(s \approx t\), that is, we have a proof
+tree~\(\Delta\) whose root is \(s \approx t\), and let us establish
+\(t \approx s\). In the following, we overline variables from the
+inference system.
+\begin{itemize}
+
+  \item If \(\Delta\) ends with \TirName{Pnil}, then \(\el = s = t\),
+    which trivially implies \(t \approx s\).
+
+  \item If \(\Delta\) ends with \TirName{Swap}, then
+    \(\cons{\overline{x},\overline{y}}{\overline{s}} = s\) and
+    \(\cons{\overline{y},\overline{x}}{\overline{s}} = t\), so \(t
+    \approx s\).
+
+  \item If \(\Delta\) ends with \TirName{Push}, then
+    \(\cons{\overline{x}}{\overline{s}} = s\) and
+    \(\cons{\overline{x}}{\overline{t}} = t\). The induction
+    hypothesis applies to the premise, \(\overline{s} \approx
+    \overline{t}\), hence \(\overline{t} \approx \overline{s}\)
+    holds. An application of \TirName{Push} with the latter premise
+    implies \(\cons{\overline{x}}{\overline{t}} \approx
+    \cons{\overline{x}}{\overline{s}}\), that is, \(t \approx s\).
+ 
+  \item If \(\Delta\) ends with \TirName{Trans}, then the induction
+    hypothesis applies to its prem\-ises and we deduce \(u \approx s\)
+    and \(t \approx u\), which can be premises for \TirName{Trans}
+    itself and lead to \(t \approx s\).\hfill\(\Box\)
+
+\end{itemize}
+
+\paragraph{Soundness}
+
+Let us now turn our attention to our main objective, which we may call
+\(\pred{Isrt}{s}\colon \pred{Ord}{\fun{isrt}(s)} \mathrel{\wedge}
+\fun{isrt}(s) \approx s\).\index{Isrt@\predName{Isrt}} Let us tackle
+its proof by structural induction on~\(s\).
+\begin{itemize}
+
+  \item The basis is~\(\pred{Isrt}{\el}\) and it is showed to hold
+    twofold. First, we have \(\fun{isrt}(\el)
+    \xrightarrow{\smash{\mu}} \el\) and \(\pred{Ord}{\el}\) is axiom
+    \(\TirName{Ord}_0\). The other conjunct holds as well since
+    \(\fun{isrt}(\el) \approx \el \Leftrightarrow \el \approx \el\),
+    which is axiom \TirName{Pnil}.
+
+  \item Let us assume \(\pred{Isrt}{s}\) and establish
+    \(\pred{Isrt}{\cons{x}{s}}\). In other words, let us assume
+    \(\pred{Ord}{\fun{isrt}(s)}\) and \(\fun{isrt}(s) \approx s\). We
+    have
+    \begin{equation}
+      \fun{isrt}(\cons{x}{s}) \xrightarrow{\smash{\nu}}
+      \fun{ins}(\fun{isrt}(s),x).\label{eq:B}
+    \end{equation}
+    Since we want \(\pred{Ord}{\fun{isrt}(\cons{x}{s})}\), assuming
+    \(\pred{Ord}{\fun{isrt}(s)}\), we realise that we need the lemma
+    \(\pred{Ord}{s} \Rightarrow \pred{Ord}{\fun{ins}(s,x)}\), which we
+    may name \(\pred{InsOrd}{s}\)\index{InsOrd@\predName{InsOrd}}. To
+    prove the conjunct \(\fun{isrt}(\cons{x}{s}) \approx
+    \cons{x}{s}\), assuming \(\fun{isrt}(s) \approx s\), we need the
+    lemma \(\pred{InsCmp}{s} \colon \fun{ins}(s,x) \approx
+    \cons{x}{s}\). In particular, \(\pred{InsCmp}{\fun{isrt}(s)}\) is
+    \(\fun{ins}(\fun{isrt}(s),x) \approx \cons{x}{\fun{isrt}(s)}\). We
+    have
+    \begin{itemize*}
+
+      \item Rule \TirName{Push} and the induction hypothesis
+        \(\fun{isrt}(s) \approx s\) imply \(\cons{x}{\fun{isrt}(s)}
+        \approx \cons{x}{s}\).
+
+      \item By the transitivity of~\((\approx)\), we draw
+        \(\fun{ins}(\fun{isrt}(s),x) \approx \cons{x}{s}\),
+
+      \item by rewrite~\eqref{eq:B}, \(\fun{isrt}(\cons{x}{s})
+        \approx \cons{x}{s}\) and \(\pred{Isrt}{\cons{x}{s}}\)
+        follow.
+
+    \end{itemize*}
+    By the induction principle, we conclude \(\forall s \in
+    S.\pred{Isrt}{s}\).\hfill\(\Box\)
+
+\end{itemize}
+
+\paragraph{Insertion adds a key}
+
+To complete the previous proof, we prove the
+lemma\index{InsCmp@\predName{InsCmp}} \(\pred{InsCmp}{s} \colon
+\fun{ins}(s,x) \approx \cons{x}{s}\) by structural induction on~\(s\).
+\begin{itemize*}
+
+  \item The basis \(\pred{InsCmp}{\el}\) stands because
+    \(\fun{ins}(\el,x) \xrightarrow{\smash{\lambda}} [x] \approx
+          [x]\), by composing rules \TirName{Pnil} and \TirName{Push}.
+
+  \item Let us assume \(\pred{InsCmp}{s}\) and deduce
+    \(\pred{InsCmp}{\cons{y}{s}}\), that is,
+    \begin{equation*}
+      \fun{ins}(s,x) \approx \cons{x}{s} \Rightarrow
+      \fun{ins}(\cons{y}{s},x) \approx \cons{x,y}{s}.
+    \end{equation*}
+    There are two cases to analyse.
+    \begin{itemize*}
+
+    \item If \(y \succ x\), then \(\fun{ins}(\cons{y}{s},x)
+      \xrightarrow{\smash{\lambda}} \cons{x,y}{s} \approx
+      \cons{x,y}{s}\), by rule~\TirName{Swap}.
+
+    \item Otherwise, \(x \succ y\) and \(\fun{ins}(\cons{y}{s},x)
+      \xrightarrow{\smash{\kappa}} \cons{y}{\fun{ins}(s,x)}\).
+      \begin{itemize*}
+
+        \item We deduce \(\cons{y}{\fun{ins}(s,x)} \approx
+          \cons{y,x}{s}\) by using the induction hypothesis as the
+          premise of rule \TirName{Push}.
+
+        \item Furthermore, \TirName{Swap}~yields \(\cons{y,x}{s}
+          \approx \cons{x,y}{s}\).
+
+        \item Transitivity of~\((\approx)\) applied to the two last
+          statements leads to \(\fun{ins}(\cons{y}{s},x) \approx
+          \cons{x,y}{s}\).
+
+      \end{itemize*}
+      Note that we do not need to assume that \(s\)~is sorted: what
+      matters here is that \(\fun{ins/2}\) loses no key it inserts,
+      but misplacement is irrelevant.\hfill\(\Box\)
+
+    \end{itemize*}
+
+\end{itemize*}
+
+
+\paragraph{Insertion preserves order}
+
+To complete the soundness proof, we must prove the
+lemma~\(\pred{InsOrd}{s} \colon \pred{Ord}{s} \Rightarrow
+\pred{Ord}{\fun{ins}(s,x)}\) by induction on the
+structure\index{induction!example} of~\(s\), meaning that insertion
+preserves order.
+
+\begin{itemize*}
+
+  \item The basis \(\pred{InsOrd}{\el}\) is easy to check:
+    \(\TirName{Ord}_0\)~states \(\pred{Ord}{\el}\); we have the
+    rewrite \(\fun{ins}(\el,x) \xrightarrow{\smash{\lambda}} [x]\) and
+    \(\TirName{Ord}_1\)~is \(\pred{Ord}{[x]}\).
+
+  \item Let us prove \(\pred{InsOrd}{s} \Rightarrow
+    \pred{InsOrd}{\cons{x}{s}}\) by assuming
+    \begin{equation*}
+      (H_0) \;\; \pred{Ord}{s},\qquad
+      (H_1) \;\; \pred{Ord}{\fun{ins}(s,x)},\qquad
+      (H_2) \;\; \pred{Ord}{\cons{y}{s}},
+    \end{equation*}
+    and deriving \(\pred{Ord}{\fun{ins}(\cons{y}{s},x)}\).
+
+    \noindent Two cases arise from comparing \(x\)~to~\(y\):
+    \begin{itemize*}
+
+      \item If \(y \succ x\), then \(H_2\)~implies
+        \(\pred{Ord}{\cons{x,y}{s}}\), by rule
+        \(\TirName{Ord}_2\). Since \(\fun{ins}(\cons{y}{s},x)
+        \xrightarrow{\smash{\lambda}} \cons{x,y}{s}\), we have
+        \(\pred{Ord}{\fun{ins}(\cons{y}{s},x)}\).
+
+      \item Otherwise, \(x \succ y\) and we derive
+        \begin{equation}
+          \fun{ins}(\cons{y}{s},x) \xrightarrow{\smash{\kappa}}
+          \cons{y}{\fun{ins}(s,x)}.\label{eq:A}
+        \end{equation}
+        Here, things get more complicated because we need to consider
+        the structure of~\(s\).
+        \begin{itemize*}
+
+        \item If \(s=\el\), then \(\cons{y}{\fun{ins}(s,x)}
+          \xrightarrow{\smash{\lambda}} [y,x]\). Furthermore, \(x
+          \succ y\), \(\TirName{Ord}_1\) and \(\TirName{Ord}_2\) imply
+          \(\pred{Ord}{[y,x]}\), so
+          \(\pred{Ord}{\fun{ins}(\cons{y}{s},x)}\).
+
+          \item Else, there exists a key~\(z\) and a stack~\(t\) such
+            that \(s = \cons{z}{t}\).
+            \begin{itemize*}
+
+              \item If \(z \succ x\), then
+                \begin{equation}
+                  \cons{y}{\fun{ins}(s,x)} =
+                  \cons{y}{\fun{ins}(\cons{z}{t},x)}
+                  \xrightarrow{\smash{\lambda}} \cons{y,x,z}{t} =\!
+                  \cons{y,x}{s}.\label{eq:C}
+                \end{equation}
+                \(H_0\)~is \(\pred{Ord}{\cons{z}{t}}\), which, with
+                \(z \succ x\) and rule \(\TirName{Ord}_2\), implies
+                \(\pred{Ord}{\cons{x,z}{t}}\). Since~\(x \succ\! y\),
+                another application of~\(\TirName{Ord}_2\) yields
+                \(\pred{Ord}{\cons{y,x,z}{t}}\), that is,
+                \(\pred{Ord}{\cons{y,x}{s}}\). This and
+                rewrite~\eqref{eq:C} entail that
+                \(\pred{Ord}{\cons{y}{\fun{ins}(s,x)}}\). Finally, due
+                to rewrite~\eqref{eq:A},
+                \(\pred{Ord}{\fun{ins}(\cons{y}{s},x)}\) holds.
+
+              \item The last remaining case to examine is when~\(x
+                \succ z\):
+                \begin{equation}
+                  \cons{y}{\fun{ins}(s,x)} \!=\!
+                  \cons{y}{\fun{ins}(\cons{z}{t},x)}
+                  \!\xrightarrow{\smash{\kappa}}\!
+                  \cons{y,z}{\fun{ins}(t,x)}.\label{eq:D}
+                \end{equation}
+                Hypothesis~\(H_2\) is \(\pred{Ord}{\cons{y,z}{t}}\),
+                which, by means of the inversion lemma of
+                rule~\(\TirName{Ord}_2\), leads to~\(y \succ z\). By
+                the last rewrite, hypothesis~\(H_1\) is equivalent to
+                \(\pred{Ord}{\cons{z}{\fun{ins}(t,x)}}\), which,
+                with~\(y \succ z\), enables the use of
+                rule~\(\TirName{Ord}_2\) again, leading to
+                \(\pred{Ord}{\cons{y,z}{\fun{ins}(t,x)}}\).
+                Rewrite~\eqref{eq:D} then yields
+                \(\pred{Ord}{\cons{y}{\fun{ins}(s,x)}}\), which,
+                together with rewrite~\eqref{eq:A} yields
+                \(\pred{Ord}{\fun{ins}(\cons{y}{s},x)}\).\index{induction!example|)}\hfill\(\Box\)
+
+      \end{itemize*}
+    \end{itemize*}
+  \end{itemize*}
+\end{itemize*}
+
+\paragraph{Assessment}
+
+Perhaps the most striking feature of the soundness proof is its
+length. More precisely, two aspects may give rise to questions. First,
+since the program is four lines long and the specification (the
+\(S_i\)~and~\(P_j\)) consists in a total of seven cases, it may be
+unclear how the proof raises our confidence in the program. Second,
+the proof itself is rather long, which leads us to wonder whether any
+error is hiding in it. The first concern can be addressed by noting
+that the two parts of the specification are disjoint and thus as easy
+to comprehend as the program. Moreover, specifications, being logical
+and not necessarily computable, are likely to be more abstract and
+composable than programs, so a larger proof may reuse them in
+different instances. For example, the predicate~\(\predName{Isrt}\)
+can easily be abstracted (higher\hyp{}order) over the sorting function
+as \(\pred{Isrt}{f,s} \colon \pred{Ord}{f(s)} \mathrel{\wedge} f(s)
+\approx s\)\index{Isrt@\predName{Isrt}}\index{Ord@\predName{Ord}} and
+thus applies to many sorting algorithms, with the caveat
+that~\((\approx)\) is probably not always suitably defined by
+transpositions. The second concern can be completely taken care of by
+relying on a \emph{proof assistant}, like\index{Coq@\textsf{Coq}}
+\textsf{Coq} \citep{BertotCasteran_2004}. For instance, the formal
+specification of~\((\approx)\) and the automatic proofs (by means
+of~\texttt{eauto}) of its reflexivity and symmetry consists in the
+following script, where \verb|x::s| stands for~\(\cons{x}{s}\),
+(\verb|->|) is~\((\Rightarrow)\), \verb|perm s t| is~\(s \approx t\)
+and \verb|List| is synonymous with stack:
+\begin{verbatim}
+Set Implicit Arguments.
+Require Import List.
+Variable A: Type.
+
+Inductive perm: list A -> list A -> Prop :=
+  Pnil  : perm nil nil
+| Push  : forall x s t, perm s t -> perm (x::s) (x::t)
+| Swap  : forall x y s, perm (x::y::s) (y::x::s)
+| Trans : forall s t u, perm s u -> perm u t -> perm s t.
+
+Hint Constructors perm.
+
+Lemma reflexivity: forall s, perm s s.
+Proof. induction s; eauto. Qed.
+
+Lemma symmetry: forall s t, perm s t -> perm t s.
+Proof. induction 1; eauto. Qed.
+\end{verbatim}
+\index{insertion sort!soundness|)}
+
+\mypar{Termination}
+\index{termination!insertion sort|(}
+\index{insertion sort!straight $\sim$!termination|(}
+
+Informally, what soundness means is that, if some program terminates,
+then the result is what was expected. This property is called
+\emph{partial correctness} when it is relevant to distinguish it from
+\emph{total correctness}\index{correctness!total
+  $\sim$|see{termination}}, which is partial correctness and
+termination. Let us prove the termination of \fun{isrt/1} by the
+dependency pairs\index{termination!dependency pair} method
+(section~\ref{flattening:termination},
+page~\pageref{flattening:termination}). The pairs to order are
+\((\fun{ins}(\cons{y}{s},x), \fun{ins}(s,x))_\kappa\),
+\((\fun{isrt}(\cons{x}{s}), \fun{isrt}(s))_\nu\) and
+\((\fun{isrt}(\cons{x}{s}), \fun{ins}(\fun{isrt}(s), x))_\nu\). By
+using the proper subterm\index{induction!proper subterm order}
+relation on the first parameter of \fun{ins/2}\index{ins@\fun{ins/2}},
+we order the first pair:
+\begin{equation*}
+\fun{ins}(\cons{y}{s},x) \succ \fun{ins}(s,x) \Leftrightarrow
+\cons{y}{s} \succ s.
+\end{equation*}
+This is enough to prove that \fun{ins/2} terminates. The second pair
+is similarly oriented:
+\begin{equation*}
+\fun{isrt}(\cons{x}{s}) \succ \fun{isrt}(s) \Leftrightarrow
+\cons{x}{s} \succ s.
+\end{equation*}
+The third pair is not worth considering after all, because we already
+know that \fun{ins/2} terminates, so the second pair is enough to
+entail the termination of \fun{isrt/1}\index{isrt@\fun{isrt/1}}. In
+other words, since \fun{ins/2} terminates, it can be considered, as
+far as termination analysis is concerned, as a data constructor, so
+the third pair becomes useless:
+\begin{equation*}
+\fun{isrt}(\cons{x}{s}) \succ \underline{\fun{ins}}(\fun{isrt}(s), x)
+\Leftrightarrow \fun{isrt}(\cons{x}{s}) \succ \fun{isrt}(s)
+\Leftrightarrow \cons{x}{s} \succ s,
+\end{equation*}
+where \(\fun{\ufun{ins}/2}\) stands for
+\fun{ins/2}\index{ins@\fun{ins/2}} considered as a constructor. (We
+have used this notation in \fig~\vref{fig:ver}.)\index{insertion
+  sort!straight $\sim$!termination|)}\index{termination!insertion
+  sort|)}\index{insertion sort!straight $\sim$|)}\hfill\(\Box\)
+
+\section{2-way insertion}
+\label{sec:2-way}
+\index{insertion sort!2-way $\sim$|(}
+
+Let us recall the definition of sorting by straight insertion:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{\;}l@{\;}l@{}}
+  \fun{ins}(\cons{y}{s},x)
+& \xrightarrow{\smash{\kappa}}
+& \cons{y}{\fun{ins}(s,x)}, \,\text{if \(y \succ x\)};
+& \fun{isrt}(\el) 
+& \xrightarrow{\smash{\mu}}
+& \el;\\
+  \fun{ins}(s,x)
+& \xrightarrow{\smash{\lambda}}
+& \cons{x}{s}.
+& \fun{isrt}(\cons{x}{s})
+& \xrightarrow{\smash{\nu}} 
+& \fun{ins}(\fun{isrt}(s),x).
+\end{array}
+\end{equation*}
+The reason why \fun{ins/2}\index{ins@\fun{ins/2}} is called straight
+insertion is because keys are compared in one direction only: from the
+top of the stack towards its bottom. We may wonder what would happen
+if we could move up or down, \emph{starting from the previously
+  inserted key}. Conceptually, this is like having a finger pointing
+at the last inserted key and the next insertion resuming from that
+point, up or down the stack. Let us call it \emph{two\hyp{}way
+  insertion} and name \fun{i2w/1}\index{i2w@\fun{i2w/1}} the sorting
+function based upon it. The stack with finger can be simulated by
+having two stacks, \(t\)~and~\(u\), such that
+\(\fun{rcat}(t,u)\)\index{rcat@\fun{rcat/2}} stands for the currently
+sorted stack, corresponding to
+\(\fun{isrt}(s)\)\index{isrt@\fun{isrt/1}} in rule~\(\nu\). (In
+section~\ref{sec:queueing}, \vpageref{sec:queueing}, we used two
+stacks to simulate a queue.) Let us call
+\(\fun{rcat}(t,u)\)\index{rcat@\fun{rcat/2}} the \emph{simulated
+  stack}\index{stack!simulated $\sim$}; stack~\(t\) is a
+\emph{reversed prefix}\index{stack!reversed prefix} of the simulated
+stack and stack~\(u\) is a \emph{suffix}\index{stack!suffix}. For
+example, a finger pointing at~\(5\) in the simulated stack
+\([0,2,4,5,7,8,9]\) would be represented by \([4,2,0]\) and
+\([5,7,8,9]\). The reversing of the first stack is best visually
+understood by drawing it with the top facing the \emph{right} side of
+the page:
+\begin{equation*}
+\abovedisplayskip=0pt
+%\abovedisplayshortskip=0pt
+%\belowdisplayskip=0pt
+\begin{array}{@{}r|c|c|c|ccc|c|c|c|c|l@{}}
+  \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{}
+& \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{}
+& \multicolumn{1}{c}{} & \multicolumn{1}{c}{\downarrow}\\
+\cline{2-5}\cline{7-11}
+t = & 0 & 2 & 4 & & & & 5 & 7 & 8 & 9 & = u\\
+\cline{2-5}\cline{7-11}
+\end{array}
+\end{equation*}
+Given some key~\(x\), it is straightly inserted either in~\(t\)
+(minding it is sorted in reverse order) or in~\(u\). If we want to
+insert~\(1\), we should pop~\(4\) and push it on the right stack, same
+for~\(2\) and then push~\(1\) on the right stack, as, by convention,
+the finger always points to the top of the right stack, where the last
+inserted key is:
+\begin{equation*}
+\abovedisplayskip=0pt
+\begin{array}{@{}|c|ccc|c|c|c|c|c|c|c|@{}}
+  \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{}
+& \multicolumn{1}{c}{} & \multicolumn{1}{c}{\downarrow}\\
+\cline{1-2}\cline{4-11}
+0 & & & & 1 & 2 & 4 & 5 & 7 & 8 & 9\\
+\cline{1-2}\cline{4-11}
+\end{array}
+\end{equation*}
+
+Let \(\fun{i2w}(s)\)\index{i2w@\fun{i2w/1}} (\emph{insertion going two
+  ways}) be the sorted stack corresponding to stack~\(s\). Let
+\(\fun{i2w}(s,t,u)\)\index{i2w@\fun{i2w/3}} be the sorted stack
+containing all the keys from~\(s\), \(t\) and~\(u\), where \(s\)~is a
+suffix of the original (probably unsorted) stack and
+\(\fun{rcat}(t,u)\)\index{rcat@\fun{rcat/2}} is the current simulated
+stack, that is, \(t\)~is the left stack (reversed prefix) and~\(u\)
+the right stack (suffix). The function
+\fun{i2w/1}\index{i2w@\fun{i2w/1}} is defined in
+\fig~\vref{fig:i2w_def}.
+\begin{figure}
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}ll}
+\fun{i2w}(s)         & \xrightarrow{\smash{\xi}}
+                     & \fun{i2w}(s,\el,\el).\\
+\fun{i2w}(\el,\el,u) & \xrightarrow{\smash{\pi}} 
+                     & u;\\
+\fun{i2w}(\el,\cons{y}{t},u)
+                     & \xrightarrow{\smash{\rho}}
+                     & \fun{i2w}(\el,t,\cons{y}{u});\\
+\fun{i2w}(\cons{x}{s},t,\cons{z}{u})
+                     & \xrightarrow{\smash{\sigma}}
+                     & \fun{i2w}(\cons{x}{s},\cons{z}{t},u),
+                     & \text{if \(x \succ z\)};\\
+\fun{i2w}(\cons{x}{s},\cons{y}{t},u)
+                     & \xrightarrow{\smash{\tau}}
+                     & \fun{i2w}(\cons{x}{s},t,\cons{y}{u}),
+                     & \text{if \(y \succ x\)};\\
+\fun{i2w}(\cons{x}{s},t,u)
+                     & \xrightarrow{\smash{\upsilon}}
+                     & \fun{i2w}(s,t,\cons{x}{u}).
+\end{array}}
+\end{equation*}
+\caption{Sorting with 2-way insertion \fun{i2w/1}
+\label{fig:i2w_def}}
+\end{figure}
+Rule~\(\xi\) introduces the two stacks used for insertion. Rules
+\(\pi\)~and~\(\rho\) could be replaced by \(\fun{i2w}(\el,t,u)
+\rightarrow \fun{rcat}(t,u)\), but we opted for a self\hyp{}contained
+definition. Rule~\(\sigma\) is used to move keys from the right stack
+to the left stack. Rule~\(\tau\) moves them the other
+way. Rule~\(\upsilon\) performs the insertion itself, namely, on top
+of the right stack. \Fig~\vref{fig:i2w2314} shows the evaluation of
+\(\fun{i2w}([2,3,1,4])\), whose trace \index{functional
+  language!evaluation!trace} is then \((\xi)(\upsilon)(\sigma\upsilon)
+(\tau\upsilon)(\sigma^3\upsilon)(\rho^3\pi)\). The number of times
+rule~\(\rho\) is used is the number of keys on the left
+stack after there are no more keys to sort. Rule~\(\pi\) is used once.
+\begin{figure}[h]
+\centering
+\includegraphics[bb=71 523 257 721]{i2w2314}
+\caption{\(\fun{i2w}([2,3,1,4]) \twoheadrightarrow [1,2,3,4]\)
+\label{fig:i2w2314}}
+\end{figure}
+
+\mypar{Extremal costs}
+\index{insertion sort!2-way $\sim$!minimum cost|(}
+
+Let us find the minimum and maximum costs for an input stack of
+\(n\)~keys. The best case will exert minimally rules
+\clause{\sigma}~and~\clause{\tau}, and this minimum number of calls
+turns out to be zero when the two comparisons are false. The first key
+inserted does not use rules \clause{\sigma}~and~\clause{\tau}, but
+only rule~\clause{\upsilon}, so, right after, the reversed prefix is
+empty and the suffix contains this key. If we want to insert the
+second key without moving the first key, and go straight to use
+rule~\clause{\upsilon}, the second key must be smaller than the
+first. Based on the same argument, the third key must be smaller than
+the second etc. In the end, this means that \emph{the input, in the
+  best case, is a stack sorted non\hyp{}increasingly.} The last steps
+consisting in the reversal of the prefix, such prefix being empty, we
+do not even use rule~\clause{\rho} at all --~only rule~\clause{\pi}
+once. In other words, the evaluation trace is
+\(\zeta\epsilon^n\alpha\) and, if we note \(\B{\fun{i2w}}{n}\) the
+cost when the stack contains \(n\)~keys in non\hyp{}increasing order,
+then we have
+\begin{equation*}
+\B{\fun{i2w}}{n} = \len{\zeta\epsilon^n\alpha} = n + 2.
+\end{equation*}
+\index{insertion sort!2-way $\sim$!minimum cost|)}
+
+\index{insertion sort!2-way $\sim$!maximum cost|(} Let us assume that
+the input stack is noted \([x_0, x_1, \dots, x_{n-1}]\) and \(x \prec
+y\) means \(y \succ x\). The worst case must exert maximally rules
+\clause{\sigma}~and~\clause{\tau}, on the one hand, and rules
+\clause{\pi}~and~\clause{\rho}, on the other hand. Let us focus first
+on maximising the use of \clause{\sigma}~and~\clause{\tau}. Since
+\(x_0\)~is the first key, it is always pushed on the suffix stack by
+rule~\clause{\upsilon}. The second key, \(x_1\), in order to travel
+the furthest, has to be inserted below~\(x_0\). By doing so,
+rule~\clause{\sigma} is used once and then~\clause{\upsilon},
+therefore, as a result, \(x_0\)~is on the left (the reversed prefix)
+and \(x_1\)~on the right (the suffix). In other words: we have
+\([x_0]\) and \([x_1]\). Because of this symmetry, in pursuit of the
+worst case, we can now move either \(x_0\)~or~\(x_1\) to the facing
+stack, that is, choose either to set \(x_2 \prec x_0\) or \(x_1 \prec
+x_2\).
+\begin{itemize}
+
+\item If \(x_2 \prec x_0\), rule~\clause{\tau} is used once, then
+  rule~\clause{\upsilon}. As a result, we have the configuration
+  \(\el\) and \([x_2, x_0, x_1]\). This translates as \(x_2 \prec x_0
+  \prec x_1\). The fourth key, \(x_3\), must be inserted at the bottom
+  of the right stack, which must be first reversed on top of the left
+  stack by rule~\clause{\sigma}: we then obtain \([x_1, x_0, x_2]\)
+  and \([x_3]\), that is, \(x_2 \prec x_0 \prec x_1 \prec
+  x_3\). Finally, the left stack is reversed on top of the second by
+  rule~\clause{\rho} and rule~\clause{\pi} is last. The evaluation
+  trace is
+  \((\xi)(\upsilon)(\sigma\upsilon)(\tau\upsilon)(\sigma^3\upsilon)
+  (\rho^3\pi)\), whose length is~\(14\).
+
+\item If \(x_1 \prec x_2\), we would have \([x_1, x_0]\) and
+  \([x_2]\), then the stacks \(\el\) and \([x_3, x_0, x_1, x_2]\),
+  that is, \(x_3 \prec x_0 \prec x_1 \prec x_2\). The complete
+  evaluation trace is
+  \((\xi)(\upsilon)(\sigma\upsilon)(\sigma\upsilon)(\tau^2\upsilon)
+  (\pi)\). The length of this trace is~\(10\), which is shorter than
+  the previous trace.
+
+\end{itemize}
+As a conclusion, the choice \(x_2 \prec x_0\) leads to a worse
+case. But what if the input stack contains an odd number~\(n\) of
+keys? To guess what happens, let us insert~\(x_4\) assuming either
+\(x_1 \prec x_2\) or \(x_2 \prec x_0\).
+\begin{itemize}
+
+\item If \(x_2 \prec x_0\), we move all the keys out of the left
+  stack, yielding the configuration \([x_4]\) and \([x_2, x_0, x_1,
+  x_3]\), so \(x_4 \prec x_2 \prec x_0 \prec x_1 \prec x_3\),
+  corresponding to the trace
+  \((\xi)(\upsilon)(\sigma\upsilon)(\tau\upsilon)(\sigma^3\upsilon)
+  (\tau^3\upsilon)(\rho\pi)\), whose length is~\(16\).
+
+\item If \(x_1 \prec x_2\), we want to insert~\(x_4\) at the bottom of
+  the right stack, thus obtaining \([x_2, x_1, x_0, x_3]\) and
+  \([x_4]\): \(x_3 \prec x_0 \prec x_1 \prec x_2 \prec x_4\),
+  corresponding to the trace \((\xi)(\upsilon)
+  (\sigma\upsilon)(\sigma\upsilon)(\tau^2\upsilon)(\sigma^4\upsilon)
+  (\rho^4\pi)\), whose length is~\(19\). It is perhaps better
+  visualised by means of oriented edges, revealing a spiral in
+  \fig~\vref{fig:spiral}.
+    \begin{figure}
+      \centering
+      \includegraphics[bb=71 671 185 716]{a3a0a1a2a4}
+      \caption{Worst case for \fun{i2w/1} if \(n=5\) (\(x_1 \prec x_2\))
+               \label{fig:spiral}}
+    \end{figure}
+
+\end{itemize}
+Therefore, it seems that when the number of keys is odd, having \(x_1
+\prec x_2\) leads to the maximum cost, whilst \(x_2 \prec x_0\) leads
+to the maximum cost when the number of keys is even. Let us determine
+these costs for any~\(n\) and find out which is the greater. Let us
+note \(\W{x_1 \prec x_2}{2p+1}\) the former cost and \(\W{x_2 \prec
+  x_0}{2p}\) the latter.
+\begin{itemize}
+
+\item If \(n = 2p+1\) and \(x_1 \prec x_2\), then the evaluation trace
+  is
+    \begin{equation*}
+    (\xi)(\upsilon)(\sigma\upsilon)(\sigma\upsilon)
+    (\tau^2\upsilon)(\sigma^4\upsilon)(\tau^4\upsilon) \ldots
+    (\sigma^{2p-2}\upsilon)(\tau^{2p-2}\upsilon)(\sigma^{2p}\upsilon)
+    (\rho^{2p}\pi),
+    \end{equation*}
+    as a partial evaluation with~\(p=3\) suggests:
+    \begin{equation*}
+      \!\begin{array}{@{}r@{\;}c@{\;}l@{}}
+        \fun{i2w}([x_0,x_1,x_2,x_3,x_4,x_5,x_6]) 
+        & \xrightarrow{\smash{\xi}}
+        & \fun{i2w}(\el,\el,[x_0,x_1,x_2,x_3,x_4,x_5,x_6])\\
+        & \xrightarrow{\smash{\upsilon}}
+        & \fun{i2w}(\el,[x_0],[x_1,x_2,x_3,x_4,x_5,x_6])\\
+        & \xrightarrow{\smash{\sigma}}
+        & \fun{i2w}([x_0],\el,[x_1,x_2,x_3,x_4,x_5,x_6])\\
+        & \xrightarrow{\smash{\upsilon}}
+        & \fun{i2w}([x_0],[x_1],[x_2,x_3,x_4,x_5,x_6])\\
+        & \xrightarrow{\smash{\sigma}}
+        & \fun{i2w}([x_1,x_0],\el,[x_2,x_3,x_4,x_5,x_6])\\
+        & \xrightarrow{\smash{\upsilon}}
+        & \fun{i2w}([x_1,x_0],[x_2],[x_3,x_4,x_5,x_6])\\
+        & \stackrel{\smash{\tau^{\smash{2}}}}{\twoheadrightarrow}
+        & \fun{i2w}(\el,[x_0,x_1,x_2],[x_3,x_4,x_5,x_6])\\
+        & \xrightarrow{\smash{\upsilon}}
+        & \fun{i2w}(\el,[x_3,x_0,x_1,x_2],[x_4,x_5,x_6])\\
+        & \stackrel{\smash{\sigma^{\smash{4}}}}{\twoheadrightarrow}
+        & \fun{i2w}([x_2,x_1,x_0,x_3],\el,[x_4,x_5,x_6])\\
+        & \xrightarrow{\smash{\upsilon}}
+        & \fun{i2w}([x_2,x_1,x_0,x_3],[x_4],[x_5,x_6])\\
+        & \stackrel{\smash{\tau^{\smash{4}}}}{\twoheadrightarrow}
+        & \fun{i2w}(\el,[x_3,x_0,x_1,x_2,x_4],[x_5,x_6])\\
+        & \xrightarrow{\smash{\upsilon}}
+        & \fun{i2w}(\el,[x_5,x_3,x_0,x_1,x_2,x_4],[x_6])\\
+        & \stackrel{\smash{\sigma^{\smash{6}}}}{\twoheadrightarrow}
+        & \fun{i2w}([x_4,x_2,x_1,x_0,x_3,x_5],\el,[x_6])\\
+        & \xrightarrow{\smash{\upsilon}}
+        & \fun{i2w}([x_4,x_2,x_1,x_0,x_3,x_5],[x_6],\el).
+      \end{array}
+    \end{equation*}
+    If we omit rules~\clause{\xi}, \clause{\upsilon}, \clause{\pi}
+    and~\clause{\rho}, we can see a pattern emerge from the subtrace
+    \((\sigma^2\tau^2)(\sigma^4\tau^4)(\sigma^6\tau^6) \ldots
+    (\sigma^{2p-2}\tau^{2p-2})(\sigma^{2p})\). Rule~\clause{\upsilon}
+    is used \(n\)~times because it inserts the key in the right
+    place. So the total cost is
+    \begin{align*}
+      \W{x_1 \prec x_2}{2p+1}
+        &= \len{\xi} + \len{\upsilon^{2p+1}}
+           + \sum_{k=1}^{p-1}{\left(\len{\sigma^{2k}} + \len{\tau^{2k}}\right)}
+           + \len{\sigma^{2p}} + \len{\rho^{2p}\pi}\\
+        &= 1 + (2p + 1) + \sum_{k=1}^{p-1}{2(2k)} + (2p) + (2p + 1)\\
+        &= 2p^2 + 4p + 3.
+    \end{align*}
+
+  \item If \(n = 2p\) and \(x_2 \prec x_0\), then the evaluation trace is
+    \begin{equation*}
+      (\xi)(\upsilon)(\sigma\upsilon)(\tau\upsilon)
+      (\sigma^3\upsilon)(\tau^3\upsilon)
+      \ldots (\sigma^{2p-1}\upsilon)(\rho^{2p-1}\pi),
+    \end{equation*}
+    as the following partial evaluation with~\(p=3\) suggests (first
+    difference with the previous case is in boldface type):
+\begin{equation*}
+\begin{array}{@{}r@{\;}c@{\;}l@{}}
+\fun{i2w}([x_{0},x_{1},x_{2},x_{3},x_{4},x_{5}])
+& \rightarrow
+& \fun{i2w}(\el,\el,[x_{0},x_{1},x_{2},x_{3},x_{4},x_{5}])\\
+& \xrightarrow{\smash{\upsilon}}
+& \fun{i2w}(\el,[x_{0}],[x_{1},x_{2},x_{3},x_{4},x_{5}])\\
+& \xrightarrow{\smash{\sigma}}
+& \fun{i2w}([x_{0}],\el,[x_{1},x_{2},x_{3},x_{4},x_{5}])\\
+& \xrightarrow{\smash{\upsilon}}
+& \fun{i2w}([x_{0}],[x_{1}],[x_{2},x_{3},x_{4},x_{5}])\\
+& \xrightarrow{\smash{\tau}}
+& \boldsymbol{\fun{i2w}(\el,[x_{0},x_{1}],[x_{2},x_{3},x_{4},x_{5}])}\\
+& \xrightarrow{\smash{\upsilon}}
+& \fun{i2w}(\el,[x_{2},x_{0},x_{1}],[x_{3},x_{4},x_{5}])\\
+& \stackrel{\smash{\sigma^{\smash{3}}}}{\twoheadrightarrow}
+& \fun{i2w}([x_{1},x_{0},x_{2}],\el,[x_{3},x_{4},x_{5}])\\
+& \xrightarrow{\smash{\upsilon}}
+& \fun{i2w}([x_{1},x_{0},x_{2}],[x_{3}],[x_{4},x_{5}])\\
+& \stackrel{\smash{\tau^{\smash{3}}}}{\twoheadrightarrow}
+& \fun{i2w}(\el,[x_{2},x_{0},x_{1},x_{3}],[x_{4},x_{5}])\\
+& \xrightarrow{\smash{\upsilon}}
+& \fun{i2w}(\el,[x_{4},x_{2},x_{0},x_{1},x_{3}],[x_{5}])\\
+& \stackrel{\smash{\sigma^{\smash{5}}}}{\twoheadrightarrow}
+& \fun{i2w}([x_{3},x_{1},x_{0},x_{2},x_{4}],\el,[x_{5}])\\
+& \xrightarrow{\smash{\upsilon}}
+& \fun{i2w}([x_{3},x_{1},x_{0},x_{2},x_{4}],[x_{5}],\el)
+\end{array}
+\end{equation*}
+If we omit rules~\clause{\xi}, \clause{\upsilon}, \clause{\pi}
+and~\clause{\rho}, we can see a pattern emerge from the subtrace
+\((\sigma^1\tau^1)(\sigma^3\tau^3)(\sigma^5\tau^5) \ldots
+(\sigma^{2p-3}\tau^{2p-3})(\sigma^{2p-1})\). Rule~\clause{\upsilon} is
+used \(n\)~times because it inserts the key in the right place. So the
+total cost is
+\begin{align*}
+\W{x_2 \prec x_0}{2p}
+   &= \len{\xi} + \len{\upsilon^{2p}}
+           + \sum_{k=1}^{p-1}{\left(\len{\sigma^{2k-1}} + \len{\tau^{2k-1}}\right)}
+           + \len{\sigma^{2p-1}} + \len{\rho^{2p-1}\pi}\\
+   &= 1 + (2p) + \sum_{k=1}^{p-1}{2(2k-1)} + (2p-1) + ((2p - 1) + 1)\\
+   &= 2p^2 + 2p + 2.
+\end{align*}
+\end{itemize}
+These formulas hold for all \(p \geqslant 0\). We can now conclude
+this discussion about the worst case of \fun{i2w/1}:
+\begin{itemize}
+
+\item If \(n = 2p\), the worst case happens when the keys satisfy the
+  total order \(x_{2p} \prec x_{2p-2} \prec \dots \prec x_0 \prec x_1
+  \prec x_3 \prec \dots \prec x_{2p-3} \prec x_{2p-1}\) and
+  \(\W{\fun{i2w}}{2p} = 2p^2 + 2p + 2\), that is, \(\W{\fun{i2w}}{n} =
+  \frac{1}{2}{n^2} + n + 2\).
+
+\item If \(n = 2p+1\), the worst case happens when the keys satisfy
+  the order \(x_{2p-1} \prec x_{2p-3} \prec \dots \prec x_3 \prec x_0
+  \prec x_1 \prec x_2 \prec \dots \prec x_{2p-2} \prec x_{2p}\) and
+  \(\W{\fun{i2w}}{2p+1} = 2p^2 + 4p + 3\), that is, \(\W{\fun{i2w}}{n}
+  = \frac{1}{2}{n^2} + n + \frac{3}{2}\).
+
+\end{itemize}
+The first case yields the maximum cost:
+\begin{equation*}
+%\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+  \W{\fun{i2w}}{n} = \frac{1}{2}{n^2} + n + 2 = \W{\fun{isrt}}{n} - n
+  + 1 \sim
+  \W{\fun{isrt}}{n} \sim \frac{1}{2}{n^2}.
+\end{equation*}
+\index{insertion sort!2-way $\sim$!maximum cost|)}
+
+
+\mypar{Average cost}
+\index{insertion sort!2-way $\sim$!average cost|(}
+
+Let \(\M{\fun{i2w}}{n}\)\index{i2w@$\M{\fun{i2w}}{n}$} be the average
+cost of the call \(\fun{i2w}(s)\)\index{i2w@\fun{i2w/1}}, where the
+stack~\(s\) has length~\(n\). We are going to use the same assumption
+as with \(\M{\fun{isrt}}{n}\), namely, we look for the cost for
+sorting all permutations of \((1,2,\dots,n)\), divided by~\(n!\). The
+insertions are illustrated by the \emph{evaluation
+  tree}\index{tree!evaluation $\sim$} in \fig~\ref{fig:2way_unbal},
+\begin{figure}[t]
+\centering
+\includegraphics{2way_unbal}
+\caption{Sorting \([a,b,c]\) (first argument of \fun{i2w/3} hidden)
+\label{fig:2way_unbal}}
+\end{figure}
+where the keys \(a\), \(b\) and~\(c\) are inserted in this order in a
+stack originally empty, with all possible total orders. Note how all
+permutations are attained exactly once at the external
+nodes\index{tree!node!external $\sim$} (see
+page~\pageref{def:external_node}). For example, \([a,b,c]\) and
+\([c,b,a]\) are external nodes. The total cost is the \emph{external
+  path length}\index{tree!external path
+  length}\label{external_path_length} of the tree, that is, the sum of
+the lengths of the paths from the root to all the external nodes,
+which is the same as the sum of the lengths of all possible
+traces\index{functional
+  language!evaluation!trace}\index{tree!evaluation $\sim$}:
+\(\len{\xi\upsilon\sigma\upsilon\sigma\upsilon\rho^2\pi} +
+\len{\xi\upsilon\sigma\upsilon\tau\upsilon\pi} +
+\len{\xi\upsilon\sigma\upsilon^2\rho\pi} +
+\len{\xi\upsilon^2\sigma^2\upsilon\rho^2\pi} +
+\len{\xi\upsilon^2\sigma\upsilon\rho\pi} + \len{\xi\upsilon^3\pi} =
+44\), so the average cost of sorting \(3\)~keys is \(44/3! = 22/3\).
+
+Given a left stack of \(p\)~keys and a right stack of \(q\)~keys, let
+us characterise all the possible traces for the insertion of one more
+key, stopping before another key is inserted or the final stack is
+made. In the left stack, an insertion is possible after the first key,
+after the second etc. until after the last. After the \(k\)th key,
+with \(1 \leqslant k \leqslant p\), the trace is thus
+\(\tau^k\upsilon\). In the right stack, an insertion is possible on
+top, after the first key, after the second etc. until after the
+last. After the \(k\)th key, with \(0 \leqslant k \leqslant q\), the
+trace is hence \(\sigma^k\upsilon\). All the possible traces are thus
+\begin{equation*}
+\sum_{k=1}^{p}{\tau^k\upsilon} + \sum_{k=0}^{q}{\sigma^k\upsilon},
+\end{equation*}
+whose cumulated lengths amount to
+\begin{equation*}
+C_{p,q} := \sum_{k=1}^{p}\len{\tau^k\upsilon} +
+\sum_{k=0}^{q}\len{\sigma^k\upsilon}
+= (p+q+1) + \frac{1}{2}p(p+1) + \frac{1}{2}q(q+1).
+\end{equation*}
+There are \(p+q+1\) insertion loci, so the average cost of one
+insertion in the configuration \((p,q)\) is 
+\begin{equation}
+\M{}{p,q} := \frac{C_{p,q}}{p+q+1}
+           = 1 + \frac{p^2 + q^2 + p + q}{2p + 2q + 2}.
+\label{eq:Mpq}
+\end{equation}
+By letting \(k := p + q\), we can re\hyp{}express this cost as
+\begin{equation*}
+\M{}{q-k,q} = \frac{1}{k+1}{q^2} - \frac{k}{k+1}{q} + \frac{k+2}{2}.
+\end{equation*}
+The left stack is reversed after the last insertion, so the subsequent
+traces are \(\rho^{p-k}\pi\), with \(1 \leqslant k \leqslant p\), if
+the last insertion took place on the left, otherwise
+\(\rho^{p+k}\pi\), with \(0 \leqslant k \leqslant q\), that is,
+\(\rho^0\pi\), \(\rho^1\pi\), \ldots, \(\rho^{p+q}\pi\). In other
+words, after an insertion, all possible configurations are uniquely
+realised (only the right stack being empty is invalid, due to
+rule~\(\upsilon\)). As a consequence, we can average the average costs
+of inserting one key over all the partitions of~\(k\) into~\(p + q\),
+with \(q \neq 0\), so the average cost of inserting one key in a
+simulated stack of \(k\)~keys is
+\begin{equation*}
+\M{}{0} := 1;\quad
+\M{}{k} := \frac{1}{k}\!\sum_{p+q=k}\M{}{p,q}
+         = \frac{1}{k}\sum_{q=1}^{k}\M{}{q-k,q}
+         = \frac{1}{3}k + \frac{7}{6},
+\end{equation*}
+minding that \(\sum_{q=1}^{k}{q^2} = k(k+1)(2k+1)/6\) (see
+equation~\eqref{eq:sum_of_squares} \vpageref{eq:sum_of_squares}). The
+cost of the final reversal is also averaged over all possible
+configurations, here of \(n>0\) keys:
+\begin{equation*}
+\M{\curvearrowright}{n} = \frac{1}{n}\sum_{k=0}^{n-1}\len{\rho^k\pi}
+                        = \frac{n+1}{2}.
+\end{equation*}
+Finally, we know that all traces start with~\(\xi\), then proceed with
+all the insertions and conclude with a reversal. This means that the
+average cost \(\M{\fun{i2w}}{n}\)\index{i2w@$\M{\fun{i2w}}{n}$} of
+sorting \(n\)~keys is defined by the following equations:
+\begin{equation*}
+\M{\fun{i2w}}{0} = 2;\quad
+\M{\fun{i2w}}{n} = 1 + \sum_{k=0}^{n-1}{\M{}{k}} + \M{\curvearrowright}{n}
+                 = \frac{1}{6}n^2 + \frac{3}{2}n + \frac{4}{3}
+                 \sim \frac{1}{6}n^2.
+\end{equation*}
+We can check that \(\M{\fun{i2w}}{3} = 22/3\), as expected. As a
+conclusion, in average, sorting with 2-way insertions is faster than
+with straight insertions, but the cost is still asymptotically
+quadratic.\index{insertion sort!2-way $\sim$!average
+  cost|)}\index{insertion sort!2-way $\sim$|)}
+
+
+\paragraph{Exercises}
+\begin{enumerate}
+
+  \item When designing~\fun{i2w/3}\index{i2w@\fun{i2w/3}}, we chose to
+    always push the key to be inserted on top of the right stack in
+    rule~\(\upsilon\). Let us modify slightly this strategy and push
+    instead onto the left stack when it is empty. See
+    rule~(\(\leadsto\)) in \fig~\vref{fig:i2w1}.
+    \begin{figure}[b]
+    \begin{equation*}
+      \boxed{%
+      \begin{array}{r@{\;}l@{\;}ll}
+        \fun{i2w}_1(s) & \rightarrow
+                      & \fun{i2w}_1(s,\el,\el).\\
+        \fun{i2w}_1(\el,\el,u) & \rightarrow & u;\\
+        \fun{i2w}_1(\el,\cons{y}{t},u)
+                     & \rightarrow
+                     & \fun{i2w}_1(\el,t,\cons{y}{u});\\
+        \fun{i2w}_1(\cons{x}{s},t,\cons{z}{u})
+                     & \rightarrow
+                     & \fun{i2w}_1(\cons{x}{s},\cons{z}{t},u),
+                     & \text{if \(x \succ z\)};\\
+        \fun{i2w}_1(\cons{x}{s},\el,u)
+                     & \leadsto
+                     & \fun{i2w}_1(s,[x],u);\\
+        \fun{i2w}_1(\cons{x}{s},\cons{y}{t},u)
+                     & \rightarrow
+                     & \fun{i2w}_1(\cons{x}{s},t,\cons{y}{u}),
+                     & \text{if \(y \succ x\)};\\
+        \fun{i2w}_1(\cons{x}{s},t,u)
+                     & \rightarrow
+                     & \fun{i2w}_1(s,t,\cons{x}{u}).
+      \end{array}}
+    \end{equation*}
+    \caption{Variation \fun{i2w\(_1\)/1} on \fun{i2w/1} (see
+      (\(\leadsto\)))\label{fig:i2w1}}
+    \end{figure}
+    Prove that the average cost satisfies now the equation
+    \index{i2w1@\fun{i2w\(_1\)/1}} \index{i2w1@\fun{i2w\(_1\)/3}}
+    \index{i2w1@$\M{\fun{i2w}_1}{n}$}
+    \begin{equation*}
+      \M{\fun{i2w}_1}{n} = \M{\fun{i2w}}{n} - H_n + 2.
+    \end{equation*}
+    \emph{Hint:} write down the examples similar to the ones in
+    \fig~\vref{fig:2way_unbal}, determine the average path length and
+    observe that the difference with
+    \fun{i2w/1}\index{i2w@\fun{i2w/1}} is that the configuration with
+    an empty left stack is replaced with a configuration with a
+    singleton left stack, to wit, \(\M{}{0,k}\) is replaced
+    with~\(\M{}{1,k-1}\) in the definition of~\(\M{}{k}\).
+
+  \item In rule~\(\upsilon\) of~\fun{i2w/3}\index{i2w@\fun{i2w/3}},
+    the key~\(x\) is pushed on the right stack. Consider in
+    \fig~\vref{fig:i2w2} (rule~(\(\leadsto\))) the variant where it is
+    pushed on the left stack instead. Show very simply that the
+    average cost satisfies\index{i2w2@\fun{i2w\(_2\)/1}}
+    \index{i2w2@\fun{i2w\(_2\)/3}} \index{i2w2@$\M{\fun{i2w}_2}{n}$}
+    \begin{equation*}
+      \M{\fun{i2w}_2}{n} = \M{\fun{i2w}}{n} + 1.
+    \end{equation*}
+    \begin{figure}[h]
+    \begin{equation*}
+      \boxed{%
+      \begin{array}{r@{\;}l@{\;}ll}
+        \fun{i2w}_2(s)         & \rightarrow
+                               & \fun{i2w}_2(s,\el,\el).\\
+        \fun{i2w}_2(\el,\el,u) & \rightarrow
+                               & u;\\
+        \fun{i2w}_2(\el,\cons{y}{t},u)
+                               & \rightarrow
+                               & \fun{i2w}_2(\el,t,\cons{y}{u});\\
+        \fun{i2w}_2(\cons{x}{s},t,\cons{z}{u})
+                               & \rightarrow
+                               & \fun{i2w}_2(\cons{x}{s},\cons{z}{t},u),
+                               & \text{if \(x \succ z\)};\\
+        \fun{i2w}_2(\cons{x}{s},\cons{y}{t},u)
+                               & \rightarrow
+                               & \fun{i2w}_2(\cons{x}{s},t,\cons{y}{u}),
+                               & \text{if \(y \succ x\)};\\
+        \fun{i2w}_2(\cons{x}{s},t,u)
+                               & \leadsto
+                               & \fun{i2w}_2(s,\cons{x}{t},u).
+      \end{array}}
+    \end{equation*}
+    \caption{Variation \fun{i2w\(_2\)/1} on \fun{i2w/1} (see
+      (\(\leadsto\)))\label{fig:i2w2}}
+    \end{figure}
+
+\end{enumerate}
+
+\section{Balanced 2-way insertion}
+\index{insertion sort!2-way $\sim$!balanced $\sim$|(}
+
+When sorting with 2-way insertions, keys are inserted from whence the
+finger is on the simulated stack. We could maintain the finger at the
+middle of the stack, leading to what we call \emph{balanced 2-way
+  insertions}. The adjective `balanced' refers to the shape of the
+comparison tree.
+
+Our best effort to keep the two stacks about the same length must lead
+to two cases: either (\textsl{a})~they are exactly of the same length,
+or (\textsl{b})~one of them, say the right one, contains one more
+key. Let us envisage how to maintain this invariant through
+insertions. Let us suppose we are in case~(\textsl{b}). Then, if the
+key has to be inserted in the left stack, the resulting stacks will
+have equal lengths, which means case~(\textsl{a}); otherwise, we move
+the top of the right stack to the top of the left stack, in addition
+to the insertion itself, and we are back to case~(\textsl{a}) as
+well. If we are in case~(\textsl{a}) and the insertion takes place in
+the right stack, no rebalancing has to be done; otherwise, the top of
+the left stack is moved to the top of the right: in both events, we
+are in case~(\textsl{b}). What if the key has to be inserted at the
+finger position?  If the two stacks have same length, that is,
+case~(\textsl{a}), we push the key on top of the right one and go back
+to case~(\textsl{b}); otherwise, it means that the right stack exceeds
+the left by one, that is, case~(\textsl{b}), so it is best to push it
+on the left stack: as a result, the stacks end having equal lengths
+and we are back to case~(\textsl{a}).
+
+To program this algorithm, we need a variant
+\fun{idn/2}\index{idn@\fun{idn/2}} (\emph{insert downwardly})
+of~\fun{ins/2}\index{ins@\fun{ins/2}} because the left stack is sorted
+decreasingly. Let us rename~\fun{ins/2}
+into~\fun{iup/2}\index{iup@\fun{iup/2}} (\emph{insert upwardly}).
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+  \fun{iup}(\cons{y}{s},x)
+& \xrightarrow{\smash{\kappa_0}}
+& \cons{y}{\fun{iup}(s,x)},\,\text{if \(y \succ x\)};
+& \fun{iup}(s,x)
+& \xrightarrow{\smash{\lambda_0}} & \cons{x}{s}.\\
+  \fun{idn}(\cons{y}{s},x)
+& \xrightarrow{\smash{\kappa_1}}
+& \cons{y}{\fun{idn}(s,x)},\,\text{if \(x \succ y\)};
+& \fun{idn}(s,x)
+& \xrightarrow{\smash{\lambda_1}} & \cons{x}{s}.
+\end{array}
+\end{equation*}
+Furthermore, we need an additional parameter that represents the
+difference in length between the two stacks: \(0\)~if they have the
+same length and \(1\)~if the right contains one more key. Let us call
+the new function
+\fun{i2wb/1}\index{i2wb@\fun{i2wb/1}}\index{i2wb@\fun{i2wb/3}}, whose
+definition is displayed in \fig~\vref{fig:i2wb}.
+\begin{figure}[t]
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}ll}
+\fun{i2wb}(s)
+& \xrightarrow{\smash{\xi}} & \fun{i2wb}(s,\el,\el,0).\\
+\fun{i2wb}(\el,\el,u,d)
+& \xrightarrow{\smash{\pi}} & u;\\
+\fun{i2wb}(\el,\cons{y}{t},u,d)        
+& \xrightarrow{\smash{\rho}} & \fun{i2wb}(\el,t,\cons{y}{u},d);\\
+\fun{i2wb}(\cons{x}{s},t,\cons{z}{u},0)
+& \xrightarrow{\smash{\sigma}} &
+\fun{i2wb}(s,t,\cons{z}{\fun{iup}(u,x)},1),
+& \text{if \(x \succ z\)};\\
+\fun{i2wb}(\cons{x}{s},\cons{y}{t},u,0)
+& \xrightarrow{\smash{\tau}} & 
+\fun{i2wb}(s,\fun{idn}(t,x),\cons{y}{u},1),
+& \text{if \(y \succ x\)};\\
+\fun{i2wb}(\cons{x}{s},t,u,0)
+& \xrightarrow{\smash{\upsilon}} & \fun{i2wb}(s,t,\cons{x}{u},1);\\
+\fun{i2wb}(\cons{x}{s},t,\cons{z}{u},1)
+& \xrightarrow{\smash{\phi}}
+& \fun{i2wb}(s,\cons{z}{t},\fun{iup}(u,x),0),
+& \text{if \(x \succ z\)};\\
+\fun{i2wb}(\cons{x}{s},\cons{y}{t},u,1)
+& \xrightarrow{\smash{\chi}}
+& \fun{i2wb}(s,\cons{y}{\fun{idn}(t,x)},u,0),
+& \text{if \(y \succ x\)};\\
+\fun{i2wb}(\cons{x}{s},t,u,1) & \xrightarrow{\smash{\psi}} & 
+\fun{i2wb}(s,\cons{x}{t},u,0).
+\end{array}}
+\end{equation*}
+\caption{Balanced 2-way insertion \label{fig:i2wb}}
+\end{figure}
+In \fig~\vref{fig:2way_bal}
+\begin{figure}
+\centering
+\includegraphics{2way_bal}
+\caption{Sorting \([a,b,c]\) by balanced 2-way insertions
+\label{fig:2way_bal}}
+\end{figure}
+are shown all the possible traces\index{tree!evaluation $\sim$} and
+outcomes of sorting \([a,b,c]\). Note that the tree is not
+perfect\index{tree!perfect $\sim$}, but balanced, as some arrows
+correspond to two rewrites. The \emph{internal path
+  length}\label{insertion__internal_path_length}
+\index{binary tree!internal path length} of the tree is~\(43\), that
+is the sum of the lengths of the paths from the root to each internal
+node, so the average cost is~\(43/6\).
+
+\mypar{Minimum cost}
+
+Let us continue by finding what is the minimum cost of
+\fun{i2wb/1}. Let us assume that we have the input \([x_0, x_1, x_2,
+x_3, x_4]\) and we want it to minimise the rewrites, which means not
+to use rules~\clause{\sigma}, \clause{\tau}, \clause{\phi}
+and~\clause{\chi}; also, the usage of rule~\clause{\rho} should be
+minimum. The latter rule is not an issue because it reverses the left
+stack and, by design, the right stack has the same length as the left,
+or exceeds it at most by one key. A simple diagram with the two stacks
+initially empty suffices to convince us that the keys must go
+alternatively to the right and then to the left, leading, for example,
+to \([x_3 , x_1]\) and \([x_4, x_2, x_0]\). This is perhaps better
+visualised by means of oriented edges revealing a whirlpool in
+\fig~\vref{fig:whirlpool},
+\begin{figure}[b]
+\centering
+\includegraphics[bb=71 671 185 716]{a1a3a4a2a0}
+\caption{Best case for \fun{i2wb/1} if \(n=5\)
+\label{fig:whirlpool}}
+\end{figure}
+to be contrasted with the spiral in \fig~\vref{fig:spiral} for
+\fun{i2w/1}.
+
+The rule definining \fun{i2w/1} has to be used first. Then each key is
+inserted, alternatively by means of rule~\clause{\upsilon}
+and~\clause{\psi}. Finally, the left stack is reversed by
+rules~\clause{\pi} and~\clause{\rho}, so the question hinges on
+determining the length of the left stack in the best case. By design,
+if the total number of keys is even, then the two stacks will end up
+containing, before using rule~\clause{\rho}, exactly half of them,
+because the stacks have the same length. If the total is odd, the left
+stack contains the integral part of this number halved. Technically,
+let us note \(\B{\fun{i2wb}}{n}\) the cost of any call
+\(\fun{i2wb}(s)\), where the stack~\(s\) contains \(n\)~keys. If \(p
+\geqslant 0\), then
+\begin{equation*}
+\B{\fun{i2wb}}{2p}   = 1 +     2p + p = 3p + 1,\quad
+\B{\fun{i2wb}}{2p+1} = 1 + (2p+1) + p = 3p + 2.
+\end{equation*}
+Another, more compact, way to put it is: \(\B{\fun{i2wb}}{n} = 1 + n
++ \floor{n/2} \sim \tfrac{3}{2}{n}\). The equivalence is correct
+because \(n/2-1 < \floor{n/2} \leqslant n/2\).
+
+\paragraph{Exercise}
+
+The worst case occurs when insertions are repeatedly performed at the
+bottom of the longest stack. Find \(\W{\fun{i2wb}}{n}\) and
+characterise the worst case.
+
+\mypar{Average cost}
+
+Let us consider the average cost when \(n=2p\). Then\index{i2wb@$\M{\fun{i2wb}}{n}$}
+\begin{equation*}
+\M{\fun{i2wb}}{2p} = 
+  1 + \sum_{k=0}^{2p-1}{\M{}{k}} + \M{\curvearrowright}{p},
+\end{equation*}
+where \(\M{}{k}\)~is the average cost of inserting a key into a
+simulated stack of \(k\)~keys and
+\(\M{\curvearrowright}{p}\)~is\index{rev@$\M{\curvearrowright}{n}$}
+the cost of reversing \(p\)~keys from left to right. The variable~\(p\)
+in~\(\M{\curvearrowright}{p}\) is correct since there are
+\(\floor{n/2}\)~keys in the left stack after all insertions are
+over. Clearly, 
+\begin{equation*}
+\M{\curvearrowright}{p} = p + 1.
+\end{equation*}
+The determination of~\(\M{}{k}\) requires the consideration of only
+two cases: \(k\)~is even or not. When analysing the average cost of
+\fun{i2w/1}, there were much more configurations to take into account
+because not all the insertions lead to balanced stacks. If \(k\)~is
+even, then there exists an integer~\(j\) such that \(k=2j\) and
+\begin{equation*}
+\M{}{2j} = \M{}{j,j},
+\end{equation*}
+where \(\M{}{j,j}\) is the average number of rewrites to insert a
+random number into a configuration of two stacks of length~\(j\). We
+already computed~\(\M{}{p,q}\) in equation~\eqref{eq:Mpq}
+\vpageref{eq:Mpq}. Consequently,
+\begin{equation*}
+\M{}{2j} = \frac{j^2 + 3j + 1}{2j+1}
+         = \frac{1}{2}{j} - \frac{1}{4} \cdot \frac{1}{2j+1} +
+         \frac{5}{4}.
+\end{equation*}
+The case \(k=2j+1\) is similarly derived: \(\M{}{2j+1} =
+(j+3)/2\). Hence:
+\begin{align}
+\M{\fun{i2wb}}{2p}
+  &= 1 + \sum_{k=0}^{2p-1}{\M{}{k}} + (p+1)
+   = 2 + p + \sum_{j=0}^{p-1}{(\M{}{2j} + \M{}{2j+1})}\notag\\
+  &= \frac{1}{2}{p^2} + \frac{13}{4}{p} + 2 -
+             \frac{1}{4}\sum_{j=0}^{p-1}{\frac{1}{2j+1}}.
+\label{eq:i2wb_2p}
+\end{align}
+We need to find the value of this sum. Let \(H_n :=
+\sum_{k=1}^n{1/k}\) be the \(n\)th \emph{harmonic
+  number}\index{harmonic number}. Then
+\begin{equation*}
+H_{2p} = \sum_{j=0}^{p-1}{\frac{1}{2j+1}} + \sum_{j=1}^{p}{\frac{1}{2j}}
+      = \sum_{j=0}^{p-1}{\frac{1}{2j+1}} + \frac{1}{2}{H_{p}}.
+\end{equation*}
+We can now replace our sum by harmonic numbers in
+equation~\eqref{eq:i2wb_2p}:
+\begin{equation*}
+\M{\fun{i2wb}}{2p}
+  = \frac{1}{2}{p^2} + \frac{13}{4}{p} - \frac{1}{4}{H_{2p}} 
+    + \frac{1}{8}{H_p} + 2.
+\end{equation*}
+The remaining case is to find \(\M{\fun{i2wb}}{2p+1}\), which, by the
+same reckoning, is
+\begin{equation*}
+\M{\fun{i2wb}}{2p+1}
+  = 1 + \sum_{k=0}^{2p}{\M{}{k}} + \M{\curvearrowright}{p}.
+\end{equation*}
+Let us reuse previous calculations:
+\begin{equation*}
+\M{\fun{i2wb}}{2p+1}
+   = \M{\fun{i2wb}}{2p} + \M{}{2p}
+   = \frac{1}{2}{p^2} + \frac{15}{4}{p} - \frac{1}{4}{H_{2p+1}} 
+     + \frac{1}{8}{H_p} + \frac{13}{4}.
+\end{equation*}
+We have \(1 + x < e^x\), for all real \(x \neq 0\). In particular,
+\(x=1/i\), for~\(i>0\) integer, leads to \(1 + 1/i < e^{1/i}\). Both
+sides being positive, we deduce \(\prod_{i=1}^{n}(1+1/i) <
+\prod_{i=1}^{n}{e^{1/i}} \Leftrightarrow n+1 < \exp(H_n)\). Finally,
+\(\ln(n+1) < H_n\). An upper bound of~\(H_n\) can be similarly derived
+by replacing~\(x\) by~\(-1/i\):
+\begin{equation}
+\ln(n+1) < H_n < 1 + \ln n.\label{ineq:Hn}
+\end{equation}
+We can now express the bounds on
+\(\M{\fun{i2wb}}{n}\)\index{i2wb@$\M{\fun{i2wb}}{n}$} without~\(H_n\):
+\begin{align*}
+\ln(p+1) - 2\ln(2p) + 14
+&< 8 \cdot \M{\fun{i2wb}}{2p} - 4{p^2} - 26{p}\\
+& < \ln p - 2\ln(2p+1) + 17;\\
+\ln(p+1) - 2\ln(2p+1) + 24
+&< 8 \cdot \M{\fun{i2wb}}{2p+1} - 4{p^2} - 30{p}\\
+&< \ln{p} - 2\ln(2p+2) + 27.
+\end{align*}
+Setting \(n=2p\) and \(n=2p+1\) leads to the respective bounds
+\begin{align*}
+-2\ln n + \ln(n+2) + 4 &< \varphi(n) < -2\ln(n+1) + \ln n + 7,\\
+-2\ln n + \ln(n+1)     &< \varphi(n) < -2\ln(n+1) + \ln(n-1) + 3,
+\end{align*}
+where \(\varphi(n) := 8 \cdot \M{\fun{i2wb}}{n} - n^2 - 13n - 10 + \ln
+2\). We retain the minimum of the lower bounds and the maximum of the
+upper bounds of~\(\varphi(n)\) so, 
+\begin{equation*}
+\ln(n+1) - 2\ln n < \varphi(n) < -2\ln(n+1) + \ln n + 7.
+\end{equation*}
+We can weaken the bounds a little bit with \(\ln n < \ln(n+1)\) and
+simplify:
+\begin{equation*}
+0 < 8 \cdot \M{\fun{i2wb}}{n} - n^2 - 13n + \ln 2n - 10 < 7.
+\end{equation*}
+Therefore, for all \(n > 0\), there exists~\(\epsilon_n\) such that
+\(0 < \epsilon_n < 7/8\) and
+\begin{equation}
+\M{\fun{i2wb}}{n}
+  = \frac{1}{8}(n^2 + 13n - \ln 2n + 10) + \epsilon_n.
+\label{eq:ave_i2wb}
+\end{equation}
+\index{insertion sort!2-way $\sim$!balanced $\sim$|)}
+\index{tri!$\sim$ par insertions|)}

@@ -1,0 +1,65 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath}% Needed for \! to work
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+%\psset{showbbox=true}
+\pstree[nodesep=2pt,levelsep=30pt,treesep=14pt,arrows=->,xbbr=-2]{\Tp}{
+  \pstree{\TR{\(\el,\el\)}\nbput{\(\xi\)}}{
+    \pstree{\TR{\(\el,[a]\)}\nbput{\(\upsilon\)}}{
+      \pstree{\TR{\([a],\el\)}\nbput[npos=0.6]{\(\sigma\!\!\!\!\!\)}}{
+        \pstree{\TR{\([a],[b]\)}\nbput[npos=0.4]{\(\upsilon\)}}{
+          \pstree{\TR{\([b,a],\el\)}\nbput[npos=0.6]{\(\sigma\!\!\!\!\)}}{
+            \pstree{\TR{\([b,a],[c]\)}\nbput[npos=0.4]{\(\upsilon\)}}{
+              \pstree{\TR{\([a],[b,c]\)}\nbput{\(\rho\)}}{
+                \pstree{\TR{\(\el,[a,b,c]\)}\nbput{\(\rho\)}}{
+                  \TR{\([a,b,c]\)}\nbput{\(\pi\)}
+                }
+              }
+            }
+          } \pstree{\TR{\(\el,[a,b]\)}\nbput[npos=0.4]{\(\tau\!\!\)}}{
+              \pstree{\TR{\(\el,[c,a,b]\)}\nbput[npos=0.4]{\(\upsilon\)}}{
+                \TR{\([c,a,b]\)}\nbput{\(\pi\)}
+              }
+          }
+          \pstree{\TR{\([a],[c,b]\)}\naput[npos=0.6]{\(\!\!\!\upsilon\)}}{
+            \pstree{\TR{\(\el,[a,c,b]\)}\nbput{\(\rho\)}}{
+              \TR{\([a,c,b]\)}\nbput{\(\pi\)}
+            }
+          }
+        }
+      }
+      \pstree{\TR{\(\el,[b,a]\)}\naput[npos=0.6]{\(\!\!\!\upsilon\)}}{
+        \pstree{\TR{\([b],[a]\)}\nbput[npos=0.6]{\(\sigma\!\!\)}}{
+          \pstree{\TR{\([a,b],\el\)}\nbput[npos=0.6]{\(\sigma\!\!\)}}{
+            \pstree{\TR{\([a,b],[c]\)}\nbput[npos=0.4]{\(\upsilon\!\)}}{
+              \pstree{\TR{\([b],[a,c]\)}\nbput{\(\rho\)}}{
+                \pstree{\TR{\(\el,[b,a,c]\)}\nbput{\(\rho\)}}{
+                  \TR{\([b,a,c]\)}\nbput{\(\pi\)}
+                }
+              }
+            }
+          }
+          \pstree{\TR{\([b],[c,a]\)}\naput[npos=0.6]{\(\!\!\upsilon\)}}{
+            \pstree{\TR{\(\el,[b,c,a]\)}\nbput{\(\rho\)}}{
+              \TR{\([b,c,a]\)}\nbput{\(\pi\)}
+            }
+          }
+        }
+        \pstree{\TR{\(\el,[c,b,a]\)}\naput[npos=0.6]{\(\!\!\upsilon\)}}{
+          \TR{\([c,b,a]\)}\nbput{\(\pi\)}
+        }
+      }
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}

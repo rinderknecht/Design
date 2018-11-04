@@ -1,0 +1,29 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+%\psset{showbbox=true}
+\pstree[nodesep=2pt,levelsep=25pt,treesep=8pt,arrows=<-]{\TR{\([1,2,3,4,5,6]\)}}{
+  \pstree{\TR{\([2,3,6]\)}}{
+    \pstree{\TR{\([3,6]\)}}{
+      \TR{\([6]\)}
+      \TR{\([3]\)}
+    }
+    \skiplevel{\TR{\([2]\)}}
+  }
+  \pstree{\TR{\([1,4,5]\)}}{
+    \pstree{\TR{\([1,4]\)}}{
+      \TR{\([4]\)}
+      \TR{\([1]\)}
+    }
+    \skiplevel{\TR{\([5]\)}}
+  }
+}
+\endTeXtoEPS
+
+\end{document}

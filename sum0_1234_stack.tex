@@ -1,0 +1,41 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[arrows=->,nodesep=0pt,levelsep=20pt,treesep=14pt]{\TR{\fbox{\fun{sum}\(_0\)}}}{
+  \TR{\phantom{\texttt{|}}}
+}
+\raisebox{-3pt}{\(\xrightarrow{\gamma}\)}
+\pstree[nodesep=0pt,levelsep=20pt,treesep=14pt]{\TR{\fbox{\fun{sum}\(_0\)}}}{
+  {\psset{nodesepB=2pt} \TR{\(1\)}}
+  {\psset{arrows=->}\TR{\phantom{\texttt{|}}}}
+}
+\raisebox{-3pt}{\(\xrightarrow{\epsilon}\)}
+\pstree[nodesep=0pt,levelsep=20pt,treesep=14pt]{\TR{\fbox{\fun{sum}\(_0\)}}}{
+  {\psset{nodesepB=2pt} \TR{\(3\)}}
+  {\psset{arrows=->}\TR{\phantom{\texttt{|}}}}
+}
+\raisebox{-3pt}{\(\xrightarrow{\epsilon}\)}
+\pstree[nodesep=0pt,levelsep=20pt,treesep=14pt]{\TR{\fbox{\fun{sum}\(_0\)}}}{
+  {\psset{nodesepB=2pt}\TR{\(6\)}}
+  {\psset{arrows=->}\TR{\phantom{\texttt{|}}}}
+}
+\raisebox{-3pt}{\(\xrightarrow{\epsilon}\)}
+\pstree[nodesep=0pt,levelsep=20pt,treesep=14pt]{\TR{\fbox{\fun{sum}\(_0\)}}}{
+  {\psset{nodesepB=2pt}\TR{\(10\)}}
+  {\psset{arrows=->}\TR{\phantom{\texttt{|}}}}
+}
+\raisebox{-3pt}{\(\xrightarrow{\delta}\)}
+\pstree[nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\(10\)}}{}
+\endTeXtoEPS
+
+\end{document}

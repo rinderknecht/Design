@@ -1,0 +1,57 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[arrows=->,nodesep=0pt,levelsep=20pt,treesep=14pt]{\TR{\fbox{\fun{sum}}}}{
+  \TR{\phantom{\texttt{|}}}
+}
+\hspace{8pt}\raisebox{-3pt}{\(\xrightarrow{\beta}\)}\hspace{-5pt}
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\(+\)}}{
+  \TR{\(1\)}
+  \psset{nodesepB=0pt}
+  \pstree[arrows=->,nodesepA=0pt,levelsep=20pt]{\TR{\fbox{\fun{sum}}}}{
+    \TR{\phantom{\texttt{|}}}
+  }
+}
+\hspace{1pt}\raisebox{-3pt}{\(\xrightarrow{\beta}\)}\hspace{4pt}
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\(+\)}}{
+  \TR{\(1\)}
+  \Tn
+  \pstree{\TR{\(+\)}}{
+    \TR{\(2\)}
+    \psset{nodesepB=0pt}
+    \pstree[arrows=->,nodesepA=0pt,levelsep=20pt]{\TR{\fbox{\fun{sum}}}}{
+      \TR{\phantom{\texttt{|}}}
+    }
+  }
+}
+\hspace{-9pt}\raisebox{-3pt}{\(\xrightarrow{\beta}\)}\hspace{9pt}
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\(+\)}}{
+  \TR{\(1\)}
+  \Tn
+  \pstree{\TR{\(+\)}}{
+    \TR{\(2\)}
+    \Tn
+    \pstree{\TR{\(+\)}}{
+      \TR{\(3\)}
+      \psset{nodesepB=0pt}
+      \pstree[arrows=->,nodesepA=0pt,levelsep=20pt]{\TR{\fbox{\fun{sum}}}}{
+        \TR{\phantom{\texttt{|}}}
+      }
+    }
+  }
+}
+\hspace{-22pt}\raisebox{-3pt}{\(\xrightarrow{\alpha}\)}\hspace{23pt}
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\(10\)}}{}
+\endTeXtoEPS
+
+\end{document}

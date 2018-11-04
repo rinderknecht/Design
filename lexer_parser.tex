@@ -1,0 +1,58 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{pstcol,pst-node,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\psset{framearc=.2,arrows=->}
+\begin{psmatrix}[rowsep=15pt]%,colsep=40pt]
+    [name=source]
+    \begin{tabular}{c}
+       source\\
+       program
+    \end{tabular}
+  &[name=lexer]
+   \psframebox{\textsc{\textsf{
+     \begin{tabular}{c}
+       lexical\\
+       analyser
+     \end{tabular}
+   }}}
+  &[name=parser]
+   \psframebox{\textsc{\textsf{
+     \begin{tabular}{c}
+       syntax\\
+       analyser
+     \end{tabular}
+   }}}\\
+  &[name=symbol_table]
+   \psframebox{\textsc{\textsf{
+     \begin{tabular}{c}
+       symbol\\
+       table
+     \end{tabular}
+   }}}
+  &[name=ast]
+   \begin{tabular}{c}
+     syntax\\ 
+     tree
+   \end{tabular}
+\ncline{source}{lexer}
+\psset{offset=.2}
+\ncline{lexer}{parser}\naput{token}
+\psset{offset=.2}
+\ncline{parser}{lexer}\naput{\emph{get token}}
+\psset{offset=0}
+\ncline{lexer}{symbol_table}
+\ncline{symbol_table}{lexer}
+\ncdiag[angleA=225]{parser}{symbol_table}
+\ncdiag[angleB=225]{symbol_table}{parser}
+\ncline{parser}{ast}
+
+\end{psmatrix}
+\endTeXtoEPS
+
+\end{document}

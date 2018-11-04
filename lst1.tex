@@ -1,0 +1,28 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath,amssymb}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\(
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{lst}_1(h) & \rightarrow & \fun{lst}_1(0,h).\\
+\fun{lst}_1(0,\cons{\ufun{push}(x)}{h}) & \rightarrow
+                                     & \cons{x}{\fun{lst}_1(0,h)};\\
+\fun{lst}_1(k,\cons{\ufun{push}(x)}{h}) & \rightarrow & \fun{lst}_1(k-1,h);\\
+\fun{lst}_1(k,\cons{\ufun{pop}()}{h}) & \rightarrow & \fun{lst}_1(k+1,h);\\
+\fun{lst}_1(k,\el)         & \rightarrow & \el.
+\end{array}}
+\)
+\endTeXtoEPS
+
+\end{document}
+
+

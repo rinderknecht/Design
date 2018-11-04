@@ -1,0 +1,32 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+%\psset{showbbox=true}
+\pstree[nodesep=2pt,levelsep=24pt,treesep=7pt]{\TR{\(a_1\)?\(a_2\)}}{
+  \psset{tpos=0.3}
+  \pstree{\TR{\(a_2\)?\(a_3\)}\tlput{\(_{<}\!\!\)}}{
+    \pstree{\TR{\(a_1\)?\(a_3\)}\tlput{\(_{<}\!\!\)}}{
+      \psset{tpos=0.25}
+      \Tr{\((a_1,a_2,a_3)\)}\tlput{\(_{<}\!\!\)}
+      \Tn
+      \Tr{\(\bot\)}
+    }
+    \psset{nodesepB=0pt}
+    \pstree[nodesep=0pt]{\Tr{}\trput{\(\!\!_{>}\)}}{
+      \Tfan
+    }
+  }
+  \psset{nodesepB=0pt}
+  \pstree[nodesep=0pt]{\Tr{}\trput{\(\!\!_{>}\)}}{
+    \skiplevel{\Tfan}
+  }
+}
+\endTeXtoEPS
+
+\end{document}

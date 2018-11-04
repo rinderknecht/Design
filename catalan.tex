@@ -1,0 +1,622 @@
+\chapter{Catalan Trees}
+\label{chap:Catalan}
+
+In part~\ref{part:linear}, we dealt with linear structures, like
+stacks and queues, but, to really understand programs operating on
+such structures, we needed the concept of tree. This is why we
+introduced very early on abstract syntax trees\index{tree!abstract
+  syntax $\sim$}, directed acyclic graphs (e.g.,
+\fig~\vref{fig:cat_dag}), comparison trees (e.g.,
+\fig~\vref{fig:cmp_tree}), binary trees (e.g.,
+\fig~\vref{fig:comp_tree}), proof trees (e.g.,
+\fig~\vref{fig:perm_proof}), evaluation trees (e.g.,
+\fig~\vref{fig:2way_unbal}) and merge trees (e.g.,
+\fig~\vref{fig:bot_up1}). Those trees were meta\hyp{}objects, or
+concepts, used to understand the linear structure at hand.
+
+In this chapter, we take a more abstract point of view and we consider
+the general class of \emph{Catalan trees}, or general trees. We will
+study them as mathematical objects with the aim to transfer our
+results to the trees used as data structures to implement
+algorithms. In particular, we will be interested in measuring,
+counting them, and determining some average parameters relative to
+their shape, the reason being that knowing what a random tree looks
+like will tell us something about the cost of traversing it in
+different ways.
+
+% Wrapping figure better declared before a paragraph
+%
+\begin{wrapfigure}[9]{r}[0pt]{0pt}
+% [9] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\includegraphics[bb=71 646 160 712]{catalan_tree}
+\caption{Catalan tree of height~4\label{fig:catalan_tree}}
+\end{wrapfigure}
+Catalan trees are a special kind of graph, that is, an object made of
+\emph{nodes} (also called \emph{vertices}) connected by \emph{edges},
+without orientation (only the connection matters). What makes Catalan
+trees is the distinction of a node, called the \emph{root}, and the
+absence of cycles, that is, closed paths made of nodes successively
+connected. Catalan trees are often called \emph{ordered trees}, or
+\emph{planted plane trees}, in graph theory, and \emph{unranked
+  trees}, or \emph{\(n\)-ary trees} in programming theory. An example
+is given in \fig~\ref{fig:catalan_tree}. Note how the root is the
+topmost node and has four subtrees, whose root are called
+\emph{children}, given in order. The nodes drawn as white disks
+\((\circ)\) make up a maximal path starting from the root (the number
+of nodes along it is maximal). The ending node has no children; there
+are actually~\(8\) such nodes in total, called the \emph{leaves}. The
+number of edges connecting white disks is the \emph{height} of the
+Catalan tree (there may be several maximal paths of same length), so
+the given example has height~\(4\).
+
+Programmers implement Catalan trees as a data structure, \emph{e.g.},
+using \textsf{XML}, in which case some information is stored in the
+nodes and its retrieval may --~in the worst case~-- require the
+reaching of a leaf. The maximum cost of a search is thus proportional
+to the height of the tree and the determination of the average height
+becomes relevant when performing a series of random searches
+\citep{VitterFlajolet_1990}. For this kind of analysis, we need first
+to find the number of Catalan trees with a given size. There are two
+common measures for the size: either we quantify the trees by their
+number of nodes or we count the edges. In fact, using one or the other
+is a matter of convenience or style: there are \(n\)~edges if there
+are \(n+1\) nodes, simply because each node, save the root, has one
+parent. It is often the case that formulas about Catalan trees are a
+bit simpler when using the number of edges, so this will be our
+measure of size in this chapter.
+
+\section{Enumeration}
+\label{sec:Catalan_enumeration}
+
+% Wrapping figure better declared before a paragraph
+%
+\begin{wrapfigure}[10]{r}[0pt]{0pt}
+% [10] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\subfloat[Dyck path\label{fig:dyck}]{%
+  \includegraphics[bb=71 634 158 712]{dyck}}
+\quad
+\subfloat[Catalan tree\label{fig:ctree}]{%
+\includegraphics[bb=65 663 127 721]{ctree}
+}
+\caption{Bijection\label{fig:bijection}}
+\end{wrapfigure}
+In most textbooks \cite[\S~5.1 \&~5.2]{SedgewickFlajolet_1996} is
+shown how to find the number of Catalan trees with \(n\)~edges by
+means of some quite powerful mathematical tools known as
+\emph{generating functions}\index{enumerative combinatorics!generating
+  function} \cite[chap.~7]{GrahamKnuthPatashnik_1994}. Instead, for
+didactical purposes, we opt for a more intuitive technique in
+enumerative combinatorics\index{enumerative combinatorics} which
+consists in constructing a one\hyp{}to\hyp{}one correspondence between
+two finite sets, so the cardinal of one set is the cardinal of the
+other. In other words, we are going to relate bijectively, on the one
+hand, Catalan trees, and, on the other hand, other combinatorial
+objects which are relatively easy to count.
+
+The objects most suitable for our purpose are \emph{monotonic lattice
+  paths}\index{monotonic lattice path|see{Dyck path}} in a square grid
+\citep{Mohanty_1979,Humphreys_2010}. These paths are made up of steps
+oriented upwards (\(\uparrow\)), called \emph{rises}, and steps
+rightwards (\(\rightarrow\)), called \emph{falls}, starting at the
+bottom left corner \((0,0)\). \emph{Dyck paths}\index{Dyck path} of
+length~\(2n\) are paths ending at \((n,n)\) which stay above the
+diagonal, or touch it. We want to show that \emph{there exists a
+  bijection between Dyck paths of length~\(2n\) and Catalan trees with
+  \(n\)~edges.}
+
+\begin{wrapfigure}[7]{r}[0pt]{0pt}
+\centering
+\includegraphics[bb=71 661 128 720]{ctree_pre}
+\caption{\label{fig:ctree_pre}}
+\end{wrapfigure}
+To understand that bijection, we need first to present a particular
+kind of \emph{traversal}\index{tree!traversal}, or
+\emph{walk}\index{tree!walk|see{traversal}}, of Catalan trees. Let us
+imagine that a tree is a map where nodes represent towns and edges
+roads. A complete traversal of the tree consists then in starting our
+trip at the root and, following edges, to visit all the nodes. (It is
+allowed to visit several times the same nodes, since there are no
+cycles.) Of course, there are many ways to achieve this tour and the
+one we envisage here is called a \emph{preorder traversal}. At every
+node, we take the leftmost unvisited edge and visit the subtree in
+preorder; when back at the node, we repeat the choice with the
+remaining unvisited children. For the sake of clarity, we show in
+\fig~\ref{fig:ctree_pre} the \emph{preorder numbering}\index{tree!Catalan $\sim$!preorder numbering} of \fig~\ref{fig:ctree}, where the order in
+which a node is visited first is shown instead of a black disk
+\((\bullet)\).
+
+\begin{wrapfigure}[12]{r}[0pt]{0pt}
+% [11] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\includegraphics[bb=71 591 186 721]{reflection}
+\caption{Reflection of a prefix w.r.t. \(y = x - 1\)
+\label{fig:reflection}}
+\end{wrapfigure}
+The first part of the bijection is an injection from Catalan trees
+with \(n\)~edges to Dyck paths of length~\(2n\). By traversing the
+tree in preorder, we associate one rise to an edge on the way down,
+and a fall to the same edge on the way up. Obviously, there are
+\(2n\)~steps in the Dyck path. The surjection simply consists in
+reversing the process by reading the Dyck path step by step,
+rightwards, and build the corresponding tree. Now, we need to count
+the number of Dyck paths of length~\(2n\), which we know now is also
+the number of Catalan trees with \(n\)~edges.
+
+The total number of monotonic paths of length~\(2n\) is the number of
+choices of \(n\)~rises amongst \(2n\)~steps, that is,
+\(\binom{2n}{n}\). We need now to subtract the number of paths that
+start with a rise and cross the diagonal. Such a path is shown in
+\fig~\ref{fig:reflection}, drawn as a bold continuous line. The first
+point reached below the diagonal is used to plot a dotted line
+parallel to the diagonal. All the steps from that point back to
+\((0,0)\) are then changed into their counterpart: a rise by a fall
+and vice-versa. The resulting segment is drawn as a dashed line. This
+operation is called a \emph{reflection} \citep{Renault_2008}. The crux
+of the matter is that we can reflect each monotonic path crossing the
+diagonal into a distinct path from \((1,-1)\) to
+\((n,n)\). Furthermore, all reflected paths can be reflected when they
+reach the dotted line back into their original counterpart. In other
+words, the reflection is bijective. (Another intuitive and visual
+approach to the same result has been published by \cite{Callan_1995}.)
+Consequently, there are as many monotonic paths from \((0,0)\) to
+\((n,n)\) that cross the diagonal as there are monotonic paths from
+\((1,-1)\) to \((n,n)\). The latter are readily enumerated:
+\(\binom{2n}{n-1}\). As a conclusion, the number of Dyck paths of
+length~\(2n\) is\label{eq:Ann}
+\begin{align*}
+C_n &= \binom{2n}{n} - \binom{2n}{n-1}
+= \binom{2n}{n} - \frac{(2n)!}{(n-1)!(n+1)!}\\
+&= \binom{2n}{n} - \frac{n}{n+1} \cdot \frac{(2n)!}{n!n!}
+ = \binom{2n}{n} - \frac{n}{n+1} \binom{2n}{n} = \frac{1}{n+1}\binom{2n}{n}.
+\end{align*}
+The numbers \(C_n\) are called \emph{Catalan numbers}\index{Catalan
+  numbers@$C_n$|see{Catalan numbers}}\index{Catalan
+  numbers}. Using Stirling's
+formula\index{Stirling's formula}, seen in
+equation~\eqref{eq:Stirling} on page~\pageref{eq:Stirling}, we find
+that the number of Catalan trees with \(n\)~edges is
+\begin{equation}
+  C_n = \frac{1}{n+1}\binom{2n}{n} \sim \frac{4^n}{n\sqrt{\pi n}}.
+\label{eq:Cn}
+\end{equation}
+
+\section{Average path length}
+
+The \emph{path length} of a Catalan tree is the sum of the lengths of
+the paths from the root. We have seen this concept in the context of
+binary trees, where it was declined in two variants, \emph{internal
+  path length} (page~\pageref{insertion__internal_path_length}) and
+\emph{external path length}
+(page~\pageref{sorting__external_path_length}), depending on the end
+node being internal or external. In the case of Catalan trees, the
+pertinent distinction between nodes is to be a \emph{leaf} (that is, a
+node without subtrees) or not, but some authors nevertheless speak of
+external path length when referring to the distances to the leaves,
+and of internal path length for the non\hyp{}leaf nodes, hence we must
+bear in mind whether the context is the Catalan trees or the binary
+trees.
+
+In order to study the average path length of Catalan trees, and some
+related parameters, we may follow \cite{DershowitzZaks_1981} by
+finding first the average number of nodes of degree~\(d\) at
+level~\(l\) in a Catalan tree with \(n\)~edges. The \emph{degree of a
+  node} is the number of its children and its \emph{level} is its
+distance to the root counted in edges and the root is at
+level~\(0\).
+
+% Wrapping figure better declared before a paragraph
+%
+%%\begin{wrapfigure}[10]{r}[0pt]{0pt}
+\begin{figure}
+% [10] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\subfloat[Dyck path\label{fig:dyck_deg}]{%
+  \includegraphics[bb=71 634 158 712]{dyck_deg}}
+\quad
+\subfloat[Catalan tree\label{fig:ctree_deg}]{%
+\includegraphics[bb=65 663 127 721]{ctree_deg}
+}
+\caption{Degree-based bijection\label{fig:degree_based_bijection}}
+\end{figure}
+%%\end{wrapfigure}
+The first step of our method for finding the average path length
+consists in finding an alternative bijection between Catalan trees and
+Dyck paths. In \fig~\ref{fig:ctree}, we see a Catalan tree equivalent
+to the Dyck path in \fig~\ref{fig:dyck}, built from the preorder
+traversal of that tree. \Fig~\ref{fig:ctree_deg} shows the same tree,
+where the contents of the nodes is their degree. The preorder
+traversal (of the degrees) is \([3,0,0,2,1,0,0]\). Since the last
+degree is always~\(0\) (a leaf), we remove it and settle for
+\([3,0,0,2,1,0]\). Another equivalent Dyck path is obtained by mapping
+the degrees of that list into as many occurrences of rises
+(\(\uparrow\)) and one fall (\(\rightarrow\)), so, for instance,
+\(3\)~is mapped to (\(\uparrow, \uparrow, \uparrow, \rightarrow\)) and
+\(0\)~to (\(\rightarrow\)). In the end, \([3,0,0,2,1,0]\) is mapped
+into \([\uparrow, \uparrow, \uparrow, \rightarrow, \rightarrow,
+  \rightarrow, \uparrow, \uparrow, \rightarrow, \uparrow, \rightarrow,
+  \rightarrow]\), which corresponds to the Dyck path in
+\fig~\ref{fig:dyck_deg}. It is easy to convince ourself that we can
+reconstruct the tree from the Dyck path, so we indeed have a
+bijection.
+
+The reason for this new bijection is that we need to find the average
+number of Catalan trees whose root has a given degree. This number
+will help us in finding the average path length, following an idea of
+\cite{Ruskey_1983}. From the bijection, it is clear that the number of
+trees whose root has degree~\(r=3\) is the number of Dyck paths made
+of the segment from \((0,0)\) to \((0,r)\), followed by one fall (see
+the dot at \((1,r)\) in \fig~\ref{fig:dyck_deg}), and then all
+monotonic paths above the diagonal until the upper right corner
+\((n,n)\). Therefore, we need to determine the number of such paths.
+
+We have seen in section~\vref{sec:Catalan_height} the bijective
+reflection of paths and the counting principle of inclusion and
+exclusion. Let us add to our tools one more bijection which proves
+often useful: the \emph{reversal}. It simply consists in reversing the
+order of the steps making up a path. Consider for example
+\fig~\ref{fig:path_reversal}.
+\begin{figure}
+\centering
+\subfloat[Reversal of
+\fig~\ref{fig:reflection} \label{fig:path_reversal}]{
+\includegraphics[bb=71 606 188 721]{path_reversal}}
+\qquad
+\subfloat[Reversal and reflection of \fig~\ref{fig:dyck_deg} after \((1,3)\)\label{fig:path_deg}]{
+\includegraphics[bb=71 634 162 721]{path_deg}}
+\caption{Reversals and reflections}
+\end{figure}
+Of course, the composition of two bijections being a bijection, the
+composition of a reversal and a reflection is bijective, hence the
+monotonic paths above the diagonal from \((1,r)\) to \((n,n)\) are in
+bijection with the monotonic paths above the diagonal from \((0,0)\)
+to \((n-r,n-1)\). For example, \fig~\ref{fig:path_deg} shows the
+reversal and reflection of the Dyck path of \fig~\ref{fig:dyck_deg}
+after the point \((1,3)\), distinguished by the black disk
+(\(\bullet\)).
+
+Recalling that Catalan trees with \(n\)~edges are in bijection with
+Dyck paths of length~\(2n\) (section~\vref{sec:Catalan_enumeration}),
+we now know that the number of Catalan trees with \(n\)~edges and
+whose root has degree~\(r\) is the number of monotonic paths above the
+diagonal from the point \((0,0)\) to \((n-r,n-1)\). We can find this
+number using the same technique we used for the total number~\(C_n\)
+of Dyck paths. The principle of inclusion and exclusion says that we
+should count the total number of paths with same extremities and
+retract the number of paths that cross the diagonal. The former is
+\(\binom{2n-r-1}{n-1}\), which enumerates the ways to interleave
+\(n-1\)~rises (\(\uparrow\)) and \(n-r\) falls (\(\rightarrow\)). The
+latter number is the same as the number of monotonic paths from
+\((1,-1)\) to \((n-r,n-1)\), as shown by reflecting the paths up to
+their first crossing, that is, \(\binom{2n-r-1}{n}\); in other words,
+that is the number of interleavings of \(n\)~rises with \(n-r-1\)
+falls. Finally, imitating the derivation of equation~\eqref{eq:Cn},
+the number \(\mathcal{R}_n(r)\) of trees with \(n\)~edges and root of
+degree~\(r\) is
+\begin{equation*}
+\mathcal{R}_n(r) = \binom{2n-r-1}{n-1} - \binom{2n-r-1}{n} 
+                 = \frac{r}{2n-r} \binom{2n-r}{n}.
+\end{equation*}
+
+Let \(\mathcal{N}_n(l,d)\) be the number of nodes in the set of all
+Catalan trees with \(n\)~edges, which are at level~\(l\) and have
+degree~\(d\). This number is the next step in determining the average
+path length because \cite{Ruskey_1983} found a neat bijection to
+relate it to \(\mathcal{R}_n(r)\) by the following equation:
+\begin{equation*}
+\mathcal{N}_n(l,d) = \mathcal{R}_{n+l}(2l+d).
+\end{equation*}
+In \fig~\ref{fig:level_deg}
+\begin{figure}
+\centering
+\subfloat[\(n\)~edges, (\(\bullet\)) is of degree~\(d\) and at level~\(l\) \label{fig:level_deg}]{%
+  \includegraphics[bb=71 594 150 721]{level_deg}}
+\quad
+\subfloat[\(n+l\) edges, root of degree~\(2l+d\)\label{fig:lifted_node}]{%
+\includegraphics[bb=71 663 295 721]{lifted_node}
+}
+\caption{Bijection\label{fig:bij_root_level}}
+\end{figure}
+is shown the general pattern of a Catalan tree with node (\(\bullet\))
+of level~\(d\) and degree~\(d\). The double edges denote a set of
+edges, so the \(\mathcal{L}_i\), \(\mathcal{R}_i\) and
+\(\mathcal{B}_i\) actually represent forests. In
+\fig~\ref{fig:lifted_node} we see a Catalan tree in bijection with the
+former, from which it is made by lifting the node of interest
+(\(\bullet\)) to become the root, the forests \(\mathcal{L}_i\) with
+their respective parents are attached below it, then the
+\(\mathcal{B}_i\), and, finally, the \(\mathcal{R}_i\) for which new
+parents are needed (inside a dashed frame in the figure). Clearly, the
+new root is of degree \(2l+d\) and there are \(n+l\)
+edges. Importantly, the transformation can be inverted for any tree
+(it is injective and surjective), so it is indeed a bijection. We
+deduce
+\begin{equation}
+\mathcal{N}_n(l,d) = \frac{2l+d}{2n-d}\binom{2n-d}{n+l}
+= \binom{2n-d-1}{n+l-1} - \binom{2n-d-1}{n+l},
+\label{eq:Nn_l_d}
+\end{equation}
+where the last step follows from expressing the binomial coefficient
+in terms of the factorial function. In particular, this entails that
+the total number of nodes at level~\(l\) in all Catalan trees with
+\(n\)~edges is
+\begin{equation*}
+\sum_{d=0}^{n}\mathcal{N}_n(l,d)
+  = \sum_{d=0}^{n}\binom{2n-d-1}{n+l-1}
+    - \sum_{d=0}^{n}\binom{2n-d-1}{n+l}.
+\end{equation*}
+Let us consider the first sum:
+\begin{equation*}
+\sum_{d=0}^{n}\binom{2n-d-1}{n+l-1}
+  = \sum_{i=n-1}^{2n-1}\binom{i}{n+l-1}
+  = \sum_{i=n+l-1}^{2n-1}\binom{i}{n+l-1}.
+\end{equation*}
+We can now make use of the identity \eqref{eq:binom_sum}
+\vpageref{eq:binom_sum}, which is equivalent to
+\(\sum_{i=j}^{k}\binom{i}{j} = \binom{k+1}{j+1}\), so
+\(j=n+l-1\) and \(k=2n-1\) yields
+\begin{equation*}
+\sum_{d=0}^{n}\binom{2n-d-1}{n+l-1} = \binom{2n}{n+l}.
+\end{equation*}
+Furthermore, replacing \(l\)~by \(l+1\) gives
+\(\sum_{d=0}^{n}\binom{2n-d-1}{n+l} = \binom{2n}{n+l+1}\), so the
+total number of nodes at level~\(l\) in all Catalan trees with
+\(n\)~edges is
+\begin{equation}
+\sum_{d=0}^{n}\mathcal{N}_n(l,d)
+ = \binom{2n}{n+l} - \binom{2n}{n+l+1}
+ = \frac{2l+1}{2n+1}\binom{2n+1}{n-l}.
+\label{eq:N_n_l_d}
+\end{equation}
+
+Let \(\Expected{P_n}\) be the \emph{average path length} of a Catalan
+tree with \(n\)~edges. We have
+\begin{equation*}
+  \Expected{P_n} := \frac{1}{C_{n}} \cdot \sum_{l=0}^{n}l\sum_{d=0}^{n}\mathcal{N}_n(l,d),
+\end{equation*}
+because there are \(C_n\)~trees and the double summation is the sum of
+the path lengths of all the trees. If we average again by the number
+of nodes, \emph{i.e.,} \(n+1\), we obtain the average level of a node
+in a random Catalan tree and beware that some authors take this as the
+definition of the average path length. Alternatively, if we pick
+distinct Catalan trees with \(n\)~edges at random and then pick
+random, distinct nodes in them, \(\Expected{P_n}/(n+1)\) is the limit
+of the average cost of reaching the nodes in question from the
+root. Using equations \eqref{eq:N_n_l_d} and~\eqref{eq:Cn}
+\vpageref{eq:Cn}, we get
+\begin{align*}
+\Expected{P_n} \cdot C_n
+ &= \sum_{l=0}^{n}l\left[\binom{2n}{n+l} - \binom{2n}{n+l+1}\right]\\
+ &= \sum_{l=1}^{n}l \binom{2n}{n+l} - \sum_{l=0}^{n-1}l \binom{2n}{n+l+1}\\
+ &= \sum_{l=1}^{n}l \binom{2n}{n+l} - \sum_{l=1}^{n}(l-1)\binom{2n}{n+l}\\
+ &= \sum_{l=1}^{n}\binom{2n}{n+l}
+  = \sum_{i=n+1}^{2n}\binom{2n}{i}.
+\end{align*}
+The remaining summation is easy to crack because it is the sum of one
+half of an even row in Pascal's triangle. We see in
+\fig~\vref{fig:pascal_triangle} that the first half equals the second
+half, only the central element remaining (there is an odd number of
+entries in an even row). This is readily proven as follows:
+\(\sum_{j=0}^{n-1}\binom{2n}{j} = \sum_{j=0}^{n-1}\binom{2n}{2n-j} =
+\sum_{i=n+1}^{2n}\binom{2n}{i}\). Therefore
+\begin{equation*}
+\sum_{i=0}^{2n}\binom{2n}{i} = 2 \cdot \!\! \sum_{i=n+1}^{2n}\binom{2n}{i}
++ \binom{2n}{n},
+\end{equation*}
+and we can continue as follows:
+\begin{equation*}
+\frac{\Expected{P_n}}{n+1}
+  = \frac{1}{2}\binom{2n}{n}^{-1}\left[\sum_{i=0}^{2n}\binom{2n}{i} -
+    \binom{2n}{n}\right]
+  = \frac{1}{2}\left[\binom{2n}{n}^{-1}\sum_{i=0}^{2n}\binom{2n}{i} - 1\right].
+\end{equation*}
+The remaining sum is perhaps the most famous combinatorial identity
+because it is a corollary of the venerable \emph{binomial theorem},
+which states that, for all real numbers \(x\)~and~\(y\), and all
+positive integers~\(n\), we have the following equality:
+\begin{equation*}
+(x+y)^n = \sum_{k=0}^{n}\binom{n}{k}x^{n-k}y^k.
+\end{equation*}
+The truth of this statement can be seen by the following
+reckoning. Since, by definition, \((x+y)^n =
+\underline{(x+y)(x+y)\ldots(x+y)}_{\text{\(n\) times}}\), each term in
+the expansion of \((x+y)^{n}\) has the form \(x^{n-k}y^k\), for
+some~\(k\) ranging from~\(0\) to~\(n\), included. The coefficient of
+\(x^{n-k}y^{k}\) for a given~\(k\) is simply the number of ways to
+choose~\(k\) variables~\(y\) from the \(n\)~factors of \((x+y)^{n}\),
+the \(x\)~variables coming from the remaining \(n-k\) factors.
+
+Setting \(x=y=1\) yields the identity \(2^n =
+\sum_{k=0}^{n}\binom{n}{k}\), which finally unlocks our last step:
+\begin{equation}
+\Expected{P_n} = \frac{n+1}{2}\left[4^{n}\binom{2n}{n}^{-1} - 1\right].
+\label{eq:EPn}
+\end{equation}
+Recalling \eqref{eq:Cn} \vpageref{eq:Cn}, we obtain the asymptotic
+expansion:
+\begin{equation}
+\Expected{P_n} \sim \frac{1}{2}n\sqrt{\pi n}.
+\label{eq:Pn_asymptotics}
+\end{equation}
+Note that this equivalence also holds if~\(n\) denotes a number of
+nodes, instead of edges. The exact formula for the average path length
+of Catalan trees with \(n\)~nodes is \(\Expected{P_{n-1}}\) because
+there are then \(n-1\) edges.
+
+For some applications, it may be useful to know the external and
+internal path lengths, which are, respectively, the path lengths up to
+the leaves and to inner nodes (not to be confused with the external
+and internal path lengths of binary trees). Let \(\Expected{E_n}\)~be
+the former and \(\Expected{I_n}\) the latter. We have
+\begin{align*}
+\Expected{E_n} \cdot C_n
+  &:= \sum_{l=0}^{n} l \cdot \mathcal{N}_n(l,0)
+   = \sum_{l=0}^{n}l\left[\binom{2n-1}{n+l-1} -
+     \binom{2n-1}{n+l}\right]\\
+  &= \sum_{l=0}^{n-1}(l+1)\binom{2n-1}{n+l} -
+     \sum_{l=0}^{n-1}l \binom{2n-1}{n+l}
+   = \sum_{l=0}^{n-1}\binom{2n-1}{n+l},\\
+\Expected{E_n} \cdot C_n
+  &= \sum_{i=n}^{2n-1}\binom{2n-1}{i}
+   = \frac{1}{2}\sum_{j=0}^{2n-1}\binom{2n-1}{j} = 4^{n-1},
+\end{align*}
+where the penultimate step follows from the fact that an odd row in
+Pascal's triangle contains an even number of coefficients and the two
+halves have equal sums. We conclude:
+\begin{equation}
+\Expected{E_n} = (n+1) 4^{n-1}\binom{2n}{n}^{-1} \sim
+\frac{1}{4}n\sqrt{\pi n}.
+\label{eq:EEn}
+\end{equation}
+The derivation of \(\Expected{I_n}\) is easy because
+\begin{equation}
+\Expected{P_n} = \Expected{E_n} + \Expected{I_n}.
+\label{eq:PPn_EEn_EIn}
+\end{equation}
+From~\eqref{eq:EPn} and~\eqref{eq:EEn}, we express \(\Expected{P_n}\)
+in terms of \(\Expected{E_n}\):
+\begin{equation*}
+\Expected{P_n} = 2 \Expected{E_n} - \frac{n+1}{2},
+\end{equation*}
+then, replacing it in~\eqref{eq:PPn_EEn_EIn}, we finally draw
+\begin{equation*}
+\Expected{I_n} = \Expected{E_n} - \frac{n+1}{2},
+\end{equation*}
+and
+\begin{equation}
+\Expected{I_n}
+  = (n+1)4^{n-1}\binom{2n}{n}^{-1} - \frac{n+1}{2} \sim
+  \frac{1}{4}n\sqrt{\pi n}.
+\label{eq:EIn}
+\end{equation}
+Moreover, formulas \eqref{eq:EPn}, \eqref{eq:EEn} and~\eqref{eq:EIn}
+entail
+\begin{equation*}
+\Expected{I_n} \sim \Expected{E_n} \sim \frac{1}{2}\Expected{P_n}.
+\end{equation*}
+
+\section{Average number of leaves}
+
+The degree\hyp{}based bijection we introduced in
+\fig~\vref{fig:degree_based_bijection} implies that there are
+\((n+1)/2\) leaves in average in a random Catalan tree with
+\(n\)~edges. Indeed, a leaf is a corner in the ordinary lattice path,
+and it is \emph{not} a corner in the degree\hyp{}based lattice path,
+that is, an internal node (non\hyp{}leaf), therefore, leaves and
+non\hyp{}leaves are equinumerous and, since their total number is
+\(n+1\), the average number of leaves is \((n+1)/2\).
+
+This fact has an interesting consequence for the programming of
+algorithms on Catalan trees, in particular, the data
+structure. Indeed, a first idea would be to use a data constructor
+\fun{tree} with a pair argument, whose first component is the data
+stored at the root and the second component is the list of the
+subtrees, for instance \(\fun{tree}(0,[\fun{tree}(1,\el),
+\fun{tree}(2,\el)])\) denotes a tree with a root~\(0\), and two
+leaves, \(1\)~and~\(2\). Note how leaves are uniquely distinguished by
+an empty list of subtrees, which makes function definitions by case
+easy because only two cases are enough to cover all
+configurations. The downside becomes apparent when implementing the
+algorithms in a real functional language, because storing a list means
+having an indirection to the heap, where the contents of the list is
+actually laid out. Therefore, with the previous encoding of Catalan
+trees, each leaf means one indirection and no contents, which may seem
+wasteful. If we assume that the Catalan trees to be processed are
+random, the question boils down to determining the average number of
+leaves, which we happily know now to be half of the nodes. In other
+words, \(50\%\) of the nodes are represented in memory with an
+indirection without contents. An alternative encoding consists in
+using lists only if they contain at least one subtree, that is, only
+for inner nodes, and leaves would be represented by a constructor
+without list. The previous example would be thus rewritten:
+\(\fun{inner}(0,[\fun{leaf}(1),\fun{leaf}(2)])\). This is not quite
+right, because we could inadvertently write \(\fun{inner}(0,\el)\),
+which is incorrect. Instead, we need to define a data structure for
+encoding non\hyp{}empty lists, like so: \(\fun{single}(x)\), for the
+singleton list containing~\(x\), and \(\fun{many}(x,l)\), for lists
+containing at least two items, the first being~\(x\) and the remaining
+ones being found in the sublist~\(l\). Consequently, the previous
+example is now correctly written as
+\(\fun{inner}(0,\fun{many}(\fun{leaf}(1),\fun{single}(\fun{leaf}(2))))\).
+
+For further reading, we recommend the papers by
+\citet*{DershwowitzZaks_1980,DershowitzZaks_1981,DershowitzZaks_1990}.
+
+\section{Average height}
+\label{sec:Catalan_height}
+
+As mentioned earlier, the \emph{height} of a tree is the number of
+edges on a maximal path from the root to a leaf, that is, a node
+without subtrees; for example, we can follow down and count the edges
+connecting the nodes~\((\circ)\) in \fig~\ref{fig:catalan_tree}. A
+tree reduced to a single leaf has height~\(0\).
+
+We begin with the key observation that a Catalan tree with \(n\)~edges
+and height~\(h\) is in bijection with a Dyck path of length~\(2n\) and
+height~\(h\) (see \fig~\vref{fig:catalan_tree} and
+\fig~\ref{fig:bijection}). This simple fact allows us to reckon on the
+height of the Dyck paths and transfer the result back to Catalan
+trees.
+
+We have already seen the correspondence between lattice paths and
+Catalan trees, in which a rise reaching the $l$th diagonal corresponds
+to a node at level~$l$ in the tree, counting levels from root
+level~$0$. A simple bijection between paths will show that for every
+node on level~$l$ of a tree of height~$h$ and size~$n$, there is a
+corresponding node on either level $h-l+1$ or $h-l$ in another tree of
+same height and size. (This bijection was found by Nachum Dershowitz.)
+
+Consider the Dyck path in~\Fig~\ref{fig:h},
+\begin{figure}
+\centering
+\includegraphics{h}
+\caption{A Dyck path of length~\(2n\) and height~\(h\)\label{fig:h}}
+\end{figure}
+in bijection with a tree with~\(n=8\) edges and height~\(h=3\). Let us
+find the last (rightmost) point on the path where it reaches its full
+height (the dotted line of equation \(y = x + h\)), which we call the
+\emph{apex} of the path (marked~$A$ in the figure). The immediately
+following fall leads to~$B$ and it is drawn with a double line. Let us
+rotate the segment from $(0,0)$ to~$A$, and the segment from~$B$
+to~$(n,n)$ by 180$^\circ$. The invariant fall $(A,B)$ now connects the
+rotated segments. This way, what was the apex becomes the origin and
+vice\hyp{}versa, making this a height\hyp{}preserving bijection
+between paths. See \fig~\ref{fig:h_prime}.
+\begin{figure}
+\centering
+\includegraphics{h_prime}
+\caption{Dyck path in bijection with \fig~\ref{fig:h}
+\label{fig:h_prime}}
+\end{figure}
+
+The point is that every rise to level~\(l\) in \fig~\ref{fig:h},
+representing a node on level~\(l\) in the corresponding Catalan tree,
+ends up reaching level $h-l+1$ or $h-l$ in \fig~\ref{fig:h_prime},
+depending on whether it was to the left (segment before~$A$) or right
+(segment after~$B$) of the apex.  In the example in the figure, the
+rise~$a$ reaches level~$1$, and its counterpart after the
+transformation rises to level \(3-1+1=3\); the rise~$b$ reached
+level~$2$ and still does so because \(3-2+1=2\); the rise~$c$ also
+reached level~$2$, but because it was to the right of the apex, it
+reaches now level \(3-2=1\). It follows from this bijection that
+\emph{the average height is within one of twice the average level of a
+  node, that is, the average path length}. Equation~\eqref{eq:EPn} is
+equivalent to
+\begin{equation*}
+2\frac{\Expected{P_n}}{n+1} = 4^{n}\binom{2n}{n}^{-1} - 1.
+\end{equation*}
+If \(\Expected{H_n}\) is the average height of a Catalan tree with
+\(n\)~edges, we then have, recalling~\eqref{eq:Pn_asymptotics},
+\begin{equation*}
+\Expected{H_n} \sim 2\frac{\Expected{P_n}}{n+1} \sim \sqrt{\pi n}.
+\end{equation*}
+

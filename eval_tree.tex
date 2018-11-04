@@ -1,0 +1,59 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amssymb}
+\usepackage{xspace}
+\usepackage{mathpartir}
+\input{ocaml_syntax}
+\input{ocaml_macros}
+
+\begin{document}
+
+\TeXtoEPS
+\begin{mathpar}
+\inferrule*
+  {\eval{\varnothing}{\src{\num{1}}}{1}\\
+   \inferrule*
+     {\inferrule*[leftskip=4em]
+      {\eval
+         {\str{x} \mapsto 1}
+         {\src{\num{2}}}
+         {2}\\
+       \eval
+         {\str{x} \mapsto 2 \oplus \str{x} \mapsto 1}
+         {\src{\ident{x}}}
+         {2}
+      }
+      {\eval
+         {\str{x} \mapsto 1}
+         {\src{\Xlet \; \ident{x} \; \equal \; \num{2} \; \Xin \; \ident{x}}}
+         {2}
+      }\\
+      \inferrule*[leftskip=1em]
+        {}
+        {\eval
+           {\str{x} \mapsto 1}
+           {\src{\emph{\ident{x}}}}
+           {1}
+        }
+     }
+     {\eval
+        {\str{x} \mapsto 1}
+        {\src{\lpar\Xlet \; \ident{x} \; \equal \; \num{2}
+         \; \Xin \; \ident{x}\rpar{} \; \texttt{+} \; \ident{x}}}
+        {2+1}
+     }
+  }
+  {\eval
+    {\varnothing}
+    {\src{\Xlet \; \ident{x} \; \equal \; \num{1} \; \Xin \;
+       \lpar\lpar\Xlet \; \ident{x} \; \equal \; \num{2} \; \Xin \;
+       \ident{x}\rpar{} \; \texttt{+} \; \ident{x}\rpar}}
+    {3}}
+\end{mathpar}
+\endTeXtoEPS
+
+\end{document}
+

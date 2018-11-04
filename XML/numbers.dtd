@@ -1,0 +1,3 @@
+<!ELEMENT numbers (num,foo?)*>
+<!ELEMENT num (#PCDATA)>
+<!ELEMENT foo (#PCDATA)>

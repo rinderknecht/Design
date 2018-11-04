@@ -1,0 +1,43 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{amssymb}
+\usepackage{vaucanson-g}
+\usepackage{pst-eps}
+
+%\ShowGrid
+ 
+\begin{document}
+
+\TeXtoEPS
+\VCDraw{%
+\begin{VCPicture}{(-2,-2)(6,6)}
+% States
+%
+\State[\texttt{|}\!,\!\texttt{|}]{(4,0)}{nn}
+\StateVar[\texttt{|}\!,\!\texttt{[]}]{(0,0)}{ne}
+\StateVar[\texttt{[]}\!,\!\texttt{|}]{(0,4)}{en}
+\StateVar[\texttt{[]}\!,\!\texttt{[]}]{(4,4)}{ee}
+
+% Initial and final states
+%
+\InitialL[]{w}{en}{\nu}
+\FinalL[]{e}{ee}{\xi}
+
+% Edges
+%
+\EdgeL[0.5]{en}{ee}{\rho}
+\LoopVarN[0.5]{en}{\rho}
+\EdgeL[0.5]{en}{nn}{\sigma}
+\ArcR[0.5]{en}{ne}{\sigma}
+%
+\LoopE[0.15]{nn}{\rho,\sigma}
+\EdgeL[0.5]{nn}{ne}{\rho,\sigma}
+%
+\ArcR[0.5]{ne}{en}{\pi}
+\end{VCPicture}
+}
+\endTeXtoEPS
+
+\end{document}

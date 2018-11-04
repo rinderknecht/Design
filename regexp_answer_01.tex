@@ -1,0 +1,131 @@
+\paragraph{Answer 1.}
+
+The method to answer these questions is simply to try small words by
+constructing them in order to satisfy the constraints.
+\begin{enumerate}
+
+  \item The \label{aba} shortest word \(x\) belonging to L(r) is found
+    by taking \(\epsilon\) in place of \(\lparen a \disjM{}
+    b\rparen\kleeneM\). So \(x = aba\). Let us check if \(x \in L(s)\)
+    or not. \(L(s)\) is made of the union of four sub-languages
+    (subsets). To make this clear, let us remove the useless
+    parentheses on the right side:
+    \begin{equation*}
+    s = \lparen ab \rparen\kleeneM{} \, \disjM{} \, \lparen ba
+    \rparen\kleeneM{} \, \disjM{} \, a\kleeneM{} \, \disjM{} \,
+    b\kleeneM.
+    \end{equation*}
+    Therefore, membership tests on \(L(s)\) have to be split
+    into four: one membership test on \(\lparen ab
+    \rparen\kleeneM\), one on \(\lparen ba \rparen\kleeneM\),
+    one on \(a\kleeneM\) and another one on
+    \(b\kleeneM\). In other words, \(x \in L(s)\) is equivalent to
+    \begin{equation*}
+    x \in L(\lparen ab \rparen\kleeneM) \;
+     \text{or} \; x \in L(\lparen ba \rparen\kleeneM) \;
+     \text{or} \; x \in L(a\kleeneM) \; \text{or} \; x
+     \in L(b\kleeneM).
+    \end{equation*}
+    Let us test the membership with \(x = aba\):
+    \begin{enumerate}
+  
+      \item The words in \(L(\lparen ab \rparen\kleeneM)\) are
+        \(\epsilon\), \(ab\), \(abab\ldots\) Thus \(aba \not\in
+        L(\lparen ab \rparen\kleeneM)\).
+
+      \item The words in \(L(\lparen ba \rparen\kleeneM)\) are
+        \(\epsilon\), \(ba\), \(baba\ldots\) Hence \(aba \not\in
+        L(\lparen ba \rparen\kleeneM)\).
+
+      \item The words in \(L(a\kleeneM)\) are \(\epsilon\), \(a\),
+        \(aa\ldots\) Therefore \(aba \not\in L(a\kleeneM)\).
+
+      \item The words in \(L(b\kleeneM)\) are \(\epsilon\), \(b\),
+        \(bb\ldots\) So \(aba \not\in L(b\kleeneM)\).
+  
+    \end{enumerate}
+    The conclusion is \(aba \not\in L(s)\).
+
+    \item What is the shortest word belonging to \(L(s)\)?  Since the
+      four sub-languages composing \(L(s)\) are starred, it means that
+      \(\epsilon \in L(s)\). Since we showed at the item~(\ref{aba})
+      that \(aba\) is the shortest word of \(L(r)\), it means that
+      \(\epsilon \not\in L(r)\) because \(\epsilon\) is of length
+      \(0\).
+
+    \item This question is a bit more difficult. After a few tries, we
+      cannot find any~\(x\) such that \(x \in L(r)\) and \(x \in
+      L(s)\). Then we may try to prove that \(L(r) \cap L(s) =
+      \varnothing\), \emph{i.e.,} there is no such~\(x\). How should we
+      proceed? The idea is to use the decomposition of \(L(s)\) into
+      for sub-languages and try to prove
+      \begin{align*}
+        L(r) \cap L(\lparen ab \rparen\kleeneM) &= \varnothing,\\
+        L(r) \cap L(\lparen ba \rparen\kleeneM) &= \varnothing,\\
+        L(r) \cap L(a\kleeneM) &= \varnothing,\\
+        L(r) \cap L(b\kleeneM) &= \varnothing.
+      \end{align*}
+      If all these four equations are true, they imply
+        \(L(r) \cap L(s) = \varnothing\).
+      \begin{enumerate}
+
+        \item Any word in \(L(r)\) ends with \(a\) whereas any word in
+          \(L(\lparen ab \rparen\kleeneM)\) finishes with \(b\) or is
+          \(\epsilon\). Thus \(L(r) \cap L(\lparen ab \rparen\kleeneM)
+          = \varnothing\).
+
+        \item For the same reason, \(L(r) \cap L(b\kleeneM) =
+          \varnothing\).
+ 
+        \item Any word in \(L(r)\) contains both \(a\) and \(b\)
+          whereas any word in \(L(a\kleeneM)\) contains only \(b\) or
+          is \(\epsilon\). Therefore \(L(r) \cap L(a\kleeneM) =
+          \varnothing\).
+
+        \item Any word in \(L(r)\) starts with \(a\) whereas any word
+          in \(L(\lparen ba \rparen\kleeneM)\) starts with \(b\) or is
+          \(\epsilon\). Thus \(L(r) \cap L(\lparen ba \rparen\kleeneM)
+          = \varnothing\).
+
+      \end{enumerate}
+      Finally, since all the four equations are false, they imply
+      that
+      \begin{equation*}
+        L(r) \cap L(s) = \varnothing.
+      \end{equation*}
+
+    \item Let us construct letter by letter a word \(x\) which does
+      not belong neither to \(L(r)\) not \(L(s)\). First, we note that
+      all words in \(L(r)\) start with \(a\), so we can try to start
+      \(x\) with \(b\): this way \(x \not\in L(r)\). So we have \(x =
+      b\ldots\) and we have to fill the dots with some letters in such
+      a way that \(x \not\in L(s)\).
+
+      We use again the decomposition of~\(L(s)\) into four
+      sub-languages and make sure that~\(x\) does not belong to any of
+      those sub-languages. First, because \(x\) starts with \(b\), we
+      have \(x \not\in L(a\kleeneM)\) and \(x \not\in L(\lparen
+      ab \rparen\kleeneM)\). Now, we have to add some more letters
+      such that \(x \not\in L(b\kleeneM)\) and \(x \not\in L(\lparen
+      ba \rparen\kleeneM)\). Since any word in \(L(b\kleeneM)\) has a
+      letter \(b\) as second letter or is \(\epsilon\), we can choose
+      the second letter of \(x\) to be \(a\). This
+      way \(x=ba\ldots \not\in L(b\kleeneM)\). Finally, we have to
+      add more letters to make sure that
+      \begin{equation*}
+      x=ba\ldots \not\in L(\lparen ba\rparen\kleeneM).
+      \end{equation*}
+      Any word in \(L(\lparen ba\rparen\kleeneM)\) is
+      either \(\epsilon\) or \(ba\) or \(baba\ldots\), hence the third
+      letter is \(b\). Therefore, let us choose the letter \(a\) as
+      the third letter of \(x\) and we thus have \(x=baa \not\in
+      L(\lparen ba\rparen\kleeneM)\). In summary, \(baa \not\in L(r),
+      baa \not\in L(b\kleeneM), baa \not\in L(\lparen
+      ba\rparen\kleeneM), baa \not\in L(a\kleeneM), baa \not\in
+      L(\lparen ab\rparen\kleeneM)\), which is equivalent
+      to \(baa \not\in L(r)\) and \(baa \not\in L(\lparen
+      ab \rparen\kleeneM) \cup L(\lparen ba \rparen\kleeneM) \cup
+      L(a\kleeneM) \cup L(b\kleeneM) = L(s)\). Therefore, \(x=baa\) is
+      one possible answer.
+
+\end{enumerate}

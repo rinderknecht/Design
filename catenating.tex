@@ -1,0 +1,995 @@
+\section{Catenating}
+
+\begin{quote}
+\small[\textsl{This slow restart may be skipped by impatient readers.}]
+\end{quote}
+In the introduction, we did not explain the design of \fun{cat/2}, the
+function which catenates its two stack arguments. Let us start from
+scratch and proceed slowly.
+
+Consider writing a function \fun{join/2} doing the same thing as
+\fun{cat/2}. First, the requirement should be expressed in English as
+a function which takes two stacks and computes a stack containing all
+the items of the first stack followed by all the items of the second
+one, while retaining the relative order of the items. In other words,
+all function calls \(\fun{join}(s,t)\) are rewritten into a stack
+containing all the items of~\(s\) followed by all the items
+of~\(t\). A requirement would be incomplete without some examples. For
+instance,
+\begin{equation*}
+\fun{join}([3,5],[2]) \twoheadrightarrow [3,5,2].
+\end{equation*}
+Nevertheless, if this is still seem a bit vague, we should try some
+extreme cases, that is, special configurations of the arguments, in
+order to understand more precisely what is expected from this
+function. Both arguments being stacks, a hint comes naturally to mind
+because it is well known that stacks must either be empty or
+non\hyp{}empty. This simple observation leads to consider four
+distinct cases: both stacks are empty; the first is empty and the
+second is not; the first is not empty and the second is; both are not
+empty:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{join}(\el,\el) & \phantom{\rightarrow} & \phantom{\el;}\\
+\fun{join}(\el,\cons{y}{t}) & \phantom{\rightarrow} & \phantom{\cons{y}{t};}\\
+\fun{join}(\cons{x}{s},\el) & \phantom{\rightarrow} & \phantom{\cons{x}{s};}\\
+\fun{join}(\cons{x}{s},\cons{y}{t}) & \phantom{\rightarrow} &
+  \phantom{\cons{x}{\fun{join}(s,\cons{y}{t})}.}
+\end{array}
+\end{equation*}
+It is important not to rush to write the right\hyp{}hand sides. Are
+some cases left out? No, because there are exactly two arguments which
+can each be either empty or not, leading to exactly \(2 \cdot 2 = 4\)
+cases. Then, we write the corresponding canvas:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{join}(\el,\el) & \rightarrow & \fbcode{CCCCCCCCCC};\\
+\fun{join}(\el,\cons{y}{t}) & \rightarrow & \fbcode{CCCCCCCCCC};\\
+\fun{join}(\cons{x}{s},\el) & \rightarrow & \fbcode{CCCCCCCCCC};\\
+\fun{join}(\cons{x}{s},\cons{y}{t}) & \rightarrow & \fbcode{CCCCCCCCCC}.
+\end{array}
+\end{equation*}
+Let us ponder which rule looks easier, because there is no reason to
+complete them in order if we do not want to. When reading the
+patterns, a clear mental representation of the situation should
+arise. Here, it seems that the first rule is the easiest because it
+contains no variable at all: what is the stack made of all the items
+of the (first) empty stack followed by all the items of the (second)
+empty stack? Since the empty stack, by definition, contains no item,
+the answer is the empty stack:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{join}(\el,\el) & \rightarrow & \el;\\
+\fun{join}(\el,\cons{y}{t}) & \rightarrow & \fbcode{CCCCCCCCCC};\\
+\fun{join}(\cons{x}{s},\el) & \rightarrow & \fbcode{CCCCCCCCCC};\\
+\fun{join}(\cons{x}{s},\cons{y}{t}) & \rightarrow & \fbcode{CCCCCCCCCC}.
+\end{array}
+\end{equation*}
+Perhaps we might wonder whether this case should be dropped. In other
+words, is it a meaningful case? Yes, because the English description
+of the behaviour of \fun{join/2} mandates the result be always a stack
+made of items of other stacks (the arguments), so, in the absence of
+any items to `put' in the result, the final stack `remains' empty.
+
+It should be evident enough that the second and third rules are
+symmetric, because when appending a non\hyp{}empty stack to the right
+of an empty stack is the same as appending it to the left: the result
+is always the non\hyp{}empty stack in question.
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{join}(\el,\el) & \rightarrow & \el;\\
+\fun{join}(\el,\cons{y}{t}) & \rightarrow & \cons{y}{t};\\
+\fun{join}(\cons{x}{s},\el) & \rightarrow & \cons{x}{s};\\
+\fun{join}(\cons{x}{s},\cons{y}{t}) & \rightarrow & \fbcode{CCCCCCCCCC}.
+\end{array}
+\end{equation*}
+The last rule is the trickiest. What does the pattern in the
+left\hyp{}hand side of the rule reveal about the situation? That both
+stacks are not empty, more precisely, the top of the first stack is
+denoted by the variable~\(x\), the corresponding rest (which can
+either be empty or not) is~\(s\), and similarly for the second stack
+and \(y\)~and~\(t\). Are these bricks enough for building the
+right\hyp{}hand side, that is, the next step towards the result? We
+understand that appending two stacks \(p\)~and~\(q\) preserves in the
+result the total order of the items present in both, but also the
+relative order of the items of~\(p\) with respect to the items
+of~\(q\). In other words, the items of \(p=\cons{x}{s}\) must be
+present in the result before the items of \(q=\cons{y}{t}\) and the
+items from~\(p\) must be in the same order as in~\(p\) (same
+for~\(q\)). With this ordering in mind, it is perhaps natural
+sketching the following:
+\begin{equation*}
+\fun{join}(\cons{x}{s},\cons{y}{t}) \rightarrow \fbcode{II} \; x \;
+\fbcode{II} \; s \; \fbcode{II} \; y \; \fbcode{II} \; t \; \fbcode{II}.
+\end{equation*}
+In one rewrite step, can the item~\(x\) be placed in its final place,
+that is, in a position from where it does not need to be moved again?
+The answer is yes: it must be the top of the result.
+\begin{equation*}
+\fun{join}(\cons{x}{s},\cons{y}{t}) \rightarrow \cons{x}{\fbcode{II}
+  \; s \; \fbcode{II} \; y \; \fbcode{II} \; t \; \fbcode{II}}.
+\end{equation*}
+What about the other top, variable~\(y\)? It should remain on 
+top of~\(t\):
+\begin{equation*}
+\fun{join}(\cons{x}{s},\cons{y}{t}) \rightarrow \cons{x}{\fbcode{II}
+  \; s \; \fbcode{II} \; \cons{y}{t}}.
+\end{equation*}
+What is the relationship between \(s\)~and~\(\cons{y}{t}\)? We
+may be tempted by
+\begin{equation*}
+\fun{join}(\cons{x}{s},\cons{y}{t}) \rightarrow 
+  \cons{x}{\cons{s}{\cons{y}{t}}}.
+\end{equation*}
+which is flawed. The reason is that, while we may allow stacks to be
+used as items for other stacks (in other words, stacks can be
+arbitrarily embedded in other stacks), \(s\)~should not be used as an
+item here, as it is when it is used as a top in
+\(\cons{s}{\cons{y}{t}}\). Let us consider the running example
+\(\fun{join}([3,5],[2])\): here, the left\hyp{}hand side of the rule
+in question bounds \(x\)~to~\(3\), \(s\)~to~\([5]\), \(y\)~to~\(2\)
+and \(t\)~to~\(\el\), therefore the corresponding putative
+right\hyp{}hand side \(\cons{x}{\cons{s}{\cons{y}{t}}}\) is actually
+\erlcode{[3|[\textbf{[5]}|[2|[]]]]}, differing from the result
+\erlcode{[3|[\textbf{5}|[2|[]]]]} in that \erlcode{[5]} is
+not~\erlcode{5}.
+
+How can \(s\)~and~\(\cons{y}{t}\) be catenated? Of course, this is
+exactly the purpose of the function \fun{join/2} currently being
+defined. Therefore, what we need here is a recursive call:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{join}(\el,\el) & \rightarrow & \el;\\
+\fun{join}(\el,\cons{y}{t}) & \rightarrow & \cons{y}{t};\\
+\fun{join}(\cons{x}{s},\el) & \rightarrow & \cons{x}{s};\\
+\fun{join}(\cons{x}{s},\cons{y}{t}) & \rightarrow & \underline{\cons{x}{\fun{join}(s,\cons{y}{t})}}.
+\end{array}
+\end{equation*}
+
+\paragraph{Correctness and completeness}
+\index{soundness|(}
+\index{completeness|(}
+
+It is extremely common that, in the course of designing a function, we
+focus on some aspect, some rule, and then on some other part of the
+code, and we may miss the forest for the trees. When we settle for a
+function definition, the next step is to check whether it is correct
+and complete with respect to the conception we had of its expected
+behaviour.
+
+We say that a definition is \emph{correct} if all function calls that
+can be rewritten in one step can be further rewritten in the expected
+result, \emph{and} if every failing call was expected to fail. By
+failure, we mean that a \emph{stuck expression} is reached, that is,
+an expression containing a function call which can not be further
+rewritten.
+
+We say that a definition is \emph{complete} if all function calls that
+we expect a priori to be computable are indeed computable. In other
+words, we must also check that the definition enables rewriting into a
+value any input we deem acceptable.
+
+How do we check that the last definition of \fun{join/2} is
+correct and complete? If the concept of `expected result' is not
+formally defined, typically by means of mathematics, we resort to
+\emph{code review} and \emph{testing}. One important aspect of the
+reviewing process consists in verifying again the left\hyp{}hand sides
+of the definition and see if all possible inputs are accepted or
+not. In case some inputs are not matched by the patterns, we must
+justify that fact and record the reason in a comment. The
+left\hyp{}hand sides of \fun{join/2} match all the combinations of two
+stacks, whether they are empty or not, and this is exactly what was
+expected: no more, no less. The next step is to inspect the
+right\hyp{}hand sides and wonder twofold: (1)~Are the right\hyp{}hand
+sides rewritten into the expected type of value, for all function
+calls?  (2)~Are the function calls being provided the expected type of
+arguments?  These checks stem from the fact that some functional
+languages, like \Erlang, do not include \emph{type inference} at
+compile\hyp{}time. Other functional languages, like \OCaml and
+\Haskell, would have their compilers automatically establish these
+properties. The examination of the right\hyp{}hand sides in the
+definition of \fun{join/2} confirms that
+\begin{itemize*}
+
+\item the right\hyp{}hand sides of the first three rules are stacks
+  containing the same kind of items as the arguments;
+
+\item the arguments of the unique recursive call in the last rule
+  are stacks made of items from the parameters;
+
+\item assuming that the recursive call has the expected type, we
+  deduce that the right\hyp{}hand side of the last rule is a stack
+  made of items from the arguments.
+
+\end{itemize*}
+As a conclusion, the two questions above have been positively
+answered. Notice how we had to assume that the recursive call already
+had the type we were trying to establish for the current
+definition. There is nothing wrong with this reasoning, called
+\emph{inductive}, and it is rife in mathematics. We shall revisit it
+in different contexts.
+
+The following stage consists in testing the definition. This means to
+define a set of inputs which lead to a set of outputs and failures
+that are all expected. For example, it is expected that
+\(\fun{join}(\el,\el) \twoheadrightarrow \el\), so we could assess
+the validity of this statement by running the code, and the function
+call indeed passes the test. How should we choose the inputs
+meaningfully? There are no general rules, but some guidelines are
+useful. One is to consider the empty case or the smaller case,
+whatever that means in the context of the function. For example, if
+some argument is a stack, then let us try the empty stack. If some
+argument is a nonnegative integer, then let us try zero. Another
+advice is to have at least \emph{test cases}, that is, some function
+calls whose values are known, which exert each rule. In the case of
+\fun{join/2}, there are four rules to be covered by the test cases.
+
+\paragraph{Improvement}
+
+Once we are convinced that the function we just defined is correct and
+complete,\index{soundness|)} \index{completeness|)}
+ it is often worth considering again the code for
+improvement. There are several directions in which improvements, often
+called \emph{optimisations} although the result may not be optimal,
+can be achieved:
+\begin{itemize*}
+
+  \item Can we rewrite the definition so that in all or some cases it
+    is faster? 
+
+  \item Is there an equivalent definition which uses less memory in
+    all or some cases?
+
+  \item Can we shorten the definition by using fewer rules (perhaps
+    some are useless or redundant) or shorter right\hyp{}hand sides?
+
+  \item Can we use less parameters in the definition? (This is related
+    to memory usage.)
+
+\end{itemize*}
+Let us reconsider \fun{join/2}:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{join}(\el,\el) & \rightarrow & \el;\\
+\fun{join}(\el,\cons{y}{t}) & \rightarrow & \cons{y}{t};\\
+\fun{join}(\cons{x}{s},\el) & \rightarrow & \cons{x}{s};\\
+\fun{join}(\cons{x}{s},\cons{y}{t}) & \rightarrow & \cons{x}{\fun{join}(s,\cons{y}{t})}.
+\end{array}
+\end{equation*}
+and focus our attention on the two first rules, whose common point is
+to have the first stack being empty. It is clear now that the
+right\hyp{}hand sides are, in both rules, the second stack, whether it
+is empty (first rule) or not (second rule). Therefore, there is no
+need to discriminate on the structure of the second stack when the
+first one is empty and we can equivalently write
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{join}(\el,t) & \rightarrow & t,\;\text{where \(t\) is a stack};\\
+\fun{join}(\cons{x}{s},\el) & \rightarrow & \cons{x}{s};\\
+\fun{join}(\cons{x}{s},\cons{y}{t}) & \rightarrow &
+  \cons{x}{\fun{join}(s,\cons{y}{t})}.
+\end{array}
+\end{equation*}
+Note how the new definition does not formally ascertain that \(t\)~is
+a stack --~hence the comment~-- so it is not strictly equivalent to
+the original definition: now \(\fun{join}(\el,5) \rightarrow 5\). Let
+us compromise by favouring the conciseness of the latter definition or
+assume type inference.
+
+Let us consider next the two last rules and look for common
+patterns. It turns out that, in the penultimate rule, the first stack
+is matched as \(\cons{x}{s}\) but nothing is done with \(x\)~and~\(s\)
+except \emph{rebuilding} \(\cons{x}{s}\) in the right\hyp{}hand
+side. This suggests that we could simplify the rule as follows:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{join}(\el,t) & \rightarrow & t;\\
+\fun{join}(s,\el) & \rightarrow & s,\;
+  \text{where \(s\) is a non-empty stack};\\
+\fun{join}(\cons{x}{s},\cons{y}{t}) & \rightarrow &
+  \cons{x}{\fun{join}(s,\cons{y}{t})}.
+\end{array}
+\end{equation*}
+It is important to check that changing \(\cons{x}{s}\) into~\(s\) does
+not affect the pattern matching, that is to say, exactly the same
+inputs which used to match the pattern are still matching it. Indeed,
+it is possible in theory that the new~\(s\) matches an empty
+stack. Can we prove that \(s\)~is never empty? The left\hyp{}hand side
+of the penultimate rule matches only if the previous rule did not
+match, in other words, rules are tried in the order of the writing,
+that is, top\hyp{}down. Therefore, we know that \(s\)~can not be bound
+to the empty stack, because \(\el\)~is used in the previous rule
+\emph{and} the second parameter can be any stack. Nevertheless, as
+happened before, \(s\)~is not necessarily a stack anymore, for
+instance, \(\fun{join}(5,\el) \rightarrow 5\). Again, we will ignore
+this side\hyp{}effect and choose the conciseness of the latter
+definition.
+
+In the last rule, we observe that the second argument, matched by
+\(\cons{y}{t}\), is simply passed over to the recursive call, thus it
+is useless to distinguish \(y\)~and~\(t\) and we can try
+\begin{equation*}
+\fun{join}(\el,t) \rightarrow t;\quad
+\fun{join}(s,\el) \rightarrow s;\quad
+\fun{join}(\cons{x}{s},\underline{t}) \rightarrow
+\cons{x}{\fun{join}(s,\underline{t})}.
+\end{equation*}
+(Can~\(t\) be empty?) Again, we must make sure that \(t\)~can not
+match an empty stack: it can not be empty because, otherwise, the
+previous pattern would have matched the call. As it is, the
+penultimate pattern is included in the last, that is, all input
+matched by the penultimate could be matched by the last, which leads
+us to consider whether the definition would still be correct if
+\(t\)~could be empty after all. Let us label the rules as follows:
+\begin{equation*}
+\fun{join}(\el,t) \xrightarrow{\smash{\alpha}} t;\quad
+\fun{join}(s,\el) \xrightarrow{\smash{\beta}} s;\quad
+\fun{join}(\cons{x}{s},t) \xrightarrow{\smash{\gamma}}
+\cons{x}{\fun{join}(s,t)}.
+\end{equation*}
+Let \(s\)~be some stack containing \(n\)~items, which we write
+informally as \(s = [x_0, x_1, \dots, x_{n-1}]\). The subscript~\(i\)
+in~\(x_i\) is the \emph{position} of the item in the stack, the top
+being at position~\(0\). Then we would rewrite in one step
+\begin{equation*}
+\fun{join}(s,\el) \smashedrightarrow{\beta} s.
+\end{equation*}
+Had rule~\clause{\beta} been erased, we would have had instead the
+series
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}l}
+\fun{join}(s,\el) 
+& \smashedrightarrow{\gamma} &
+  [x\sb{0}|\fun{join}([x\sb{1},\ldots,x\sb{n-1}],\el)]\\
+& \smashedrightarrow{\gamma} & 
+  [x\sb{0}|[x\sb{1}|\fun{join}([x\sb{2},\ldots,x\sb{n-1}],\el)]]\\
+& = & [x\sb{0},x\sb{1}|\fun{join}([x\sb{2},\ldots,x\sb{n-1}],\el)]\\
+& \smashedrightarrow{\gamma} &
+  [x\sb{0},x\sb{1}|[x\sb{2}|\fun{join}([x\sb{3},\ldots,x\sb{n-1}],\el)]]\\
+& = & [x\sb{0},x\sb{1},x\sb{2}|\fun{join}([x\sb{3},\ldots,x\sb{n-1}],\el)]\\
+& \smash{\vdots} &\\
+& \smashedrightarrow{\gamma} & 
+  [x\sb{0},x\sb{1},\ldots,x\sb{n-1}|\fun{join}(\el,\el)]\\
+& \smashedrightarrow{\alpha} & [x\sb{0},x\sb{1},\ldots,x\sb{n-1}|\el]\\
+& = & [x\sb{0},x\sb{1},\ldots,x\sb{n-1}]\\
+& = & s.
+\end{array}
+\end{equation*}
+In short, we found \(\fun{join}(s,\el) \twoheadrightarrow s\).
+This means that rule~\clause{\beta} is useless, since its removal
+allows us to reach the same result~\(s\), although more slowly:
+\(n\)~steps by rule~\clause{\gamma} plus~\(1\) by
+rule~\clause{\alpha}, instead of one step by
+rule~\clause{\beta}. We are hence in a situation where we discover
+that the original definition was already specialised for speed when
+the second stack is empty. If we remove rule~\clause{\beta}, the
+program is shorter but becomes slower in that special case. This kind
+of dilemma is quite common in programming and there is sometimes no
+clear\hyp{}cut answer as to what is the best design. Perhaps another
+argument can here tip the scale slightly in favour of the
+removal. Indeed, whilst the removal slows down some calls, it makes
+the number of rewrites easy to remember: it is the number of items of
+the first stack plus~\(1\); in particular, the length of the second
+argument is irrelevant. So let us settle for a new definition with a
+new name:
+\begin{equation*}
+\fun{cat}(\el,t) \xrightarrow{\alpha} t;\quad
+\fun{cat}(\cons{x}{s},t) \xrightarrow{\beta} \cons{x}{\fun{cat}(s,t)}.
+\end{equation*}
+Let us note that \(\fun{cat}(5,\el)\) fails again, as it does in the
+original version.
+
+When programming medium or large applications, it is recommended to
+use evocative variables, like~\erlcode{StackOfProc}, instead of
+enigmatic ones, like~\(s\). But in this presentation we are mostly
+concerned with short programs, not software engineering, so short
+variables will do. Nevertheless, we need to opt for a naming
+convention so we can easily recognise the type of the variables across
+function definitions.
+
+\mypar{Tail form}
+
+As the rewrite of \(\fun{cat}(s,\el)\) shows, the right\hyp{}hand side
+of rule~\clause{\beta} of \fun{cat/2} features a call with the
+\emph{context} \(\cons{x}{\text{\textvisiblespace}}\), the
+mark~\textvisiblespace{} standing for the location of the call
+\(\fun{cat}(s,t)\). When all the right\hyp{}hand sides of a definition
+are either values, or arithmetic expressions, or expressions made only
+of data constructors, or one function call whose arguments are values
+or arithmetic expressions or data constructors, it is said to be in
+\emph{tail form}.
+ 
+We may wonder whether a tail form variant is necessary or not and we
+will discuss this issue later. At the moment, let us take this as a
+stylistic exercise and, instead of presenting a systematic
+transformation, let us envisage a pragmatic approach. In the case of
+\fun{cat/2}, as stated above, the only context is
+\(\cons{x}{\text{\textvisiblespace}}\) and the operator~(\erlcode{|})
+is not associative, that is, \(\cons{x}{\cons{y}{z}} \not\equiv
+\cons{\cons{x}{y}}{z}\). The idea is to add another parameter in which
+we will store the values from the context, and when the input is
+exhausted, we will rebuild the context from that parameter, called an
+\emph{accumulator}. Here, we want a new function \fun{cat/3} whose
+definition has the shape
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}l}
+\fun{cat}(\el,t,\underline{u}) & \rightarrow & \fbcode{CCCCCCC};\\
+\fun{cat}(\cons{x}{s},t,\underline{u}) & \rightarrow & \fbcode{CCCCCCC}.
+\end{array}
+\end{equation*}
+The new parameter~\(u\) is the accumulator in question. Since we want
+to store many~\(x\) in it, it must be a stack. Furthermore, its initial
+value should be the empty stack, otherwise extraneous items would be
+found in the result. Therefore, the definition in tail form,
+equivalent to \fun{cat/2} and named \fun{cat\(_0\)/2}, calls
+\fun{cat/3} with the extra argument~\(\el\):
+\begin{equation*}
+\fun{cat\(_0\)}(s,t) \rightarrow \fun{cat}(s,t,\el).
+\end{equation*}
+Let us go back to \fun{cat/3} and push~\(x\) on~\(u\):
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}l}
+\fun{cat}(\el,t,u) & \smashedrightarrow{\alpha} & \fbcode{CCCCCCC};\\
+\fun{cat}(\cons{x}{s},t,u) & \smashedrightarrow{\beta} &
+  \fun{cat}(s,t,\cons{x}{u}).
+\end{array}
+\end{equation*}
+What is the accumulator with respect to the expected result? We
+already know that it can not be a partial result, because
+(\erlcode{|})~is not associative. So some more work has to be done
+with \(u\)~\emph{and}~\(t\), but, first, we should understand what
+\(u\)~contains at this point and unfolding a call, with a piece of
+paper and a pencil, is quite enlightening. Let \(s\)~be a stack of
+\(n\)~items \([x_0,x_1,\dots,x_{n-1}]\). We have the following:
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}l}
+\fun{cat}(s,t,\el) & \smashedrightarrow{\beta} &
+  \fun{cat}([x\sb{1},\ldots,x\sb{n-1}],t,[x\sb{0}])\\
+              & \smashedrightarrow{\beta} &
+  \fun{cat}([x\sb{2},\ldots,x\sb{n-1}],t,[x\sb{1},x\sb{0}])\\
+              & \smash{\vdots}\\
+              & \smashedrightarrow{\beta} & \fun{cat}(\el,t,[x\sb{n-1},x\sb{n-2},\ldots,x\sb{0}])\\
+              & \smashedrightarrow{\alpha} & \fbcode{CCCCCCC}.
+\end{array}
+\end{equation*}
+Therefore, \(u\)~in the left\hyp{}hand side of rule~\clause{\alpha} is
+bound to a stack which contains the same items as the original first
+argument~\(s\), but in \emph{reverse order}. In other words, given the
+call \(\fun{cat}(s,t,\el)\), the parameter~\(u\) in the first pattern
+of \fun{cat/3} holds~\(s\) reversed. What can we do with
+\(u\)~and~\(t\) in order to reach the result?  The key is to realise
+that the answer depends on the contents of~\(u\), which, therefore,
+needs to be matched more accurately: is~\(u\) empty or not? This leads
+to split rule~\clause{\alpha} into \(\alpha_0\) and \(\alpha_1\):
+\newlength\Split\settowidth\Split{\(_{\alpha_0}\)}
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}l}
+\fun{cat}(\el,t,\el) & \MyArrow{\Split}{\alpha\sb{0}} &
+  \fbcode{CCCCCCC};\\
+\fun{cat}(\el,t,\cons{x}{u}) & \MyArrow{\Split}{\alpha\sb{1}} & 
+  \fbcode{CCCCCCC};\\
+\fun{cat}(\cons{x}{s},t,u) & \MyArrow{\Split}{\beta} &
+ \fun{cat}(s,t,\cons{x}{u}).
+\end{array}
+\end{equation*}
+Notice that rules \clause{\alpha_0}~and~\clause{\alpha_1} could be
+swapped, as they filter completely distinct cases. The right\hyp{}hand
+side of rule~\clause{\alpha_0} is easy to guess: it must be~\(t\),
+since it corresponds to the case when we want to append the empty
+stack to~\(t\):
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}l}
+\fun{cat}(\el,t,\el) & \MyArrow{\Split}{\alpha\sb{0}} & t;\\
+\fun{cat}(\el,t,\cons{x}{u}) & \MyArrow{\Split}{\alpha\sb{1}} & \fbcode{CCCCCCC};\\
+\fun{cat}(\cons{x}{s},t,u) & \MyArrow{\Split}{\beta} &
+  \fun{cat}(s,t,\cons{x}{u}).
+\end{array}
+\end{equation*}
+How do we relate \(t\), \(x\)~and~\(u\) in rule \clause{\alpha_1} with
+the result we are looking for? Given the rewrite \(\fun{cat}(s,t,\el)
+\twoheadrightarrow \fun{cat}(\el,t,\cons{x}{u})\), we know that
+\(\cons{x}{u}\)~is~\(s\) reversed, so item \(x\)~is last in~\(s\) and
+it should be on top of~\(t\) in the result. What should we do
+with~\(u\)? The key is to realise that we need to start the same
+process again, that is, we need another recursive call:
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}l}
+\fun{cat}(\el,t,\el) & \MyArrow{\Split}{\alpha\sb{0}} & t;\\
+\fun{cat}(\el,t,\cons{x}{u}) & \MyArrow{\Split}{\alpha\sb{1}} &
+  \fun{cat}(\el,\cons{x}{t},u);\\
+\fun{cat}(\cons{x}{s},t,u) & \MyArrow{\Split}{\beta} &
+  \fun{cat}(s,t,\cons{x}{u}).
+\end{array}
+\end{equation*}
+To test the correctness of this definition, we can try a small
+example:
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}l}
+\fun{cat}([1,2,3],[4,5],\el) 
+  & \MyArrow{\Split}{\beta} & \fun{cat}([2,3],[4,5],[1])\\
+  & \MyArrow{\Split}{\beta} & \fun{cat}([3],[4,5],[2,1])\\
+  & \MyArrow{\Split}{\beta} & \fun{cat}(\el,[4,5],[3,2,1])\\
+  & \MyArrow{\Split}{\alpha\sb{1}} &
+    \fun{cat}(\el,[3,4,5],[2,1])\\
+  & \MyArrow{\Split}{\alpha\sb{1}} & 
+    \fun{cat}(\el,[2,3,4,5],[1])\\
+  & \MyArrow{\Split}{\alpha\sb{1}} &
+    \fun{cat}(\el,[1,2,3,4,5],\el)\\
+  & \MyArrow{\Split}{\alpha\sb{0}} & [1,2,3,4,5].
+\end{array}
+\end{equation*}
+As a conclusion, the tail form version of \fun{cat/2}, called
+\fun{cat\(_0\)/2}, requires an auxiliary function \fun{cat/3} with an
+accumulator whose purpose is to reverse the first argument:
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}l}
+\fun{cat\(_0\)}(s,t) & \smashedrightarrow{\alpha} & \fun{cat}(s,t,\el).\\
+\fun{cat}(\el,t,\el) & \smashedrightarrow{\beta} & t;\\
+\fun{cat}(\el,t,\cons{x}{u}) & \smashedrightarrow{\gamma} & 
+  \fun{cat}(\el,\cons{x}{t},u);\\
+\fun{cat}(\cons{x}{s},t,u) & \smashedrightarrow{\delta} &
+  \fun{cat}(s,t,\cons{x}{u}).
+\end{array}
+\end{equation*}
+We also know what to do when the context is not made of a call to some
+associative operator: push the values of the variables it contains and
+when the input stack is empty, pop these and use them to fill the
+context, which is then evaluated. We will revisit this method.
+
+\paragraph{Efficiency}
+
+The number of steps to rewrite \(\fun{cat\(_0\)}(s,t)\) into a value is
+greater than with \(\fun{cat}(s,t)\), as we guessed while writing the
+previous example. Indeed, assuming that \(s\)~contains \(n\)~items, we
+have
+\begin{itemize*} 
+
+  \item one step to obtain \(\fun{cat}(s,t,\el)\), by
+  rule~\clause{\alpha};
+
+  \item \(n\)~steps to reverse \(s\) in the accumulator, by
+  rule~\clause{\delta};
+
+  \item \(n\)~steps to reverse the accumulator on top of~\(t\), by
+    rule~\clause{\gamma};
+
+  \item one step when the accumulator is finally empty, by
+    rule~\clause{\beta}.
+
+\end{itemize*}
+Thus, the total number of steps is \(2n+2\), which is twice the cost
+of the previous version. Why the difference between \fun{cat/2} and
+\fun{cat\(_0\)/2}? The operation applied to the accumulator consists
+in pushing an item onto a stack and has to be undone later: the
+accumulator is not a partial result but a \emph{temporary stack} used
+to hold the items of the first stack in reverse order. We shall find
+many occurrences of this situation. Meanwhile, it is important to
+remember that a tail form variant of a function operating on stacks
+may lead to a slower program. Also, the derived definition in tail
+form may be longer, as illustrated by \fun{cat\(_0\)/2}: four rules
+instead of two.
+
+The rewrites \(\fun{cat}_0([1,2,3],[4,5]) \twoheadrightarrow
+[1,2,3,4,5]\) seen above can be abstractly conceived as a product
+(composition) of rules: \(\alpha \cdot \delta^n \cdot \gamma^n \cdot
+\beta\), or, simply, \(\alpha\delta^n\gamma^n\beta\). This expression
+is called the \emph{execution trace} and its length is the number of
+rules \(\C{\fun{cat\(_0\)}}{n}\) of \(\fun{cat\(_0\)}(s,t)\), given
+that the length of a rule is~\(1\), hence \(\len{\alpha} = \len{\beta}
+= \len{\gamma} = \len{\delta} = 1\) and the length of the composition
+of two rules is the sum of their lengths: \(\len{\alpha \cdot \delta}
+= \len{\alpha} + \len{\delta}\). Therefore,
+\begin{align*}
+\C{\fun{cat\(_0\)}}{n} 
+  &= \len{\alpha\delta^n\gamma^n\beta}
+   = \len{\alpha} + \len{\delta^n} + \len{\gamma^n} + \len{\beta}
+   = 1 + \len{\delta} \cdot n + \len{\gamma} \cdot n + 1\\
+  &= 2n + 2.
+\end{align*}
+
+\paragraph{Digression}
+
+Let us reconsider the definition~\eqref{def:fact} of
+\fun{fact/1}\index{fact@\textsf{fact/1}} \vpageref{def:fact}:
+\begin{equation*}
+\fun{fact}(0) \xrightarrow{\smash{\alpha}} 1;\qquad
+\fun{fact}(n) \xrightarrow{\smash{\beta}} n \cdot \fun{fact}(n-1).
+\end{equation*}
+For instance, we have
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}lc@{\;}l}
+\fun{fact}(3) & \xrightarrow{\beta} & 3 \cdot \fun{fact}(3-1) 
+              & = & 3 \cdot \fun{fact}(2)\\
+              & \xrightarrow{\smash[t]{\beta}} & 
+              3 \cdot (2 \cdot \fun{fact}(2-1)) 
+              & = & 3 \cdot (2 \cdot \fun{fact}(1))\\
+              & \xrightarrow{\smash[t]{\alpha}} & 
+                3 \cdot (2 \cdot (1)) & = & 6 = 3!
+\end{array}
+\end{equation*}
+It is often clearer to implicitly compose intermediary arithmetic
+operations~(\(=\)) with the current rewrite and write in short
+\begin{equation*}
+\fun{fact}(3) \xrightarrow{\beta} 3 \cdot \fun{fact}(2)
+\xrightarrow{\smash[t]{\beta}} 3 \cdot (2 \cdot \fun{fact}(1))
+\xrightarrow{\smash[t]{\alpha}} 3 \cdot (2 \cdot (1)) = 6.
+\end{equation*}
+Note how the last rewrite (\(\xrightarrow{\smash[t]{\alpha}}\)) must
+be followed by a series of multiplications~\(3 \cdot (2 \cdot 1)\)
+because each individual multiplication had to be delayed until
+\(\fun{fact}(1)\) be computed. This could have been anticipated
+because the call to \fun{fact/1} in the right\hyp{}hand side of the
+rewrite rule (\(\xrightarrow{\smash[t]{\beta}}\)), that is, the
+underlined text in
+\begin{equation*}
+\fun{fact}(n) \xrightarrow{\smash[t]{\beta}} n \cdot \underline{\fun{fact}(n-1)}
+\end{equation*}
+has the non\hyp{}empty context
+`\erlcode{\(n\)~*~\textvisiblespace}'. To understand why this is
+important, let us consider a slightly longer series of
+rewrites:\label{trace:fact_5}
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}l} 
+\fun{fact}(5)
+& \smashedrightarrow{\beta} & 5 \cdot \fun{fact}(4)\\
+& \smashedrightarrow{\beta} & 5 \cdot (4 \cdot \fun{fact}(3))\\
+& \smashedrightarrow{\beta} & 5 \cdot (4 \cdot (3 \cdot \fun{fact}(2)))\\
+& \smashedrightarrow{\beta} & 5 \cdot (4 \cdot (3 \cdot (2 \cdot 
+                              \fun{fact}(1))))\\
+& \smashedrightarrow{\alpha} & 5 \cdot (4 \cdot (3 \cdot (2 \cdot
+(1)))).
+\end{array}
+\end{equation*}
+It is clear that each rewrite by (\(\xrightarrow{\smash[t]{\beta}}\))
+yields a longer expression. Let us focus now only on the shapes of
+these expressions:
+\begin{equation*}
+\setlength\fboxsep{0mm}
+\begin{array}{r@{\;}c@{\;}l} 
+\fun{fact}(5)
+& \smashedrightarrow{\beta} & \fbox{\phantom{$5 \cdot \fun{fact}(4)$}}\\
+& \smashedrightarrow{\beta} & \fbox{\phantom{$5 \cdot (4 \cdot \fun{fact}(3))$}}\\
+& \smashedrightarrow{\beta} & \fbox{\phantom{$5 \cdot (4 \cdot (3 \cdot \fun{fact}(2)))$}}\\
+& \smashedrightarrow{\beta} & \fbox{\phantom{$5 \cdot (4 \cdot (3 \cdot (2 \cdot \fun{fact}(1))))$}}\\
+& \smashedrightarrow{\alpha} & \fbox{\phantom{$5 \cdot (4 \cdot (3
+    \cdot (2 \cdot (1))))$}}.
+\end{array}
+\end{equation*}
+This phenomenon suggests that a great deal of space, that is, computer
+\emph{memory}, is needed to keep the expressions before the final,
+long arithmetic computations. The example leads to induce that the
+larger term occurring in the computing of \(\fun{fact}(n)\) is the one
+just before (\(\xrightarrow{\smash[t]{\alpha}}\)) and its size is
+likely to be proportional to~\(n\), since all the integers from
+\(n\)~to~\(1\) had to be kept until the end.
+
+A tail form version
+\fun{fact\(_0\)/1}\index{fact0@\textsf{fact\(_0\)/1}} would be
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\fun{fact}_0(n) & \rightarrow & \fun{fact}_0(n,1),
+\;\text{if \(n \geqslant 1\)}. & \fun{fact}_0(1,a) & \rightarrow & a;\\
+&&& \fun{fact}_0(n,a) & \rightarrow & \fun{fact}_0(n-1,a \cdot n).
+\end{array}
+\end{equation*}
+Here, in contrast with \fun{cat/3}, the operation applied to the
+accumulator is associative (a multiplication) and the accumulator is,
+at all times, a partial result. Instead of delaying the
+multiplications, exactly one multiplication is going to be computed at
+each rewrite, thus, in the end, nothing remains to be done: there is
+no instance of the context to resume. This kind of definition is thus
+in tail form.\index{functional language!tail form}
+
+Notice that the cost of \fun{fact\(_0\)/1} is~\(n+1\), whilst the cost
+of \fun{fact/1} is~\(n\), so, contrary to \fun{cat\(_0\)/2} and
+\fun{cat/2}, the tail form here does not significantly increases the
+cost. This is due to the nature of the operations on the accumulator,
+which do not require to be reversed or undone.
+
+The previously considered function call \(\fun{fact}_0(5)\) is
+evaluated thusly:
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}lc@{\;}l}
+\fun{fact}_0(5)
+& \xrightarrow{\smash[t]{\alpha}} & \fun{fact}_0(5,1), 
+&& \text{since \(5 > 1\)},\\
+& \xrightarrow{\smash[t]{\gamma}} & \fun{fact}_0(5-1,1 \cdot 5)
+& = & \fun{fact}_0(4,5)\\
+& \xrightarrow{\smash[t]{\gamma}} & \fun{fact}_0(4-1,5 \cdot 4)
+& = & \fun{fact}_0(3,20)\\
+& \xrightarrow{\smash[t]{\gamma}} & \fun{fact}_0(3-1,20 \cdot 3)
+& = & \fun{fact}_0(2,60)\\
+& \xrightarrow{\smash[t]{\gamma}} & \fun{fact}_0(2-1,60 \cdot 2)
+& = & \fun{fact}_0(1,120)\\
+& \xrightarrow{\smash[t]{\beta}} & 120.
+\end{array}
+\end{equation*}
+The reason why \(\fun{fact}_0(5) \equiv \fun{fact}(5)\) is that
+\begin{equation}
+  (((1 \cdot 5) \cdot 4) \cdot 3) \cdot 2
+= 5 \cdot (4 \cdot (3 \cdot (2 \cdot 1))).\label{eq:fact5}
+\end{equation}
+This equality holds because, in general, for all numbers~\(x\),
+\(y\)~and~\(z\),
+\begin{enumerate*}
+
+\item \label{mult_assoc} the multiplication is associative: \(x \cdot
+  (y \cdot z) = (x \cdot y) \cdot z\);
+
+\item \label{mult_one} the number \(1\) is neutral with respect to
+  (\(\cdot\)): \(x \cdot 1 = 1 \cdot x = x\).
+
+\end{enumerate*}
+To show exactly why, let us write~(\(\eqn{\ref{mult_assoc}}\))
+and~(\(\eqn{\ref{mult_one}}\)) to denote, respectively, the use of
+associativity and neutrality, then lay out the following equalities
+leading from the left\hyp{}hand side to the right\hyp{}hand side of
+the purported equality~\eqref{eq:fact5}:
+\begin{align*}
+  (((1 \cdot 5) \cdot 4) \cdot 3) \cdot 2
+  &\eqn{\smash{\ref{mult_one}}} ((((1 \cdot 5) \cdot 4) \cdot 3) \cdot
+  2) \cdot 1\\
+  &\eqn{\smash{\ref{mult_assoc}}} (((1 \cdot 5) \cdot 4) \cdot 3)
+  \cdot (2 \cdot 1)\\ 
+  &\eqn{\smash{\ref{mult_assoc}}} ((1 \cdot 5) \cdot 4) \cdot (3 \cdot (2
+    \cdot 1))\\
+  &\eqn{\smash{\ref{mult_assoc}}} (1 \cdot 5) \cdot (4 \cdot (3 \cdot
+  (2 \cdot 1))\\
+  &\eqn{\smash{\ref{mult_assoc}}} 1 \cdot (5 \cdot (4 \cdot (3 \cdot
+  (2 \cdot 1))))\\
+  &\eqn{\smash{\ref{mult_one}}} 5 \cdot (4 \cdot (3 \cdot (2 \cdot
+  1))).\quad \Box
+\end{align*}
+Furthermore, if we do not want to rely upon the neutrality of~\(1\),
+we could define another equivalent function \fun{fact\(_1\)/1} which
+sets the initial call to \(\fun{fact}_1(n-1,n)\), instead of
+\(\fun{fact}_0(n,1)\), and stops when the number is~\(0\), instead
+of~\(1\):
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\fun{fact}_1(n) & \xrightarrow{\smash[t]{\alpha}} &
+\fun{fact}_1(n-1,n),\;\text{if \(n > 0\)}.
+& \fun{fact}_1(0,a) & \xrightarrow{\smash[t]{\beta}} & a;\\
+&&& \fun{fact}_1(n,a) & \xrightarrow{\smash[t]{\gamma}} & 
+\fun{fact}_1(n-1,a \cdot n).
+\end{array}
+\end{equation*}
+The same example now runs as
+\begin{equation*}
+\begin{array}{r@{\;}c@{\;}lc@{\;}l}
+\fun{fact}_1(5)
+& \xrightarrow{\smash[t]{\alpha}} & \fun{fact}_1(5-1,5)
+& = & \fun{fact}_1(4,5)\\
+& \xrightarrow{\smash[t]{\gamma}} & \fun{fact}_1(4-1,5 \cdot 4)
+& = & \fun{fact}_1(3,20)\\
+& \xrightarrow{\smash[t]{\gamma}} & \fun{fact}_1(3-1,20 \cdot 3)
+& = & \fun{fact}_1(2,60)\\
+& \xrightarrow{\smash[t]{\gamma}} & \fun{fact}_1(2-1,60 \cdot 2)
+& = & \fun{fact}_1(1,120)\\
+& \xrightarrow{\smash[t]{\gamma}} & \fun{fact}_1(1-1,120 \cdot 1)
+& = & \fun{fact}_1(0,120)\\
+& \xrightarrow{\smash[t]{\beta}} & 120.
+\end{array}
+\end{equation*}
+This new version relies on the following equality which can be proved
+only by means of associativity: \((((5 \cdot 4) \cdot 3) \cdot 2)
+\cdot 1 = 5 \cdot (4 \cdot (3 \cdot (2 \cdot 1)))\).
+
+The number of rewrites of \fun{fact\(_0\)/1} is almost the same as
+with \fun{fact/1}, precisely one more step due to the
+rule~\clause{\alpha}. But the former presents an advantage in terms of
+memory usage, as long as it is assumed that all integers within a
+certain range occupy the same space. This means that, for instance,
+that the memory needed to store the number~\(120\) is the same as for
+the number~\(5\). Then the shape of the previous rewrites:
+\begin{equation*}
+\setlength\fboxsep{0mm}
+\begin{array}{r@{\;}c@{\;}l} 
+\fun{fact}_0(5)
+& \xrightarrow{\smash[t]{\alpha}} &
+\fbox{\phantom{$\fun{fact}_0(0,10)$}}\\
+& \xrightarrow{\smash[t]{\gamma}} &
+\fbox{\phantom{$\fun{fact}_0(0,10)$}}\\
+& \xrightarrow{\smash[t]{\gamma}} &
+\fbox{\phantom{$\fun{fact}_0(0,10)$}}\\
+& \xrightarrow{\smash[t]{\gamma}} &
+\fbox{\phantom{$\fun{fact}_0(0,10)$}}\\
+& \xrightarrow{\smash[t]{\gamma}} &
+\fbox{\phantom{$\fun{fact}_0(0,10)$}}\\
+& \xrightarrow{\smash[t]{\beta}} & \fbox{\phantom{CCC}}.
+\end{array}
+\end{equation*}
+It seems probable that this version uses a constant chunk of memory,
+while \fun{fact/1} uses an increasing amount of memory, more precisely
+a space proportional to~\(n\) when computing~\(n!\). (In the following
+sections, we shall see that a more precise model of memory allocation
+is provided by abstract syntax trees.) This phenomenon has been
+anticipated by the keen reader who noticed that there is no context
+for the calls in the rules defining \fun{fact\(_0\)/2}, so there are
+no delayed computations that accumulate until the last step. As a
+conclusion, \fun{fact\(_0\)/1} is always preferable to \fun{fact/1}.
+
+The previous discussions on obtaining equivalent definitions which are
+in tail form suppose to consider programs as some kind of data. At
+this point, it is a methodological standpoint only and we do not mean
+that functions can be processed as stacks (we shall come back on this
+later when discussing higher\hyp{}order functions and
+continuation\hyp{}passing style), but, more informally, we mean that
+definitions can be transformed into other definitions and that this is
+often an excellent method, as opposed to trying to figure out from
+scratch the final definition. It would have been probably more
+difficult to write the tail form variant of \fun{cat/2} without having
+first designed the version not in tail form.
+
+It is in general not a good idea to start head\hyp{}on by defining a
+function in tail form because it may either be unnecessary or lead to
+a mistake since these kinds of definitions are usually more
+involved. In the following sections and chapters, we will explain when
+tail form definitions are useful and how to obtain them using a
+systematic method.
+
+Let us consider a simple case by defining a function \fun{last/1} such
+that \(\fun{last}(s)\)~computes the last item of the non\hyp{}empty
+stack~\(s\). The correct approach is to forget about tail forms and
+aim straight at the heart of the problem. We know that \(s\)~can not
+be empty, so let us start with the following left\hyp{}hand side:
+\begin{equation*}
+\fun{last}(\cons{x}{s}) \rightarrow \fbcode{CCCCCCC}.
+\end{equation*}
+Can we reach the result in one step? No, because we do not know
+whether \(x\)~is the sought item: we need to know more
+about~\(s\). This additional information about the structure of~\(s\)
+is given by more precise patterns: \(s\)~can be empty or not, that is:
+\(s = \el\) or \(s=\cons{y}{t}\). We then have:
+\begin{equation*}
+\fun{last}(\cons{x}{\el}) \rightarrow \fbcode{CCCCCCC};\quad
+\fun{last}(\cons{x}{\cons{y}{t}}) \rightarrow \fbcode{CCCCCCC}.
+\end{equation*}
+The first pattern can be simplified as follows:
+\begin{equation*}
+\fun{last}([x]) \rightarrow \fbcode{CCCCCCC};\quad
+\fun{last}(\cons{x}{\cons{y}{t}}) \rightarrow \fbcode{CCCCCCC}.
+\end{equation*}
+The first right\hyp{}hand side is easy to guess:
+\begin{equation*}
+\fun{last}([x]) \rightarrow x;\quad
+\fun{last}(\cons{x}{\cons{y}{t}}) \rightarrow \fbcode{CCCCCCC}.
+\end{equation*}
+In the last rule, how do \(x\), \(y\)~and~\(t\) relate to the result?
+Can we reach it in one step? No, despite we know that \(x\)~is
+\emph{not} the result, we still don't know whether \(y\)~is, so we
+have to start over again, which means a recursive call is required:
+\begin{equation*}
+\fun{last}([x]) \rightarrow x;\quad
+\fun{last}(\cons{x}{\cons{y}{t}}) \rightarrow
+  \fun{last}(\fbcode{CCCC}).
+\end{equation*}
+Note how knowing that some specific part of the input is not useful to
+build the output is useful knowledge. We can not call recursively
+\(\fun{last}(t)\) because \(t\)~may be empty and the call would then
+fail, meaning that the answer was actually~\(y\). Therefore, we must
+call with \(\cons{y}{t}\) to give~\(y\) the chance to be the last:
+\begin{equation*}
+\fun{last}([x]) \rightarrow x;\quad
+\fun{last}(\cons{x}{\cons{y}{t}}) \rightarrow \fun{last}(\cons{y}{t}).
+\end{equation*}
+As we advocated previously, the next phase consists in testing this
+definition for correctness and completeness, using meaningful examples
+(covering extreme cases and all the rules at least once). For the sake
+of the argument, let us assume that \fun{last/1} is correct and
+complete. The next step is then to try and improve upon it. Let us
+look for patterns occurring in both sides of the same rule and ponder
+whether they can be avoided. For instance, we observe that
+\(\cons{y}{t}\)~is used as a whole, in other words, \(y\)~and~\(t\)
+are not used separately in the second right\hyp{}hand side. Therefore,
+it is worth trying to fold back and replace the pattern by a more
+general one, in this case: \(s = \cons{y}{t}\).
+\begin{equation*}
+\fun{last}([x]) \rightarrow x;\quad
+\fun{last}(\cons{x}{s}) \rightarrow \fun{last}(s).
+\end{equation*}
+This transformation is correct because the case where \(s\)~is empty
+has already been matched by the first pattern. Notice also that we
+indeed considered a definition as some data. (We should write more
+accurately \emph{metadata} since definitions are not data processed by
+the program, but by the programmer.) In passing, \fun{last/1} is in
+tail form.
+
+What if we had tried to find directly a definition in tail form? We
+might have recalled that such definitions often need an accumulator
+and we would have tried perhaps something along these lines:
+\begin{equation*}
+\fun{last}_0(s) \rightarrow \fun{last}_1(s,0).\qquad
+\fun{last}_1(\el,y) \rightarrow y;\quad
+\fun{last}_1(\cons{x}{s},y) \rightarrow \fun{last}_1(s,x).
+\end{equation*}
+The first observation may be about the function name
+\fun{last\(_1\)}. Why not write the following, in accordance with the
+style up to now?
+\begin{equation*}
+\fun{last}_0(s) \rightarrow \fun{last}_0(s,0).\qquad
+\fun{last}_0(\el,y) \rightarrow y;\quad
+\fun{last}_0(\cons{x}{s},y) \rightarrow \fun{last}_0(s,x).
+\end{equation*}
+There would be no confusion between \fun{last\(_0\)/1} and
+\fun{last\(_0\)/2} because, each taking a different number of
+arguments, they are logically considered different. The reason why we
+recommend to distinguish the names and, in general, to use one name
+for only one function, is that this discipline enables the compiler to
+catch the error consisting in forgetting one argument. For instance,
+the program
+\begin{equation*}
+\fun{last}_0(s) \rightarrow \fun{last}_0(s,0).\qquad
+\fun{last}_0(\el,y) \rightarrow y;\quad
+\fun{last}_0(\cons{x}{s},y) \rightarrow \underline{\fun{last}_0(s)}.
+\end{equation*}
+contains an error that goes unreported, while
+\begin{equation*}
+\fun{last}_0(s) \rightarrow \fun{last}_1(s,0).\qquad
+\fun{last}_1(\el,y) \rightarrow y;\quad
+\fun{last}_1(\cons{x}{s},y) \rightarrow \underline{\fun{last}_1(s)}.
+\end{equation*}
+raises an error. However, for didactic purposes in this book, we will
+not always follow this recommendation of having unique function
+names. The possibility to use the same name for different functions
+which can be otherwise distinguished by the number of their arguments
+is called \emph{overloading}. Overloading of functions in the
+programming language \Cpp is permitted, but the rules used to
+distinguish amongst the different functions sharing the same name is
+different than in \Erlang, as it makes use of the number of parameters
+but also their static types.
+
+Computing the call \(\fun{last}_0([1,2,3])\) with the original
+definition, we find that the three rules are covered until the correct
+result is found, that is~\(3\). Because we recommended previously to
+make some litmus test and the argument is a stack, we try the empty
+stack and obtain the evaluation \(\fun{last}_0(\el) \rightarrow
+\fun{last}_1(\el,0) \rightarrow 0\), which is unexpected, since this
+test ought to fail (see how \fun{last/1} is not defined for the empty
+stack). Can we fix this?
+
+Let us simply change the left\hyp{}hand side of \fun{last\(_0\)/1} so
+that only non\hyp{}empty stacks are matched. We find here a case where
+more information on the structure of the input is needed and a
+variable is too general a pattern. We need instead
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\fun{last}_0(\underline{\cons{x}{s}}) & \rightarrow &
+  \fun{last}_0(\underline{\cons{x}{s}},0). &
+\fun{last}_0(\el,y) & \rightarrow & y;\\
+&&& \fun{last}_0(\cons{x}{s},y) & \rightarrow & \fun{last}_0(s,x).
+\end{array}
+\end{equation*}
+This emendation seems to go against an improvement we made earlier,
+when we replaced \(\cons{y}{t}\) by~\(s\), but it does not: here we
+want to exclude some input, that is, we do not seek an equivalent
+function, whilst before the purpose was to simplify and obtain an
+equivalent function.
+
+The definition of \fun{last\(_0\)/1} is correct and complete but a
+careful review should raise some doubts about its actual
+simplicity. For example, the initial value of the accumulator, given
+in the unique right\hyp{}hand side of \fun{last\(_0\)/1} is~\(0\), but
+this value is never used, because it is discarded immediately after in
+the second right\hyp{}hand side of \fun{last\(_0\)/2}. Indeed, we
+could write the equivalent definition:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\fun{last}_1(\cons{x}{s}) & \rightarrow & \fun{last}_1(\cons{x}{s},\underline{7}). &
+\fun{last}_1(\el,y) & \rightarrow & y;\\
+&&&\fun{last}_1(\cons{x}{s},y) & \rightarrow & \fun{last}_1(s,x).
+\end{array}
+\end{equation*}
+The initial value of the accumulator here does not even need to be an
+integer, it could be of any type, like \([4,\el]\). This is the sign
+that we should better give up this overly complicated definition,
+which is the product of a method that does not consider programs as
+data and is founded on the wrong assumption that definitions in tail
+form often require an accumulator: in general, they do not.
+
+Take for example the polymorphic identity: \(\fun{id}(x) \rightarrow
+x\). It is trivially in tail form. In passing, being in tail form has
+nothing to do, in general, with recursion, despite the widespread and
+unfortunate locution `tail\hyp{}recursive function'. A recursive
+definition may be in tail form, but a definition in tail form may not
+be recursive, like \fun{id/1}.

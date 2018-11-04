@@ -1,0 +1,3794 @@
+\chapter{Introduction to \XSLT}
+
+Recursion is a programming technique often neglected in undergraduate
+curricula, rushed at the end of the semester, except when the
+programming language is functional, that is, if it prominently
+features immutable data and a control flow mostly defined by the
+composition of mathematical functions. Examples of such languages are
+\Scheme, \Haskell, \OCaml, \Erlang and \XSLT~\citep{Kay_2008}. Amongst
+them, \XSLT is rarely taught in college, so professionals without
+prior exposure to functional programming are likely to face the double
+challenge of learning a new programming paradigm and using \XML: while
+the former put forth recursion, the latter obscures it because of its
+inherent verbosity. The syntactic difficulty is inevitable with \XSLT
+because its grammar \emph{is} \XML, as well as it is the grammar of
+its input and, usually, of its output.
+
+This is why this chapter introduces the basics of \XSLT by relying on
+our understanding of our abstract functional programming language or,
+concretely, a small subset of \Erlang, a language chosen for its plain
+and regular syntax, as well as its native pattern matching, yielding
+very compact programs. Hopefully, the mental model of an \Erlang
+programmer will ease the transition to thinking recursively in \XSLT,
+having then to overcome only the obstacle of \XML. Accordingly, a tiny
+subset of \XSLT is presented and previous examples in \Erlang are
+systematically stripped of their use of pattern matching so they
+become easily translatable into \XSLT, which lacks that feature. At
+the same time, new exercises on unranked trees, that is, trees where
+internal nodes can have a variable number of children, are worked out
+directly in \XSLT, aiming at a transfer of skills from \Erlang. 
+
+The purpose of this chapter is not to present as many features of
+\XSLT as possible, but to think recursively in \XSLT, which can be
+conceived as a functional language specialised for the processing of
+\XML documents.
+
+\section{Documents}
+
+We start our journey with a very brief presentation of the basics of
+\XML, \HTML and \DTD, based on our lecture notes. The reader already a
+bit familiar with these languages may skip it and use it as a
+reference for the following chapters.
+
+\mypar{\XML}
+
+The acronym \XML stands for \emph{eXtensible Markup Language}. It is a
+language for defining unranked trees with plain text, with a minimum
+number of syntactic constructs. These trees are used to model
+\emph{structured documents}. Database programmers would perhaps call
+them \emph{semi\hyp{}structured data} because they are then conceived
+in opposition to data that fit well into tables, the fundamental
+structure of relational databases. These tables implement a
+mathematical model of \emph{relations} satisfying \emph{schemas},
+whilst \XML represents \emph{unranked trees} and \emph{formal
+  grammars}. (To add to the confusion, \XML also can be adjoined
+schemas of their own.)  Anyway, to understand what \XML is and how
+this modelling works, it is probably easier to start with a small
+example, like an email.  What are the different \emph{elements} and
+what is the \emph{structure}, that is, how are the elements related to
+each other? As far as the elements are concerned, an email contains at
+least
+\begin{itemize*}
+
+  \item the sender's address,
+
+  \item a subject or title,
+
+  \item the recipient's address,
+
+  \item a body of plain text.
+
+\end{itemize*}
+The elements correspond to the tree nodes and the structure is modelled
+by the shape of the tree itself (its topology). For example:
+
+\noindent\rule{\linewidth}{0.5pt}
+\begin{alltt}
+From: Me
+Subject: Homework
+To: You
+
+  A \textbf{deadline} is a due date for a \emph{homework}.
+\end{alltt}
+\rule{\linewidth}{0.5pt}
+\medskip
+This email can be modelled by a tree in \fig~\vref{fig:mail}.
+\begin{figure}
+\centering
+\includegraphics[scale=1,bb=71 620 389 723]{mail}
+\caption{An email viewed as an \XML tree\label{fig:mail}}
+\end{figure}
+Note that the (boxed) leaves, called \emph{text nodes}, contain text
+whereas the inner nodes contain information \emph{about} their
+subtrees, in particular the leaves. Since the information in the inner
+nodes describes the information actually laid out, it is called
+\emph{metadata} or \emph{mark\hyp{}up}, which explains part of the
+acronym `\XML'. The corresponding \XML document is:
+\begin{verbatim}
+<email>
+  <from>Me</from>
+  <subject>Homeworks</subject>
+  <to>You</to>
+  <body>
+  A <definition>deadline</definition> is a due date for a
+<emphasis>homework</emphasis>.
+  </body>
+</email>
+\end{verbatim}
+
+\paragraph{Elements}
+
+Each subtree is denoted by an opening and a closing \emph{tag}. An
+opening tag is a name enclosed between \texttt{<} and \texttt{>}. A
+closing tag is a name enclosed between \texttt{</} and \texttt{>}. A
+pair of opening and closing tags constitute an \emph{element}; in
+other words, a subtree corresponds to an element. In particular, the
+element including all the others is called the \emph{root element}
+(here, it is named \texttt{email}). The \emph{element name} is not
+part of the text, it is metadata, so it suggests the meaning of the
+data contained in the subtree. For example, the whole \XML document is
+an element whose name is \texttt{email} because the document describes
+a email. A preorder traversal of the \XML tree (see
+page~\pageref{preorder} for binary trees) yields nodes in the same
+order as their corresponding elements, when read in the \XML
+document. (We shall comment on this.) The data (as opposed to the
+metadata) is always contained in the leaves, and is always text. Note,
+in particular, how the contents of the text nodes who are children of
+elements \texttt{definition} and \texttt{emphasis} have been
+respectively typeset with a bold typeface and in italics, but other
+interpretations would have been possible. It is important to
+understand that visual interpretations of mark\hyp{}up are \emph{not}
+defined in \XML. This is why we wrote earlier that \XML is purely a
+formal grammar, without semantics.
+
+Actually, our example is not a correct \XML document because it lacks
+a special element which says that the document is indeed \XML, and,
+more precisely, what is the version of \XML used here, for instance:
+\begin{verbatim}
+<?xml version="1.0"?>
+\end{verbatim}
+This special element is actually not an element per se, as the special
+markers \texttt{<?} and \texttt{?>} show. It is more a declaration,
+carrying some information about the current file to destination of the
+reader, whether it is a parsing software, usually called an \emph{\XML
+  processor}, or a human. As such, it is a \emph{processing
+  instruction} (more to come on this).
+
+For now, consider the following element:
+\begin{verbatim}
+<axiom>
+The empty set <varnothing/> contains no elements.
+</axiom>
+\end{verbatim}
+which could be interpreted as\\
+\noindent\rule{\linewidth}{0.5pt}
+\textsf{
+\textbf{Axiom}: The empty set \(\varnothing\) contains no elements.}\\
+\noindent\rule{\linewidth}{0.5pt}
+
+This \verb|<varnothing/>| is an \emph{empty element}, it features a
+special tag terminator, \verb|/>|, which is absent in normal opening
+and closing tags. It is useful for denoting things, as symbols, that
+cannot be written with the Roman alphabet and need to be distinguished
+from plain text. The associated tree is
+\begin{center}
+\includegraphics{axiom}
+\end{center}
+An empty element corresponds to a leaf in the \XML tree, despite it is
+mark\hyp{}up and not data.
+
+Nodes do not need to be unique amongst siblings. For instance, if we
+want to send an email to several recipients, we would write:
+\begin{alltt}
+<email>
+  <from>Me</from>
+  <subject>Homeworks</subject>
+  <to>You</to>
+  \textbf{<to>Me</to>} 
+  <body>
+  A <definition>deadline</definition> is a due date for a
+<emphasis>homework</emphasis>.
+  </body>
+</email>
+\end{alltt}
+The \XML tree associated to this \XML document is
+\begin{center}
+\includegraphics[bb=72 622 412 723]{mailtoto}
+\end{center}
+Note that there are two nodes~\texttt{to} and that their order must be
+the same as in the \XML document.
+
+\paragraph{Attributes}
+
+It is possible to annotate each mark\hyp{}up node with some labelled
+strings, called \emph{attributes}. For example, we may want to specify
+that our email is urgent, which is a property of the email as a whole,
+not a part of the contents per se:
+\begin{alltt}
+<email \textbf{priority="urgent"}>
+  <from>Me</from>
+  <subject>Homeworks</subject>
+  <to>You</to>
+  <body>
+  A <definition>deadline</definition> is a due date for a
+<emphasis>homework</emphasis>.
+  </body>
+</email>
+\end{alltt}
+That \XML document may be represented by the following annotated tree:
+\begin{center}
+\includegraphics[bb=71 652 322 721]{urgent}
+\end{center}
+Note the symbol \textsf{@} preceding the attribute name, which
+distinguishes it from element nodes. Amongst siblings, attribute nodes
+are found \emph{before}\label{attr_before} element nodes. We may
+attach several attributes to a given element:
+\begin{alltt}
+<email \textbf{priority="urgent"} \textbf{ack="yes"}>
+  <from>Me</from>
+  <subject>Homeworks</subject>
+  <to>You</to>
+  <body>
+  A <definition>deadline</definition> is a due date for a
+<emphasis>homework</emphasis>.
+  </body>
+</email>
+\end{alltt}
+\begin{center}
+\includegraphics[bb=70 651 367 723]{attr}
+\end{center}
+The order of the attributes matters. Any element can have attributes,
+including empty elements. Attributes are considered to be a special
+kind of node, although they are not often represented in the \XML tree
+for lack of room.
+
+The \texttt{xml} processing instruction too can hold other predefined
+attributes besides \verb|version|:
+\begin{verbatim}
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.1' encoding="US-ASCII"?>
+<?xml version='1.0' encoding='iso-8859-1'?>
+\end{verbatim}
+The encoding is the \emph{character encoding} of the \XML document,
+which is particularly useful when using \Unicode or some dedicated
+Asian font, for instance. Note that the attribute names must be in
+lowercase and the attribute \emph{values} must be enclosed in single
+or double quotes. In the case of \verb|version| and \verb|encoding|,
+only some standardised values are valid.
+
+\paragraph{Escaping}
+
+Most programming languages offer strings of characters to the
+programmer to use. For instance, in \Clang, the strings are enclosed
+between double quotes, like \verb|"abc"|. Thus, if the string contains
+double quotes, we must take care of distinguishing, or
+\emph{escaping}, them, so the compiler (or, more precisely, the
+parser) can recognise the double quotes in the contents from the
+enclosing double quotes. In~\Clang, escaping a character is achieved
+by adding a backslash just before it. This way, the following is a
+valid \Clang string: \verb|"He said: \"Hello!\"."|
+
+In \XML, there is a similar problem. The attribute values can either
+be enclosed by single or double quotes. If the latter, the double
+quotes in the contents need escaping; if the former, the quotes need
+escaping. Problems also stem from the characters used for the
+mark\hyp{}up. For example, the following element
+\begin{verbatim}
+<problem>For all integers n, we have n < n + 1.</problem>
+\end{verbatim}
+is not valid because the text between the tags contains the character
+`\texttt{<}', which is confused by the \XML parsers with the
+(expected) start of a tag:
+\begin{alltt}
+<problem>For all integers n, we have n \fbox{<\,} n + 1.</problem>
+\end{alltt}
+The way in which \XML escapes this character is by using the special
+sequence of characters \verb|&lt;| so the previous element, once
+corrected, is
+\begin{alltt}
+<valid>For all integers n, we have n \textbf{&lt;} n + 1.</valid>
+\end{alltt}
+
+\paragraph{Predefined named entities}
+
+The sequence \verb|&lt;| is called a \emph{predefined named entity}.
+Such entities always
+\begin{enumerate*}
+ 
+  \item start with an ampersand (\verb|&|), 
+
+  \item continue with a predefined name (here, \texttt{lt}),
+
+  \item end with a semicolon (\texttt{;}).
+
+\end{enumerate*}
+Of course, the use of the ampersand to mark the start of an entity
+entails that this very character must itself be escaped if used to
+only denote itself. In that case, we should use \verb|&amp;|
+instead. There are some other characters which can \emph{sometimes}
+cause a problem to \XML parsers (as opposed to always create a
+problem, as \verb|<| and \verb|&| do).  A summary of all the
+predefined named entities is given in the following table.
+\begin{center}
+\begin{tabular}{cll}
+\toprule
+\textsf{Character} & \textsf{Entity} & \textsf{Mandatory}\\
+\midrule
+\verb|&| & \verb|&amp;|  & always\\
+\verb|<| & \verb|&lt;|   & always\\
+\verb|>| & \verb|&gt;|   & in attribute values\\
+\verb|"| & \verb|&quot;| & between double quotes\\
+\verb|'| & \verb|&apos;| & between single quotes\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent As an illustration, consider the following document:
+\XMLinUnchecked{entities.xml}
+
+\noindent The two last entities are \emph{predefined numbered
+  entities} because they denote characters by using their \Unicode
+point (\url{http://www.unicode.org/}). If the code is given in
+decimal, it is introduced by \verb|&#|, for instance, \verb|&#100|. If
+the code is given in hexadecimal, it is introduced by \verb|&#x|, for
+example, \verb|&#x00E7|.
+
+\paragraph{Internal entities}
+
+It can be annoying to use numbers to refer to characters, especially
+if one considers that \Unicode requires up to six digits. To make life
+easier, it is possible to bind a name to an entity representing a
+character, and get a \emph{user\hyp{}defined internal entity}. They
+are called internal because their definition must be in the same
+document where they are used. For example, it is easier to use
+\verb|&n;| rather than \verb|&#241|, especially if the text is in
+Spanish (this represents the letter \texttt{\~{n}}). This kind of
+entity must be declared in the \emph{document type declaration}, which
+is located, if any, just after the declaration \verb|<?xml ... ?>| and
+before the root element.
+\label{xml_intro:DOCTYPE} A document type declaration is made of the
+following components:
+\begin{enumerate*}
+
+  \item the opening \verb|<!DOCTYPE|,
+
+  \item the root element name,
+
+  \item the opening character \verb|[|,
+  
+  \item the \emph{named character entity} declarations,
+
+  \item the closing \verb|]>|.
+
+\end{enumerate*}
+A named character entity declaration is made of
+\begin{enumerate*}
+
+  \item the opening \verb|<!ENTITY|,
+
+  \item the entity name,
+
+  \item the numbered character entity between double quotes,
+
+  \item the closing \verb|>|
+
+\end{enumerate*}
+For example: \verb|<!ENTITY n "&#241;">|
+Here is a complete example:
+\XMLinUnchecked{espana.xml}
+\noindent One can think such an entity as being a macro in
+\textsf{cpp}, the \Clang preprocessor language. It is indeed possible
+to extend user\hyp{}defined internal entities to denote any character
+string, not just a single character. Typically, if one wishes to
+repeat a long or difficult piece of text, like a foreign company name
+or the genealogy of the kings of Merina, it is best to name this text
+and put an entity with that name wherever one wants its contents. The
+syntax for the declaration is fundamentally the same. For example,
+\begin{verbatim}
+<!ENTITY univ "Konkuk University">
+<!ENTITY motto "<spain>Viva Espa&n;a!</spain>">
+<!ENTITY n "&#241;">
+\end{verbatim}
+
+\paragraph{External entities}
+
+Sometimes the \XML document needs to include other \XML documents, but
+copying and pasting of those is not a good strategy, since this
+precludes us from automatically following their editing. Fortunately,
+\XML allows us to specify the inclusion of other \XML documents by
+means of \emph{external entities}. The declaration of these entities
+is as follows:
+\begin{enumerate*}
+
+  \item the opening \verb|<!ENTITY|,
+
+  \item the entity name,
+
+  \item the keyword \verb|SYSTEM|,
+
+  \item the full name of the \XML file between double quotes,
+
+  \item the closing \verb|>|
+
+\end{enumerate*}
+For example,
+\begin{verbatim}
+<?xml version="1.0"?>
+<!DOCTYPE longdoc [
+  <!ENTITY part1 SYSTEM "p1.xml">
+  <!ENTITY part2 SYSTEM "p2.xml">
+  <!ENTITY part3 SYSTEM "p3.xml">
+]>
+<longdoc>
+  The included files are:
+  &part1;
+  &part2;
+  &part3;
+</longdoc>
+\end{verbatim}
+At parsing time, the external entities are fetched by the
+underlying operating system and copied into the main \XML document,
+replacing their associated entity. Therefore the included parts cannot
+contain any prolog, that is, no \XML declaration \verb|<?xml ... ?>|
+and no document type declaration \texttt{<!DOCTYPE~...~]>}. When
+reading an external entity, \XML processors are required to copy
+verbatim the contents of the referenced external document and then to
+parse it as if it always belonged to the main document.
+
+\paragraph{Unparsed entities}
+
+\emph{Unparsed entities} allow us to refer to binary objects, like
+images, videos, sounds, or to some text which is not \XML, like a
+program or a play by Shakespeare. They are declared by
+\begin{enumerate*}
+
+  \item the opening \verb|<!ENTITY|,
+
+  \item the entity name,
+
+  \item the keyword \verb|SYSTEM|,
+
+  \item the full name of the non\hyp{}\XML external file between
+    double quotes,
+
+  \item the keyword \verb|NDATA|,
+
+  \item a \emph{notation} (the kind of the file),
+
+  \item the closing \verb|>|
+
+\end{enumerate*}
+The following is an example.
+\XMLinUnchecked{notation.xml}
+\noindent Had we used external entities, the object would have been
+copied in place of the reference and parsed as \XML{} --~which it is
+not. Notice the notation \texttt{gif}, which is the kind of the
+unparsed entity. Notations must be defined in the document type
+declarations as follows:
+\begin{enumerate*}
+
+  \item the opening \verb|<!NOTATION|,
+
+  \item the notation name,
+
+  \item the keyword \verb|SYSTEM|,
+
+  \item a description of the kind of unparsed entity the notation
+    refers to (it can be a \MIME type, an URL, plain English...)
+
+  \item the closing \verb|>|
+
+\end{enumerate*}
+Notice also that unparsed entities must be used either
+\begin{itemize*}
+
+  \item as attribute values (in our example, the attribute name is
+  \texttt{image}),
+
+  \item or as names (\texttt{picture}), instead of the entity syntax
+    (\texttt{\&picture;}).
+
+\end{itemize*}
+For example, the next document is \emph{not} well\hyp{}formed:
+\begin{verbatim}
+<?xml version="1.0"?>
+<!DOCTYPE doc [
+  <!NOTATION jpeg SYSTEM "image/jpeg">
+  <!ENTITY pic "pictures/me.jpeg" NDATA jpeg>
+]>
+<doc>
+  &pic;
+</doc>
+\end{verbatim}
+\begin{figure}[b]
+\centering
+\includegraphics[bb=71 627 278 723]{entities}
+\caption{Summary of the different kinds of entities}
+\end{figure}
+
+\paragraph{Unparsed character data}
+
+It is sometimes tiresome to have to escape characters, that is, to use
+character entities. To avoid the need of escaping, there is a special
+construct: \emph{CDATA sections} (short for `Character DATA'), made of
+\begin{enumerate*}
+
+  \item the opening \verb|<!CDATA[|,
+
+  \item some text without escaping and without the sequence
+    \verb|]]>|,
+
+  \item the closing \verb|]]>|.
+
+\end{enumerate*}
+For example
+\begin{alltt}
+<paragraph>An example of conditional in C:
+  <c>\textbf{<!CDATA[}if (x < y) return &r;\textbf{]]>}</c>
+</paragraph>
+\end{alltt}
+
+\paragraph{Internal linking}
+
+Consider a document representing a technical book, like a textbook. It
+is common to find cross\hyp{}references in such kind of books, that
+is, references in some chapters to other chapters or sections, or
+bibliographical entries. One easy way to achieve this is to use some
+attributes as labels, that is, names unambiguously identifying a
+location in the structure, and some attributes as references (to the
+labels). The problem is that the writer is then in charge of checking
+whether
+\begin{itemize*}
+
+  \item a given label is unique throughout the whole document, 
+        including external entities,
+
+  \item every reference corresponds to an existing label (linking).
+
+\end{itemize*}
+\label{xml_intro:ATTLIST}
+\XML provides a way to ensure that any validating parser will check
+this kind of internal linking automatically: using the predefined
+attributes \texttt{ID} and \texttt{IDREF}. The former is the kind of
+all the (attribute) labels and the latter is the kind of all the
+(attribute) references. The attributes used either as labels or
+references must be declared in the \texttt{DOCTYPE} section using
+\texttt{ATTLIST} (`attribute list').
+
+To declare labels, we must write
+\begin{enumerate*}
+
+  \item the opening \verb|<!ATTLIST|,
+
+  \item the name of the element being labelled,
+
+  \item the names of the label attributes separated by spaces,
+
+  \item the keyword \texttt{ID},
+
+  \item the keyword \texttt{\#REQUIRED} if the element must always be
+    labelled, otherwise \texttt{\#IMPLIED},
+
+  \item the closing \verb|>|
+
+\end{enumerate*}
+For the references, we must write
+\begin{enumerate*}
+
+  \item the opening \verb|<!ATTLIST|,
+
+  \item the name of the referring element,
+
+  \item the names of the reference attributes separated by spaces,
+
+  \item the keyword \texttt{IDREF},
+
+  \item the keyword \texttt{\#REQUIRED} if the element must always
+    carry a reference, otherwise \texttt{\#IMPLIED},
+
+  \item the closing \verb|>|
+
+\end{enumerate*}
+For example,
+\label{xml_intro:id_idref}
+\XMLinUnchecked{id_idref.xml}
+
+\paragraph{Comments}
+
+It is possible to include comments in an \XML document. They are made
+of
+\begin{enumerate*}
+
+  \item the opening \verb|<!--|,
+
+  \item some text without the sequence \verb|--|,
+
+  \item the closing \verb|-->|.
+
+\end{enumerate*}
+For example
+\begin{alltt}
+<p>Our store is located at</p>
+\textbf{<!-- <address>Eunpyeong-gu, Seoul</address> -->}
+<address>Gangnam-gu, Seoul</address>
+\end{alltt}
+Contrary to programming languages, comments are \emph{not} ignored
+by the parsers and are nodes of the \XML tree.
+
+\paragraph{Namespaces}
+
+Each \XML document defines its own element names, which we
+collectively call its \emph{vocabulary}. In case we use external
+entities which refer to other \XML documents using, by coincidence,
+the same names, we end with an ambiguity in the main document. A good
+way to avoid these name clashes is to use \emph{namespaces}. A
+namespace is a user\hyp{}defined annotation of each element names and
+attribute names. Therefore, if two \XML documents use two different
+namespaces, that is to say, two different element name annotations,
+there is no way to mix their elements when importing one document into
+the other, because each element name carries an extra special
+annotation which is different (ideally unique in the set of documents
+of interest).
+
+The definition of a namespace can be done at the level of any element
+by using a special attribute with the following syntax:
+\begin{alltt}
+xmlns:\textit{prefix} = "\textit{URL}"
+\end{alltt}
+where \texttt{\emph{prefix}} is the space name and \texttt{\emph{URL}}
+(\emph{Universal Resource Location}) points to a web page describing
+in natural language (for example, in English) the namespace. Consider
+the namespace \texttt{course} in the following:
+\begin{alltt}
+<?xml version="1.0"?>
+<\textbf{course:short} 
+  \textbf{xmlns:course}="http://konkuk.ac.kr/~rinderkn/Mirror/XML">
+ <\textbf{course:}date>26 August 2006</\textbf{course:}date>
+ <\textbf{course:}title>Some XML-centric languages</\textbf{course:}title>
+ <\textbf{course:}topic \textbf{course:}level="advanced">
+   We study XML, XPath and XSLT.</\textbf{course:}topic>
+</\textbf{course:}short>
+\end{alltt}
+The scope of a namespace, that is, the part of the document where it
+is usable, is the subtree whose root is the element declaring the
+namespace. By default, if the prefix is missing, the element and all
+its sub\hyp{}elements without prefix belong to the namespace. So, the
+previous example could be simply rewritten
+\begin{alltt}
+<?xml version="1.0"?>
+<short \textbf{xmlns}="http://konkuk.ac.kr/~rinderkn/Mirror/XML">
+ <date>26 August 2006</date>
+ <title>Some XML-centric languages</title>
+ <topic level="advanced">We study XML, XPath and XSLT.</topic>
+</short>
+\end{alltt}
+Note that the colon is missing in the namespace attribute:
+`\texttt{xmlns=...}'. This example illustrates the important fact that
+what ultimately defines a namespace is a URL, not a prefix (like
+\texttt{course}).
+
+As an example of a name clash and how to avoid it, let us consider a
+file \texttt{fruits.xml} containing the following \HTML fragment:
+\begin{verbatim}
+<table>
+  <tr>
+    <td>Bananas</td>
+    <td>Oranges</td>
+  </tr>
+</table>
+\end{verbatim}
+\HTML will be sketched in a coming subsection, but, for now, suffice
+it to say that the elements have an implicit meaning if the file is
+indeed interpreted as \HTML. For example, \texttt{table} refers to a
+typographical layout.
+
+Imagine now a file \texttt{furniture.xml} containing a description of
+pieces of furniture, like
+\begin{verbatim}
+<table>
+  <name>Round table</name>
+  <wood>Oak</wood>
+</table>
+\end{verbatim}
+Now, the main document \texttt{main.xml} includes both files:
+\begin{verbatim}
+<?xml version="1.0"?>
+<!DOCTYPE eclectic [
+  <!ENTITY part1 SYSTEM "fruits.xml">
+  <!ENTITY part2 SYSTEM "furniture.xml">
+]>
+<eclectic>
+  &part1;
+  &part2;
+</eclectic>
+\end{verbatim}
+The problem is that \texttt{table} has a different meaning in the two
+included files, so they should not be confused: this is a clash
+name. The solution consists in using two different namespaces. First:
+\begin{verbatim}
+<html:table xmlns:html="http://www.w3.org/TR/html5/">
+  <html:tr>
+    <html:td>Bananas</html:td>
+    <html:td>Oranges</html:td>
+  </html:tr>
+</html:table>
+\end{verbatim}
+Second:
+\begin{verbatim}
+<f:table xmlns:f="http://www.e-shop.com/furnitures/">
+  <f:name>Round table</f:name>
+  <f:wood>Oak</f:wood>
+</f:table>
+\end{verbatim}
+But this is a heavy solution. Fortunately, namespaces can be
+defaulted:
+\begin{verbatim}
+<table xmlns="http://www.w3.org/TR/html5/">
+  <tr>
+    <td>Bananas</td>
+    <td>Oranges</td>
+  </tr>
+</table>
+\end{verbatim}
+Second:
+\begin{verbatim}
+<table xmlns="http://www.e-shop.com/furnitures/">
+  <name>Round table</name>
+  <wood>Oak</wood>
+</table>
+\end{verbatim}
+The two kinds of tables can be safely mixed now. For example
+\begin{verbatim}
+<mix xmlns:html="http://www.w3.org/TR/html5/"
+     xmlns:f="http://www.e-shop.com/furnitures/">
+<html:table>
+  ...
+  <f:table>
+  ...
+  </f:table>
+...
+<html:table>
+</mix>
+\end{verbatim}
+Note that element \texttt{mix} has no associated namespace (it is
+neither \texttt{html} nor~\texttt{f}). It is possible to unbind or
+rebind a prefix namespace (the following examples are found at
+\url{http://www.w3.org/TR/REC-xml-names/}):
+\begin{alltt}
+<?xml version="1.1"?>
+<x xmlns:n1="http://www.w3.org">
+  <n1:a/> <!-- valid; the prefix n1 is bound to                    
+               http://www.w3.org -->
+    <x \textbf{xmlns:n1=""}>
+      <n1:a/> <!-- invalid; the prefix n1 is not bound here -->
+      <x xmlns:n1="http://www.w3.org">
+        <n1:a/> <!-- valid; the prefix n1 is bound again -->
+      </x>
+   </x>
+</x>
+\end{alltt}
+
+\XMLinUnchecked{beers.xml}
+
+\XMLinUnchecked{scoping.xml}
+
+\noindent An element may have children elements with the same name
+(like the element~\texttt{to} in the email example above), but an
+element may not have attributes with identical names or identical
+namespaces (URL) and identical names. For example, each of the
+\texttt{bad} empty elements is invalid in the following:
+\begin{verbatim}
+<!-- http://www.w3.org is bound to n1 and n2 -->
+<x xmlns:n1="http://www.w3.org" xmlns:n2="http://www.w3.org" >
+  <bad a="1"    a="2"/>     <!-- invalid -->
+  <bad n1:a="1" n2:a="2"/>  <!-- invalid -->
+</x>
+\end{verbatim}
+However, each of the following is valid, the second because
+\emph{default namespaces never apply to attribute names}:
+\begin{verbatim}
+<!-- http://www.w3.org is bound to n1 and is the default -->
+<x xmlns:n1="http://www.w3.org" xmlns="http://www.w3.org" >
+  <good a="1" b="2"/>    <!-- valid -->
+  <good a="1" n1:a="2"/> <!-- valid -->
+</x>
+\end{verbatim}
+Namespaces will be very important when learning \XSLT. Although
+namespaces are declared as attributes, they are present in the \XML
+tree corresponding to the document as a special node, different from
+the attribute nodes.
+
+\paragraph{Processing instructions}
+
+In some exceptional cases, it may be useful to include in an \XML
+document some data that are targeted to a specific \XML
+processor. These data are then embedded in a special element, and the
+data themselves are called a \emph{processing instruction} because
+they tell a particular processor, for instance, \Saxon, what to do at
+this point. The syntax is
+\begin{alltt}
+<?\textit{target} \textit{data}?>
+\end{alltt}
+The \emph{target} is a string supposed to be recognised by a specific
+\XML processor and the \emph{data} is then used by this
+processor. Note that the data takes the shape of attribute values, and
+may be absent. For example:
+\begin{verbatim}
+<?xml version="1.0"?>
+\end{verbatim}
+
+\paragraph{Validation}
+
+All \XML processors must check whether the input document satisfy the
+\emph{syntactical} requirements of a well\hyp{}formed \XML document.
+In particular,
+\begin{itemize*}
+
+\item pairs of tags making up an element must be present, except for
+  empty elements which are closed with \texttt{/>} (this has to be
+  contrasted with \HTML, which is very lax in this regard),
+
+  \item the predefined entities must really be predefined (unicodes
+    are automatically checked),
+
+  \item internal entities must be declared in the prolog, etc.
+
+\end{itemize*}
+\emph{Validating processors} also check that the external entities are
+indeed found (their well\hyp{}formedness is checked after they have
+been inserted in the main document). There are several \XML parsers
+available free of charge over the internet, implemented in several
+languages. Most of them are actually libraries (API), so an
+application processing \XML would only need to be interfaced with one
+of them. A good standalone, validating parser is \texttt{xmllint}.
+
+\mypar{\HTML}
+
+The \emph{Hyper-Text Markup Language} (\emph{\textsf{HTML}}) is used
+to describe web pages. See the W3C Draft Recommendation at
+\url{http://www.w3.org/TR/html5/}. Let us skim over this vast language
+and illustrate it with some small examples. For instance, all \HTML
+file containing English should at least follow the pattern
+\begin{alltt}
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <title>\textit{the title of the window}</title>
+  </head>
+  <body>
+     \emph{...contents and markup...}
+  </body>
+</html>
+\end{alltt}
+Elements \texttt{h1}, \texttt{h2}, ..., \texttt{h6} enable six kinds
+of headers, of decreasing font sizes. Consider opening in a web
+browser the following document: \XMLinUnchecked{h.html}
+\noindent Other useful elements are the following:
+\begin{itemize*}
+
+  \item The empty element \texttt{<br/>} is interpreted by
+    user agents as a \emph{line break};
+
+  \item element \texttt{em} marks text to be \emph{emphasised}
+    (for example, by using an italic font);
+
+  \item element \texttt{strong} marks text to be emphasised stronger
+    than with \texttt{em} (for instance, by using a bold font);
+
+  \item element \texttt{p} delimits a \emph{paragraph}.
+
+\end{itemize*}
+\emph{Lists} are a common way to typeset closely related sentences,
+like enumerations. There are three kinds of lists:
+\begin{enumerate*}
+ 
+  \item unordered lists;
+
+  \item ordered lists;
+
+  \item lists of definitions.
+
+\end{enumerate*}
+Unordered lists are the well\hyp{}known `bullet lists', where each
+line is displayed after an indentation followed by a bullet, like the
+following.
+\begin{itemize*}
+
+  \item element \texttt{ul} contains an unordered list;
+
+  \item element \texttt{li} (`list item') contains an item in the
+    list.
+
+\end{itemize*}
+Try the following recipe:
+\begin{verbatim}
+<h3>Ingredients</h3>
+<ul>
+  <li>100 g. flour,</li>
+  <li>10 g. sugar,</li>
+  <li>1 cup of water,</li>
+  <li>2 eggs,</li>
+  <li>salt and pepper.</li>
+</ul>
+\end{verbatim}
+Ordered lists are lists whose items are introduced by an indentation
+followed by a number, in increasing order. They require
+\begin{enumerate*}
+
+  \item the element \texttt{ol}, which contains the ordered list,
+
+  \item elements \texttt{li}, as in unordered lists.
+
+\end{enumerate*}
+For example,
+\begin{verbatim}
+<h3>Procedure</h3>
+<ol>
+  <li>Mix dry ingredients thoroughly;</li>
+  <li>Pour in wet ingredients;</li>
+  <li>Mix for 10 minutes;</li>
+  <li>Bake for one hour at 300 degrees.</li>
+</ol>
+\end{verbatim}
+A list of definitions is a list whose items are introduced by a few
+words in a bold font followed by the contents of the item
+itself. Consider
+\noindent\rule{\linewidth}{0.5pt}
+\begin{description*}
+
+  \item[hacker]\ \\
+    A clever programmer.
+
+  \item[nerd]
+
+  \item[geek]\ \\
+    A technically bright but socially misfit person.
+
+\end{description*}
+\noindent\rule{\linewidth}{0.5pt}
+The elements involved are
+\begin{itemize*}
+
+  \item \texttt{dl} (`definition list'), which contains the whole
+    list of definitions;
+
+  \item \texttt{dt} (`definition term'), which contains every term
+    to be defined;
+
+  \item \texttt{dd} (`definition description'), which contains every
+    definition of a term.
+
+\end{itemize*}
+The previous example corresponds to the following \HTML excerpt:
+\begin{verbatim}
+<dl>
+  <dt><strong>hacker</strong></dt>
+    <dd>A clever programmer.</dd>
+  <dt><strong>nerd</strong></dt>
+  <dt><strong>geek</strong></dt>
+    <dd>A technically bright but socially misfit person.</dd>
+</dl>
+\end{verbatim}
+A \emph{table} is a rectangle divided into smaller rectangles, called
+\emph{cells}, which contain some text. When read vertically, cells are
+said to belong to \emph{columns}, whilst horizontally, they belong to
+\emph{rows}. A row or a column can have a \emph{header}, that is, a
+cell at their beginning containing a name in bold face. A table can
+have a \emph{caption}, which is a short text describing the contents
+of the table and displayed just above it, like a title. Columns can be
+divided themselves into subcolumns, when needed. The following example
+is taken from \url{http://www.w3.org/TR/html4/struct/tables.html}.
+\begin{center}
+\emph{A test table with merged cells}\\
+
+\begin{tabular}{|c|c|c|c|}
+\hline
+                 & \multicolumn{2}{|c|}{\textbf{Average}} & \textbf{Red}\\
+\cline{2-3}
+                 & \textbf{height}    &   \textbf{weight} & \textbf{eyes}\\
+\hline
+\textbf{Males}   & 1.9                & 0.003             & 40\%\\
+\hline
+\textbf{Females} & 1.7                & 0.002             & 43\%\\
+\hline
+\end{tabular}
+\end{center}
+\textbf{Males} and \textbf{Females} are row headers. The column
+headers are \textbf{Average}, \textbf{Red eyes}, \textbf{height} and
+\textbf{weight}. The column \textbf{Average} spans two columns; in
+other words, it contains two subcolumns, \textbf{height} and
+\textbf{weight}. The caption reads \emph{A test table with merged
+  cells}. The corresponding \HTML code is
+\begin{verbatim}
+<table border="1">
+  <caption><em>A test table with merged cells</em></caption>
+  <tr>
+    <th rowspan="2"/>
+    <th colspan="2">Average</th>
+    <th rowspan="2">Red<br/>eyes</th>
+  </tr>
+  <tr><th>height</th><th>weight</th></tr>
+  <tr><th>Males</th><td>1.9</td><td>0.003</td><td>40%</td></tr>
+  <tr>
+    <th>Females</th>
+    <td>1.7</td>
+    <td>0.002</td>
+    <td>43%</td>
+  </tr>
+</table>
+\end{verbatim}
+The meaning of the elements is as follows:
+\begin{itemize*}
+
+  \item Element \texttt{table} contains the table; its attribute
+  \texttt{border} specifies the width of the table borders, that is,
+  of the lines separating the cells from the rest.
+
+  \item Element \texttt{caption} contains the caption.
+
+  \item Element \texttt{th} (`table header') contains a row or column
+    header, that is, the title of the row of column in bold type.
+
+  \item Element \texttt{td} (`table data') contains the data of a
+    cell (if not a header).
+
+  \item Element \texttt{tr} (`table row') contains a row, that is, a
+    series of \texttt{td} elements, perhaps starting with a
+    \texttt{th} element.
+
+\end{itemize*}
+Notice the attributes \texttt{rowspan} and \texttt{colspan} of the
+\texttt{th} element. Attribute \texttt{rowspan} allows us to specify
+how many rows the current cell spans. For example, the first row, that
+is, the one on the top\hyp{}left corner, is empty and covers two rows
+because \verb|<th rowspan="2"/>|. Attribute \texttt{colspan} allows us
+to declare how many columns the current cell spans. For example, the
+second cell contains the text \textbf{Average} and covers two columns
+because \verb|<th colspan="2">Average</th>|. Notice the line break
+\verb|<br/>| in the third cell (first row, last column) and how
+\textbf{height} and \textbf{weight} are automatically at the right
+place
+
+\emph{Hyperlinks} in \HTML are defined by the element `\texttt{a}'
+with its mandatory attribute \texttt{href}
+(`hyper\hyp{}reference'). For example, consider the following
+hyperlink:
+\begin{verbatim}
+<a href="http://konkuk.ac.kr/~rinderkn/">See my web page.</a>
+\end{verbatim}
+
+\mypar{\XHTML}
+
+The current working draft of \HTML is \HTML~5. Until it becomes a
+standard supported by web browsers and \XSLT processors, it is best
+for beginners to use a simpler version of \HTML, called \XHTML
+(\emph{eXtensible Hyper-Text Markup Language}), whose W3C
+Recommandation is found at
+\url{http://www.w3.org/TR/xhtml1/}. Basically, \XHTML is \XML, but the
+elements which are found in \HTML have the same meaning (instead of
+none). For example, the previous examples are valid \XHTML, with the
+provision that a specific \texttt{DOCTYPE} is declared. The pattern is
+the following:
+\begin{alltt}
+<?xml version="1.0" encoding="\emph{encoding}"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en" lang="en">
+  <head>
+    <title>\textit{the title of the window}</title>
+  </head>
+  <body>
+     \emph{...contents and markup...}
+  </body>
+</html>
+\end{alltt}
+Just like \XML documents, \XHTML documents can be and should be
+validated before being published on the web, for example using the
+site at \url{http://validator.w3.org/}.
+
+\mypar{\DTD}
+
+We saw \vpageref{xml_intro:DOCTYPE} that the \emph{Document Type
+  Declaration} may contain markup which constrains the \XML document
+it belongs to (elements, attributes etc.). The content of a Document
+Type Declaration is made of a \emph{Document Type Definition},
+abbreviated \DTD. So the former is the container of the latter. It is
+possible to have all or part of the \DTD in a separate file, usually
+with the extension `\texttt{.dtd}'. We already saw \emph{attribute
+  lists} \vpageref{xml_intro:ATTLIST} when setting up internal
+linking.  In general, the special element \texttt{ATTLIST} can be used
+to specify any kind of attributes, not just labels and
+references. Consider the attribute declarations for element
+\texttt{memo}:
+\begin{verbatim}
+<!ATTLIST memo ident      CDATA          #REQUIRED
+               security   (high | low)   "high"
+               keyword    NMTOKEN        #IMPLIED>
+\end{verbatim}
+\texttt{CDATA} stands for \emph{character data} and represents any
+string. A \emph{named token} (\texttt{NMTOKEN}) is a string starting
+with a letter and which may contain letters, numbers and certain
+punctuation. In order for a document to be validated, which requires
+more constraints than to be merely well\hyp{}formed, all the elements
+used must be declared in the \DTD. The name of each element must be
+associated a \emph{content model}, that is, a description of what it
+is allowed to contain, in terms of textual data and sub\hyp{}elements
+(mark\hyp{}up). This is achieved by means of the \DTD \texttt{ELEMENT}
+declarations. There are five content models:
+\begin{enumerate*}
+
+  \item the \emph{empty element}:
+\begin{verbatim}
+<!ELEMENT padding EMPTY>
+\end{verbatim}
+
+  \item elements with \emph{no content restriction}:
+\begin{verbatim}
+<!ELEMENT open ALL>
+\end{verbatim}
+
+  \item elements containing \emph{only text}:
+\begin{verbatim}
+<!ELEMENT emphasis (#PCDATA)>
+\end{verbatim}
+which means \emph{parsed\hyp{}character data}.
+
+\bigskip
+
+  \item elements containing \emph{only elements}:
+\begin{verbatim}
+<!ELEMENT section (title,para+)>
+<!ELEMENT chapter (title,section+)>
+<!ELEMENT report (title,subtitle?,(section+ | chapter+))>
+\end{verbatim}
+where \texttt{title}, \texttt{subtitle} and~\texttt{para} are
+elements.
+
+\bigskip
+
+  \item elements containing \emph{both text and elements}:
+\begin{verbatim}
+<!ELEMENT para (#PCDATA | emphasis | ref)+>
+\end{verbatim}
+where \texttt{emphasis} and~\texttt{ref} are elements. 
+\end{enumerate*}
+The definition of a content model is akin to \emph{regular
+  expressions}. Such an expression can be made up by combining the
+following expressions:
+\begin{itemize*}
+
+  \item \texttt{(\(e_1\), \(e_2\), \dots, \(e_n\))} represents the
+    elements represented by~\(e_1\), followed by the elements
+    represented by~\(e_2\) etc. until~\(e_n\);
+
+  \item \texttt{\(e_1\) | \(e_2\)} represents the elements represented
+    by~\(e_1\) or~\(e_2\);
+
+  \item \texttt{(\(e\))} represents the elements represented by~\(e\);
+
+  \item \texttt{\(e\)?} represents the elements represented by~\(e\)
+    or none;
+
+  \item \texttt{\(e\)+} represents a non\hyp{}empty repetition of
+    the elements represented by~\(e\);
+
+  \item \texttt{\(e\)*} represents the repetition of the elements
+    represented by~\(e\).
+
+\end{itemize*}
+\emph{Warning:} When mixing text and elements, the only possible
+regular expression is either \verb|(#PCDATA)| or
+\verb/(#PCDATA | ...)*/
+
+The part of a \DTD which is included in the same file as the \XML
+document it applies to is called the \emph{internal subset}. See
+again the example \vpageref{xml_intro:id_idref}. The part of a
+\DTD which is in an independent file (\texttt{.dtd}) is called the
+\emph{external subset}. If there is no internal subset and
+everything is in the external subset we have a declaration like
+\begin{verbatim}
+<!DOCTYPE some_root_element SYSTEM "some.dtd">
+\end{verbatim}
+In order to validate an \XML document, its \DTD must completely
+describe the elements and attributes used.  This is not mandatory when
+well\hyp{}formedness is required. Therefore, the example
+\vpageref{xml_intro:id_idref} is well\hyp{}formed but not valid in
+the sense above, because the elements \texttt{map} and
+\texttt{country} are not declared. To validate the document, it is
+enough, for example, to add
+\begin{verbatim}
+<!ELEMENT map (country*)>
+<!ELEMENT country EMPTY>
+\end{verbatim}
+
+\section{Introduction}
+
+\noindent Given one or several \XML documents, it may be useful
+\begin{itemize}
+
+  \item to search the documents and output what has been found in a
+  format suitable for another application or reader, in particular,
+  \XML (filtering in);
+
+  \item to copy the input, perhaps without certain parts (filtering
+  out), and/or adding data (updating).
+
+\end{itemize}
+When such needs arise, it is a good idea to use the functional
+programming languages \XQuery or \XSLT (\emph{eXtensible Stylesheet
+  Language Transformations}). Even if both languages share a great
+deal of common use cases (to the point of having in common a
+sublanguage, \XPath), the first application, which is more oriented
+towards database management, is more commonly tackled with \XQuery,
+whilst the second usage is often undertaken with \XSLT.
+
+An \XSLT processor reads an \XML document and an \XSLT program, then
+applies the \emph{transformations} defined in \XSLT to the document,
+and the result is printed, usually in plain text, \XML or \HTML. The
+twist is that an \XSLT file is actually an \XML document, which
+enables \XSLT to transform \XSLT programs. For example, if we use an
+element \verb|book| in an \XML document, \XML itself does not
+necessarily imply that this element models a book, although some
+application using the document perhaps will precisely do that. One can
+think of \XML as merely syntactic rules, in other words, a formal
+grammar, with no semantics attached to the constructs. An \XSLT
+document is thus \XML with a performative declaration.
+
+To enable the interpretation of \XML as \XSLT, \XSLT programs require
+the predefined namespace \url{http://www.w3.org/1999/XSL/Transform},
+which is often (but not necessarily) named \texttt{xsl}, as shown in
+\XSLTinUnchecked{empty.xsl} The first line states that this is an \XML
+document. The second defines the interpretation as \XSLT by declaring
+the namespace for \XSLT and using the \emph{root element}
+\texttt{xsl:transform} (\texttt{xsl:stylesheet} is also accepted). The
+version of \XSLT is set to \texttt{2.0}, which is the version current
+at the time of writing. Moreover, the element \texttt{xsl:output}
+states that the output is to be plain text. Other than that, the
+program says nothing else, so we might expect the transformation to do
+nothing. Assume then the following \XML document,
+\texttt{cookbook.xml}, to be transformed:
+\XMLinUnchecked{cookbook.xml}
+\noindent The application of the empty transformation to this document
+yields \XMLinUnchecked{cookbook1_out.xml}
+
+Perhaps surprisingly, something did happen: the contents of the
+\emph{text nodes} of the input \XML document were extracted \emph{in
+  the same order}, but not the attribute values. (Note that if
+\verb|<xsl:output method="text"/>| were missing, the output would be
+considered \XML and \verb|<?xml ... ?>| would be outputted by
+default.) More precisely, the order corresponds to a preorder
+traversal of the corresponding \XML tree: this is the implicit
+traversal of \XSLT processors, also called \emph{document order}. The
+rationale is that, since the aim is often to rewrite a document into
+another, this traversal corresponds to the order in which a book is
+read and written, cover to cover. Furthermore, the reason why the text
+nodes are extracted by default is due to \XSLT favouring a filtering
+style: if part of the input should be ignored or augmented, the
+programmer must say so. Finally, let us remark that there is no need
+for explicit printing instructions in \XSLT: the programmer assumes
+that the result is \XML or text and the run\hyp{}time system ensures
+automatic \emph{serialisation} of the result.
+
+\paragraph{Matching}
+\label{par:matching}
+
+Let us complete our empty transformation as follows:
+\XSLTinUnchecked{chapter.xsl}
+\noindent Note the predefined element \texttt{xsl:template} defining a
+\emph{template}. It bears the attribute \texttt{match}, whose value is
+the name of the element we want to transform. During the preorder
+traversal, if a \texttt{chapter} element is found (that is, matched),
+the contents of the text node of the template (\texttt{A chapter})
+becomes the result. (Let us not confuse the text node and its
+contents.) Applying the previous transformation to the document in the
+file named \texttt{cookbook.xml} yields
+\XMLinUnchecked{cookbook2_out.xml}
+
+\noindent Let us match now the root element with the following:
+\XSLTinUnchecked{chapters.xsl}
+\noindent The result is now:
+\XMLinUnchecked{cookbook3_out.xml}
+\noindent The reason is that when a template matches a node, called
+the \emph{context node} from within the template, that node is
+processed (here, the text \texttt{Chapters:} or \texttt{A chapter} is
+produced) and the preorder traversal resumes \emph{without visiting the
+  children of the context node}. Therefore, after the element
+\texttt{cookbook} is matched and done with, the \XSLT processor
+ignores every\-thing else since it is the root element.
+
+In order to visit and try to match the children of the context node,
+one must tell so the processor by using the special empty element
+\begin{verbatim}
+<xsl:apply-templates/>
+\end{verbatim}
+Let us add this element as a child of the template matching the root
+element: \XSLTinUnchecked{cookbook.xsl}
+\noindent The result is now:
+\XMLinUnchecked{cookbook4_out.xml}
+\noindent It is striking that the text `\texttt{Chapters:}' is not
+aligned with the title. It is a sad fact that the handling of
+whitespace and newlines can be very confusing in \XML and \XSLT, in
+particular when we want or not some space if the output, like here, is
+plain text. We will not discuss this thorny issue here and refer the
+reader to the book by~\cite{Kay_2008}, page~141. As for the rest, the
+title appears after `\texttt{Chapters:}', which is confusing.
+
+If we simply want to get rid of the title, we could simply define an
+empty template matching \texttt{title}:
+\XSLTinUnchecked{cookbook1bis.xsl}
+\noindent The result is now:
+\XMLinUnchecked{cookbook5_out.xml}
+
+If we want to retain the title, we need to extract the text from the
+text node which is a child of the \texttt{title} element, and put it
+before `\texttt{Chapters:}'. One way is to apply the templates on
+\texttt{title} alone using the special attribute \texttt{select},
+whose value is the child's name, then produce `\texttt{Chapters:}',
+and finally apply the templates to the chapters:
+\XSLTinUnchecked{cookbook1.xsl}
+\noindent The result is now:
+\XMLinUnchecked{cookbook6_out.xml}
+\noindent This is not quite it, because we must not apply the
+templates to all the children of \texttt{cookbook}, only to the
+chapters:
+\XSLTinUnchecked{cookbook2.xsl}
+\noindent The result is now:
+\XMLinUnchecked{cookbook7_out.xml}
+\noindent We just hit another quirk with the newlines. What happened
+is that the \emph{selection} (via the attribute \texttt{select})
+gathered all the \texttt{chapter} nodes in a linear structure called a
+\emph{sequence}, the templates have been applied to all of the nodes
+in it, then each of the results has been serialised, catenated to the
+others and, finally, a newline character has been added. The reason
+why we had newlines after each `\texttt{A chapter}' before is because
+each of these texts constituted a singleton sequence. In order to
+recover the newlines, we could use the special element
+\texttt{xsl:text}, whose purpose is to output the content of its
+unique text node \emph{as it is}, without tweaking blanks and
+newlines. Here, we could force a newline after each `\texttt{A
+  chapter}'. In \XML, the newline character is the numbered entity
+\verb|&#10;| \XSLTinUnchecked{cookbook3.xsl}
+\noindent The result is now:
+\XMLinUnchecked{cookbook8_out.xml}
+\noindent Still not perfect, but let us abandon this example and spend
+some time understanding sequences.
+
+\section{Transforming sequences}
+
+As we already know from part~\ref{part:linear}, the linear structure
+of choice in functional languages is the stack, also called list. In
+\XSLT, it is the \emph{sequence}. The empty sequence is written
+\texttt{()} and the non-empty sequence is written \texttt{(\(x_1\),
+  \(x_2\), \dots, \(x_n\))}, where the~\(x_i\) are items, or
+\texttt{\(x_1\), \(x_2\), \dots, \(x_n\)}. The difference with stacks
+is twofold. First, sequences are always flat, so when an item of a
+sequence is itself a sequence, it is replaced by its contents, if
+any. For instance, \texttt{(1,(),(2,(3)),4)} is actually evaluated in
+\texttt{(1,2,3,4)}. In particular, a singleton sequence is the same as
+the unique item it contains: \texttt{((5))} is~\texttt{5}. Second, no
+cost is incurred when catenating two sequences (in contrast with the
+linear cost in the length of the first stack when catenating two
+stacks), so the previous evaluation costs~\(0\). The reason is that
+catenation of sequences, being frequently needed, is a built\hyp{}in
+operation. Therefore, in \XSLT, catenation is the primary operation,
+not pushing, as it is the case with stacks. 
+
+Just like in \Erlang, sequences can contain any kind of items, not
+just integers. We will use sequences to hold \XML elements and
+attributes, for instance. Another thing to know about sequences is
+that if \texttt{seq} is the name of a sequence, then \texttt{\$seq}
+represents the sequence: \emph{note the dollar sign}. If we write
+\texttt{seq} in the value of an attribute \texttt{match} or
+\texttt{select}, it means the \emph{element}
+\texttt{seq}. Furthermore, the first item in \texttt{\$seq} is written
+\texttt{\$seq[1]}, the second \texttt{\$seq[2]} etc. where the natural
+number is the \emph{position} of the item. If we select an item
+missing in a sequence, the result is the empty sequence, for example,
+if \texttt{\$seq[2]} is \texttt{()}, it means that \texttt{\$seq}
+contains at most one item. It is often very useful to extract a
+subsequence, similarly to projecting the substack (the tail) of a
+given stack. This is done with the predefined function
+\texttt{position}: \texttt{\$seq[position()>1]} or
+\texttt{\$seq[position() != 1]}.
+
+\mypar{Length}
+
+Let us recall here a functional program computing the length of a
+stack:
+\begin{equation*}
+\fun{len}_0(\el) \rightarrow 0;\quad
+\fun{len}_0(\cons{x}{s}) \rightarrow 1 + \fun{len}_0(s).
+\end{equation*}
+In view of a translation to \XSLT, let us add to our source language a
+conditional expression and rewrite the program without pattern
+matching:
+\begin{equation}
+\fun{len}_0(s) \rightarrow \xkwd{if} \; s = \el \; \xkwd{then} \; 0 \;
+\xkwd{else} \; 1 + \fun{len}_0(\fun{tl}(s)).
+\label{def:len0_xslt}
+\end{equation}
+where \(\fun{tl}(s)\) (\emph{tail}) returns the immediate substack
+of~\(s\). Note that we cannot define \fun{tail/1} without pattern
+matching, so it has to be translated into a predefined function. In
+order to start writing the \XSLT program, we need to be more specific
+about the input. Let us suppose that we obtain our sequence by
+selecting the children nodes \texttt{chapter} of the root element
+\texttt{book}. In other words, we want to count the number of chapters
+in a book. For instance, \XMLinUnchecked{toc.xml}
+\noindent The \DTD is as follows:
+\DTDin{book.dtd}
+The style we recommend in \XSLT consists in explicitly typing as much
+as we can the data and the templates. In order to do so, we need to
+use a tiny part of a standard called \XMLSchema~\citep{Walmsley_2002},
+by means of a namespace, just like we enable \XSLT through a namespace. This explains the canvas of our program:
+\begin{alltt}
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:transform version="2.0"
+               xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+               \textbf{xmlns:xs="http://www.w3.org/2001/XMLSchema"}>
+  <xsl:output method="text" encoding="UTF-8"/>
+  ...
+</xsl:transform>
+\end{alltt}
+In all our \XSLT programs whose output is text, we would like to
+have a newline character at the end to improve readability. Because
+the root element is likely to vary, we match the \emph{document root},
+noted~\texttt{/}, which is an implicit node whose only child is the
+root element. We then apply any available templates to the root
+element and put a newline:
+\begin{verbatim}
+  <xsl:template match="/">
+    <xsl:apply-templates/>
+    <xsl:text>&#10;</xsl:text>
+  </xsl:template>
+\end{verbatim}
+Now we need to match the root element and call the translation of
+\fun{len\(_0\)/1}. To translate functions, we will use a special kind
+of template, called a \emph{named template}, which differs from the
+\emph{matching templates} we saw earlier. There are two sides to their
+usage: their definition and their call.
+
+The canvas for defining a named template is
+\begin{alltt}
+<xsl:template name="\(f\)" as="\(t\)">
+  <xsl:param name="\(x\sb{1}\)" as="\(t\sb{1}\)"/>
+  ...
+  <xsl:param name="\(x\sb{n}\)" as="\(t\sb{n}\)"/>
+  ...
+</xsl:template>
+\end{alltt}
+The name of the template is~\(f\), each~\(x_i\) is a parameter of
+type~\(t_i\), the type of the value computed by~\(f\) is~\(t\).
+
+The canvas for calling a named template is as follows:
+\begin{alltt}
+<xsl:call-template name="\(f\)">
+  <xsl:with-param name="\(x\sb{1}\)" select="\(v\sb{1}\)" as="\(t\sb{1}\)"/>
+  ...
+  <xsl:with-param name="\(x\sb{n}\)" select="\(v\sb{n}\)" as="\(t\sb{n}\)"/>
+</xsl:call-template>
+\end{alltt}
+The template named~\(f\) has \(n\)~parameters \(x_1\), \(x_2\),
+\ldots, \(x_n\), such that the type of~\(x_i\) is~\(t_i\) and its
+value is~\(v_i\). Binding values to parameters in this way is featured
+in programming languages like \Ada (\emph{named association}) and
+\OCaml (\emph{labels}), and it allows the programmer to forget about
+the parameters order, which is particularly useful when they are
+numerous.
+
+At this point it is important to know that there exists functions in
+\XSLT, defined by the element \texttt{xsl:function}, and, although we
+chose named templates for the translation, plain \XSLT functions would
+do as well.
+
+Resuming our translation, we need to call the named template which
+will be the translation of \fun{len\(0\)/1}:
+\begin{verbatim}
+  <xsl:template match="book" as="xs:integer">
+    <xsl:call-template name="len0">
+      <xsl:with-param name="chapters" select="chapter"
+                      as="element(chapter)*"/>
+    </xsl:call-template>
+  </xsl:template>
+\end{verbatim}
+As mentioned previously, we had to name the parameter we pass a value
+to, that is, \texttt{chapters}. Perhaps more puzzling is the meaning
+of the attribute value \texttt{element(chapter)*}: it is the type of a
+sequence (possibly empty) of \texttt{chapter} elements. Although it
+may not be necessary in this instance to provide this type because it
+is implicit in the selection \texttt{select="chapter"}, we recommend
+to always use the attribute \texttt{as} with
+\texttt{xsl:with-param}. Furthermore, note that the result of the
+template matching \texttt{book} is also typed as \texttt{xs:integer}
+because it is the same result as that of the called template
+\texttt{len0}. (In the template matching the document root
+(\texttt{/}), we did not specify the return type because we wanted
+that template to work with every transformation.)
+
+Let us focus now on the definition of the called template, that is,
+the translation of \fun{len\(_0\)/1} (at last!). We expect the
+following pattern:
+\begin{verbatim}
+  <xsl:template name="len0" as="xs:integer">
+    <xsl:param name="chapters" as="element(chapter)*"/>
+    ...
+  </xsl:template>
+\end{verbatim}
+The parameter named \texttt{chapters} corresponds to~\(s\) in the
+definition~\eqref{def:len0_xslt} of \fun{len\(_0\)/1}; we changed the
+name to fit more closely the specialised meaning, limited to chapters
+here. We need now to translate the conditional expression \(\xkwd{if}
+\dots \xkwd{then} \dots \xkwd{else} \dots\) into \XSLT. Unfortunately,
+tests in \XSLT are quite verbose in general. Let us introduce three
+elements that allow us to write general tests in the style of the
+\texttt{switch} constructs of \Java:
+\begin{alltt}
+<xsl:choose>
+  <xsl:when test="\(b\sb{1}\)">\(e\sb{1}\)</xsl:when>
+  ...
+  <xsl:when test="\(b\sb{n}\)">\(e\sb{n}\)</xsl:when>
+  <xsl:otherwise>\(e\sb{n+1}\)</xsl:otherwise>
+</xsl:choose>
+\end{alltt}
+The values~\(b_i\) of the \texttt{test} attributes are evaluated (The
+apparent tautology is due to the \XSLT vocabulary: an attribute value
+is actually not a value in general, but an expression.) in order until
+one, say~\(b_j\), results in the boolean \texttt{true}, causing the
+sequence~\(e_j\) to be evaluated; otherwise the sequence~\(e_{n+1}\)
+(children of \texttt{xsl:otherwise}) is processed. Resuming our
+exercise, we fill a bit more the blanks:
+\begin{alltt}
+  <xsl:template name="len0" as="xs:integer">
+    <xsl:param name="chapters" as="element(chapter)*"/>
+    <xsl:choose>
+      <xsl:when test="\textbf{empty(\$chapters)}">
+        ... <!-- Translation of \(0\) -->
+      </xsl:when>
+      <xsl:otherwise>
+        ... <!-- Translation of \(1 + \fun{len}\sb{0}(s)\) -->
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+\end{alltt}
+Note the built\hyp{}in \XSLT function \texttt{empty}, which returns
+\texttt{true} if its argument is an empty sequence, and \texttt{false}
+otherwise. The translation of~\(0\) is not so simple, though! Indeed,
+the obvious~\texttt{0} would mean that we actually produce a
+\emph{text} containing the character~\texttt{0}, instead of the
+expected integer. There is a very useful \XSLT element which may come
+handy here --~although more versatile than it seems here, as we shall
+see later. Let us introduce the \emph{sequence constructor}:
+\begin{verbatim}
+<xsl:sequence select="..."/>
+\end{verbatim}
+The selected value must evaluate into a sequence which is then
+substituted in place of the element \texttt{xsl:sequence}. One may
+wonder why this is so convoluted, and the reason is that the value of
+the \texttt{select} attributes belongs to a sublanguage of \XSLT,
+called \XPath, and \XPath can only be used for selections or tests
+(\texttt{empty} is an \XPath function). In a \texttt{select}
+attribute, \texttt{0}~means~\(0\), not the text made of the single
+character~\texttt{0}, and \texttt{xsl:sequence} allows us to inject in
+\XSLT the \XPath values, so we can construct a sequence made with
+\XPath. Of course, we have to keep in mind that any item is equivalent
+to a singleton sequence, in particular \texttt{(0)}~is the same
+as~\texttt{0} in \XPath. Therefore, the translation of~\(0\) is
+\begin{alltt}
+      <xsl:when test="empty(\$chapters)">
+        \textbf{<xsl:sequence select="0"/>}
+      </xsl:when>
+\end{alltt}
+The expression \(1 + \fun{len}_0(s)\) is made of three parts: the
+stack~\(s\), the function call \(\fun{len}_0(s)\) and the addition
+of~\(1\) to the value of the call. We already know that stacks are
+translated as sequences, we also know that function calls become calls
+to named templates. It is simple to add~\(1\) to a function call in
+\XPath, for instance \texttt{1 + f(\$n)}, but this syntax is not valid
+outside a selection or a test and, anyway, we defined a named
+template, not a function in \XSLT (which must be called in
+\XPath). Therefore, we have to hold temporarily the value of the
+recursive call in a variable, say~\texttt{x}, then use
+\texttt{xsl:sequence} to compute (in \XPath) the value of \texttt{1 +
+  \$x}. The element which defines a variable in \XSLT is
+\texttt{xsl:variable} and it has two possible forms: either with a
+\texttt{select} attribute or with children. In the former case, we
+have the pattern
+\begin{alltt}
+<xsl:variable name="\(x\)" select="\(v\)" as="\(t\)">
+\end{alltt}
+and the latter is
+\begin{alltt}
+<xsl:variable name="\(x\)" as="\(t\)">
+  ... <!-- Children whose value is \(v\) and has type \(t\) -->
+</xsl:variable>
+\end{alltt}
+where the value of the variable~\(x\) is~\(v\), of type~\(t\). The
+reason for the dual syntax is due again to the territory delimited by
+\XPath: if~\(v\) can be computed in \XPath alone, we should use the
+first form, otherwise we need the second. In our problem, we need the
+second form because \(v\)~is the value of a recursive call \emph{not}
+expressed in \XPath, as we use \texttt{xsl:call-template}. We can now
+complete the program: \XSLTinUnchecked{len0.xsl}
+\noindent The result of running it on our table of contents is, as
+expected:
+\XMLinUnchecked{toc_out.xml}
+
+After we recover from the sustained effort and the disappointment from
+such an incredible verbosity in comparison to \Erlang, we may find out
+that there exists a built\hyp{}in function in \XPath, named
+\texttt{count}, which is basically a translation of
+\(\fun{len}_0/1\). Nevertheless, our purpose is to address beginners,
+so the didactic usefulness primes other considerations.
+
+Let us work on the translation of a better version of
+\fun{len\(_0\)/1}:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\fun{len}_1(s) & \rightarrow & \fun{len}_1(s,0). &
+\fun{len}_1(\el,n) & \rightarrow & n;\\
+&&& \fun{len}_1(\cons{x}{s},n) & \rightarrow & \fun{len}_1(s,n+1).
+\end{array}
+\end{equation*}
+Function \fun{len\(_1\)/1} is better than \fun{len\(_0\)/1} because
+its cost is the same as the latter \emph{and} it uses a constant
+amount of memory, being in tail form. The tail form implies that we do
+not need a variable, because the addition is performed in \XPath
+(parameter of the recursive call):
+\XSLTinUnchecked{len1.xsl}
+\noindent Note how we did not have to define a named template for
+\fun{len\(_0\)/1}.
+
+As a last variation, consider a variant input where the chapters are
+all children of a \texttt{contents} element and their names are held
+in a \texttt{title} attribute, instead of a text node:
+\XMLinUnchecked{toc3.xml}
+\noindent Of course, the \DTD \texttt{boot\_att.dtd} has to be
+changed: \DTDin{book_att.dtd}
+\noindent To solve this problem, we must modify a previous \XSLT 
+transformation, not think from the abstract functional language.
+First, we should modify the call to the template so as to select the
+chapters where they are now:
+\begin{alltt}
+  <xsl:template match="book" as="xs:integer">
+    <xsl:call-template name="len3">
+      <xsl:with-param name="elm" select="\textbf{contents/chapter}"
+                                 as="element(chapter)*"/>
+      <xsl:with-param name="n" select="0" as="xs:integer"/>
+    </xsl:call-template>
+  </xsl:template>
+\end{alltt}
+The expression \texttt{contents/chapter} is a selection in \XPath
+which means: `Gather all the children \texttt{contents} of the context
+node (\texttt{book}), preserving their relative order (here, there is
+only one), then select all the children named \texttt{chapter} of all
+those nodes, also preserving their relative order.' Other than that,
+there is no need to change the template (apart from its name, now
+\texttt{len3}). Notice also that using \texttt{title} attributes made
+no difference.
+
+But let us take this opportunity to make slight variations and learn
+something new. Let us say that we want the template to be able to work
+on any kind of elements, not just \texttt{chapter}, and we would like
+to use a \emph{default parameter}. Indeed, the type of the template
+parameter \texttt{chapters} is \texttt{element(chapter)*}, so it is
+not enough general. The solution is the type \texttt{element()*},
+which means `A sequence, possibly empty, of elements.' Moreover, the
+original value of the parameter~\texttt{n} must always be~\texttt{0},
+so we could make this value a default by adding a \texttt{select}
+attribute to the corresponding \texttt{xsl:param} element:
+\begin{alltt}
+  <xsl:template name="len3" as="xs:integer">
+    <xsl:param name="elm" as="\textbf{element()*}"/>
+    <xsl:param name="n" as="xs:integer" \textbf{select="0"}/>
+    ...
+  </xsl:template>
+\end{alltt}
+In passing, we renamed the parameter to the neutral \texttt{elm}. Of
+course, the call to the template is now shorter:
+\begin{verbatim}
+  <xsl:template match="book" as="xs:integer">
+    <xsl:call-template name="len3">
+      <xsl:with-param name="elm" select="contents/chapter"
+                                 as="element(chapter)*"/>
+    </xsl:call-template>
+  </xsl:template>
+\end{verbatim}
+Note that it is still possible to impose an initial value
+to~\texttt{n} that would not be~\texttt{0}. Also, it is possible now
+to reuse the template \texttt{len3} for computing the length of any
+sequence of elements.
+
+In the end, the new transformation is
+\XSLTinUnchecked{len3.xsl}
+
+\mypar{Summing}
+
+Given a stack of integers, we can compute their sum as follows
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\fun{sum}(\cons{x}{s}) & \rightarrow & \fun{sum}_0(\cons{x}{s},0). &
+\fun{sum}_0(\el,n) & \rightarrow & n;\\
+&&& \fun{sum}_0(\cons{x}{s},n) & \rightarrow & \fun{sum}_0(s,n+x).
+\end{array}
+\end{equation*}
+Immediately, we see that there is just a small difference between
+\fun{sum\(_0\)/2} and \fun{len\(_1\)/2}: instead of adding~\(1\), we
+add~\(x\). Thus, we can expect a tiny modification of the
+corresponding \XSLT template. Let us assume the following input:
+\XMLinUnchecked{sum.xml}
+\noindent with the \DTD
+\DTDin{sum.dtd}
+\noindent The change we would like to make to \texttt{len3} is
+\begin{alltt}
+        <xsl:call-template name="\textbf{sum}">
+          <xsl:with-param name="elm" as="element()*"
+                          select="\$elm[position()>1]"/>
+          <xsl:with-param name="n" as="xs:integer"
+                          select="\textbf{\$elm[1]} + \$n"/>
+        </xsl:call-template>
+\end{alltt}
+Unfortunately, the compiler \Saxon returns the following warning about
+the change:
+\begin{verbatim}
+The only value that can pass type-checking is an empty sequence.
+Required item type of value of parameter $n is xs:integer;
+supplied value has item type xs:double
+\end{verbatim}
+and the wrong result \texttt{18135233274}, which is just the
+catenation of the contents of the text nodes of the \texttt{num}
+elements. What happened? From the message, one thing is clear: the
+problem has to do with the type system, that is why we did not
+anticipate it from the untyped \fun{sum\(_0\)/2}. It is also clear
+that the compiler understands that \texttt{\$n} is an integer,
+therefore the culprit can only be our modification,
+\texttt{\$elm[1]}. We would like it to be of type \texttt{xs:integer}
+too, but is it? The type of \texttt{\$elm} is \texttt{element()*}, as
+declared, which means that the items it contains are elements, not
+integers, hence the issue. We need to force the type of
+\texttt{\$elem[1]} to become \texttt{xs:integer}, that is, we
+\emph{cast} it. First, we need to select the text node of
+\texttt{\$elem[1]} and then cast it by using \texttt{xs:integer} like
+an \XPath \emph{function}: \texttt{xs:integer(\$elm[1]/text())}. There
+is no warning now:
+\begin{verbatim}
+18135233274
+\end{verbatim}
+The wrong result is still there. It is time to understand why! It is
+clearly made of the all text nodes, in document order and serialised
+without any separation. We know from the start that, by default, this
+is what \XSLT is meant to do, therefore we failed to specify that
+\emph{we} actually want. A look back at the first call to \texttt{sum}
+reveals
+\begin{verbatim}
+  <xsl:template match="book" as="xs:integer">
+    <xsl:call-template name="sum">
+      <xsl:with-param name="elm" select="contents/chapter"
+                                 as="element(chapter)*"/>
+    </xsl:call-template>
+  </xsl:template>
+\end{verbatim}
+Because we do not have \texttt{chapter} elements in the input now, an
+empty sequence is selected by \texttt{contents/chapter}. It should be
+\texttt{num}. But this does not change the wrong result. The reason is
+that there is no context node because there is no \texttt{book}
+element in the document. Therefore, we should write:
+\begin{verbatim}
+  <xsl:template match="numbers" as="xs:integer">
+    <xsl:call-template name="sum">
+      <xsl:with-param name="elm" select="num"
+                                 as="element(num)*"/>
+    </xsl:call-template>
+  </xsl:template>
+\end{verbatim}
+This time, the correct result comes out:
+\XMLinUnchecked{sum_out.xml}
+\noindent There is still a subtle error, which becomes apparent when
+inputting the empty sequence. (Among other values, we recommend to
+test programs with extreme values of the input.) Indeed, the result is
+then~\texttt{0}, which is not what is expected if we consider the
+abstract function \fun{sum/1} as a specification.
+\begin{equation*}
+\fun{sum}(\cons{x}{s}) \rightarrow \fun{sum}_0(\cons{x}{s},0).
+\end{equation*}
+In \XSLT, we forgot to forbid the empty sequence. This can be achieved
+by specifying a type `non\hyp{}empty sequence of elements':
+\texttt{element()+}.
+\begin{alltt}
+  <xsl:template match="numbers" as="xs:integer">
+    <xsl:call-template name="sum">
+      <xsl:with-param name="elm" select="num"
+                                 as="\textbf{element(num)+}"/>
+    </xsl:call-template>
+  </xsl:template>
+\end{alltt}
+If we try the input
+\XMLinUnchecked{empty_sum.xml}
+\noindent we obtain now the expected error message
+\begin{verbatim}
+An empty sequence is not allowed as the value of parameter $elm
+\end{verbatim}
+The transform is complete now:
+\XSLTinUnchecked{sum.xsl}
+
+If we would rather have no output instead of an error message at
+run\hyp{}time, we could check for emptiness before the first call and
+do nothing. But there is a shorter way, easily understood on the
+abstract program:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\fun{sum}_1(s) & \rightarrow & \fun{sum}_2(s,0). &
+    \fun{sum}_2(\el,n) & \rightarrow & \fun{nothing}();\\
+&&& \fun{sum}_2([x],n) & \rightarrow & x+n;\\
+&&& \fun{sum}_2(\cons{x}{s},n) & \rightarrow & \fun{sum}_2(s,x+n).
+\end{array}
+\end{equation*}
+The data constructor in case of empty stack, \(\fun{nothing}()\), will
+be translated in \XSLT as an empty element:
+\begin{alltt}
+\      \textbf{<xsl:when test="empty(\$elm)"/>}
+      <xsl:when test="empty(\$elm[2])">
+        <xsl:sequence select="xs:integer(\$elm[1]/text()) + \$n"/>
+      </xsl:when>
+\end{alltt}
+The case for the singleton sequence is
+\texttt{empty(\$elm[2])}. Indeed, we know that \texttt{\$elm} is not
+empty, because that is the previous case; therefore, all we have to do
+is to check for the existence of \texttt{\$elm[2]}: if absent, this
+selection results in the empty sequence and, since we know that
+\texttt{\$elm[1]} exists, the sequence \texttt{\$elm} contains exactly
+one element. Still, there is a problem remaining with the types: the
+template matching \texttt{numbers} and the template named \texttt{sum}
+have to return a value of type \texttt{xs:integer}, which is not
+possible if \texttt{\$elm} is empty, in which case, as we just saw, an
+empty sequence is returned (because of the empty element
+\texttt{xsl:when}). There is a way in \XPath to express the type `A
+sequence with no item or exactly one.' using the operator
+`\texttt{?}'. If we recall that a value can always be implicitly cast
+to a sequence containing that value, then \texttt{xs:integer?} means
+`An integer or an empty sequence.' Therefore,
+\XSLTinUnchecked{sum1.xsl}
+
+\mypar{Skipping}
+
+We want to make a copy of a given stack, without its last item. A way
+to achieve this is to check first whether the stack contains zero, one
+or more items. In the first two cases, the result is the empty stack;
+in the last, we know that the first item is not the last, so we keep
+it and proceed recursively with the rest:
+\begin{equation*}
+\fun{cutl}(\cons{x,y}{s}) \rightarrow \cons{x}{\fun{cutl}(\cons{y}{s})};\quad
+\fun{cutl}(s) \rightarrow \el.
+\end{equation*}
+In \Erlang, this would be implemented as follows (header omitted):
+\begin{verbatim}
+cutl([X|S=[_|_]]) -> [X|cutl(S)];
+cutl(_)           -> [].
+\end{verbatim}
+To see how to express it in \XSLT, we need first to set some context
+of use. For example, let us say that we have a table of contents
+complying with the following \DTD, \texttt{book\_bis.dtd}:
+\DTDin{book_bis.dtd}
+\noindent For example, the input may be
+\XMLinUnchecked{toc_bis.xml}
+\noindent We want a copy of that \XML document without the last
+chapter:
+\XMLinUnchecked{toc_bis1_out.xml}
+\noindent This is the first time we use \XSLT to output \XML, acting
+as a negative filter, that is, filtering out part of the input. We can
+start by reusing some code from previous transforms and then work on
+the translation of the function \fun{cutl/1} in \XSLT, which will be a
+template named \texttt{cutl}. But first, the boilerplate and a twist:
+\begin{alltt}
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:transform version="2.0"
+               xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema">
+               \textbf{exclude-result-prefixes="xs"}>
+
+  \textbf{<xsl:output method="xml" version="1.0"
+              encoding="UTF-8" indent="yes"/>}
+\end{alltt}
+Note that the output method is no longer \texttt{text}, but
+\texttt{xml}, as we wish to output \XML. Of course, we then need to
+state which version of \XML we want (here, \texttt{1.0}), what the
+encoding of the file will be (here, \texttt{UTF-8}), and if we want
+the resulting \XML to be indented (yes, because it greatly increases
+legibility, but if we would expect the output to be processed by
+another \XSLT program, indentation could be dropped). There is another
+novelty, which is the attribute \texttt{exclude-result-prefixes="xs"}
+of \texttt{xsl:transform}. For the sake of clarity, we shall come back
+to it after we are finished.
+
+On we go now with the rest of the canvas:
+\begin{alltt}
+  <xsl:template match="/">
+    <xsl:apply-templates/>
+    <xsl:text>&#10;</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="book" as="element(book)">
+    \textbf{<xsl:copy>}
+      <xsl:sequence select="author"/>
+      <xsl:sequence select="title"/>
+      <contents>
+        <xsl:call-template name="cutl">
+          <xsl:with-param name="items" select="contents/chapter"
+                          as="element(chapter)*"/>
+        </xsl:call-template>
+      </contents>
+    \textbf{</xsl:copy>}
+  </xsl:template>
+
+  <xsl:template name="cutl" as="item()*">
+    <xsl:param name="items" as="item()*"/>
+    ...
+  </xsl:template>
+
+</xsl:transform>
+\end{alltt}
+We used a bold typeface to bring forth a new \XSLT element, namely
+\texttt{xsl:copy}. Perhaps it was expected \texttt{<book>...</book>},
+and this would have worked indeed. Instead, we may prefer avoid
+copying the element name too often, in case it changes in future
+versions. This is where \texttt{xsl:copy} comes handy: it is \emph{a
+  shallow copy of the context node}. The context node is the node that
+was last matched by an element \texttt{xsl:template}, so it is here
+\texttt{book}, and `shallow' means that the children are not copied
+(we want to copy but also modify the descendants).
+
+Furthermore, notice how we used \texttt{xsl:sequence} with a selection
+of an input element (\texttt{author} and \texttt{title}). This is
+where \texttt{xsl:sequence} shines: what it does is to \emph{refer to}
+the selected elements, without actually copying them. In that sense,
+it acts like a pointer, as featured in some imperative programming
+languages, like \Clang, and thus saves memory.
+
+Last, but not least, note how the output is constructed by recreating
+an \XML document; in particular, the juxtaposition of elements denotes
+the catenation of the singleton sequences they are (for instance, the
+two aforementioned \texttt{xsl:sequence} are written one after the
+other).
+
+Now we need to translate \fun{cutl/1}. As we already know, \XSLT does
+not feature pattern matching, so we should rewrite our abstract
+functional program without it:
+\begin{equation*}
+  \fun{cutl}(t) \rightarrow \xkwd{if} \; \fun{tl}(t) \neq \el \;
+  \xkwd{then} \; \cons{\fun{hd}(t)}{\fun{cutl}(\fun{tl}(t))} \;
+  \xkwd{else} \; \el.
+\end{equation*}
+where \(\fun{hd}(t)\) (\emph{head}) \index{head@\fun{hd/1}} evaluates
+in the first item of the stack~\(t\) and \(\fun{tl}(t)\) (\emph{tail})
+\index{tail@\fun{tl/1}} in the immediate substack of~\(t\). (Of
+course, \(\fun{hd}(\el)\) and \(\fun{tl}(\el)\) could fail, so we
+always must check that their argument is not the empty stack.) We note
+the two occurrences of \(\fun{tl}(t)\), so, in \XSLT, we should use a
+variable to hold the value of this call to avoid recomputing it. We
+start like so:
+\begin{alltt}
+  <xsl:template name="cutl" as="item()*">
+    <xsl:param name="items" as="item()*"/>
+    \textbf{<xsl:variable name="tail" select="\$items[position()>1]"
+                              as="item()*"/>}
+    ...
+  </xsl:template>
+\end{alltt}
+Note that we did not specialise the template to process only
+\texttt{chapter} elements, but any kind of item, including primitive
+types, like integers, but also nodes and, in particular, elements.
+
+Now we need to translate the conditional. We already have
+seen the element \texttt{xsl:choose} and proceed to fill the previous ellipsis:
+\begin{alltt}
+    <xsl:choose>
+      <xsl:when test="\textbf{not(empty(\$tail))}"> ... </xsl:when>
+      <xsl:otherwise> ... </xsl:otherwise>
+    </xsl:choose>
+\end{alltt}
+The purpose of \XPath functions \texttt{empty} and \texttt{not} is
+evident. The translation of the \xkwd{else} alternative is the empty
+sequence in the \texttt{xsl:otherwise} element. This is easily done
+without even the \texttt{xsl:sequence} element:
+\begin{alltt}
+    <xsl:choose>
+      <xsl:when test="not(empty(\$tail))"> ... </xsl:when>
+      \textbf{<xsl:otherwise/>}
+    </xsl:choose>
+\end{alltt}
+Indeed, an empty element can always be considered as having an empty
+sequence of children. In \XSLT, conditionals which have the form of
+one \texttt{xsl:when} and an empty \texttt{xsl:otherwise} are better
+expressed using the element \texttt{xsl:if}. For instance, our code
+becomes
+\begin{alltt}
+    \textbf{<xsl:if test="not(empty(\$tail))"> ... </xsl:if>}
+\end{alltt}
+Implicitly, if the test fails, the value of the conditional
+\texttt{xsl:if} is the empty sequence. We need now to translate
+\(\cons{\fun{hd}(t)}{\fun{cutl}(\fun{tl}(t))}\). \index{head@\fun{hd/1}}
+\index{tail@\fun{tl/1}} We already have at our disposal the
+translation of \(\fun{tl}(t)\), which is the \XSLT variable
+\texttt{tail}. The translation of \(\fun{hd}(t)\) is simply the
+singleton sequence \texttt{<xsl:sequence
+  select="\$items[1]"/>}. Instead of pushing on a stack, we catenate
+two sequences and this catenation is simply textual juxtaposition:
+\begin{verbatim}
+    <xsl:if test="not(empty($tail))">
+      <xsl:sequence select="$items[1]"/>
+      <xsl:call-template name="cutl">
+        <xsl:with-param name="items" select="$tail"
+                        as="item()*"/>
+      </xsl:call-template>
+    </xsl:if>
+\end{verbatim}
+In the end, the solution is
+\XSLTinUnchecked{last.xsl}
+
+At this point, we may wonder why we needed to set the attribute
+\texttt{exclude-result-prefixes="xs"} of element
+\texttt{xsl:transform}. If we remove it, we obtain the same result
+except for the element \texttt{contents}:
+
+\begin{alltt}
+   <contents \textbf{xmlns:xs="http://www.w3.org/2001/XMLSchema"}>
+     ...
+   </contents>
+\end{alltt}
+The reason is that when a namespace is declared, all the descendant
+elements inherit it, except the namespace associated to \XSLT, here
+named \texttt{xsl}. Therefore, when we wrote
+\begin{verbatim}
+   <contents>
+     ...
+   </contents>
+\end{verbatim}
+in the previous transform, the element \texttt{contents}
+\emph{implicitly} had the namespace child node~\texttt{xs}. The reason
+why \texttt{author} and \texttt{title} did not, is that we used
+\texttt{xsl:sequence} to reference the input, where that namespace is
+absent. The same happens with the elements \texttt{chapter}, which are
+selected in the input. The element \texttt{book} was actually copied
+with \texttt{xsl:copy}, and we saw that this element does not copy
+children, amongst whose the namespace nodes. The default behaviour of
+the \XSLT processor is to set the inherited namespaces in case they
+are of some use in the output. In the present example, \texttt{xs} is
+useless, so it is best to exclude it from the (namespace) prefixes in
+the result: \texttt{exclude-result-prefixes="xs"}.
+
+\paragraph{Skipping the penultimate item}
+
+The purpose of this exercise is to write an \XSLT transform which
+takes as input a table of contents and outputs it in \XML where the
+penultimate chapter is missing. If there is no chapter or only one,
+the output is identical to the input. The input should conform to the
+following \DTD, named \texttt{book\_bis.dtd}:
+\DTDin{book_bis.dtd}
+\noindent For example, the input may be
+\XMLinUnchecked{toc_bis.xml}
+\noindent The corresponding output is
+\XMLinUnchecked{toc_bis2_out.xml}
+\noindent The boilerplate \XSLT code is the same, except the template,
+which we name here \texttt{cutp}. We do not start from an abstract
+functional program, but from the previous transform. We will need more
+cases, so \texttt{xsl:choose} is back. Perhaps the first difference is
+the case when \texttt{tail} is empty. This means that we need to keep
+the first item, instead of ignoring it:
+\begin{verbatim}
+    <xsl:choose>
+      <xsl:when test="empty($tail)">
+        <xsl:sequence select="$items[1]"/>
+      </xsl:when>
+      ...
+    </xsl:choose>
+\end{verbatim}
+As for the complementary case, when the tail is not empty, that is to
+say, when there are at least two items, we do not know whether the
+first one is the penultimate or not, and the same can be said about
+the second. Therefore, we need more information on the structure of
+the tail, in particular, whether its tail is, in turn, empty (the tail
+of the tail of the complete sequence), in other words, whether the
+sequence contains at least three items or not. If it does, then we
+know that the first item is not the penultimate, but we still can not
+say nothing about the others, so a recursive call is in order; if it
+does not, then it means that the whole sequence contains exactly two
+items, so we put in the result the second one only, and ignore the
+first. In the end, we have
+\begin{verbatim}
+  <xsl:template name="cutp" as="item()*">
+    <xsl:param name="items" as="item()*"/>
+    <xsl:variable name="tail" select="$items[position()>1]"
+                              as="item()*"/>
+    <xsl:choose>
+      <xsl:when test="empty($tail)">
+        <xsl:sequence select="$items[1]"/>
+      </xsl:when>
+      <xsl:when test="empty($tail[position()>1])">
+        <xsl:sequence select="$items[2]"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$items[1]"/>
+        <xsl:call-template name="cutp">
+          <xsl:with-param name="items" select="$tail" 
+                                       as="item()*"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+\end{verbatim}
+Notice that the case \texttt{<xsl:when test="empty(\$items)"/>} is
+actually missing because it is unnecessary: if \texttt{\$items} is
+empty, then \texttt{\$tail} is empty as well, and the result is thus
+\texttt{\$items[1]}, which is the empty sequence.
+
+\mypar{Reversal}
+
+The purpose of this exercise is to write an \XSLT transform which
+takes as input a table of contents with chapters and outputs the same
+table of contents in \XML where the chapters have been reversed with
+respect to the document order (so, for example, the introduction is
+listed last). In section~\vref{sec:reversal}, we saw that the
+straightforward definition of \fun{rev\(_0\)}:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+  \fun{cat}(\el,t)\index{cat@\fun{cat/2}}
+& \rightarrow & t;
+& \fun{rev}_0(\el)
+& \rightarrow & \el;\\
+  \fun{cat}(\cons{x}{s},t)
+& \rightarrow & \cons{x}{\fun{cat}(s,t)}.
+& \fun{rev}_0(\cons{x}{s})
+& \rightarrow & \fun{cat}(\fun{rev}_0(s),[x]).
+\end{array}
+\end{equation*}
+We saw that this definition yielded a quadratic cost and therefore
+should not be used for reversing stacks. In \XSLT, the cost is linear
+because catenation has cost zero. We would then write the following
+translation:
+\begin{verbatim}
+  <xsl:template name="rev" as="item()*">
+    <xsl:param name="items" as="item()*"/>
+    <xsl:if test="not(empty($items))">
+      <xsl:call-template name="rev">
+        <xsl:with-param name="items" as="item()*"
+                        select="$items[position()>1]"/>
+      </xsl:call-template>
+      <xsl:sequence select="$items[1]"/>
+    </xsl:if>
+  </xsl:template>
+\end{verbatim}
+Instead of producing an \XML document, we could use this opportunity
+to see how to produce an \XHTML document. Although the purpose may
+seem a bit foolish (reversing a table of contents), it is appropriate
+to start learning complicated languages such as \XSLT and \XHTML.
+
+In order to instruct an \XSLT processor to produce \XHTML, we need to
+set some attributes of \texttt{xsl:transform} and \texttt{xsl:output}
+as follows:
+\begin{verbatim}
+<xsl:transform version="2.0"
+               xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               xmlns:xhtml="http://www.w3.org/1999/xhtml"
+               exclude-result-prefixes="xs">
+
+  <xsl:output method="xhtml"
+              doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"
+              doctype-system=
+              "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+              indent="yes"
+              omit-xml-declaration="yes"/>
+\end{verbatim}
+Note that we defined a namespace \texttt{xhtml} for \XHTML elements
+and that the \XHTML version is~\texttt{1.0} (`strict' means that it
+adheres strictly to \XML). Perhaps the real novelty is setting
+\texttt{omit-xml-declaration="yes"}. Since \XHTML (strict) is \XML,
+the declaration \texttt{<?xml version="1.0"?>} is to be expected, but
+some web browsers are confused by this, so we prefer to be on the safe
+side and not have that declaration.
+
+Given the previous table of contents, we now would like to obtain
+\begin{verbatim}
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"  
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en" lang="en">
+   <head>
+      <meta http-equiv="Content-Type"
+            content="text/html; charset=UTF-8" />
+      <title>Definitive XML Schema</title>
+   </head>
+   <body>
+      <h2>Definitive XML Schema</h2>
+      <p>by Priscilla Walmsley</p>
+      <h3>Reversed table of contents</h3>
+      <ul>
+         <li>Instances and schemas</li>
+         <li>Schema composition</li>
+         <li>Namespaces</li>
+         <li>A quick tour of XML Schema</li>
+         <li>Schema: An Introduction</li>
+      </ul>
+   </body>
+</html>
+\end{verbatim}
+which, interpreted by a web browser, would likely render as
+
+\noindent\rule{\linewidth}{0.5pt}
+\noindent\textbf{\large Definitive XML Schema}
+
+\bigskip
+
+\noindent by Priscilla Walmsley
+
+\bigskip
+
+\noindent\textbf{Reversed table of contents}
+\begin{itemize*}
+
+  \item Instances and schemas
+  \item Schema composition
+  \item Namespaces
+  \item A quick tour of XML Schema
+  \item Schema: An Introduction
+
+\end{itemize*}
+\noindent\rule{\linewidth}{0.5pt}
+
+\noindent First, here is the template matching \texttt{book}:
+\begin{alltt}
+  <xsl:template match="book" as="element(xhtml:html)">
+    <html xmlns="http://www.w3.org/1999/xhtml"
+          xml:lang="en" lang="en">
+      <head>
+        <title><xsl:sequence select="\textbf{title/text()}"/></title>
+      </head>
+      <body>
+        <h2>\textbf{<xsl:value-of select="title"/>}</h2>
+        <p>by \textbf{<xsl:value-of select="author"/>}</p>
+        <h3>Reversed table of contents</h3>
+        <ul>
+          <xsl:call-template name="rev">
+            <xsl:with-param name="chap"
+                            select="contents/chapter"/>
+          </xsl:call-template>
+        </ul>
+      </body>
+    </html>
+  </xsl:template>
+\end{alltt}
+Note first the selection \texttt{title/text()}, which means `the text
+nodes of the element \texttt{title}, which is the child of the context
+node (\texttt{book}).' Second, we meet a new \XSLT element,
+\texttt{xsl:value-of}, whose purpose is to create a text node from the
+selected items. If we select elements, like here the unique
+\texttt{title} element, its \emph{descendant} text nodes (there is
+only one child here) are catenated in document order and put in a new
+text node. Therefore, \texttt{<xsl:sequence select="title/text()"/>}
+has the same result as \texttt{<xsl:value-of select="title"/>},
+although in the later case a new text node has been created (instead
+of being shared with the input). As a remark, we decided to specialise
+the types to make them fit as closely as possible the elements being
+processed, like \texttt{element(xhtml:html)}, which means: `One
+element \texttt{html} in the namespace \texttt{xhtml}.'
+
+Finally, the template doing the reversal is:
+\begin{alltt}
+  <xsl:template name="rev" as="element(xhtml:li)*">
+    <xsl:param name="chap" as="element(chapter)*"/>
+    <xsl:if test="not(empty(\$chap))">
+      <xsl:call-template name="rev">
+        \!\!<xsl:with-param name="chap"\!\! select="\$chap[position()>1]"/>
+      </xsl:call-template>
+      <li \textbf{xmlns="http://www.w3.org/1999/xhtml"}>
+        \textbf{<xsl:value-of select="\$chap[1]/@title"/>}
+      </li>
+    </xsl:if>
+  </xsl:template>
+\end{alltt}
+Again, we specialise the types, like \texttt{element(xhtml:li)*},
+meaning: `Sequence (possibly empty) of elements \texttt{li} in the
+namespace \texttt{xhtml}.' And \texttt{element(chapter)*} is a
+sequence of chapters, without namespace. But the two interesting
+excerpts are set in a bold typeface.
+
+The first one is the declaration of the \texttt{xhtml} namespace in
+the element \texttt{li}:
+\texttt{xmlns="http://www.w3.org/1999/xhtml"}. This is simply
+necessary to conform with the type of the value of the
+template. Indeed, this value should be, as we just saw, a sequence of
+elements \texttt{li} in the namespace \texttt{xhtml}. But
+\texttt{<li>} is actually outside all namespaces, because there is no
+default namespace declaration in any ascendant node, contrary to the
+template matching \texttt{book}, which we described previously. There,
+we had the declaration \texttt{<html
+  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">}, so
+any descendent element written without a namespace actually
+inherits the \texttt{xhtml} namespace. This is not the case in the
+template named \texttt{rev}, so an explicit declaration is necessary,
+otherwise a type error is raised by the \XSLT compiler.
+
+The second noteworthy excerpt is the selection of the
+\texttt{xsl:value-of} element, \texttt{\$chap[1]/@title}, which means:
+`The \texttt{title} attribute of the first element of the sequence
+\texttt{\$chap}.' Here, we cannot substitute the element
+\texttt{xsl:sequence}, as with the text node before. Indeed, if we try
+\texttt{<xsl:sequence select="\$chap[1]/@title"/>}, the result is 
+\begin{verbatim}
+       ...
+         <li title="Instances and schemas"></li>
+         <li title="Schema composition"></li>
+         <li title="Namespaces"></li>
+         <li title="A quick tour of XML Schema"></li>
+         <li title="Schema: An Introduction"></li>
+       ...
+\end{verbatim}
+Let us recall that \texttt{xsl:sequence} is an alias of, or a
+reference to, the input, in this case an attribute node, so we should
+expect a \texttt{title} \emph{attribute} in the output. But we wanted
+the value of the attribute \texttt{title}, not the attribute itself,
+hence the need of \texttt{xsl:value-of}. If we wonder why we really
+need to create a text node, we must understand that \emph{the value of
+  an attribute is not a text node}. This can be seen by changing the
+selection to \texttt{<xsl:sequence select="\$chap[1]/title/text()"/>},
+in which case the result is
+\begin{verbatim}
+       ...
+         <li></li>
+         <li></li>
+         <li></li>
+         <li></li>
+         <li></li>
+       ...
+\end{verbatim}
+Attributes are special and often a source of confusion for beginners.
+
+\mypar{Comma-separated values}
+\label{par:CSV}
+
+The purpose of this exercise is to write an \XSLT transform which
+takes as input a sequence of elements containing each one text node
+and output their contents in the same order, separated by commas and
+ended by a period. If the input sequence is empty, the result is the
+empty sequence. More precisely, let us assume the following \DTD:
+\DTDin{csv.dtd}
+\noindent and the conforming input
+\XMLinUnchecked{csv.xml}
+\noindent Then we want
+\XMLinUnchecked{csv_out.xml}
+
+The algorithm is simple enough: if the input sequence is empty, the
+result is the empty sequence; if the input is a singleton sequence,
+the result is the item it contains, followed by a period; otherwise,
+the first item of the result is the first in the input, followed by a
+comma and the value of a recursive call on the tail. Probably, the
+difficulty is to implement this scheme with \XSLT. Here is how:
+\XSLTinUnchecked{csv1.xsl}
+\noindent Note first that we merged the two templates that match the
+document root (\texttt{/}) and the root element (\texttt{numbers})
+because we do not reconstruct an \XML document. Furthermore, we may
+remark on the type \texttt{text()*}, which means `A sequence (possibly
+empty) of text nodes.' The remaining titbits are the
+\texttt{xsl:value-of} elements, in particular a new attribute,
+\texttt{separator}. Its value must be a string which is used to
+separate the selected items. By default, that string is
+\texttt{'\textvisiblespace'}, that is why we set it here to the empty
+string. Otherwise, we would obtain:
+`\texttt{0\textvisiblespace,1\textvisiblespace,A\textvisiblespace,B\textvisiblespace,C\textvisiblespace.}'. Note
+that the value of the attribute \texttt{separator} is the
+\emph{contents} of a string, so if we use \texttt{"''"}, we are
+\emph{not} specifying the empty string and produce instead:
+`\texttt{0'',1'',A'',B'',C''.}'.
+
+At this point it is perhaps pertinent to draw the relationships
+between the different types we have encountered, and learn a few
+more. Consider the tree in \fig~\vref{fig:tests}.
+\begin{figure}
+\centering
+\includegraphics{tests}
+\caption{\XPath subtypes\label{fig:tests}}
+\end{figure}
+The ascendant reading of an edge from a node~\(x\) to a node~\(y\) is
+`\(x\)~is a [subtype of] \(y\).' For instance, an \texttt{element()}
+is a \texttt{node()}. This models a subtyping relationship, which
+means that in any context where a \texttt{node()} is correct, a
+\texttt{element()} is also correct. This relationship is transitive,
+so anywhere an \texttt{item()} is expected, a \texttt{text()} is
+valid, which can be seen at work in the parameter of the template
+named \texttt{csv}. As an illustration, let us consider a slight
+variation of the input, where the content of interest is stored as
+attribute values, like so:
+\XMLinUnchecked{csv_att.xml}
+\noindent The \DTD \texttt{csv\_att.dtd} is
+\DTDin{csv_att.dtd}
+\noindent It is then enough to change the selection of the parameter
+\texttt{item} as follows:
+\begin{alltt}
+      <xsl:with-param name="items" select="numbers/hexa/\textbf{@val}"/>
+\end{alltt}
+The type of the selection is \texttt{attribute()*}, which is a
+subtype of \texttt{item()*}, therefore is a suitable value for the
+parameter of template \texttt{csv} and the result is the same as with
+the first \XML input (no attributes).
+
+While we are interested in the data types, let us pay attention to the
+selections of the elements \texttt{xsl:value-of}, for instance
+\texttt{(\$items[1],'.')}. Statically, the type of \texttt{\$items[1]}
+is \texttt{item()}, although we know, from the initial template call,
+that it is actually \texttt{text()}. The type of \texttt{'.'} is
+\texttt{xs:string}. The sequence in question then has the type
+\texttt{item()*}, because \texttt{xs:string} is a subtype of
+\texttt{item()}, as seen in \fig~\vref{fig:tests}. Since the result of
+the template is of type \texttt{text()*}, the strings it contains will
+be cast into text nodes, thus allocating memory. The serialiser is the
+back\hyp{}end of the code generated by the \XSLT compiler (the
+front\hyp{}end is the \XML parser) and its purpose is to produce text
+from all the values obtained. In this case, it will then destructure
+all these text nodes to generate strings (either displayed on a
+terminal or written in a file). If we want to avoid this boxing of
+strings in text nodes and their subsequent unboxing, we could plan
+ahead and opt for a return type \texttt{xs:string*}, so
+\begin{alltt}
+  <xsl:template match="/" as="\textbf{xs:string*}">
+    ...
+  </xsl:template>
+
+  <xsl:template name="csv" as="\textbf{xs:string*}">
+    ...
+  </xsl:template>
+\end{alltt}
+As a result of this change, we obtain
+`\texttt{0,\textvisiblespace{}1,\textvisiblespace{}A,\textvisiblespace{}B,\textvisiblespace{}C.}'. The
+extra spaces come from the fact that we forgot that the elements
+\texttt{xsl:value-of} create text nodes and the implicit serialisation
+of these (by casting to \texttt{xs:string*}) yields blank separators,
+here rendered as `\texttt{\textvisiblespace}'. The morale of this
+excursus is to keep working with non\hyp{}primitive types, that is,
+attributes and nodes, if the input contains attributes and nodes, and
+let the serialiser manage the linearisation for the output. (It is
+possible to use \XSLT for string processing, although this is not the
+main application domain of the language, in which case working with
+\texttt{xs:string*} makes sense.)
+
+Let us give this exercise a last spin by remarking that the algorithm
+may be conceived as \emph{working in parallel} on the sequence items,
+as long as we know how to distinguish the last item because it must
+be treated differently (it is followed by a period instead of a
+comma). But `parallel' does not necessarily imply a temporal meaning,
+like multithreading, and can be also thought as processing in
+isolation, then fusion of the partial results, which is what a
+\emph{map} does. We saw maps when introducing functional iterators in
+\Erlang, \vpageref{par:maps}:
+\begin{equation*}
+\erlcode{map(\(F\),[\(X_1\),\(X_2\),\(\ldots\),\(X_{n}\)])}
+\equiv
+\erlcode{[\(F\)(\(X_1\)),\(F\)(\(X_2\)),\(\ldots\),\(F\)(\(X_{n}\))]}.
+\end{equation*}
+A simple definition is
+\begin{verbatim}
+map(_,   []) -> [];
+map(F,[X|S]) -> [F(X)|map(F,S)].
+\end{verbatim}
+Note that \texttt{map} is a higher\hyp{}order function and \XSLT only
+features first\hyp{}order templates and functions. Nevertheless, we
+can implement maps by using a kind a template we already have been
+using since the introduction to \XSLT, starting
+\vpageref{par:matching}: the \emph{matching template}. The \XSLT
+processor (by which we mean the run\hyp{}time produced by the \XSLT
+compiler) implicitly performs a preorder traversal of the input \XML
+tree; when it finds an element~\(e\), it evaluates the corresponding
+matching template and carries on with the traversal. A matching
+template works as a rewrite rule for an implicit function in our
+abstract functional language, each rule being tried in turn when
+encountering a node in the \XML tree.
+
+Since we often select some children of the context node and apply to
+them the same treatment (as if in parallel), we need a mechanism to
+gather the results for each child into one sequence. In the running
+exercise, we wish to select a sequence of \texttt{hexa} elements,
+children of \texttt{numbers}, and expect a template matching
+\texttt{hexa}. We also want to group the results, just like a map
+would do. This is achieved twofold by the definition of a template
+\begin{verbatim}
+  <xsl:template match="hexa" as="text()*">
+    ...
+  </xsl:template>
+\end{verbatim}
+which is analogous to the definition of the functional parameter~\(F\)
+above and by
+\begin{verbatim}
+    <xsl:apply-templates select="hexa"/>
+\end{verbatim}
+which is analogous to calling \texttt{map} in
+\Erlang.\label{match_as_map}
+
+The only problem remaining is to find out if the context node
+\texttt{hexa} is the last in the sequence upon which all templates
+were applied. This is where \XPath comes handy in providing a function
+\texttt{last()}, which returns the position of the last item matched
+in the same sequence as the context node. Here is what the transform
+looks like now:
+\XSLTinUnchecked{csv3.xsl}
+\noindent This reminds us that any item implicitly carries information
+about itself, including its position in a sequence, but also the
+position of the last item in that sequence. Notice that we do not need
+any parameter in the template matching \texttt{hexa}, because, inside,
+the context node is one of the original elements \texttt{hexa}, and we
+do not need to know which one is it or what are the others (think
+parallel processing, if you feel inclined to do so). For example,
+\begin{verbatim}
+<xsl:sequence select="text()"/>
+\end{verbatim}
+means: `Reference the text node of the context node,' (as opposed to
+copying it with \texttt{xsl:value-of}).
+
+We will use matching templates in the forthcoming section about the
+transformation of trees, but we need first more practice to understand
+better named templates, because they are closer to the concept of
+first\hyp{}order function in our abstract functional language.
+
+\mypar{Shuffling}
+
+The purpose of this exercise is to write an \XSLT transform which
+takes as input two sequences of elements and output one sequence
+containing the items of each sequence shuffled, or, more precisely,
+the first item of the resulting sequence is the first item of the
+first sequence, the second item is the first item of the second
+sequence, the third item is the second item of the first sequence, the
+fourth item is the second item of the second sequence etc. An
+enlightening analogy is interleaving two hands from a deck of cards.
+
+If the first items of both sequences are taken out at the same time,
+then comes a moment when either both sequences are empty or only one
+of them is. The problem is actually underspecified: nothing is said
+about what to do if the two sequences are not of the same
+length. Actually, in the latter case, we will ignore the remaining
+items.
+
+The \DTD we have in mind is the following
+\DTDin{persons.dtd}
+\noindent Then, this input:
+\XMLinUnchecked{persons1.xml}
+\noindent yields this output:
+\XMLinUnchecked{persons1A_out.xml}
+\noindent The following input:
+\XMLinUnchecked{persons2.xml}
+\noindent yields this output:
+\XMLinUnchecked{persons2A_out.xml}
+\noindent This input:
+\XMLinUnchecked{persons3.xml}
+\noindent yields this output:
+\XMLinUnchecked{persons3A_out.xml}
+Following the strategy outlined above, we expect a template named
+\texttt{shuffle} to have two parameters, one for the names and one for
+the notes:
+\begin{verbatim}
+  <xsl:template match="persons" as="element(persons)">
+    <xsl:copy>
+      <xsl:call-template name="shuffle">
+        <xsl:with-param name="names" select="names/name"/>
+        <xsl:with-param name="notes" select="notes/note"/>
+      </xsl:call-template>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template name="shuffle" as="element()*">
+    <xsl:param name="names" as="element(name)*"/>
+    <xsl:param name="notes" as="element(note)*"/>
+    ...
+  </xsl:template>
+\end{verbatim}
+Note that we use \texttt{xsl:copy} to copy the context node
+\texttt{persons} and that we had to use the return type
+\texttt{element()*} because we cannot express in \XPath: `A sequence
+of mixed elements \texttt{name} and \texttt{note}.' The body of that
+template follows our plan. If the parameters are both not empty, we do
+something, otherwise an implicit empty sequence will be produced. This
+test is performed in \XPath using the Boolean connector \texttt{and}
+as follows:
+\begin{alltt}
+  <xsl:template name="shuffle" as="element(persons)*">
+    <xsl:param name="names" as="element(name)*"/>
+    <xsl:param name="notes" as="element(note)*"/>
+    \textbf{<xsl:if test="not(empty(\$names)) and not(empty(\$notes))">}
+      <xsl:sequence select="\$names[1]"/>
+      <xsl:sequence select="\$notes[1]"/>
+      <xsl:call-template name="shuffle">
+        <xsl:with-param name="names"
+                        select="\$names[position()>1]"/>
+        <xsl:with-param name="notes"
+                        select="\$notes[position()>1]"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+\end{alltt}
+
+Another possibility, when confronted to dangling items, is to append
+them to the already outputted items. For instance, given the first
+input above yields now
+\XMLinUnchecked{persons1B_out.xml}
+\noindent The second input above leads to
+\XMLinUnchecked{persons2B_out.xml}
+\noindent And the last input above results in
+\XMLinUnchecked{persons3B_out.xml}
+\noindent Here is a solution:
+\begin{verbatim}
+  <xsl:template name="shuffle" as="element()*">
+    <xsl:param name="names" as="element(name)*"/>
+    <xsl:param name="notes" as="element(note)*"/>
+    <xsl:choose>
+      <xsl:when test="empty($notes)">
+        <xsl:sequence select="$names"/>
+      </xsl:when>
+      <xsl:when test="empty($names)">
+        <xsl:sequence select="$notes"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="($names[1],$notes[1])"/>
+        <xsl:call-template name="shuffle">
+          <xsl:with-param name="names"
+                          select="$names[position()>1]"/>
+          <xsl:with-param name="notes"
+                          select="$notes[position()>1]"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+\end{verbatim}
+Note how we placed \texttt{\$notes[1]} after \texttt{\$names[1]} in
+\XPath with
+\begin{verbatim}
+        <xsl:sequence select="($names[1],$notes[1])"/>
+\end{verbatim}
+instead of working at the level of \XSLT, as previously:
+\begin{verbatim}
+      <xsl:sequence select="$names[1]"/>
+      <xsl:sequence select="$notes[1]"/>
+\end{verbatim}
+
+As a variation, it is possible to achieve the same result by
+extracting one element at a time, instead of two. Of course, the
+program will be about twice as slow, but it is interesting
+nevertheless:
+\begin{verbatim}
+  <xsl:template name="shuffle" as="element()*">
+    <xsl:param name="names" as="element(name)*"/>
+    <xsl:param name="notes" as="element(note)*"/>
+    <xsl:choose>
+      <xsl:when test="empty($names)">
+        <xsl:sequence select="$notes"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$names[1]"/>
+        <xsl:call-template name="shuffle">
+          <xsl:with-param name="names" select="$notes"/>
+          <xsl:with-param name="notes"
+                          select="$names[position()>1]"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+\end{verbatim}
+The point is to swap the arguments in the recursive call. Of course,
+the parameters' names are not pertinent anymore, and a neutral
+renaming would be fitting. In our abstract functional language, we
+would write
+\begin{equation*}
+\fun{shuffle}(\el,t) \rightarrow t;\quad
+\fun{shuffle}(\cons{x}{s},t) \rightarrow \cons{x}{\fun{shuffle}(t,s)}.
+\end{equation*}
+This is actually almost the same definition as that of \fun{cat/1} (catenation):
+\begin{equation*}
+\fun{cat}(\el,t) \rightarrow t;\quad
+\fun{cat}(\cons{x}{s},t) \rightarrow \cons{x}{\fun{cat}(\underline{s},\underline{t})}.
+\end{equation*}
+
+\mypar{Maximum}
+
+The aim of this exercise is to write an \XSLT transform which takes as
+input a sequence of integers and outputs the maximum of these numbers
+as plain text. If an item is not castable to \texttt{xs:integer}, a
+dynamic type error is raised and the execution is stopped. If an item
+is an empty text node, for example, \texttt{<num/>}, it is skipped. If
+the sequence contains no integer, not text is outputted, because the
+maximum is undefined. The root element is \texttt{numbers} and the
+elements containing the numbers are named \texttt{num}. Any element
+other than \texttt{num} is ignored.
+
+The \DTD we have in mind is the following:
+\DTDin{numbers.dtd}
+\noindent If the input document is
+\XMLinUnchecked{numbers.xml}
+\noindent the result is
+\XMLinUnchecked{numbers_out.xml}
+
+\noindent First, let us set the types in the following schema:
+\begin{verbatim}
+  <xsl:template match="numbers" as="xs:integer?">
+    ...
+  </xsl:template>
+
+  <xsl:template name="max" as="xs:integer?">
+    <xsl:param name="int" as="xs:integer*"/>
+    <xsl:param name="cur" as="xs:integer?"/>
+    ...
+  </xsl:template>
+\end{verbatim}
+Let's recall the type operator `\texttt{?}' meaning `One or none', so
+\texttt{xs:integer?} is either an empty sequence or a sequence
+containing one integer. This precaution is necessary because we are
+not certain that the input contains at least an integer (we even
+allowed for dummy elements \texttt{foo}, as a look back at the \DTD
+confirms). The parameter \texttt{int} contains the remaining integers
+to examine, whilst \texttt{cur} is the current maximum, if any. That
+is why we should initialise the latter with the contents of the first
+number:
+\begin{alltt}
+  <xsl:template match="numbers" as="xs:integer?">
+    <xsl:call-template name="max">
+      <xsl:with-param name="int" 
+                      select="num[position()>1]/text()"/>
+      <xsl:with-param name="cur" select="\textbf{num[1]/text()}"/>
+    </xsl:call-template>
+  </xsl:template>
+\end{alltt}
+Note that had we written \texttt{\$num[1]/text()}, the selection would
+have been empty, as there is no \emph{variable} \texttt{num}, but,
+instead, we meant the \emph{child element} \texttt{num}. Next, we
+selected the text nodes, although the expected types are
+\texttt{xs:integer*} and \texttt{xs:integer?}. In fact, a cast at
+run\hyp{}time will be performed. In the case of \texttt{cur}, if the
+cast fails, the empty sequence will result; otherwise, an integer
+(that is, a sequence containing a single integer). In the case of
+\texttt{int}, a cast is attempted for each element in the sequence and
+the resulting sequences are catenated.
+
+There are several ways to solve this problem. We could make the
+following cases:
+\begin{itemize}
+
+  \item if there are no integers to examine, the result is the current
+    integer, if any;
+
+  \item if there is an actual, current integer, and if it is greater
+    than the first integer to examine, we start over while discarding
+    the latter;
+
+  \item otherwise, the first integer to examine becomes the current
+    maximum and we start over and discard the previous maximum.
+
+\end{itemize}
+This plan is implemented as follows:
+\begin{verbatim}
+  <xsl:template name="max" as="xs:integer?">
+    <xsl:param name="int" as="xs:integer*"/>
+    <xsl:param name="cur" as="xs:integer?"/>
+    <xsl:choose>
+      <xsl:when test="empty($int)">
+        <xsl:sequence select="$cur"/>
+      </xsl:when>
+      <xsl:when test="not(empty($cur)) and $cur ge $int[1]">
+        <xsl:call-template name="max">
+          <xsl:with-param name="int"
+                          select="$int[position()>1]"/>
+          <xsl:with-param name="cur" select="$cur"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="max">
+          <xsl:with-param name="int"
+                          select="$int[position()>1]"/>
+          <xsl:with-param name="cur" select="$int[1]"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+\end{verbatim}
+Notice how we checked for the presence of a current maximum with
+\texttt{not(empty(\$cur))} and the \XPath Boolean operator `greater
+than or equal to' is~\texttt{ge}. We may further remark that, in both
+recursive calls, the parameter \texttt{int} has the same value
+\texttt{\$int[position()>1]}, so we might want to share the code as
+follows:
+\begin{alltt}
+<xsl:template name="max" as="xs:integer?">
+  <xsl:param name="int" as="xs:integer*"/>
+  <xsl:param name="cur" as="xs:integer?"/>
+  <xsl:choose>
+    <xsl:when test="empty(\$int)">
+      <xsl:sequence select="\$cur"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:call-template name="max">
+        <xsl:with-param name="int" select="\$int[position()>1]"/>
+        <xsl:with-param name="cur">
+          <xsl:choose>
+            <xsl:when\!\! test="not(empty(\$cur)) and \$cur\! ge \!\$int[1]">
+              <xsl:sequence select="\$cur"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:sequence select="\$int[1]"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+\end{alltt}
+This template contains less duplication and is more logically
+structured, but it is longer, which means that the usual reflexes
+gained from experience in other programming languages may be
+counterproductive in \XSLT. Note in passing that this answer
+illustrates that \texttt{xsl:with-param} may have children instead of
+a \texttt{select} attribute.
+
+\mypar{Reducing}
+
+The purpose of this exercise is to write an \XSLT transform which
+takes as input a flat document tree, that is, the document root has
+children but no grand\hyp{}children. The children carry an attribute
+and the output should be the same document without those children
+being consecutively repeated. This is the same as the function
+\fun{red/1} we saw in \fig~\vref{fig:red}:
+\begin{equation*}
+\begin{array}{@{}r@{\;}c@{\;}l@{}}
+\fun{red}(\el) & \rightarrow & \el;\\
+\fun{red}(\cons{x,x}{s}) & \rightarrow & \fun{red}(\cons{x}{s});\\
+\fun{red}(\cons{x}{s})   & \rightarrow & \cons{x}{\fun{red}(s)}.
+\end{array}
+\end{equation*}
+In \XSLT, we need more constraints on the input and we must be take
+into account data types. Let us opt for the following \DTD:
+\DTDin{numbers_bis.dtd}
+\noindent For example, this valid input
+\XMLinUnchecked{numbers_bis.xml}
+\noindent results in
+\XMLinUnchecked{numbers_bis_out.xml}
+\noindent If we start from \fun{red/1}, we need to remove the pattern
+matching and use instead conditionals. First, we separate the patterns
+depending on the number of items:
+\begin{equation*}
+\begin{array}{@{}r@{\;}c@{\;}l@{}}
+\fun{red}(\el) & \rightarrow & \el;\\
+\fun{red}([x]) & \rightarrow & [x];\\
+\fun{red}(\cons{x,x}{s}) & \rightarrow & \fun{red}(\cons{x}{s});\\
+\fun{red}(\cons{x,y}{s}) & \rightarrow & \cons{x}{\fun{red}(\cons{y}{s})}.
+\end{array}
+\end{equation*}
+Now, we can remove pattern matching:
+\begin{equation*}
+\begin{array}{@{}r@{\;}c@{\;}l@{}}
+\fun{red}(t) & \rightarrow & \xkwd{if} \; t=\el\; \xkwd{or} \;
+                             \fun{tl}(t)=\el \; \xkwd{then} \; t\\
+             &             & \xkwd{else} \; \xkwd{if} \; \fun{hd}(t) = \fun{hd}(\fun{tl}(t)) \;
+\xkwd{then} \; \fun{red}(\fun{tl}(t)) \; \xkwd{else} \; \cons{\fun{hd}(t)}{\fun{red}(\fun{tl}(t))}.
+\end{array}
+\end{equation*}
+where \(\fun{hd}(t)\) \index{head@\fun{hd/1}} is the head of
+stack~\(t\) and \(\fun{tl}(t)\) \index{tail@\fun{tl/1}} is the tail
+of~\(t\), that is, its immediate substack. In \XSLT, we may define a
+variable by means of the element \texttt{xsl:variable}, so we can
+improve the translation by computing only once the translation of
+\(\fun{red}(\fun{tl}(t))\). We also know that \(\fun{hd}(t)\)
+translates as \texttt{\$t[1]}, where~\texttt{t} is the translation
+of~\(t\), and \(\fun{tl}(t)\) translates as \texttt{\$t[position()>1]}
+or \texttt{\$t[position()!=1]}. Here is the full transform:
+\XSLTinUnchecked{red.xsl}
+\noindent Note how we do not cast the attribute value to
+\texttt{xs:integer}, for example with
+\texttt{xs:integer(\$t[1]/@val) ne xs:integer(\$t[2]/@val)}, because
+we want to allow any kind of value for comparison.
+
+\mypar{Merging}
+\label{par:merging}
+
+The purpose of this exercise is to write an \XSLT transform which
+takes as input two sequences of elements which are sorted by
+increasing values of the same integer attribute, and it outputs one
+sequence containing all the items sorted increasingly. We can reuse
+for this the function \fun{mrg/2} in \fig~\vref{fig:mrg}, which merges
+two ordered stacks:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{mrg}(\el,t)         & \rightarrow & t;\\
+\fun{mrg}(s,\el)         & \rightarrow & s;\\
+\fun{mrg}(\cons{x}{s},\cons{y}{t}) & \rightarrow
+& \cons{y}{\fun{mrg}(\cons{x}{s},t)},\;\text{if \(x \succ y\)};\\
+\fun{mrg}(\cons{x}{s},t) & \rightarrow & \cons{x}{\fun{mrg}(s,t)}.
+\end{array}
+\end{equation*}
+We envisage the following simple \DTD \texttt{list.dtd}:
+\DTDin{list.dtd}
+\noindent Given the following \XML document
+\XMLinUnchecked{ordered_lists.xml}
+\noindent the output is
+\XMLinUnchecked{ordered_lists_out.xml}
+Here, we can translate \fun{mrg/2} in \XSLT without explicitly getting
+rid of pattern matching:
+\XSLTinUnchecked{merge1.xsl}
+\noindent If we would like instead produce text, we only have the
+changes
+\begin{verbatim}
+...
+  <xsl:output method="text"/>
+...
+  <xsl:template match="lists" as="xs:integer*">
+    <xsl:call-template name="merge">
+      <xsl:with-param name="seq1" select="list[1]/item" 
+                                  as="xs:integer*"/>
+      <xsl:with-param name="seq2" select="list[2]/item" 
+                                  as="xs:integer*"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="merge" as="xs:integer*">
+    <xsl:param name="seq1" as="xs:integer*"/>
+    <xsl:param name="seq2" as="xs:integer*"/>
+    ...
+  </xsl:template>
+...
+\end{verbatim}
+
+
+\section{Transforming trees}
+
+After an extensive training with the transformation of sequences, it
+is time that we tackle the general case, that is, trees. As we have
+mentioned at the beginning of this chapter, \XML trees are
+\emph{unranked}, which means that an element node can have a variable
+number of children, if not invalidated by a \DTD. This is in contrast
+with binary trees, for instance, whose nodes can only have two or no
+children.
+
+\mypar{Size}
+
+The purpose of this exercise is to write an \XSLT transform which
+takes as input a table of contents and computes the number of
+sections. But, contrary to a previous exercise, the table is not flat
+here, more precisely, the \DTD we have in mind is as follows:
+\DTDin{book_deep.dtd}
+\noindent An example of valid \XML document is
+\XMLinUnchecked{toc_deep.xml}
+\noindent Of course, we expect the result
+\saxon{tmp.txt}{toc_deep}{count1}
+Instead of going back to our abstract functional language, or \Erlang,
+and then translating to \XSLT, let us try to figure out the algorithm
+in plain English and move to write the transform.
+
+The idea is to match the root element, then select the first level of
+sections, just below the chapters. This sequence of nodes
+\texttt{section} is passed to a template named \texttt{count}, whose
+job is to count all the sections in it. If this sequence of sections
+is empty, the answer is~\texttt{0}. Otherwise,
+\begin{enumerate}
+
+\item we call recursively \texttt{count} on the subsections of the
+  first section;
+
+\item this number plus~\(1\) is the number of sections in the first
+  section (including itself) of the sequence;
+
+\item finally we call recursively \texttt{count} on the rest of the
+  sequence (that is, the remaining sections) and add this number to
+  the previous one: the total is the result.
+
+\end{enumerate}
+Note that the two recursive calls can be interchanged and the case
+described (call first on the children of the first node, then on the
+following siblings), is \emph{depth\hyp{}first} traversal of the tree,
+which we write first:
+\XSLTinUnchecked{count1.xsl}
+\noindent Beware of selecting \texttt{\$sections[1]/section}, but not
+\texttt{sections[1]/section}, which is empty, because \texttt{section}
+is a child element of the context node, whereas \texttt{\$section} is
+the content of the variable \texttt{section}. Perhaps it is wise to
+avoid using variables which are also element names in the input. Note
+also that because we must call named templates at the \XSLT level, not
+in \XPath, we have to define variables \texttt{subsec} and
+\texttt{subseq} to hold the results of the two recursive calls. Had we
+use \XSLT functions (\texttt{xsl:function}), we would have called them
+in \XPath. For the sake of uniformity, let us stick to named
+templates, even though, in some contexts, they may add verbosity to an
+already verbose language.
+
+If we want to visit the siblings before the children, we just need to
+swap the declarations of the variables:
+\begin{verbatim}
+      ...
+        <xsl:variable name="subseq" as="xs:integer">
+          ...
+        </xsl:variable>
+        <xsl:variable name="subsec" as="xs:integer">
+          ...
+        </xsl:variable>
+        ...
+\end{verbatim}
+This makes no difference because the parts of the tree traversed by
+the two calls are complementary. It is nevertheless instructive to
+draw the \XML tree and follow the (descending) calls with one colour
+on the left side of the nodes, and the (ascending) results with
+another colour on the right side.
+
+Instead of counting the sections in a bottom\hyp{}up fashion, we can
+thread a counter during our traversal and increment it each time we
+encounter a section; the final result is then the current count when
+we are back at the root. (The counter is a kind of
+\emph{accumulator}.) We have
+\XSLTinUnchecked{count3.xsl}
+\noindent Note how the case of the empty sequence \texttt{\$sections}
+yields the current count instead of~\texttt{0}, as opposed to
+previous versions.
+
+For the sake of practising with the \XSLT syntax, we might remark that
+the variable \texttt{subsec} is only used to initialise the parameter
+\texttt{current} of second recursive call. We could avoid creating that
+variable if we expand its recursive call as a child of the parameter
+in question:
+\begin{alltt}
+  <xsl:template name="count" as="xs:integer">
+    <xsl:param name="sections" as="element(section)*"/>
+    <xsl:param name="current"  as="xs:integer" \textbf{select="0"}/>
+    <xsl:choose>
+      <xsl:when test="empty(\$sections)">
+        <xsl:sequence select="\$current"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="count">
+          <xsl:with-param name="sections"
+                          select="\$sections[position()>1]"/>
+          \textbf{<xsl:with-param name="current" as="xs:integer">
+            <xsl:call-template name="count">
+              <xsl:with-param name="sections" 
+                              select="\$sections[1]/section"/>
+              <xsl:with-param name="current" 
+                              select="\$current + 1"/>
+            </xsl:call-template>
+          </xsl:with-param>}
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+\end{alltt}
+Note the use of a default value for parameter \texttt{current}, thus
+avoiding its initialisation in the first call (in the template
+matching element \texttt{book}).
+
+\mypar{Summing}
+
+The purpose of this exercise is to write an \XSLT transform which
+takes as input a document made of one kind of element with one kind of
+attribute whose value is a positive integer, and computes the sum of
+all these numbers. More precisely, we think of the following \DTD:
+\DTDin{numbers_tree.dtd}
+\noindent and, for instance, of the following input:
+\XMLinUnchecked{numbers_tree.xml}
+\noindent The expected result is then
+\saxon{tmp.txt}{numbers_tree}{sum2}
+The key is to understand the difference between this exercise and the
+exercise where we had to count the number of sections in a table of
+contents. In the latter, we counted~\texttt{1} for each section. In
+the former, we simply take the value of the attribute \texttt{val}
+instead of~\texttt{1}:
+\XSLTinUnchecked{sum2.xsl}
+
+\mypar{Mirroring}
+
+The purpose of this exercise is to write an \XSLT transform which
+takes as input a table of contents with sections only and output the
+same table in \XML where the sections have been reversed, level by
+level, which means that the result tree is the image of the input tree
+in a mirror. We already defined an abstract function \fun{mir/1} doing
+exactly that appears in \fig~\vref{fig:mirror}:
+\begin{equation*}
+\fun{mir}(\fun{ext}()) \rightarrow \fun{ext}();
+\quad
+\fun{mir}(\fun{int}(x,t_1,t_2)) \rightarrow
+\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)).
+\end{equation*}
+\noindent The \DTD we have in mind have in mind here is the following:
+\DTDin{book_simple.dtd}
+\noindent An example of valid input is the following table of contents:
+\XMLinUnchecked{toc_simple.xml}
+\noindent Note that each section title has been numbered in order to
+better understand the corresponding output:
+\XMLinUnchecked{toc_simple_out.xml}
+
+The difference with the function \fun{mir/1} is that \XML trees are
+unranked and there are no external nodes. The case
+\(\fun{mir}(\fun{ext}())\) corresponds to empty sequence of
+subsections and its right\hyp{}hand side \(\fun{ext}()\) translates
+then as an empty sequence as well, which means that the structure of
+the named template is
+\begin{verbatim}
+  <xsl:template name="mir" as="element(section)*">
+    <xsl:param name="sections" as="element(section)*"/>
+    <xsl:if test="not(empty($sections))">
+      ...
+    </xsl:if>
+  </xsl:template>
+\end{verbatim}
+This is a typical use\hyp{}case for \texttt{xsl:if}, instead of the
+general \texttt{xsl:choose}. Next, we focus on the second rewrite
+rule, whose right\hyp{}hand side is
+\(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1))\). In \XSLT, the
+parameter is a \emph{sequence} of sections, that is, a forest, because
+we are dealing with unranked trees, so the children of the root make
+up a forest, not a pair \((t_1, t_2)\) like in binary
+trees. Therefore, we need to generalise the mirroring to a stack. If
+we simply reverse it, this is not good because the children need
+reversing too, and so the grand\hyp{}children etc. In other words, we
+need to traverse the whole tree, thus we should expect to perform two
+recursive calls: one horizontally (to process the current level
+\texttt{\$sections}), and one vertically (to process the children of a
+node in the current level, usually the first).
+
+The previous canvas then should be filled like so:
+\begin{verbatim}
+  <xsl:template name="mir" as="element(section)*">
+    <xsl:param name="sections" as="element(section)*"/>
+    <xsl:if test="not(empty($sections))">
+      <xsl:call-template name="mir">
+        <xsl:with-param name="sections"
+                        select="$sections[position()>1]"/>
+      </xsl:call-template>
+      <section>
+        <xsl:sequence select="$sections[1]/@title"/>
+        <xsl:call-template name="mir">
+          <xsl:with-param name="sections"
+                          select="$sections[1]/section"/>
+        </xsl:call-template>
+      </section>
+    </xsl:if>
+  </xsl:template>
+\end{verbatim}
+This template can be conceived as interleaving the reversal and the
+recursive mirroring of the children of the root. Note how
+\texttt{<xsl:sequence select="\$sections[1]/@title"/>} is needed to
+rebuild the attribute of the mirrored image
+\texttt{<section>...</section>} of the first section. Recall that
+attribute nodes must be defined \emph{before} the other kinds of nodes
+amongst the children (see page~\pageref{attr_before}), that is,
+immediately after the opening tag \texttt{<section>}. The complete
+transform is \XSLTinUnchecked{flip1.xsl}
+\noindent Again, we have an illustration of the necessity of the
+attribute setting \texttt{exclude-result-prefixes="xs"}, or else the
+rebuilt section would needlessly inherit the namespace~\texttt{xs}.
+
+Now, let us answer the same question when the table of contents
+contains chapters, which in turn contain sections, and we do not want
+the chapters to be reversed, only the sections. More precisely, the
+\DTD we want is \texttt{book\_deep.dtd}:
+\DTDin{book_deep.dtd}
+\noindent and a valid input would be
+\XMLinUnchecked{toc_chap.xml}
+\noindent We want the result
+\XMLinUnchecked{toc_chap_out.xml}
+\noindent We mentioned that we had to write
+\begin{verbatim}
+      <section>
+        <xsl:sequence select="$sections[1]/@title"/>
+        ...
+      </section>
+\end{verbatim}
+to copy the attribute of the first section. Instead, we would like to
+write \texttt{<section title="\$sections[1]/@title">}, but the
+attribute value is then considered as plain text, not as a
+selection. Therefore, the problem boils down to performing a selection
+in an attribute which is neither \texttt{test} nor
+\texttt{select}. The answer lies with an \XPath operator
+\texttt{\{...\}}, which means `Consider the text between braces as
+\XPath, not plain text.' In other words, we could write
+\begin{alltt}
+      <section title="\textbf{\{}\$sections[1]/@title\textbf{\}}">
+        ...
+      </section>
+\end{alltt}
+Clearly, we do not need to rewrite the template named \texttt{mir}
+because sections are to be processed in the same way as before,
+although it may be interesting to use this new \XPath operator for the
+sake of learning. Other than that, all we need is a new named template
+to handle the chapters by reconstructing them \emph{in the same
+  order}, but with mirrored \texttt{section} children (if any). This
+means that we can reuse the same structure as \texttt{mir}, but
+without the reversal:
+\begin{verbatim}
+  <xsl:template match="book" as="element(book)">
+    <xsl:copy>
+      <xsl:sequence select="@title"/>
+      <xsl:sequence select="author"/>
+      <xsl:call-template name="mk_chap">
+        <xsl:with-param name="chapters" select="chapter"/>
+      </xsl:call-template>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template name="mk_chap" as="element(chapter)*">
+    <xsl:param name="chapters" as="element(chapter)*"/>
+    <xsl:if test="not(empty($chapters))">
+      <chapter title="{$chapters[1]/@title}">
+        <xsl:call-template name="mir">
+          <xsl:with-param name="sections"
+                          select="$chapters[1]/section"/>
+        </xsl:call-template>
+      </chapter>
+      <xsl:call-template name="mk_chap">
+        <xsl:with-param name="chapters"
+                        select="$chapters[position()>1]"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+\end{verbatim}
+Note that the \texttt{xsl:copy} element admit no \texttt{select}
+attribute: it only performs a shallow copy of the context node. Here
+it is clear that the context node is \texttt{book}, because
+\texttt{xsl:copy} is a child of the template matching
+\texttt{book}. But what if it is in a named template? How do we know
+the context node there, since we are not in a matching template? The
+answer is that the context node is the last matched node in the
+control flow up to the present instruction. For instance, in the
+template named \texttt{mir}, the context node is the root element
+\texttt{book}.
+
+Because the order of the chapters must be left unchanged, it is
+interesting to use a template matching \texttt{chapter} to process
+them and call it with \texttt{<xsl:apply-templates select="chapter"/>},
+instead of using the bulky template named \texttt{mk\_chap}. It means:
+\begin{enumerate*}
+
+\item select the elements \texttt{chapter} which are children of the
+  context node;
+
+\item for each element in the resulting sequence, in parallel, apply
+  the first template in the stylesheet which matches \texttt{chapter};
+
+\item when finished, gather all the results in one sequence, in the
+  same order as the original chapters.
+
+\end{enumerate*}
+As we saw \vpageref{match_as_map}, a matching template is like a map,
+the parallel application of a template to the items of a sequence. In
+other words, when \emph{parallel} processing of elements is envisaged,
+we use \texttt{xsl:apply-templates}, otherwise \emph{sequential}
+processing is chosen, that is \texttt{xsl:call-template}. (Please keep
+in mind that `parallel' does not imply that an implementation of an
+\XSLT processor must be multi\hyp{}threaded, only that it could
+be. The function \texttt{map} in \Erlang is clearly sequential, for
+instance, although it could be programmed using concurrent, even
+distributed, processes.) We have to rewrite the template matching
+\texttt{book} and the template named \texttt{mk\_chap}, which becomes
+a template matching \texttt{chapter}:
+\begin{verbatim}
+  <xsl:template match="book" as="element(book)">
+    <xsl:copy>
+      <xsl:attribute name="title" select="@title"/>
+      <xsl:sequence select="author"/>
+      <xsl:apply-templates select="chapter"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="chapter" as="element(chapter)">
+    <xsl:copy>
+      <xsl:attribute name="title" select="@title"/>
+      <xsl:call-template name="mir">
+        <xsl:with-param name="sections" select="section"/>
+      </xsl:call-template>
+    </xsl:copy>
+  </xsl:template>
+\end{verbatim}
+Note how the structure of the new template does not mimic anymore that
+of the template named \texttt{mir}, thus is shorter. Also, we
+introduced a new \XSLT element:
+\begin{alltt}
+ <xsl:template match="book" as="element(book)">
+    <xsl:copy>
+      \textbf{<xsl:attribute name="title" select="@title"/>}
+      ...
+\end{alltt}
+This is an alternative to using \texttt{xsl:sequence} as before. Also,
+we have now an element \texttt{xsl:copy} per matching template, the
+context node being \texttt{book} in one case, and \texttt{chapter}, in
+the other.
+
+Comparing the contents of the template matching chapters with the
+following element in the template named \texttt{mir},
+\begin{verbatim}
+      ...
+      <section title="{$sections[1]/@title}">
+        <xsl:call-template name="flip">
+        <xsl:with-param name="sections"
+                        select="$sections[1]/section"/>
+        </xsl:call-template>
+      </section>
+      ...
+\end{verbatim}
+it becomes apparent that both actions are the same: make a shallow
+copy of an element and mirror its children. Therefore it would be
+advantageous if the template matching chapters also matched
+sections. Because we used \texttt{xsl:copy} and
+\texttt{xsl:attribute}, it becomes possible to have a common template
+matching chapters and sections: \texttt{<xsl:template
+  match="chapter|section">}, whose interpretation is as follows:
+`Match either a \texttt{chapter} or a \texttt{section}.'
+
+Here is the difference with the previous answer:
+\begin{alltt}
+  <xsl:template match="chapter|section" as="element()*">
+    <xsl:copy>
+      <xsl:attribute name="title" select="@title"/>
+      <xsl:call-template name="mir">
+        <xsl:with-param name="sections" select="section"/>
+      </xsl:call-template>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template name="mir" as="element(section)*">
+    <xsl:param name="sections" as="element(section)*"/>
+    <xsl:if test="not(empty(\$sections))">
+      <xsl:call-template name="mir">
+        <xsl:with-param name="sections"
+                        select="\$sections[position()>1]"/>
+      </xsl:call-template>
+      \textbf{<xsl:apply-templates select="\$sections[1]"/>}
+    </xsl:if>
+  </xsl:template>
+\end{alltt}
+Note how we have to apply templates to the first section in
+\texttt{mir} (see code in bold), instead of calling recursively
+\texttt{mir} (this call is now done in the template matching chapters
+and sections). Since the template applies to only one section,
+parallelism is lost, but code sharing is gained nonetheless.
+
+The elements \texttt{xsl:call-template} and
+\texttt{xsl:apply-templates} differ also is that the former always
+results in a call while the latter may be a non\hyp{}operation if the
+\texttt{select} attribute evaluates to an empty sequence. In other
+words, \texttt{<xsl:apply-templates select="..."/>} does nothing if the
+value of \texttt{"..."} is the empty sequence, whereas
+\texttt{<xsl:call-template name="t">} always calls the template named~\texttt{t}, even if the parameters are empty sequences.
+
+It is possible for a matching template to have parameters. Just put
+some \texttt{xsl:param} elements just after \texttt{<xsl:template
+  match="...">} (this is the definition) and \texttt{xsl:with-param}
+just after \texttt{xsl:apply-templates} (this is the
+application). This is the same syntax as
+\texttt{xsl:call-template}.
+
+Let us then change the call to template \texttt{mir} into a template
+application with a parameter and remove the definition of \texttt{mir}
+entirely. The shortest transform to achieve the same effects as the
+previous ones is
+\XSLTinUnchecked{flip4.xsl}
+
+\mypar{Height}
+
+The purpose of this exercise is to write an \XSLT transform which
+takes as input a table of contents and outputs its height.
+\begin{itemize}
+
+  \item The height of a table of contents is the largest height of its
+  chapters.
+
+  \item The height of a chapter (respectively, section) is~\texttt{1}
+    plus the largest height of its sections (respectively,
+    subsections).
+
+  \item The height of an empty sequence is~\texttt{0}.
+
+\end{itemize}
+For instance, a book with no chapters has height~\texttt{0} (it is
+empty). A book made only of chapters with no sections at all has
+height~\texttt{1} (it is flat). We will use the same \DTD as in the
+previous exercise:
+\DTDin{book_deep.dtd}
+\noindent The same input
+\XMLinUnchecked{toc_chap.xml}
+\noindent yields the result
+\saxon{tmp.txt}{toc_chap}{height1}
+
+The above definition is a parallel algorithm, because the heights of
+the chapters and sections can be computed separately. Therefore, let
+us write the transform using matching templates only and we reuse the
+template named \texttt{max} for finding the maximum of two integers.
+\XSLTinUnchecked{height1.xsl}
+
+Same question but this time, instead of computing in parallel de
+heights of the children of a given node, let us compute them
+sequentially with a named template. The purpose is to avoid computing
+a sequence of heights and then taking their maximum. Instead, we would
+compute the current height along the traversal.
+
+Two parameters are needed: a parameter \texttt{cur} representing the
+height of the sequence so far (the initial value is~\texttt{0}) and a
+parameter \texttt{seq} holding the rest of the sequence whose height
+we want to know. Then
+\begin{enumerate}
+
+  \item we compute the height of the sequence of the children of
+    \texttt{\$seq[1]};
+
+  \item we add~\texttt{1} to obtain the height of \texttt{\$seq[1]};
+
+  \item the maximum of this value and \texttt{\$cur} is the value of
+    \texttt{cur} in the recursive call with
+    \texttt{\$seq[position()>1]}. If \texttt{\$seq} is empty, the
+    maximum height of the nodes is \texttt{\$cur}. (This scheme is
+    similar to counting the number of sections.)
+
+\end{enumerate}
+\noindent This is written in \XSLT as follows:
+\XSLTinUnchecked{height2.xsl}
+
+In the previous question, the height is computed
+\emph{bottom\hyp{}up}, that is, the increments on the height are
+performed just before the recursive calls end and new calls initialise
+the height parameter to~\texttt{0}. Instead, we can propose an
+alternate design where the height is incremented \emph{top\hyp{}down},
+that is, the height parameter is added~\texttt{1} just before the
+recursive calls start:
+\XSLTinUnchecked{height3.xsl}
+
+\mypar{Numbering}
+
+The purpose of this exercise is to write an \XSLT transform which
+takes as input a table of contents and outputs it in \XHTML, first
+without numbering chapters and sections, then numbering them. The \DTD
+is still the same:
+\DTDin{book_deep.dtd}
+\noindent The valid input is still
+\XMLinUnchecked{toc_chap.xml}
+\noindent The expected result (without numbering) is then
+\begin{verbatim}
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=UTF-8"/>
+    <title>Definitive XML Schema</title>
+  </head>
+  <body>
+    <h2>Definitive XML Schema</h2>
+    <p>by Priscilla Walmsley</p>
+    <h3>Table of contents</h3>
+    <ul>
+      <li>[I] A quick tour of XML Schema
+        <ul>
+          <li>[I.1] An example schema</li>
+          <li>[I.2] The components of XML Schema
+            <ul>
+              <li>[I.2.1] Declaration vs. definition</li>
+              <li>[I.2.2] Global vs. local components</li>
+            </ul>
+          </li>
+          <li>[I.3] Elements and attributes
+            <ul>
+              <li>[I.3.1] The tag/type distinction</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>[II] Instances and schemas
+        <ul>
+          <li>[II.1] Using the instance attributes</li>
+          <li>[II.2] Schema processing
+            <ul>
+              <li>[II.2.1] Validation</li>
+              <li>[II.2.2] Augmenting the instance</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </body>
+</html>
+\end{verbatim}
+which, interpreted by a web browser, would likely render as
+
+\noindent\rule{\linewidth}{0.5pt}
+\noindent\textbf{\large Definitive XML Schema}
+
+\bigskip
+
+\noindent by Priscilla Walmsley
+
+\bigskip
+
+\noindent\textbf{Table of contents}
+\begin{itemize*}
+  \item [I] A quick tour of XML Schema
+    \begin{itemize*}
+      \item [I.1] An example schema
+      \item [I.2] The components of XML Schema
+        \begin{itemize*}
+          \item [I.2.1] Declaration vs. definition
+          \item [I.2.2] Global vs. local components
+        \end{itemize*}
+      \item [I.3] Elements and attributes
+        \begin{itemize*}
+          \item [I.3.1] The tag/type distinction
+        \end{itemize*}
+    \end{itemize*}
+  \item [II] Instances and schemas
+    \begin{itemize*}
+      \item [II.1] Using the instance attributes
+      \item [II.2] Schema processing
+        \begin{itemize*}
+          \item [II.2.1] Validation
+          \item [II.2.2] Augmenting the instance
+        \end{itemize*}
+    \end{itemize*}
+\end{itemize*}
+\noindent\rule{\linewidth}{0.5pt}
+
+\bigskip
+
+\noindent The following solution should not be difficult by now:
+\XSLTinUnchecked{num1.xsl}
+\noindent Perhaps it is worth noting \texttt{<xsl:value-of
+  select="@title"/>}, since the titles are attribute values, so we
+need \texttt{xsl:value-of} to create a text node, just like for
+\texttt{"author/@first,author/@last"}, which is the same as
+\texttt{"(author/@first,author/@last)"}. Also possible here woud have
+been \texttt{"author/@*"}, which means `All attribute values of the
+element \texttt{author}, child of the context node.'
+
+Now, let us add a number between square brackets after the \XHTML
+\texttt{<li>} tag, which is the position of the item in the list, like
+so:
+\begin{alltt}
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=UTF-8"/>
+    <title>Definitive XML Schema</title>
+  </head>
+  <body>
+    <h2>Definitive XML Schema</h2>
+    <p>by Priscilla Walmsley</p>
+    <h3>Table of contents</h3>
+    <ul>
+      <li>\textbf{[1]} [I] A quick tour of XML Schema
+        <ul>
+          <li>\textbf{[1]} [I.1] An example schema</li>
+          <li>\textbf{[2]} [I.2] The components of XML Schema
+            <ul>
+              <li>\textbf{[1]} [I.2.1] Declaration vs. definition</li>
+              <li>\textbf{[2]} [I.2.2] Global vs. local components</li>
+            </ul>
+          </li>
+          <li>\textbf{[3]} [I.3] Elements and attributes
+            <ul>
+              <li>\textbf{[1]} [I.3.1] The tag/type distinction</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>\textbf{[2]} [II] Instances and schemas
+        <ul>
+          <li>\textbf{[1]} [II.1] Using the instance attributes</li>
+          <li>\textbf{[2]} [II.2] Schema processing
+            <ul>
+              <li>\textbf{[1]} [II.2.1] Validation</li>
+              <li>\textbf{[2]} [II.2.2] Augmenting the instance</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </body>
+</html>
+\end{alltt}
+The added numbers have been set in a bold typeface. The only other
+change lies in the template matching chapters and sections:
+\begin{alltt}
+ <xsl:template match="section|chapter" as="element(xhtml:li)">
+    <li xmlns="http://www.w3.org/1999/xhtml">
+      \textbf{<xsl:value-of select="('[',position(),'] ',@title)" 
+                    separator=""/>}
+      <xsl:if test="not(empty(section))">
+        <ul><xsl:apply-templates select="section"/></ul>
+      </xsl:if>
+    </li>
+  </xsl:template>
+\end{alltt}
+The \texttt{separator} attribute must be set to the empty string, so
+the items in the selection (strings and integer) are converted to one
+text node without the default blank separator. For example, the result
+of evaluating \texttt{<xsl:value-of select="1,2,3">} is the string
+\texttt{'1 2 3'}.
+
+Finally, we can complete the numbering so it becomes what is expected
+in a table of contents. Let us resume with an input \emph{without} any
+numbers:
+\XMLinUnchecked{toc_deep.xml}
+\noindent and, for making things a little bit easier, the output will
+number the chapters with Arabic numbers, like the sections:
+\begin{verbatim}
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en" lang="en">
+  <head><meta http-equiv="Content-Type"
+              content="text/html; charset=UTF-8"/>
+        <title>Definitive XML Schema</title>
+  </head>
+  <body>
+    <h2>Definitive XML Schema</h2>
+    <p>by Priscilla Walmsley</p>
+    <h3>Table of contents</h3>
+    <ul>
+      <li>[1] A quick tour of XML Schema
+        <ul>
+          <li>[1.1] An example schema</li>
+          <li>[1.2] The components of XML Schema
+            <ul>
+              <li>[1.2.1] Declarations vs. definitions</li>
+              <li>[1.2.2] Global vs. local components</li>
+            </ul>
+          </li>
+          <li>[1.3] Elements and attributes
+            <ul>
+              <li>[1.3.1] The tag/type distinction</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>[2] Instances and schemas
+        <ul>
+          <li>[2.1] Using the instance attributes</li>
+          <li>[2.2] Schema processing
+            <ul>
+              <li>[2.2.1] Validation</li>
+              <li>[2.2.2] Augmenting the instance</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </body>
+</html>
+\end{verbatim}
+The idea is to add a parameter \texttt{prefix} to the template
+matching chapters and sections, which receives the prefix numbering of
+the parent. For instance, when matching the section entitled
+`Declarations vs. definitions', the parameter value is the sequence
+\texttt{(1,'.',2,'.')}, so we simply catenate the position of the
+section amongst its siblings, that is, \texttt{1}. Then we create a
+text node to format \texttt{[1.2.1]}. Here is the change:
+\begin{verbatim}
+  <xsl:template match="chapter|section" as="element(xhtml:li)">
+    <xsl:param name="prefix" as ="item()*"/>
+    <xsl:variable name="current" select="($prefix,position())"/>
+    <li xmlns="http://www.w3.org/1999/xhtml">
+      <xsl:value-of select="('[',$current,'] ',@title)"
+                    separator=""/>
+      <xsl:if test="not(empty(section))">
+        <ul>
+          <xsl:apply-templates select="section">
+             <xsl:with-param name="prefix"
+                             select="($current,'.')"/>
+          </xsl:apply-templates>
+        </ul>
+      </xsl:if>
+    </li>
+  </xsl:template>
+\end{verbatim}
+Note that the first application of this template is left unchanged:
+\begin{verbatim}
+        ...
+        <ul><xsl:apply-templates select="chapter"/></ul>
+        ...
+\end{verbatim}
+because, in \XSLT, an empty sequence is implicitly passed, which is
+here convenient.
+
+
+\mypar{Sorting leaves}
+
+The purpose of this exercise is to write an \XSLT transform which
+takes as input a document representing a binary tree whose leaves
+contain an integer and sort these in nondecreasing order. The integers
+in the sorted sequence must be separated by commas and terminated by a
+period in the resulting text. For instance, the following \XML
+document
+\XMLinUnchecked{num.xml}
+\noindent yields the following output: \saxon{tmp.txt}{num}{tmerge}
+The format of the output should remind us of the comma-separated
+values (CSV), \vpageref{par:CSV}, and the ordering of the merging of
+ordered sequences, \vpageref{par:merging}. Then, a first idea could be
+to traverse the tree and collect the numbers in ordered sequences
+which are merged together with the template named \texttt{merge} until
+one remains and, finally, we use the template named \texttt{csv}. More
+precisely, this traversal can be performed in parallel: the recursive
+template applications on the children yield two ordered sequences,
+which are merged; if the context node is the root element, then we
+call \texttt{csv}. In other words, the mergers are performed purely in
+a bottom\hyp{}up fashion (that is, after the end of the recursive
+calls). Therefore, we start with
+\begin{alltt}
+  <xsl:template match="/" as="text()*">
+    <xsl:call-template name="csv">
+      <!-- The following cast is needed. -->
+      <xsl:with-param name="items" \textbf{as="xs:integer*"}>
+        <xsl:apply-templates select="num"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    <xsl:text>&#10;</xsl:text>
+  </xsl:template>
+\end{alltt}
+Note how the type annotation \texttt{xs:integer*} is necessary when
+invoking the template \texttt{csv}, whose type is
+\begin{verbatim}
+  <xsl:template name="csv" as="text()*">
+    <xsl:param name="items" as="item()*"/>
+    ...
+  </xsl:template>
+\end{verbatim}
+The rest is
+\begin{verbatim}
+  <xsl:template match="num" as="xs:integer*">
+    <xsl:choose>
+      <xsl:when test="empty(@val)">
+        <xsl:call-template name="merge">
+          <xsl:with-param name="fst" as="xs:integer*">
+            <xsl:apply-templates select="num[1]"/>
+          </xsl:with-param>
+          <xsl:with-param name="snd" as="xs:integer*">
+            <xsl:apply-templates select="num[2]"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="@val"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+\end{verbatim}
+The template \texttt{merge} needs to be simplified and generalised
+because it was too specialised:
+\begin{verbatim}
+  <xsl:template name="merge" as="element(item)*">
+    <xsl:param name="seq1" as="element(item)*"/>
+    <xsl:param name="seq2" as="element(item)*"/>
+    ...
+  </xsl:template>
+\end{verbatim}
+We need it to receive integers now:
+\begin{verbatim}
+  <xsl:template name="merge" as="xs:integer*">
+    <xsl:param name="fst" as="xs:integer*"/>
+    <xsl:param name="snd" as="xs:integer*"/>
+    <xsl:choose>
+      <xsl:when test="empty($fst)">
+        <xsl:sequence select="$snd"/>
+      </xsl:when>
+      <xsl:when test="empty($snd)">
+        <xsl:sequence select="$fst"/>
+      </xsl:when>
+      <xsl:when test="$fst[1] lt $snd[1]">
+        <xsl:sequence select="$fst[1]"/>
+        <xsl:call-template name="merge">
+          <xsl:with-param name="fst"
+                          select="$fst[position()>1]"/>
+          <xsl:with-param name="snd" select="$snd"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$snd[1]"/>
+        <xsl:call-template name="merge">
+          <xsl:with-param name="fst" select="$fst"/>
+          <xsl:with-param name="snd"
+                          select="$snd[position()>1]"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+\end{verbatim}
+
+\paragraph{Exercise}
+
+Is example~2.2 in the book of~\cite{Mangano_2006}, page~39, really in
+tail form?

@@ -1,0 +1,27 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{xspace}
+\usepackage{pstricks,pst-tree,pst-eps}
+
+\input{token}
+
+\newcommand{\mknode}[2]{\TR{\token{#1}{#2}}}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[treesep=10pt,levelsep=30pt,nodesep=2pt]{\mknode{SYM}{:=}}{
+  \mknode{ID}{position}
+  \pstree{\mknode{OP}{+}}{
+    \mknode{ID}{initial}
+    \pstree{\mknode{OP}{*}}{
+      \mknode{ID}{rate}
+      \mknode{NUM}{60}
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}

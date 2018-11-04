@@ -1,0 +1,21 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\psset{radius=2.5pt}
+\pstree[levelsep=17pt,treesep=13pt]{\TC*}{
+  \TC*
+  \TC*
+  \pstree{\TC*}{
+    \pstree{\TC*}{\TC*}
+    \TC*
+  }
+}
+\endTeXtoEPS
+
+\end{document}

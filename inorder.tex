@@ -1,0 +1,25 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=17pt,treesep=14pt,nodesep=2pt]{\TR{\(4\)}}{
+  \pstree{\TR{\(2\)}}{
+    \pstree{\TR{\(0\)}}{
+      \Tn
+      \TR{\(1\)}
+    }
+    \TR{\(3\)}
+  }
+  \pstree{\TR{\(5\)}}{
+    \Tn
+    \TR{\(6\)}
+  }
+}
+\endTeXtoEPS
+
+\end{document}

@@ -1,0 +1,3305 @@
+\chapter{Merge Sort}
+\label{chap:merge_sort}
+\index{merge sort|(}
+\index{sorting|see{merge sort}}
+
+\cite{Knuth_1996} reports that the first computer program, designed
+in~\oldstylenums{1945} by the mathematician John von~Neumann, was a
+sorting algorithm, nowadays called \emph{merge sort}. It is amongst
+the most widely taught sorting algorithms because it illustrates the
+important solving strategy known as `\emph{divide and
+  conquer}'\index{divide and conquer}: the input is split, each
+non\hyp{}trivial part is recursively processed and the partial
+solutions are finally combined to form the complete solution.  While
+merge sort is not difficult to program, finding its cost requires
+advanced mathematical knowledge. Most
+textbooks \citep{GrahamKnuthPatashnik_1994,CLRS_2009} show how to find
+the order of growth of an upper bound of the cost (expressed by means
+of Bachmann's notation \(\mathcal{O}\)) from recurrences it satisfies,
+but the general case is often not presented in the main chapters, or
+not at all, because a precise asymptotic solution requires skills in
+\emph{analytic combinatorics} \citep{FlajoletSedgewick_2001,
+  FlajoletSedgewick_2009, FlajoletGolin_1994, Hwang_1998,
+  ChenHwangChen_1999}. Moreover, there are several variants of merge
+sort \citep{Knuth_1998,GolinSedgewick_1993} and often the only one
+introduced, called \emph{top\hyp{}down}, is illustrated on arrays. We
+show in this chapter that stacks, as a purely functional data
+structure \citep{Okasaki_1998b}, are suitable both for a top\hyp{}down
+and a \emph{bottom\hyp{}up} approach of merge
+sort \citep{PannyProdinger_1995}.
+
+
+\section{Merging}
+\label{sec:merging}
+\index{merge sort!merging|(}
+
+John von~Neumann did not actually described merge sort, but its basic
+operation, \emph{merging}, which he named \emph{meshing}. Merging
+consists in combining two ordered stacks of keys into one ordered
+stack. Without loss of generality, we shall be only interested in
+sorting keys in increasing order. For instance, merging \([10,12,17]\)
+and \([13,14,16]\) results in \([10,12,13,14,16,17]\). One way to
+achieve this consists in comparing the two smallest keys, output the
+smallest and repeat the procedure until one of the stacks becomes
+empty, in which case the other is wholly appended. We have (compared
+keys underlined):
+\begin{equation*}
+\left\{
+\begin{aligned}
+&\underline{10}~12~17\\
+&\underline{13}~14~16
+\end{aligned}
+\right.
+\rightarrow 10
+\left\{
+\begin{aligned}
+&\underline{12}~17\\
+&\underline{13}~14~16
+\end{aligned}
+\right.
+\rightarrow 10~12
+\left\{
+\begin{aligned}
+&\underline{17}\\
+&\underline{13}~14~16
+\end{aligned}
+\right.
+\rightarrow 10~12~13
+\left\{
+\begin{aligned}
+&\underline{17}\\
+&\underline{14}~16
+\end{aligned}
+\right.
+%\quad\text{etc.}
+\end{equation*}
+The function \fun{mrg/2}\index{mrg@\fun{mrg/2}} (\emph{merge}) in
+\fig~\vref{fig:mrg}
+\begin{figure}
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{mrg}(\el,t)         & \xrightarrow{\smash{\theta}} & t;\\
+\fun{mrg}(s,\el)         & \xrightarrow{\smash{\iota}} & s;\\
+\fun{mrg}(\cons{x}{s},\cons{y}{t}) & \xrightarrow{\smash{\kappa}}
+& \cons{y}{\fun{mrg}(\cons{x}{s},t)},\;\text{if \(x \succ y\)};\\
+\fun{mrg}(\cons{x}{s},t) & \xrightarrow{\smash{\lambda}}
+                         & \cons{x}{\fun{mrg}(s,t)}.
+\end{array}}
+\end{equation*}
+\caption{Merging two stacks\label{fig:mrg}
+\index{merge sort!merging!program}}
+\end{figure}
+implements this scheme. Rule~\(\iota\) is not necessary but is
+retained because it allows the cost to be symmetric, just as
+\fun{mrg/2}\index{mrg@\fun{mrg/2}} is: \(\C{\fun{mrg}}{m,n} =
+\C{\fun{mrg}}{n,m}\)\index{mrg@$\C{\fun{mrg}}{m,n}$} and
+\(\fun{mrg}(s,t) \equiv \fun{mrg}(t,s)\), where \(m\)~and~\(n\) are
+the lengths of~\(s\) and~\(t\). This property enables easier cost
+calculations and faster computations. Note that in the definition of
+\fun{cat/2}\index{cat@\fun{cat/2}} (equation~\eqref{def:cat} on
+page~\pageref{def:cat}), we do not include a similar rule,
+\(\fun{cat}(s,\el) \rightarrow s\), because, despite the gain in
+speed, the function is asymmetric and cost calculations are simplified
+when using \(\C{\fun{cat}}{n}\)\index{cat@$\C{\fun{cat}}{n}$} rather
+than \(\C{\fun{cat}}{m,n}\). \Fig~\vref{fig:mrg_247} shows a
+\begin{figure}[b]
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+  \fun{mrg}([3,4,7],[1,2,5,6])
+& \xrightarrow{\smash{\kappa}}
+& \cons{1}{\fun{mrg}([3,4,7],[2,5,6])}\\
+& \xrightarrow{\smash{\kappa}}
+& \cons{1,2}{\fun{mrg}([3,4,7],[5,6])}\\
+& \xrightarrow{\smash{\lambda}}
+& \cons{1,2,3}{\fun{mrg}([4,7],[5,6])}\\
+& \xrightarrow{\smash{\lambda}}
+& \cons{1,2,3,4}{\fun{mrg}([7],[5,6])}\\
+& \xrightarrow{\smash{\kappa}}
+& \cons{1,2,3,4,5}{\fun{mrg}([7],[6])}\\
+& \xrightarrow{\smash{\kappa}}
+& \cons{1,2,3,4,5,6}{\fun{mrg}([7],\el)}\\
+& \xrightarrow{\smash{\iota}}
+& [1,2,3,4,5,6,7].
+\end{array}}
+\end{equation*}
+\caption{\(\fun{mrg}([3,4,7],[1,2,5,6]) \twoheadrightarrow
+  [1,2,3,4,5,6,7]\)\label{fig:mrg_247} \index{merge
+    sort!merging!example}\index{functional language!evaluation!trace}}
+\end{figure}
+trace for \fun{mrg/2}. Rules \(\kappa\)~and~\(\lambda\) involve a
+comparison, while \(\theta\)~and~\(\iota\) do not and end the
+evaluations; therefore, if
+\(\OC{\fun{mrg}}{m,n}\)\index{mrg@$\OC{\fun{mrg}}{m,n}$} is the number
+of comparisons to merge with \fun{mrg/2}\index{mrg@\fun{mrg/2}} two
+stacks of lengths \(m\)~and~\(n\), we have\index{mrg@$\C{\fun{mrg}}{m,n}$}
+\begin{equation}
+\C{\fun{mrg}}{m,n} = \OC{\fun{mrg}}{m,n} + 1.\label{def:cost_mrg}
+\end{equation}
+In order to gain some generality, we shall study
+\(\OC{\fun{mrg}}{m,n}\). Graphically, we represent a key from one
+stack as a \emph{white node} \((\circ)\) and a key from the other as a
+\emph{black node} \((\bullet)\). Nodes of these kinds are printed in a
+horizontal line, the leftmost being the smallest. Comparisons are
+always performed between black and white nodes and are represented as
+\emph{edges} in% \fig~\vref{fig:merged}.
+%\begin{figure}
+%\centering
+\begin{equation}
+\includegraphics[bb=73 710 292 718]{merged}%[bb=73 702 292 724]
+\label{fig:merged}
+\end{equation}
+%\caption{Two ordered stacks merged into one\label{fig:merged}}
+%\end{figure}
+An incoming arrow means that the node is smaller than the other end of
+the edge, so all edges point leftwards and the number of comparisons
+is the number of nodes with an incoming edge.
+
+%\addcontentsline{toc}{subsection}{Cost}
+\paragraph{Minimum cost}
+\label{merge:best_case}
+\index{merge sort!merging!minimum cost|(}
+
+There are two consecutive white nodes without any edges at the right
+end, which suggests that the more keys from one stack we have at the
+end of the result, the fewer comparisons we needed for merging: the
+minimum number is achieved when \emph{the shorter stack comes first in
+  the result}. Consider the following example (the number of
+comparisons is the number of black nodes):
+\begin{center}
+\includegraphics[bb=73 698 292 724]{min_mrg}
+\end{center}
+The minimum number of comparisons
+\(\OB{\fun{mrg}}{m,n}\)\index{mrg@$\OB{\fun{mrg}}{m,n}$} when merging
+stacks of size \(m\)~and~\(n\) is
+\begin{equation}
+\OB{\fun{mrg}}{m,n} = \min\{m,n\}.\label{eq:best_merge}
+\end{equation}
+\index{merge sort!merging!minimum cost|)}
+
+\paragraph{Maximum cost}
+\index{merge sort!merging!maximum cost|(}
+
+We can see that we can increase the number of comparisons with respect
+to \(m+n\) by removing, in~\eqref{fig:merged}, those rightmost
+nodes in the result \emph{that are not compared}, as can be seen in
+\begin{center}
+\includegraphics[bb=73 702 258 724]{max_mrg2}
+\end{center}
+This maximises comparisons because all nodes, but the last, are the
+destination of an edge. The maximum number of comparisons
+\(\OW{\fun{mrg}}{m,n}\)\index{mrg@$\OW{\fun{mrg}}{m,n}$} is
+\begin{equation}
+\OW{\fun{mrg}}{m,n} = m + n - 1.\label{eq:worst_merge}
+\end{equation}
+Interchanging the two rightmost nodes in the previous example leaves
+\(m+n-1\) invariant:
+\begin{center}
+\includegraphics[bb=71 700 260 726]{max_mrg1}
+\end{center}
+so the maximum number of comparisons occurs when \emph{the last two
+  keys of the result come from two stacks.}
+\index{merge sort!merging!maximum cost|)}
+
+
+\paragraph{Average cost}
+\index{merge sort!merging!average cost|(}
+
+Let us seek the average number of comparisons in all distinct mergers
+of two stacks of lengths \(m\)~and~\(n\). Consider
+\fig~\vref{fig:mean_mrg1},
+\begin{figure}[b]
+\centering
+\includegraphics[bb=66 648 350 725]{mean_mrg1}
+\caption{All possible mergers with \(m=3\) (\(\circ\)) and \(n=2\)
+  (\(\bullet\))
+\label{fig:mean_mrg1}}
+\end{figure}
+with \(m=3\) white nodes and \(n=2\) black nodes which are interleaved
+in all possible manners. Note how the figure is structured. The first
+column lists the configurations where the rightmost black node is the
+last of the result. The second column lists the cases where the
+rightmost black node is the penultimate node of the result. The third
+column is divided in two groups itself, the first of which lists the
+cases where the rightmost black node is the antepenultimate. The total
+number of comparisons is~\(35\) and the number of configurations
+is~\(10\), thus the average number of comparisons is \(35/10 =
+7/2\).\label{seven_two} Let us devise a method to find this ratio for
+any \(m\)~and~\(n\). First, the number of configurations: how many
+ways are there to combine \(m\)~white nodes and \(n\)~black nodes?
+This is the same as asking how many ways there are to paint in black
+\(n\)~nodes picked amongst \(m+n\) white nodes. More abstractly, this
+is equivalent to wonder how many ways there are to choose
+\(n\)~objects amongst \(m+n\). This number is called a \emph{binomial
+  coefficient}\index{binomial coefficient} and noted
+\(\binom{m+n}{n}\). For example, let us consider the set
+\(\{a,b,c,d,e\}\) and the \emph{combinations}\index{combination} of
+\(3\)~objects taken from it are
+\begin{gather*}
+\{a,b,c\},\{a,b,d\},\{a,b,e\},\{a,c,d\},\{a,c,e\},\{a,d,e\},\\
+\{b,c,d\},\{b,c,e\},\{b,d,e\},\\
+\{c,d,e\}.
+\end{gather*}
+This enumeration establishes that \(\binom{5}{3} = 10\). Notice that
+we use mathematical sets, therefore the order of the elements or their
+repetition are not meaningful. It is not difficult to count the
+combinations if we recall how we counted the permutations,
+\vpageref{par:permutations}. Let us determine \(\binom{r}{k}\). We can
+pick the first object amongst~\(r\), the second amongst \(r-1\)
+etc. until we pick the \(r\)th object amongst \(r-k+1\), so there are
+\(r(r-1)\dots(r-k+1)\) choices. But these arrangements contain
+duplicates, for example, we may form \(\{a,b,c\}\) and \(\{b,a,c\}\),
+which are to be considered identical combinations because order does
+not matter. Therefore, we must divide the number we just obtained by
+the number of redundant arrangements, which is the number of
+permutations of \(k\)~objects, that is, \(k!\). In the end:
+\begin{equation*}
+\binom{r}{k} := \frac{r(r-1)\ldots(r-k+1)}{k!} =
+\frac{r!}{k!(r-k)!}.
+\end{equation*}
+We can check now that in \fig~\vref{fig:mean_mrg1}, we must have
+\(10\)~cases: \(\binom{5}{2} = 5!/(2!3!) = 10\). The symmetry of the
+problem means that merging a stack of \(m\)~keys with a stack of~\(n\)
+leads to exactly the same results as merging a stack of \(n\)~keys
+with a stack of \(m\)~keys:
+\begin{equation*}
+\binom{m+n}{n} = \binom{m+n}{m}.
+%\label{eq:comb_m_n}
+\end{equation*}
+This can also be easily proved by means of the definition:
+\begin{equation*}
+\binom{m+n}{n} := \frac{(m+n)!}{n!(m+n-n)!} =
+\frac{(m+n)!}{m!n!} =: \binom{m+n}{m}.
+\end{equation*}
+The total number \(K(m,n)\) of comparisons needed to merge~\(m\) and
+\(n\)~keys in all possible manners with our algorithm is the number of
+nodes with incoming edges. Let \(\overline{K}(m,n)\) be the total
+number of nodes \emph{without} incoming edges, circled in
+\fig~\ref{fig:mean_mrg2}.
+\begin{figure}[b]
+\centering
+\includegraphics[bb=66 625 252 730]{mean_mrg2}
+\caption{Counting vertically\label{fig:mean_mrg2}}
+\end{figure}
+This figure has been obtained by moving the third column of
+\fig~\vref{fig:mean_mrg1} below the second column and by removing the
+edges. Since, for each merger, there are \(m+n\) nodes and each has an
+incoming edge or not, and because there are \(\binom{m+n}{n}\)
+mergers, we have
+\begin{equation}
+K(m,n) + \overline{K}(m,n) = (m + n) \binom{m+n}{n}.
+\label{eq:KoverK}
+\end{equation}
+It is simple to characterise the circled nodes: they make up the
+longest, rightmost contiguous series of nodes of the same
+colour. Since there are only two colours, the problem of determining
+the total number \(W(m,n)\) of white circled nodes is symmetric to the
+determination of the total number \(B(m,n)\) of black circled nodes,
+that is,
+\begin{equation*}
+B(m,n) = W(n,m).
+\end{equation*}
+Therefore,
+\begin{equation}
+\overline{K}(m,n) = W(m,n) + B(m,n) = W(m,n) + W(n,m).
+\label{eq:K}
+\end{equation}
+From equations~\eqref{eq:KoverK} and~\eqref{eq:K}, we draw
+\begin{equation}
+K(m,n) = (m + n) \binom{m+n}{n} - W(m,n) - W(n,m).
+\label{eq:K_temp}
+\end{equation}
+We can decompose \(W(m,n)\) by counting the circled white nodes
+\emph{vertically}. In \fig~\ref{fig:mean_mrg2}, \(W(3,2)\) is the sum
+of the numbers of mergers with at least one, two and three ending
+circled white nodes: \(W(3,2) = 1 + 3 + 6 = 10\). The first column
+yields \(B(3,2) = 1 + 4 = 5\). In general, the number of mergers with
+one ending circled white node is the number of ways to combine
+\(n\)~black nodes with \(m-1\) white nodes: \(\binom{n+m-1}{n}\). The
+number of mergers with at least two ending white nodes is
+\(\binom{n+m-2}{n}\), etc.
+\begin{equation*}
+W(m,n)
+  = \binom{n+m-1}{n} + \binom{n+m-2}{n} + \dots + \binom{n+0}{n}
+  = \!\sum_{j=0}^{m-1}{\!\binom{n+j}{n}}.
+\end{equation*}
+This sum can actually be simplified, more precisely, it has a closed
+form, but in order to understand its underpinnings, we need firstly to
+develop our intuition about combinations. By computing combinations
+\(\binom{r}{k}\) for small values of~\(r\) and~\(k\) using the
+definition, we can fill a table traditionally known as \emph{Pascal's
+  triangle}\index{Pascal's triangle} and displayed in
+\fig~\vref{fig:pascal_triangle}.
+\begin{figure}
+\centering
+\includegraphics{pascal}
+\caption{The corner of Pascal's triangle (in boldface type)
+\label{fig:pascal_triangle}}
+\end{figure}
+Note how we set the convention \(\binom{r}{k} = 0\) if \(k >
+r\). Pascal's triangle features many interesting properties relative
+to the sum of some of its values. For instance, if we choose a number
+in the triangle and look at the one on its right, then the one below
+the latter is their sum. For the sake of illustration, let us extract
+from \fig~\vref{fig:pascal_triangle} the lines \(r=7\) and \(r=8\):
+\begin{center}
+\begin{tabular}{||c|c||rrrrrrrrrr||}
+\cline{5-6}\cline{8-9}
+      & 7 & \textbf{1} & \textbf{7} & \multicolumn{1}{|c}{\textbf{21}} & \multicolumn{1}{c|}{\textbf{35}} &  \textbf{35} &  \multicolumn{1}{|c}{\textbf{21}} & \multicolumn{1}{c|}{\textbf{7}} &  \textbf{1} & 0 & 0\\
+\cline{5-5}\cline{8-8}
+      & 8 & \textbf{1} & \textbf{8} & \textbf{28} & \multicolumn{1}{|c|}{\textbf{56}} &  \textbf{70} &  \textbf{56} & \multicolumn{1}{|c|}{\textbf{28}} &  \textbf{8} & \textbf{1} & 0\\
+\cline{6-6}\cline{9-9}
+\end{tabular}
+\end{center}
+We surrounded two examples of the additive property of combinations we
+discussed: \(21 + 35 = 56\) and \(21 + 7 = 28\). We would then bet
+that
+\begin{equation*}
+\binom{r-1}{k-1} + \binom{r-1}{k} = \binom{r}{k}.
+\end{equation*}
+This is actually not difficult to prove if we go back to the
+definition:
+\begin{align*}
+\binom{r}{k} &:= \frac{r!}{k!(r-k)!}
+              = \frac{r}{k} \cdot \frac{(r-1)!}{(k-1)!((r-1)-(k-1))!}
+              = \frac{r}{k} \binom{r-1}{k-1}.\\
+\binom{r}{k} &:= \frac{r!}{k!(r-k)!}
+              = \frac{r}{r-k} \cdot \frac{(r-1)!}{k!((r - 1) - k)!}
+              = \frac{r}{r-k} \binom{r-1}{k}.
+\end{align*}
+The first equality is valid if \(k > 0\) and the second if \(r \neq
+k\). We can now replace \(\binom{r-1}{k-1}\) and \(\binom{r-1}{k}\) in
+terms of \(\binom{r}{k}\) in the sum
+\begin{equation*}
+\binom{r-1}{k-1} + \binom{r-1}{k} = \frac{k}{r}\binom{r}{k}
++ \frac{r-k}{r}\binom{r}{k} = \binom{r}{k}.
+\end{equation*}
+The sum is valid if \(r > 0\). There is direct proof of the formula by
+enumerative combinatorics without algebra. Let us suppose that we
+\emph{already} have all the subsets of \(k\)~keys chosen
+among~\(r\). By definition, there are \(\binom{r}{k}\) of them. We
+choose to distinguish an arbitrary key amongst~\(r\) and we want to
+group the subsets in two sets: on one side, all the combinations
+containing this particular key, on the other side, all the
+combinations without it. The former subset has cardinal
+\(\binom{r-1}{k-1}\) because its combinations are built from the fixed
+key and further completed by choosing \(k-1\) remaining keys amongst
+\(r-1\). The latter subset is made of \(\binom{r-1}{k}\) combinations
+which are made from \(r-1\) keys, of which \(k\)~have to be selected
+because we ignore the distinguished key. This yields the same additive
+formula. Now, let us return to our pending sum
+\begin{equation*}
+W(m,n) = \sum_{j=0}^{m-1}{\binom{n+j}{n}}.
+\end{equation*}
+
+% Wrapping figure better declared before a paragraph
+%
+\begin{wrapfigure}[6]{l}[0pt]{0pt}
+% 6 vertical lines
+% left placement
+% 0pt of margin overhang
+\centering
+\includegraphics[bb=73 650 110 721]{triangle1}%[... 721]
+\end{wrapfigure}
+In terms of navigation across Pascal's triangle, we understand that
+this sum operates on numbers in the same column. More precisely, it
+starts from the diagonal with the number \(\binom{n}{n} = 1\) and goes
+down until a total of \(m\)~numbers have been added. So let us choose
+a simple example and fetch two adjacent columns were the sum is
+small. On the left is an excerpt for \(n=4\) (the left column is the
+fifth in Pascal's triangle) and \(m=4\) (height of the left
+column). Interestingly, the sum of left column, which is the sum under
+study, equals the number at the bottom of the second column: \(1 + 5 +
+15 + 35 = 56\). By checking other columns, we may feel justified to
+think that this is a general pattern. Before attempting a general
+proof, let us see how it may work on our particular example. Let us
+start from the bottom of the second column, that is, \(56\), and use
+the addition formula in reverse, that is, express \(56\) as the sum of
+the numbers in the row above it: \(56 = 35 + 21\).  We would like to
+keep~\(35\) because it is part of the equality to prove. So let us
+apply the addition formula again to \(21\) and draw \(21 = 15 +
+6\). Let us keep \(15\) and resume the same procedure on \(6\) so \(6
+= 5 + 1\). Finally, \(1 = 1 + 0\). We just checked \(56 = 35 + (15 +
+(5 + (1 + 0)))\), which is exactly what we wanted. Because we want the
+number corresponding to \(35\) in our example to be
+\(\binom{n+m-1}{n}\), we have the derivation
+\begin{align}
+\binom{n+m}{n+1}
+  &= \binom{n+m-1}{n} + \binom{n+m-1}{n+1}\notag\\
+  &= \binom{n+m-1}{n} + \left[\binom{n+m-2}{n} +
+     \binom{n+m-2}{n+1}\right]\notag\\
+  &= \binom{n+m-1}{n} + \binom{n+m-2}{n} + \dots +
+     \left[\binom{n}{n} + \binom{n}{n+1}\right],\notag\\
+\binom{n+m}{n+1}
+  &= \sum_{j=0}^{m-1}{\binom{n+j}{n}} = W(m,n).
+\label{eq:binom_sum}
+\end{align}
+Now, we can replace this closed form in equation~\eqref{eq:K_temp}
+\vpageref{eq:K_temp} so\index{K@$K(m,n)$}
+\begin{equation*}
+K(m,n) = (m + n)
+\binom{m+n}{n} - \binom{m+n}{n+1} - \binom{m+n}{m+1}. 
+\end{equation*}
+By definition, the average number of comparisons
+\(\OM{\fun{mrg}}{m,n}\)\index{mrg@$\OM{\fun{mrg}}{m,n}$} is the ratio
+of \(K(m,n)\) by \(\binom{m+n}{n}\), therefore
+\begin{equation}
+\OM{\fun{mrg}}{m,n} = m + n - \frac{m}{n+1} - \frac{n}{m+1}
+  = \frac{mn}{m+1} + \frac{mn}{n+1}.
+\label{eq:Amrg}
+\end{equation}
+Since we necessarily expect \(\OB{\fun{mrg}}{m,n} \leqslant
+\OM{\fun{mrg}}{m,n} \leqslant \OW{\fun{mrg}}{m,n}\), we may wonder if
+and when the bounds are tight. For the upper bound to be tight, we
+need \((m,n)\) to satisfy the equation \(m^2 + n^2 - mn = 1\), whose
+only natural solutions are \((0,1)\), \((1,0)\) and \((1,1)\). For the
+lower bound to be tight, we must have \(mn/(m+1) + mn/(n+1) =
+\min\{m,n\}\), whose only natural solutions are \((0,n)\), \((m,0)\)
+and \((1,1)\). Furthermore, the cases \((m,1)\) and \((1,n)\) may
+suggest that merging one key with others is equivalent to inserting
+that key amongst the others, as we did with straight insertion in
+section~\ref{sec:straight_ins} \vpageref{sec:straight_ins}. In other
+words, we expect the theorem
+\begin{equation}
+\fun{ins}(x,s) \equiv \fun{mrg}([x],s).
+\label{eq:ins_mrg}
+\index{ins@\fun{ins/2}}\index{mrg@\fun{mrg/2}}
+\end{equation}
+Therefore, \emph{insertion is a special case of merging.}
+Nevertheless, the average costs are not exactly the same. First, we
+have \(\M{\fun{mrg}}{m,n} = \OM{\fun{mrg}}{m,n} + 1\), because we need
+to account for using once either rule~\(\theta\) or~\(\iota\) in
+\fig~\ref{fig:mrg}, as we already acknowledged by
+equation~\eqref{def:cost_mrg}. Then, equations~\eqref{eq:ins}
+\vpageref{eq:ins} and~\eqref{eq:Amrg} yield
+\begin{equation*}
+\M{\fun{mrg}}{1,n} = \frac{1}{2}{n} + 2 - \frac{1}{n+1}
+\quad\text{and}\quad
+\M{\fun{ins}}{n} = \frac{1}{2}{n} + 1.
+\index{ins@$\M{\fun{ins}}{n}$}\index{mrg@$\M{\fun{mrg}}{1,n}$}
+\end{equation*}
+Asymptotically, they are equivalent:
+\begin{equation*}
+\M{\fun{mrg}}{1,n} \sim \M{\fun{ins}}{n}.
+\end{equation*}
+But \fun{mrg/2}\index{mrg@\fun{mrg/2}} is slightly slower in average
+than \fun{ins/2}\index{ins@\fun{ins/2}} in this special case:
+\begin{equation*}
+\M{\fun{mrg}}{1,n} - \M{\fun{ins}}{n} = 1 - \frac{1}{n+1} < 1
+\quad\text{and}\quad
+\M{\fun{mrg}}{1,n} - \M{\fun{ins}}{n} \sim 1.
+\end{equation*}
+Also, it may be interesting to see what happens when \(m=n\), that is,
+when the two stacks to be merged have the same length:
+\begin{equation}
+\M{\fun{mrg}}{n,n} = 2n - 1 + \frac{2}{n+1} = \W{\fun{mrg}}{n,n} - 1 +
+\frac{2}{n+1} \sim 2n.\index{mrg@$\M{\fun{mrg}}{n,n}$}
+\label{eq:Amrg_n_n}
+\end{equation}
+In other words, the average cost of merging two stacks of identical
+length is asymptotically the total number of keys being merged, which
+is the worst case.
+\index{merge sort!merging!average cost|)}
+
+\paragraph{Termination}
+\label{merging_termination}
+\index{merge sort!merging!termination|(}
+
+The termination of \fun{mrg/2}\index{mrg@\fun{mrg/2}} in
+\fig~\vref{fig:mrg} is easy to prove by considering a lexicographic
+order\index{induction!lexicographic order}
+(page~\pageref{par:ackermann}) on pairs of stacks which are, in turn,
+partially ordered by the immediate subterm
+relation\index{induction!immediate subterm order}
+(page~\pageref{par:well-founded}), or, more restrictively, the
+\emph{immediate substack relation}\index{induction!immediate substack
+  order}, that is, \(\cons{x}{s} \succ s\). The dependency
+pairs\index{termination!dependency pair} of rules
+\(\kappa\)~and~\(\lambda\) are ordered by \((\cons{x}{s},\cons{y}{t})
+\succ (\cons{x}{s},t)\) and \((\cons{x}{s},t) \succ
+(s,t)\).\index{merge sort!merging!termination|)}\index{merge
+  sort!merging|)}\hfill\(\Box\)
+
+\section{Sorting $2^n$ keys}
+\label{sec:power_of_two}
+\index{merge sort!power@$2^n$ keys|(}
+
+Merging can be used to sort \emph{one} stack of keys as follows. The
+initial stack of keys is split in two, then the two pieces are split
+again etc. until singletons remain. These are then merged pairwise
+etc. until only one stack remains, which is inductively sorted, since
+a singleton stack is a sorted stack on its own and
+\(\fun{mrg}(s,t)\)\index{mrg@\fun{mrg/2}} is sorted if~\(s\) and~\(t\)
+are. The previous scheme leaves open the choice of a splitting
+strategy and, perhaps, the most intuitive way is to cut in two halves,
+which works well in the case of \(2^p\)~keys. We will see in later
+sections how to deal with the general case and with a different
+splitting strategy. For now, let us consider in
+\fig~\vref{fig:bot_up1}
+\begin{figure}
+\centering
+\includegraphics{bot_up1}
+\caption{Sorting \([7,3,5,1,6,8,4,2]\)
+\label{fig:bot_up1}}
+\end{figure}
+all the mergers and their relative order to sort the stack \([7, 3, 5,
+  1, 6, 8, 4, 2]\). We name this structure a \emph{merge
+  tree}\index{merge sort!merge tree|see{tree}}\index{tree!merge
+  $\sim$}, because each node of the tree is a sorted stack, either a
+singleton or the merger of its two children. The root logically holds
+the result. The merge tree is best understood from a bottom\hyp{}up,
+level by level examination. Let us note \(\C{\Join}{p}\) the number of
+comparisons to sort \(2^p\)~keys and consider a merge tree with
+\(2^{p+1}\)~leaves. It is made of two immediate subtrees with
+\(2^p\)~leaves and the root holds \(2^{p+1}\)~keys. Therefore
+\begin{equation*}
+\C{\Join}{0} = 0,
+\quad
+\C{\Join}{p+1} = 2 \cdot \C{\Join}{p} + \OC{\fun{mrg}}{2^p,2^p}.
+\end{equation*}
+Unrolling the recursion, we arrive at
+\begin{equation}
+\C{\Join}{p+1}
+  = 2^p\sum_{k=0}^p{\frac{1}{2^k}\OC{\fun{mrg}}{2^k,2^k}}.
+\index{mrg@$\C{\Join}{n}$}
+\label{eq:cost_power_2}
+\end{equation}
+
+%\addcontentsline{toc}{subsection}{Cost}
+\paragraph{Minimum cost}
+\index{merge sort!power@$2^n$ keys!minimum cost|(}
+
+When the given stack is already sorted, either in increasing or
+decreasing order, the number of comparisons is minimum. In fact, given
+a minimum\hyp{}comparison merge tree\index{tree!merge $\sim$}, any
+exchange of two subtrees whose roots are merged leaves the number of
+comparisons invariant. This happens because the merge tree is built
+bottom\hyp{}up and the number of comparisons is a symmetric
+function. Let us note \(\B{\Join}{p}\) the minimum number of
+comparisons to sort \(2^p\)~keys. From equations
+\eqref{eq:cost_power_2} and \eqref{eq:best_merge},
+\begin{equation}
+%\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\B{\Join}{p}
+  = 2^{p-1}\!\sum_{k=0}^{p-1}{\frac{1}{2^k}\OB{\fun{mrg}}{2^k,2^k}}
+  = p2^{p-1}.\label{eq:best_power}\index{mrg@$\B{\Join}{n}$}
+\end{equation}
+\index{merge sort!power@$2^n$ keys!minimum cost|)}
+
+\paragraph{Maximum cost}
+\index{merge sort!power@$2^n$ keys!maximum cost|(}
+
+Just as with the best case, constructing a maximum\hyp{}comparison
+merge sort is achieved by making worst cases for all the subtrees, for
+example, \([7,3,5,1,4,8,6,2]\). Let~\(\W{\Join}{p}\) be the maximum
+number of comparisons for sorting \(2^p\)~keys. From equations
+\eqref{eq:cost_power_2}~and~\eqref{eq:worst_merge},
+\begin{equation}
+%\abovedisplayskip=2pt
+\belowdisplayskip=0pt
+\W{\Join}{p}
+  = 2^{p-1}\!\sum_{k=0}^{p-1}{\frac{1}{2^k}\OW{\fun{mrg}}{2^k,2^k}}
+  = (p-1)2^p + 1.
+\label{eq:worst_power}\index{mrg@$\W{\Join}{n}$}
+\end{equation}
+\index{merge sort!power@$2^n$ keys!maximum cost|)}
+
+\paragraph{Average cost}
+\index{merge sort!power@$2^n$ keys!average cost|(}
+\label{par:Atms_2p}
+
+For a given stack, all permutations of which are equally likely, the
+average cost of sorting it by merging is obtained by considering the
+average costs of all the subtrees of the merge tree: all the
+permutations of the keys are considered for a given length. Therefore,
+equation~\eqref{eq:cost_power_2} is satisfied by
+\(\OM{\fun{mrg}}{2^k,2^k}\) and \(\M{\Join}{p}\)
+\index{mrg@$\M{\Join}{n}$}, that is, the average number of comparisons
+for sorting \(2^p\)~keys. Equations~\eqref{eq:Amrg_n_n}
+and~\eqref{def:cost_mrg} yield
+\begin{equation*}
+%\abovedisplayskip=2pt
+%\belowdisplayskip=2pt
+\OM{\fun{mrg}}{n,n} = 2n - 2 + \frac{2}{n+1}.
+\index{mrg@$\OM{\fun{mrg}}{n,n}$}
+\end{equation*}
+Together with equation \eqref{eq:cost_power_2}, we further draw, for
+\(p > 0\),
+\begin{align}
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\M{\Join}{p}
+  &= 2^{p-1}\sum_{k=0}^{p-1}{\frac{1}{2^k}\OM{\fun{mrg}}{2^k,2^k}}
+  = 2^p\sum_{k=0}^{p-1}{\frac{1}{2^k}\left(2^k - 1 + \frac{1}{2^k +
+      1}\right)}\notag\\
+  &= 2^{p}\left(p - \sum_{k=0}^{p-1}{\frac{1}{2^k}}
+     + \sum_{k=0}^{p-1}{\frac{1}{2^k(2^k+1)}}\right)\notag\\
+  &= 2^{p}\left(p - \sum_{k=0}^{p-1}{\frac{1}{2^k}}
+     + \sum_{k=0}^{p-1}\left(\frac{1}{2^k}
+     - \frac{1}{2^k+1}\right)\!\!\right)
+   = p2^p - 2^p \sum_{k=0}^{p-1}\frac{1}{2^k+1}\notag\\
+  &= p2^p - 2^p \sum_{k \geqslant 0}\frac{1}{2^k+1}
+     + 2^p \sum_{k \geqslant p}\frac{1}{2^k+1}
+= p2^p - \alpha 2^p + \sum_{k \geqslant 0}\frac{1}{2^{k}+2^{-p}},
+\label{eq:Mjoin}
+\end{align}
+where \(\alpha := \sum_{k \geqslant 0}\frac{1}{2^k+1} \simeq
+1.264500\) is irrational \citep{Borwein_1992}. Since \(0 < 2^{-p} <
+1\), we have \(1/(2^k + 1) < 1/(2^k+2^{-p}) < 1/2^k\) and we conclude
+\begin{equation}
+(p - \alpha)2^p + \alpha < \M{\Join}{p} < (p-\alpha)2^p + 2.
+\label{ineq:M_join}
+\end{equation}
+The uniform convergence of the series \(\sum_{k \geqslant
+  0}\frac{1}{2^{k}+2^{-p}}\) allows us to interchange the limits
+on~\(k\) and~\(p\) and deduce that \(\M{\Join}{p} - (p-\alpha)2^p - 2
+\to 0^{-}\), as \(p \to \infty\). In other words,
+\(\M{\Join}{p}\) is best approximated by its upper bound, for
+sufficiently large values of~\(p\).
+\index{merge sort!power@$2^n$ keys!average cost|)}
+\index{merge sort!power@$2^n$ keys|)}
+
+\section{Top-down merge sort}
+\index{merge sort!top-down $\sim$|(}
+
+When generalising the fifty\hyp{}fifty splitting rule to an arbitrary
+number of keys, thus obtaining stacks of lengths \(\floor{n/2}\) and
+\(\ceiling{n/2}\), we obtain the variant of merge sort called
+\emph{top\hyp{}down}. The corresponding program is shown in
+\fig~\vref{fig:tms}\index{merge sort!top-down $\sim$!program}.
+\begin{figure}[!b]
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{tms}(\cons{x,y}{t}) & \rightarrow
+                         & \fun{cutr}([x],\cons{y}{t},t);\\
+\fun{tms}(t)             & \rightarrow & t.\\
+\\
+\fun{cutr}(s,\cons{y}{t},\cons{a,b}{u})
+                       & \rightarrow & \fun{cutr}(\cons{y}{s},t,u);\\
+\fun{cutr}(s,t,u)        & \rightarrow 
+                         & \fun{mrg}(\fun{tms}(s),\fun{tms}(t)).\\
+\\
+\fun{mrg}(\el,t)         & \rightarrow & t;\\
+\fun{mrg}(s,\el)         & \rightarrow & s;\\
+\fun{mrg}(\cons{x}{s},\cons{y}{t}) & \rightarrow
+                         & \cons{y}{\fun{mrg}(\cons{x}{s},t)},\;
+                           \text{if \(x \succ y\)};\\
+\fun{mrg}(\cons{x}{s},t) & \rightarrow & \cons{x}{\fun{mrg}(s,t)}.
+\end{array}}
+\end{equation*}
+\caption{Top-down merge sort with \fun{tms/1}\label{fig:tms}}
+\end{figure}
+Note that the call \(\fun{cutr}(s,t,u)\)\index{cutr@\fun{cutr/3}}
+reverses the first half of~\(t\) on top of~\(s\) if~\(s=t\). The
+technique consists in starting with \(s=\el\) and projecting the keys
+of~\(t\) one by one and those of~\(u\) two by two, so when
+\(\fun{cutr}(s,t,\el)\) or \(\fun{cutr}(s,t,[y])\) are reached, we
+know that \(t\)~is the second half of the original stack and \(s\)~is
+the reversed first half (of length \(\floor{n/2}\) if \(n\)~is the
+length of the original stack). In the first rule of~\fun{tms/1}, we
+saved one recursive call to \fun{cutr/3} and some memory by calling
+\(\fun{cutr}([x],\cons{y}{t}, t)\) instead of
+\(\fun{cutr}(\el,\cons{x,y}{t},\cons{x,y}{t})\). Moreover, this way,
+the second rule implements the two base cases, \(\fun{tms}(\el)\) and
+\(\fun{tms}([y])\). Furthermore, notice that, in the second rule of
+\fun{cutr/2}, if~\(u = \el\), then the length of the original stack is
+even and if \(u = [a]\), then it is odd. One possible drawback of
+\fun{tms/1}\index{tms@\fun{tms/1}} is that the sort is
+\emph{unstable}, that is, the relative order of equal keys is not
+invariant.
+
+%\addcontentsline{toc}{subsection}{Cost}
+
+Since all comparisons are performed by
+\fun{mrg/2}\index{mrg@\fun{mrg/2}}, the definition of
+\fun{tms/1}\index{tms@\fun{tms/1}} implies that the number of
+comparisons satisfies
+\begin{equation}
+\OC{\fun{tms}}{0} = \OC{\fun{tms}}{1} = 0,
+\qquad
+\OC{\fun{tms}}{n} = \OC{\fun{tms}}{\floor{n/2}}
++ \OC{\fun{tms}}{\ceiling{n/2}}
++ \OC{\fun{mrg}}{\floor{n/2},\ceiling{n/2}}.
+\index{tms@$\OC{\fun{tms}}{n}$}
+\label{eq:cost_tms}
+\end{equation}
+
+%\addcontentsline{toc}{subsection}{Cost}
+\mypar{Minimum cost}
+\index{merge sort!top-down $\sim$!minimum cost|(}
+
+The minimum number of comparisons satisfies
+\begin{equation*}
+%\abovedisplayskip=0pt
+\OB{\fun{tms}}{0} = \OB{\fun{tms}}{1} = 0,
+\;
+\OB{\fun{tms}}{n} = \OB{\fun{tms}}{\floor{n/2}}
++ \OB{\fun{tms}}{\ceiling{n/2}}
++ \OB{\fun{mrg}}{\floor{n/2},\ceiling{n/2}}.
+\index{mrg@\fun{mrg/2}}
+\index{tms@$\OB{\fun{tms}}{n}$}
+\end{equation*}
+% Wrapping figure better declared before a paragraph
+%
+{\setlength{\intextsep}{0pt} % No space before and after a figure
+\begin{wrapfigure}[22]{r}[0pt]{0pt}
+% 22 vertical lines (3 for each display)
+% mandatory right placement (better because of a list)
+% 0pt of margin overhang
+\centering
+\includegraphics[bb=71 435 149 721]{bits}
+\caption{\label{fig:bits}}
+%\caption{Binary numbers from \(1\) to \(n\)\label{fig:bits}}
+\end{wrapfigure}
+We have \(\OB{\fun{tms}}{n} = \OB{\fun{tms}}{\floor{n/2}} +
+\OB{\fun{tms}}{\ceiling{n/2}} + \floor{n/2}\), using
+equation~\eqref{eq:best_merge}
+\vpageref{eq:best_merge}.\index{tms@$\OB{\fun{tms}}{n}$} In particular
+\begin{equation*}
+\OB{\fun{tms}}{2p} = 2 \cdot \OB{\fun{tms}}{p} + p,\quad
+\OB{\fun{tms}}{2p+1} = \OB{\fun{tms}}{p} + \OB{\fun{tms}}{p+1} + p.
+\end{equation*}
+Let us introduce the difference of two successive terms, \(\Delta_n :=
+\OB{\fun{tms}}{n+1} - \OB{\fun{tms}}{n}\), so \(\Delta_0 = 0\), and
+find some constraints on it. Because of the floor and ceiling
+functions of~\(n/2\), we consider two complementary cases.
+\begin{itemize}
+
+ \item \(\Delta_{2p} = \OB{\fun{tms}}{2p+1} - \OB{\fun{tms}}{2p} =
+  \OB{\fun{tms}}{p+1} - \OB{\fun{tms}}{p} = \Delta_{p}\).
+
+  \item \(\Delta_{2p+1} = \OB{\fun{tms}}{p+1} - \OB{\fun{tms}}{p} + 1 =
+  \Delta_{p} + 1\).
+
+\end{itemize}
+We already met~\(\Delta_n\) under the name~\(\nu_n\) in
+equation~\eqref{eq:ruler_nu} \vpageref{eq:ruler_nu}. Let us define it
+recursively:% as follows:
+\begin{equation}
+\nu_{0} := 0,\quad \nu_{2n} := \nu_{n},\quad
+\nu_{2n+1} := \nu_{n} + 1.\label{def:nu}\index{bit sum}
+\end{equation}
+This definition becomes obvious when we consider the binary
+representations of~\(2n\) and~\(2n+1\). Notice that \(\nu\)~is a
+deceptively simple function: it is periodic because \(\nu_{1} =
+\nu_{2^p} = 1\), but \(\nu_{2^p-1}=p\). Resuming our argument:
+\(\OB{\fun{tms}}{n+1} = \OB{\fun{tms}}{n} + \nu_n\), and summing on
+both sides yields
+\begin{equation}
+\abovedisplayskip=2pt
+\abovedisplayshortskip=2pt
+\belowdisplayskip=2pt
+\OB{\fun{tms}}{n} = \sum_{k=0}^{n-1}{\nu_k}.\label{eq:OB_tms}
+\index{tms@$\OB{\fun{tms}}{n}$}
+\end{equation}}
+
+\noindent \cite{Trollope_1968} first found a closed form for
+\(\sum_{k=0}^{n-1}\nu_k\), whose demonstration was later simplified by
+\cite{Delange_1975}, who extended the analysis with Fourier
+series. \cite{Stolarsky_1977} provided many references on the
+subject. In equation~\eqref{eq:best_power}, we have
+\(\OB{\fun{tms}}{2^p} = \frac{1}{2}p2^p\), that is,
+\(\OB{\fun{tms}}{n} = \frac{1}{2}n\lg n\) when \(n=2^p\). This should
+prompt us to look, like \cite{McIlroy_1974}, for an additional linear
+term in the general case, that is, the greatest real constants~\(a\)
+and~\(b\) such that, for \(n \geqslant 2\),
+\begin{equation}
+\pred{Low}{n} \colon \tfrac{1}{2}n\lg n + an + b \leqslant \OB{\fun{tms}}{n}.
+\label{ineq:McIlroy}
+\end{equation}\index{Low@\predName{Low}}%
+The base case is \(\pred{Low}{2} \colon 2a + b \leqslant 0\). The most
+obvious way to structure the inductive argument is to follow the
+definition of \(\OB{\fun{tms}}{n}\) when \(n=2p\) and \(n=2p+1\), but
+a bound on \(\OB{\fun{tms}}{2p+1}\) would rely on bounds on
+\(\OB{\fun{tms}}{p}\) and \(\OB{\fun{tms}}{p+1}\), compounding
+imprecision. Instead, if we could have at least one exact value from
+which to inductively build the bound, we would gain
+accuracy. Therefore, we may expect a better bound if we can find a
+decomposition of \(\OB{\fun{tms}}{2^p+i}\), where \(0 < i \leqslant
+2^p\), in terms of \(\OB{\fun{tms}}{2^p}\) (exact) and
+\(\OB{\fun{tms}}{i}\). This is easy if we count the 1-bits in
+\fig~\vref{fig:Btms_table},
+\begin{figure}
+\centering
+\includegraphics[bb=71 595 210 721]{Btms_table}
+\caption{$\protect\OB{\fun{tms}}{2^p+i} = \protect\OB{\fun{tms}}{2^p}
+  + \protect\OB{\fun{tms}}{i} + i$\label{fig:Btms_table}}
+\end{figure}
+which is the same as the table in \fig~\ref{fig:bits}, where
+\(n=2^p+i\). (Keep in mind that \(\OB{\fun{tms}}{n}\) is the sum of
+the bits up to \(n-1\), as seen in equation~\eqref{eq:OB_tms}.) We
+find:
+\begin{equation}
+\OB{\fun{tms}}{2^p+i} = \OB{\fun{tms}}{2^p} + \OB{\fun{tms}}{i} + i.
+\label{eq:OBtms_2m_i}
+\end{equation}
+(The term~\(i\) is the sum of the leftmost bits.) Therefore, let us
+assume \(\pred{Low}{n}\), for all \(1 \leqslant n \leqslant 2^p\), and
+prove \(\pred{Low}{2^p+i}\), for all \(0 < i \leqslant 2^p\). The
+induction principle entails then that \(\pred{Low}{n}\) holds for
+all~\(n \geqslant 2\). The inductive step \(\pred{Low}{2^p+i}\) should
+give us the opportunity to maximise the constants~\(a\)
+and~\(b\).\index{Low@\predName{Low}} Let \(m=2^p\). Using
+\(\OB{\fun{tms}}{2^p} = \tfrac{1}{2}p2^p\) and the inductive
+hypothesis \(\pred{Low}{i}\), we have
+\begin{equation}
+\tfrac{1}{2}m\lg m + (\tfrac{1}{2}i\lg i + ai + b) + i
+\leqslant 
+\OB{\fun{tms}}{m} + \OB{\fun{tms}}{i} + i = \OB{\fun{tms}}{m+i}.
+\label{ineq:Btms_n_i}
+\end{equation}
+We need now to find \(a\)~and~\(b\) such that the inductive step
+\(\pred{L}{m+i}\) holds as well, that is,
+\(\tfrac{1}{2}(m+i)\lg(m+i) + a(m+i) + b \leqslant \B{}{m+i}\).
+Using~\eqref{ineq:Btms_n_i}, this is implied by
+\begin{equation*}
+\tfrac{1}{2}(m+i)\lg(m+i) + a(m+i) + b
+\leqslant
+\tfrac{1}{2}m\lg m + (\tfrac{1}{2}i\lg i + ai + b) + i.
+\end{equation*}
+We can already notice that this inequality is equivalent to
+\begin{equation}
+\tfrac{1}{2}m\lg(m+i) + \tfrac{1}{2}i\lg(m+i) + am
+\leqslant \tfrac{1}{2}m\lg m + \tfrac{1}{2}i\lg i + i.
+\label{ineq:Btms_n_i_details}
+\end{equation}
+But \(\tfrac{1}{2}m\lg(m+i) > \tfrac{1}{2}m\lg m\) and
+\(\tfrac{1}{2}i\lg(m+i) > \tfrac{1}{2}i\lg i\), therefore the
+constant~\(a\) we are seeking must satisfy \(am \leqslant i\) for all
+\(0 < i < m\), hence we expect \(a < 0\).
+
+We extend~\(i\) over the real numbers by defining \(i=x2^p=xm\), where
+\(x\)~is a real number such that \(0 < x \leqslant 1\). By replacing
+\(i\)~by~\(xm\) in inequality~\eqref{ineq:Btms_n_i_details}, we obtain
+\begin{equation*}
+\tfrac{1}{2}(1+x)\lg(1+x) + a \leqslant \tfrac{1}{2}x\lg x + x.
+\end{equation*}
+Let \(\Phi(x) := \tfrac{1}{2}x\lg x - \tfrac{1}{2}(1+x)\lg(1+x)
++ x\). Then, this is equivalent to \(a \leqslant \Phi(x)\).
+
+The function~\(\Phi\) can be continuously extended at~\(0\), as
+\(\lim_{x \to 0} x\lg x = 0\), and it is differentiable on the
+interval \(]0,1]\):
+\begin{equation}
+\frac{d\Phi}{dx} = \frac{1}{2}\lg\frac{4x}{x+1}.
+\label{eq:der_Phi}
+\end{equation}
+The root of \(d\Phi/dx = 0\) is \myfrac{1}/{3}, and the derivative
+is negative before, and positive after. Therefore, \(a_{\max} :=
+\min_{0 \leqslant x \leqslant 1}\Phi(x) = \Phi(\tfrac{1}{3}) =
+-\tfrac{1}{2}\lg\tfrac{4}{3}\). The base case was \(b \leqslant -2a\),
+therefore \(b_{\max} := -2a_{\max} = \lg\tfrac{4}{3}\). Finally,
+\begin{equation}
+  \tfrac{1}{2}n\lg n - \left(\tfrac{1}{2}\lg\tfrac{4}{3}\right)n + \lg\tfrac{4}{3}
+  \leqslant \OB{\fun{tms}}{n},
+\label{ineq:lower_Btms}
+\end{equation}
+where \(\tfrac{1}{2}\lg\tfrac{4}{3} \simeq 0.2075\) and
+\(\lg\tfrac{4}{3} \simeq 0.415\). Importantly, the lower bound is
+tight if \(x=\myfrac{1}/{3}\), that is, when
+\(2^p+i=2^p+x2^p=(1+1/3)2^p=2^{p+2}\!/3\), or, in general,
+\(2^k\!/3\). The nearest integers are \(\floor{2^k\!/3}\) and
+\(\ceiling{2^k\!/3}\), so we must find out which one minimises
+\(\OB{\fun{tms}}{n} - \tfrac{1}{2}n\lg(\tfrac{3}{4}n)\), because we
+have \(\tfrac{1}{2}n\lg n - \left(\tfrac{1}{2}\lg\tfrac{4}{3}\right)n
+= \tfrac{1}{2}n\lg(\tfrac{3}{4}n)\). We start with the following
+theorems.
+\begin{lemma}
+\label{lem:div3}
+\textsl{Integers of the form \(4^p-1\) are divisible by~\(3\).}
+\end{lemma}
+\begin{proof}
+  Let \(\pred{Div}{p}\)\index{Div@\predName{Div}} be the proposition
+  to prove. Trivially, \(\pred{Div}{1}\) is true. Let us assume
+  \(\pred{Div}{p}\) and proceed to establish \(\pred{Div}{p+1}\). The
+  former means that there exists an integer~\(q\) such that \(4^p - 1
+  = 3q\). Therefore, \(4^{p+1} - 1 = 3(4q+1)\), which means that
+  \(\pred{Div}{p+1}\) holds. The induction principle then entails that
+  the lemma holds for all integers~\(p\).
+\end{proof}
+\begin{thm}
+\label{thm:OB_lambda}
+\textsl{We have \(\OB{\mathsf{tms}}{1+\phi_k} -
+  \OB{\mathsf{tms}}{\phi_k} = \floor{k/2}\), where \(\phi_k :=
+  \floor{2^k\!/3}\).}
+\end{thm}
+\noindent \emph{Proof.} Let \(\phi_k := \floor{2^k\!/3}\). Either
+\(k\)~is even or odd.
+\begin{itemize}
+
+  \item If \(k=2m\), then \(2^k\!/3 = (4^m-1)/3 + 1/3\). Since
+    \(1/3<1\) and, by lemma~\ref{lem:div3}, \((4^m-1)/3\) is an
+    integer, we have \(2^k\!/3 = \floor{2^k\!/3} + 1/3\) and
+    \(\floor{2^k\!/3} = (4^m-1)/3 = 4^{m-1} + 4^{m-2} + \dots + 1 =
+    2^{2m-2} + 2^{2m-4} + \dots + 1 = (1010\dots01)_2\). Hence
+    \(\nu_{\phi_{2m}} = m\). We know that \(\OB{\fun{tms}}{m+1} =
+    \OB{\fun{tms}}{m} + \nu_m\), therefore
+    \(\OB{\fun{tms}}{1+\phi_{2m}} - \OB{\fun{tms}}{\phi_{2m}} = m\),
+    or, equivalently, \(\OB{\fun{tms}}{1+\phi_k} -
+    \OB{\fun{tms}}{\phi_k} = \floor{k/2}\).
+
+  \item If \(k=2m+1\), then \(2^k\!/3 = 2(4^m-1)/3 + 2/3\). Since
+    \(2/3<1\) and, by lemma~\ref{lem:div3}, \((4^m-1)/3\) is an
+    integer, we have \(2^k\!/3 = \floor{2^k\!/3} + 2/3 =
+    \ceiling{2^k\!/3} - 1/3\) and \(\floor{2^k\!/3} = 2(4^m-1)/3 =
+    2^{2m-1} + 2^{2m-3} + \dots + 2 = (1010\dots10)_2\); so
+    \(\nu_{\phi_{2m+1}} = m\). From \(\OB{\fun{tms}}{m+1} =
+    \OB{\fun{tms}}{m} + \nu_m\) comes \(\OB{\fun{tms}}{1+\phi_{2m+1}}
+    - \OB{\fun{tms}}{\phi_{2m+1}} = m\), or,
+    equivalently,\index{tms@$\OB{\fun{tms}}{n}$|(}
+    \(\OB{\fun{tms}}{1+\phi_k} - \OB{\fun{tms}}{\phi_k} =
+    \floor{k/2}\).\hfill\(\Box\)
+
+\end{itemize}
+\noindent Let \(Q(x) := \tfrac{1}{2}x\lg(\tfrac{3}{4}x)\) and let us
+proceed to compare \(\OB{\fun{tms}}{\phi_k} - Q(\phi_k)\) with
+\(\OB{\fun{tms}}{1+\phi_k} - Q(1+\phi_k)\) by making two cases
+depending upon the parity of~\(k\). If the former difference is
+smaller, then \(p=\phi_k\)~is the integer which minimises
+\(\OB{\fun{tms}}{p} - \tfrac{1}{2}p\lg(\tfrac{3}{4}p)\); otherwise, it
+is \(p=1+\phi_k\).
+\begin{itemize}
+
+  \item If \(k=2m+2\), then \(\phi_{2m+2} = 2^{2m} + \phi_{2m}\) (see
+    proof of theorem~\ref{thm:OB_lambda}). From
+    equation~\eqref{eq:OBtms_2m_i}, we draw
+    \(\OB{\fun{tms}}{\phi_{2m+2}} = \OB{\fun{tms}}{2^{2m}} +
+    \OB{\fun{tms}}{\phi_{2m}} + \phi_{2m} = \OB{\fun{tms}}{\phi_{2m}}
+    - m4^m + \phi_{2m}\). Summing both sides from \(m=0\) to \(m=n-1\)
+    yields \(\OB{\fun{tms}}{\phi_{2n}} = \OB{\fun{tms}}{\phi_0} + S_n
+    + \sum_{m=0}^{n-1}{\phi_{2m}}\), where \(S_n :=
+    \sum_{m=0}^{n-1}{m4^m}\). We have \(S_n + n4^n =
+    \sum_{m=1}^{n}{m4^m} = \sum_{m=0}^{n-1}(m+1)4^{m+1} = 4 \cdot S_n
+    + 4\sum_{m=0}^{n-1}4^m\). Finally, \(9 \cdot S_n = (3n -4)4^n +
+    4\). On the other hand, \(9 \sum_{m=0}^{n-1}{\phi_{2m}} = 4^n - 3n
+    - 1\). Finally, remarking that \(\phi_0 = 0\) and
+    \(\OB{\fun{tms}}{0} = 0\), we gather that
+    \begin{equation}
+      \OB{\fun{tms}}{\phi_{2n}} = (n-1)\phi_{2n}.
+    \label{eq:OBtms_phi_2n}
+    \end{equation}
+    Let us now work out \(Q(\phi_{2n}) = \tfrac{1}{2}\phi_{2n}(2(n-1)
+    + \lg(1-1/4^n)) = \OB{\fun{tms}}{\phi_{2n}} +
+    \tfrac{1}{2}\phi_{2n}\lg(1-1/4^n)\), with an application
+    of~\eqref{eq:OBtms_phi_2n}. If we let \(f(x) := (1-x)
+    \ln(1-1/x)\), then \(\OB{\fun{tms}}{\phi_{2n}} - Q(\phi_{2n}) =
+    f(4^n)/(6\ln 2)\). Elementary analysis shows that
+    \(3\ln\tfrac{3}{4} \leqslant f(x) < 1\), for \(x \geqslant 4\),
+    that is, \(1 - \tfrac{1}{2}\lg 3 \leqslant
+    \OB{\fun{tms}}{\phi_{2n}} - Q(\phi_{2n}) < 1/(6\ln 2)\), if \(n
+    \geqslant 1\). This means that \(\boxed{0.2075 <
+    \smash{\OB{\fun{tms}}{\phi_{2n}}} - Q(\phi_{2n}) < 0.2405.}\)
+
+    From theorem~\ref{thm:OB_lambda} and
+    equation~\eqref{eq:OBtms_phi_2n}, we have
+    \begin{equation}
+      \OB{\fun{tms}}{1+\phi_{2n}} = (n-1)(1+\phi_{2n}) + 1.
+      \label{eq:OBtms_succ_phi_2n}
+    \end{equation}
+    Furthermore, \(Q(1+\phi_{2n}) = \tfrac{1}{2}(1+\phi_{2n}) (2(n-1)
+    + \lg(1+1/2^{2n-1})) = \OB{\fun{tms}}{1+\phi_{2n}} - 1 +
+    \tfrac{1}{6}(4^n + 2)\lg(1+2/4^n)\), the last step making use
+    of~\eqref{eq:OBtms_succ_phi_2n}. If \(g(x) := 1 -
+    \tfrac{1}{6}(x+2)\lg(1+2/4^n)\), then
+    \(\OB{\fun{tms}}{1+\phi_{2n}} - Q(1+\phi_{2n}) =
+    g(4^n)\). Elementary analysis entails that \(2 - \lg 3 \leqslant
+    g(x) < 1 - 1/(3\ln 2)\), when \(x \geqslant 4\), that is, \(2 -
+    \lg 3 \leqslant g(4^n) < 1 - 1/(3\ln 2)\), for \(n \geqslant
+    1\). Approximately, \(\boxed{0.4150 <
+      \smash{\OB{\fun{tms}}{1+\phi_{2n}}} - Q(1+\phi_{2n}) <
+      0.5192.}\)
+
+    \bigskip \textsl{Hence \(p=\phi_{2n} = (1010\dots01)_2\) minimises
+      \(\OB{\fun{tms}}{p} - \tfrac{1}{2}p\lg(\tfrac{3}{4}p)\).}
+    \bigskip
+
+  \item If \(k=2m+1\), then \(\phi_{2m+1} = 2^{2m-1} + \phi_{2m-1}\)
+    (see proof of theorem~\ref{thm:OB_lambda}). From
+    equation~\eqref{eq:OBtms_2m_i}, we draw
+    \(\OB{\fun{tms}}{\phi_{2m+1}} = \OB{\fun{tms}}{2^{2m-1}} +
+    \OB{\fun{tms}}{\phi_{2m-1}} + \phi_{2m-1} =
+    \OB{\fun{tms}}{\phi_{2m-1}} - (2m-1)4^{m-1} +
+    \phi_{2m-1}\). Summing both sides from \(m=1\) to \(m=n-1\) and
+    multiplying by~\(9\) yields \(9\OB{\fun{tms}}{\phi_{2n+1}} =
+    \tfrac{1}{2}S_{n+1} - 3(4^n-1) + \sum_{m=0}^{n-1}\phi_{2m+1}\),
+    which simplifies into
+    \begin{equation}
+      \OB{\fun{tms}}{\phi_{2n+1}} = (n - \tfrac{1}{2})\phi_{2n+1}.
+      \label{eq:OBtms_phi_2n_1}
+    \end{equation}
+    We have \(Q(\phi_{2n+1}) = \tfrac{1}{2}\phi_{2n+1}(2n-1 +
+    \lg(1-1/4^n)) = \OB{\fun{tms}}{\phi_{2n+1}} +
+    \tfrac{1}{2}\phi_{2n+1}\lg(1-1/4^n)\), where the last equality
+    follows from~\eqref{eq:OBtms_phi_2n_1}. If we let \(f(x) :=
+    (1-x)\ln(1-1/x)\), as we did for \(Q(\phi_{2n})\), we have
+    \(\OB{\fun{tms}}{\phi_{2n+1}} - Q(\phi_{2n+1}) = f(4^n)/(3\ln
+    2)\). We know \(3\ln\tfrac{3}{4} \leqslant f(x) < 1\), for \(x
+    \geqslant 4\), therefore \(\lg 3 - 2 \leqslant
+    \OB{\fun{tms}}{\phi_{2n+1}} - Q(\phi_{2n+1}) < 1/(3\ln 2)\), if
+    \(n \geqslant 1\). Hence \(\boxed{0.4150 <
+      \smash{\OB{\fun{tms}}{\phi_{2n+1}}} - Q(\phi_{2n+1}) <
+      0.4809.}\)
+
+    From theorem~\ref{thm:OB_lambda} and
+    equation~\eqref{eq:OBtms_phi_2n_1}, we deduce
+    \begin{equation}
+      \OB{\fun{tms}}{1+\phi_{2n+1}} = (n-\tfrac{1}{2})(1+\phi_{2n+1})
+      + \tfrac{1}{2}.
+      \label{eq:OBtms_succ_phi_2n_1}
+    \end{equation}
+    Moreover, \(Q(1+\phi_{2n+1}) = \tfrac{1}{2}(1+\phi_{2n+1})(2n-1 +
+    \lg(1+1/2^{2n+1})) = \OB{\fun{tms}}{1+\phi_{2n+1}} - \tfrac{1}{2}
+    + \tfrac{1}{6}(1+2^{2n+1})\lg(1+1/2^{2n+1})\), the last step being
+    a consequence of~\eqref{eq:OBtms_succ_phi_2n_1}. If we let \(h(x)
+    := \tfrac{1}{2} - \tfrac{1}{6}(1+x)\lg(1+1/x)\), then
+    \(\OB{\fun{tms}}{1+\phi_{2n+1}} - Q(1+\phi_{2n+1}) =
+    h(2^{2n+1})\). Elementary analysis shows that \(5 - 3\lg 3
+    \leqslant h(x) < 1/2 - 1/(6\ln 2)\), for \(x \geqslant 8\), that
+    is, \(5 - 3\lg 3 \leqslant \OB{\fun{tms}}{1+\phi_{2n+1}} -
+    Q(1+\phi_{2n+1}) < 1/2 - 1/(6\ln 2)\), if \(n \geqslant 1\). So
+    \(\boxed{0.2450 < \smash{\OB{\fun{tms}}{1+\phi_{2n+1}}} -
+      Q(1+\phi_{2n+1}) < 0.2596.}\)
+
+    \bigskip
+    \textsl{Hence \(p = 1+\phi_{2m+1} = (1010\dots1011)_2\) minimises
+    \(\OB{\fun{tms}}{p} - \tfrac{1}{2}p\lg p\).}
+
+\end{itemize}
+Finally, we conclude that the lower bound in~\eqref{ineq:lower_Btms}
+is tight if \(n=2\) (from the base case) and is otherwise the sharpest
+when \(n=(1010\dots01)_2\) or \(n=(1010\dots1011)_2\). As a whole,
+these values constitute the \emph{Jacobsthal
+  sequence},\index{Jacobsthal number} defined as
+\begin{equation}
+J_0 = 0; \; J_1=1; \; J_{n+2} = J_{n+1} + 2J_{n},\; \text{for \(n
+  \geqslant 0\).}
+\label{eq:Jacobsthal}
+\end{equation}
+
+Let us use now the same inductive approach to find a good upper bound
+to \(\OB{\fun{tms}}{n}\). In other words, we want to minimise the real
+constants \(a'\)~and~\(b'\) such that, for \(n \geqslant 2\),
+\begin{equation*}
+\OB{\fun{tms}}{n} \leqslant \tfrac{1}{2}n\lg n + a'n + b'.
+\end{equation*}
+The only difference with the search for the lower bound is that
+inequalities are reversed, so we want
+\begin{equation*}
+\Phi(x) \leqslant a', \;\text{where \(\Phi(x) := \tfrac{1}{2}x\lg x - \tfrac{1}{2}(1+x)\lg(1+x) + x\)}.
+\end{equation*}
+Here, we need to find the maximum of~\(\Phi\) on the closed interval
+\([0,1]\). The two positive roots of~\(\Phi\) are \(0\)~and~\(1\), and
+\(\Phi\)~is negative between them (see
+equation~\eqref{eq:der_Phi}). Therefore \(a'_{\min} := \max_{0
+  \leqslant x \leqslant 1}\Phi(x) = \Phi(0) = \Phi(1) = 0\). From the
+base case, we have \(b'_{\min} = -2a_{\min} = 0\). Therefore, we have
+the bounds
+\begin{equation}
+\tfrac{1}{2}n\lg n - \left(\tfrac{1}{2}\lg\tfrac{4}{3}\right)n + \lg\tfrac{4}{3}
+\leqslant \OB{\fun{tms}}{n} \leqslant
+\tfrac{1}{2}n\lg n.
+\label{ineq:bounds_Btms}
+\index{tms@$\OB{\fun{tms}}{n}$}
+\end{equation}
+The upper bound is clearly tight when \(n=2^p\) because of
+equation~\eqref{eq:best_power}. It is also very obvious now that we
+have \(\OB{\fun{tms}}{n} \sim \frac{1}{2}n\lg n\), but if we were only
+interested in this asymptotic result, \cite{Bush_1940} gave a very
+simple counting argument on the bits in \fig~\vref{fig:bits}.
+\cite{Delange_1975} investigated \(\OB{\fun{tms}}{n}\) by means of
+advanced real analysis and showed that \(\OB{\fun{tms}}{n} =
+\tfrac{1}{2}n\lg n + F_0(\lg n) \cdot n\), where \(F_0\)~is a
+continuous, nowhere differentiable function of period~\(1\), and whose
+Fourier series shows the mean value to be approximately
+\(-0.145599\). \index{tms@$\OB{\fun{tms}}{n}$|)}
+\index{merge sort!top-down $\sim$!minimum cost|)}
+
+\mypar{Maximum cost}
+\label{tms:maximum}
+\index{merge sort!top-down $\sim$!maximum cost|(}
+
+The maximum number of comparisons satisfies
+\begin{equation*}
+\OW{\fun{tms}}{0} = \OW{\fun{tms}}{1} = 0,
+\qquad
+\OW{\fun{tms}}{n} = \OW{\fun{tms}}{\floor{n/2}}
++ \OW{\fun{tms}}{\ceiling{n/2}}
++ \OW{\fun{mrg}}{\floor{n/2},\ceiling{n/2}}.
+\index{tms@$\OW{\fun{tms}}{n}$|(}
+\index{mrg@\fun{mrg/2}}
+\end{equation*}
+Equation~\eqref{eq:worst_merge} \vpageref{eq:worst_merge} yields
+\(\OW{\fun{tms}}{n} = \OW{\fun{tms}}{\floor{n/2}} +
+\OW{\fun{tms}}{\ceiling{n/2}} + n - 1\) and
+\begin{equation*}
+\OW{\fun{tms}}{0} = \OW{\fun{tms}}{1} = 0;\; 
+\OW{\fun{tms}}{2p} = 2\OW{\fun{tms}}{p} + 2p - 1,\;
+\OW{\fun{tms}}{2p+1} = \OW{\fun{tms}}{p} + \OW{\fun{tms}}{p+1} + 2p.
+\end{equation*}
+Let the difference of two successive terms be \(\Delta_n :=
+\smash[t]{\W{}{n+1}} - \W{}{n}\). If we know \(\Delta_n\), we know
+\(\W{}{n}\) because \(\sum_{k=1}^{n-1}\Delta_k =
+\sum_{k=1}^{n-1}\W{}{k+1} - \sum_{k=1}^{n-1}\W{}{k} = \W{}{n} -
+\W{}{1} = \W{}{n}\). We remark that
+\begin{itemize}
+
+  \item if \(n=2p\), then \(\Delta_{2p} = \Delta_{p} + 1\),
+
+  \item else \(n=2p+1\) and \(\W{}{2p+2} = 2 \cdot \W{}{p+1} + 2p
+    + 1\), so \(\Delta_{2p+1} = \Delta_{p} + 1\).
+
+\end{itemize}
+In summary, \(\Delta_0 = 0\) and \(\Delta_n = \Delta_{\floor{n/2}} +
+1\). If we start unravelling the recurrence, we get \(\Delta_n =
+\Delta_{\floor{\floor{n/2}/2}}+ 2\), so we must simplify
+\(\floor{\floor{\floor{\dots}/2}/2}\).
+\begin{thm}[Floors and Fractions]
+\label{thm:floors}
+\textsl{Let \(x\)~be a real number and \(q\)~a natural number. Then
+  \(\floor{\floor{x}/q} = \floor{x/q}\).}
+\end{thm}
+\begin{proof}
+  The equality is equivalent to the conjunction of the two
+  complementary inequalities \(\floor{\floor{x}/q} \leqslant
+  \floor{x/q}\) and \(\floor{x/q} \leqslant \floor{\floor{x}/q}\). The
+  former is straightforward because it is a consequence of \(\floor{x}
+  \leqslant x\). In the latter, because both sides of the inequality
+  are integers, \(\floor{x/q} \leqslant \floor{\floor{x}/q}\) is
+  equivalent to state that \(p \leqslant \floor{x/q} \Rightarrow p
+  \leqslant \floor{\floor{x}/q}\), for any integer~\(p\). An obvious
+  lemma is that if \(i\)~is an integer and \(y\)~a real number, \(i
+  \leqslant \floor{y} \Leftrightarrow i \leqslant y\), so the original
+  inequality is equivalent to \(p \leqslant x/q \Rightarrow p
+  \leqslant \floor{x}/q\), which is trivially equivalent to \(pq
+  \leqslant x \Rightarrow pq \leqslant \floor{x}\). Since \(pq\)~is an
+  integer, this implication is true from the same lemma.
+\end{proof}
+Using theorem~\vref{thm:floors}, we deduce \(\Delta_n = m\), with
+\(m\)~being the largest natural number such that \(\floor{n/2^m} =
+0\). In other words, \(m\)~is the number of bits in the binary
+notation of~\(n\), which is found in equation~\eqref{eq:e_r} to be
+\(\Delta_n = \floor{\lg n} + 1\). Since we already know that \(\W{}{n}
+= \sum_{k=1}^{n-1}\Delta_k\), we conclude,
+with~\eqref{eq:num_of_bits}, that
+\begin{equation}
+\W{}{n} = \sum_{k=1}^{n-1}(\floor{\lg k}+1).
+\label{eq:tms_n_tmp}
+\end{equation}
+Whilst the minimum cost is the number of \(1\)-bits up to \(n-1\), we
+find now that the maximum cost is the total number of bits up to
+\(n-1\). Informally, this leads us to bet that \(\OW{\fun{tms}}{n}
+\sim 2 \cdot \OB{\fun{tms}}{n} \sim n\lg n\), since we would expect
+the number of \(0\)-bits and \(1\)-bits to be the same in
+average. Consider again the bit table in \fig~\vref{fig:bits}. The
+greatest power of~\(2\) smaller than~\(n\) is~\(2^{\floor{\lg n}}\)
+because it is the binary number \((10\dots0)_2\) having the same
+number of bits as~\(n\); it thus appears in the same section of the
+table as~\(n\). The trick consists in counting the bits in
+\emph{columns}, from top to bottom, and leftwards. In the rightmost
+column, we find \(n\)~bits. In the second column, from the right, we
+find \(n-2^1+1\) bits. The third from the right contains \(n-2^2+1\)
+bits etc. until the leftmost column containing \(n-2^{\floor{\lg
+    n}}+1\) bits. The total number of bits in the table is
+\begin{equation*}
+\abovedisplayskip=2pt
+\belowdisplayskip=2pt
+\sum_{k=1}^{n}{\!(\floor{\lg k}+1)}
+   = \sum_{k=0}^{\floor{\lg n}}{\!(n-2^k+1)}
+   = (n + 1)(\floor{\lg n} + 1) - 2^{\floor{\lg n}+1} + 1.
+\end{equation*}
+Let \(n := (b_{m-1}\dots b_0)_2\), then \(2^{m-1} \leqslant n
+\leqslant 2^m - 1\) and \(2^{m-1} < 2^{m-1} + 1 \leqslant n + 1
+\leqslant 2^m\), so \(m-1 < \lg(n+1) \leqslant m\), that is, \(m =
+\ceiling{\lg(n+1)}\), which, with equation~\eqref{eq:e_r}
+\vpageref{eq:e_r}, proves \(1 + \floor{\lg n} =
+\ceiling{\lg(n+1)}\). As a consequence, equation~\eqref{eq:tms_n_tmp}
+can be rewritten as
+\begin{equation}
+%\abovedisplayskip=4pt
+%\belowdisplayskip=4pt
+\OW{\fun{tms}}{0} = \OW{\fun{tms}}{1} = 0,
+\qquad
+\OW{\fun{tms}}{n} = n\ceiling{\lg n} - 2^{\ceiling{\lg n}} + 1.
+\label{eq:top}
+\end{equation}
+This equation is subtler than it seems, due to the periodicity hidden
+in \(2^{\ceiling{\lg n}}\). Depending on whether \(n = 2^p\) or not,
+two cases arise:
+\begin{itemize*}
+
+  \item if~\(n=2^p\), then \(\OW{\fun{tms}}{n} = n\lg n - n +
+    1\);
+
+  \item otherwise, we have \(\ceiling{\lg n} = \floor{\lg n} + 1 = \lg
+    n - \{\lg n\} + 1\) and \(\OW{\fun{tms}}{n} = n\lg n + \theta(1 -
+    \{\lg n\}) \cdot n + 1\), with \(\theta(x) := x - 2^x\) and
+    \(\{x\} := x - \floor{x}\) is the \emph{fractional
+      part}\index{fractional part@$\{x\}$|see{fractional
+        part}}\index{fractional part} of the real~\(x\). In
+    particular, we have \(0 \leqslant \{x\} < 1\). The derivative is
+    \(\theta'(x) = 1 - 2^x\ln 2\); it has one root \(\theta'(x_0) = 0
+    \Leftrightarrow x_0 = -\lg\ln 2\) and it is positive
+    before~\(x_0\), and negative after. Concordantly, \(\theta(x)\)
+    reaches its maximum at~\(x_0\): \(\max_{0<x\leqslant 1}\theta(x) =
+    \theta(x_0) = -(1+\ln\ln{2})/\!\ln{2} \simeq -0.9139\), and
+    \(\min_{0<x\leqslant 1}\theta(x) = \theta(1) = -1\). By
+    injectivity, \(\theta(1) = \theta(1-\{\lg n\})\) implies \(\{\lg
+    n\} = 0\), that is, \(n=2^p\) (first case).
+\end{itemize*}
+Hence \(\OW{\fun{tms}}{n} = n\lg n + A(\lg n) \cdot n + 1\), where
+\(A(x) := 1 - \{x\} - 2^{1 - \{x\}}\) is a periodic function, since
+\(A(x) = A(\{x\})\), such that \(-1 \leqslant A(x) < -0.91\). Further
+analysis of~\(A(x)\) requires Fourier series or complex analysis; its
+mean value is about \(-0.942695\). Read \cite{FlajoletGolin_1994}, as
+well as \cite{PannyProdinger_1995}.
+\begin{equation}
+n\lg n - n + 1 \leqslant \OW{\fun{tms}}{n} <
+n\lg n - 0.91 n + 1.\label{ineq:OWtms}
+\end{equation}
+The lower bound is attained when \(n=2^p\). The upper bound is most
+accurate when \(\{\lg n\} = 1 + \lg\ln 2\), that is, when \(n\)~is the
+nearest integer to \(2^p\ln 2\) (take the binary expansion of \(\ln
+2\), shift the point \(p\)~times to the right and round). Obviously,
+\(\OW{\fun{tms}}{n} \sim n\lg n\).\index{tms@$\OW{\fun{tms}}{n}$|)}
+\index{merge sort!top-down $\sim$!maximum cost|)}
+
+\mypar{Average cost}
+\index{merge sort!top-down $\sim$!average cost|(}
+
+Let \(\OM{\fun{tms}}{n}\)\index{tms@$\OM{\fun{tms}}{n}$|(} be the
+average number of comparisons to sort \(n\)~keys top\hyp{}down. All
+permutations of the input stack being equally likely,
+equation~\eqref{eq:cost_tms} becomes
+\begin{equation*}
+\OM{\fun{tms}}{0} = \OM{\fun{tms}}{1} = 0,\qquad
+\OM{\fun{tms}}{n} = \OM{\fun{tms}}{\floor{n/2}} +
+\OM{\fun{tms}}{\ceiling{n/2}} +
+\OM{\fun{mrg}}{\floor{n/2},\ceiling{n/2}},\index{mrg@\fun{mrg/2}}
+\end{equation*} 
+which, with equation~\eqref{eq:Amrg}, in turn implies
+\begin{equation*}
+\OM{\fun{tms}}{n} = \OM{\fun{tms}}{\floor{n/2}} +
+\OM{\fun{tms}}{\ceiling{n/2}} + n -
+\frac{\floor{n/2}}{\ceiling{n/2}+1} 
+- \frac{\ceiling{n/2}}{\floor{n/2}+1}.
+\end{equation*}
+If we proceed as we did for the extremal costs, we get
+\begin{equation*}
+\OM{\fun{tms}}{2p} = 2\cdot\OM{\fun{tms}}{p} + 2p - 2 +
+\frac{2}{p+1},\; \OM{\fun{tms}}{2p+1} = \OM{\fun{tms}}{p} +
+\OM{\fun{tms}}{p+1} + 2p - 1 + \frac{2}{p+2}.
+\end{equation*}
+These recurrences are a bit tricky. Setting \(\Delta_n :=
+\OM{\fun{tms}}{n+1} - \OM{\fun{tms}}{n}\) yields
+\begin{equation*}
+\Delta_{2p} = \Delta_p + 1 + \frac{2}{p+2} - \frac{2}{p+1},
+\quad
+\Delta_{2p+1} = \Delta_p + 1.
+\end{equation*}
+Contrary to the difference equations derived for the extremal costs,
+these are not helpful, so we should try an inductive approach, as we
+did for finding bounds on
+\(\OB{\fun{tms}}{n}\). Inequations~\eqref{ineq:M_join}
+\vpageref{ineq:M_join} are equivalent to \(n\lg n - \alpha n + \alpha
+< \OM{\fun{tms}}{n} < n\lg n - \alpha n + 2\), where \(n = 2^p\), and
+this suggests us to also look for bounds of the form \(n\lg n + an +
+b\) when \(n \neq 2^p\).
+
+Let us start with the lower bound and set to maximise the
+real constants \(a\)~and~\(b\) in
+\begin{equation*}
+\abovedisplayskip=0pt
+\belowdisplayskip=2pt
+\pred{H}{n} \colon n\lg n + an + b \leqslant \OM{\fun{tms}}{n},
+\; \text{for \(n \geqslant 2\).}
+\end{equation*}
+Since \(\pred{H}{2p}\) depends on \(\pred{H}{p}\), and
+\(\pred{H}{2p\!+\!1}\) depends on \(\pred{H}{p}\) and
+\(\pred{H}{p\!+\!1}\), the property \(\pred{H}{n}\), for any \(n>1\),
+transitively depends on \(\pred{H}{2}\) alone, because we are
+iterating divisions by~\(2\). If we write \(\pred{H}{n} \leadsto
+\pred{H}{m}\) to mean `\(\pred{H}{n}\) depends on \(\pred{H}{m}\),' we
+have, for example, \(\pred{H}{2^3} \leadsto \pred{H}{2^2} \leadsto
+\pred{H}{2^1}\); \(\pred{H}{7} \leadsto \pred{H}{3} \leadsto
+\pred{H}{2}\) and \(\pred{H}{7} \leadsto \pred{H}{4} \leadsto
+\pred{H}{2}\). \(\pred{H}{2}\) is equivalent to
+\begin{equation}
+2a + b + 1 \leqslant 0.
+\label{ineq:base_lower_Atms}
+\end{equation}
+Because the definition of \(\OM{\fun{tms}}{n}\) depends on the parity
+of~\(n\), the inductive step will be twofold. Let us assume
+\(\pred{H}{m}\) for \(m < 2p\), in particular, we suppose
+\(\pred{H}{p}\), which, with the expression of \(\OM{\fun{tms}}{2p}\)
+above, entails
+\begin{equation*}
+\abovedisplayskip=2pt
+\belowdisplayskip=2pt
+ (2p\lg p + 2ap + 2b) + 2p - 2 + \frac{2}{p+1} \leqslant \OM{\fun{tms}}{2p}.
+\end{equation*}
+We want \(\pred{H}{2p} \colon 2p\lg(2p) + 2ap + b
+= 2p\lg p + 2ap + 2p + b \leqslant \OM{\fun{tms}}{2p}\), which holds
+if the following condition does:
+\begin{equation*}
+\abovedisplayskip=0pt
+\belowdisplayskip=2pt
+2p\lg p + 2ap + 2p + b \leqslant 2p\lg p + 2ap + 2b + 2p - 2 + \frac{2}{p+1},
+\end{equation*}
+which is equivalent to
+\begin{equation*}
+\abovedisplayskip=0pt
+\belowdisplayskip=2pt
+2 - \frac{2}{p+1} = \frac{2p}{p+1} \leqslant b.
+\end{equation*}
+Let \(\Phi(p) := 2p/(p+1)\). This function is strictly increasing for
+\(p > 0\) and \(\Phi(p) \to 2^{-}\), as \(p \to +\infty\).
+
+The other inductive step deals with the odd values of~\(n\). We assume
+\(\pred{H}{m}\) for all \(m < 2p+1\), in particular, we suppose
+\(\pred{H}{p}\) and \(\pred{H}{p+1}\), which, with the expression of
+\(\OM{\fun{tms}}{2p+1}\) above, implies
+\begin{equation*}
+%\abovedisplayskip=0pt
+%\belowdisplayskip=2pt
+(p\lg p + ap + b) + ((p+1)\lg(p+1) + a(p+1) + b) + 2p - 1 +
+\frac{2}{p+2} \leqslant \OM{\fun{tms}}{2p+1},
+\end{equation*} 
+which may be simplified slightly into
+\begin{equation*}
+%\abovedisplayskip=0pt
+%\belowdisplayskip=2pt
+p\lg p + (p+1)\lg(p+1) + a(2p+1) + 2b + 2p - 1 + \frac{2}{p+2}
+\leqslant \OM{\fun{tms}}{2p+1}.
+\end{equation*} 
+We want to prove \(\pred{H}{2p+1} \colon (2p+1)\lg(2p+1) +
+a(2p+1) + b \leqslant \M{}{2p+1}\), which is thus implied by 
+\begin{equation}
+%\abovedisplayskip=0pt
+%\belowdisplayskip=2pt
+  (2p+1)\lg(2p+1) \leqslant
+  p\lg p + (p+1)\lg(p+1) + b + 2p - 1 + \frac{2}{p+2}.
+\label{ineq:Psi_temp}
+\end{equation} 
+Let \(\Psi(p) := (2p+1)\lg(2p+1) - (p+1)\lg(p+1) - p\lg p -
+2p + 1 - 2/(p+2)\). Then~\eqref{ineq:Psi_temp} is equivalent to
+\(\Psi(p) \leqslant b\). Furthermore,
+\begin{equation*}
+\frac{d\Psi}{dp}(p) = \frac{2}{(p+2)^2} + \lg\left(1+\frac{1}{4p(p+1)}\right).
+\end{equation*}
+Clearly, \(d\Psi/dp > 0\), for all \(p > 0\), so \(\Psi(p)\)~is
+strictly increasing for \(p > 0\). Let us find \(\lim_{p \to
+  +\infty}\Psi(p)\) by rewriting \(\Psi(p)\) as follows:
+\begin{align*}
+\Psi(p)
+  &= 2 - \frac{2}{p+2} + (2p+1)\lg(p+\tfrac{1}{2}) - (p+1)\lg(p+1)
+     - p\lg p\\
+  &= 2 - \frac{2}{p+2} + p\left(\lg(p+\tfrac{1}{2})^2 - \lg(p+1)
+   - \lg p\right) + \lg(p+\tfrac{1}{2})\\
+  &\phantom{=} \quad - \lg(p+1)\\
+  &= 2 - \frac{2}{p+2} + p\lg\left(1 + \frac{1}{4p(p+1)}\right) +
+  \lg\frac{p + \myfrac{1}/{2}}{p+1}.
+\end{align*}
+The limit of \(x\ln(1+1/x^2)\) as \(x \to +\infty\) can be found by
+changing \(x\)~into \(1/y\) and considering the limit as \(y \to
+0^{+}\), which is shown by l'H\^{o}pital's rule to be~\(0\). This
+result can be extended to apply to the large term in \(\Psi(p)\) and,
+since all the other variable terms converge to~\(0\), we can conclude
+that \(\Psi(p) \to 2^{-}\), as \(p \to +\infty\).
+
+Because we need to satisfy the conditions \(\Psi(p) \leqslant b\) and
+\(\Phi(p) \leqslant b\) for both inductive steps to hold, we have to
+compare \(\Psi(p)\)~and~\(\Phi(p)\), when \(p\)~is a natural number:
+we have \(\Phi(1) < \Psi(1)\) and \(\Phi(2) < \Psi(2)\), but \(\Psi(p)
+< \Phi(p)\) if \(p \geqslant 3\). Therefore, for~\(b\) not to depend
+on~\(p\), we need it to be greater than~\(2\), the smallest upper
+bound of~\(\Phi\)
+and~\(\Psi\). Inequality~\eqref{ineq:base_lower_Atms} means that we
+need to minimise~\(b\) in order to maximise~\(a\) (which is the
+priority), so we settle for the limit: \(b_{\min} = 2\), and the same
+inequality entails \(a \leqslant -3/2\), hence \(a_{\max} =
+-3/2\). The principle of complete induction finally establishes that,
+for \(n \geqslant 2\),
+\begin{equation}
+  n\lg n - \frac{3}{2} n + 2 < \OM{\fun{tms}}{n}.
+\label{ineq:lower_Atms}
+\end{equation}
+This bound is not very good, but it was easy to obtain. We may recall
+the lower bound when \(n=2^p\), in~\eqref{ineq:M_join}
+\vpageref{ineq:M_join}: \(n\lg n - \alpha n + \alpha <
+\OM{\fun{tms}}{n}\), where \(\alpha \simeq 1.264499\). In fact,
+\cite{FlajoletGolin_1994} proved 
+\begin{equation}
+n\lg n - \alpha n < \OM{\fun{tms}}{n}.
+\label{ineq:best_lower_Atms}
+\end{equation}
+Asymptotically, that bound is, up to the linear term, the same as for
+the case \(n=2^p\). Our inductive method cannot reach this nice result
+because it yields sufficient conditions that are too strong, in
+particular, we found no obvious way to get the decomposition
+\(\OM{\fun{tms}}{2^p+i} = \OM{\fun{tms}}{2^p} + \OM{\fun{tms}}{i} +
+\dots\)
+
+Now, let us find the smallest real constants \(a'\)~and~\(b'\) such
+that for \(n \geqslant 2\), \(\OM{\fun{tms}}{n} \leqslant n\lg n + a'n
++ b'\). The base case of \(\pred{H}{n}\)
+in~\eqref{ineq:base_lower_Atms} is here reversed: \(2a' + b' + 1
+\geqslant 0\). Hence, in order to minimise~\(a'\), we need to
+maximise~\(b'\). Furthermore, the conditions on~\(b'\) from the
+inductive steps are reversed as well with respect to~\(b\): \(b'
+\leqslant \Phi(p)\) and \(b' \leqslant \Psi(p)\). The base case is
+\(\pred{H}{2}\), that is, \(p=1\), and we saw earlier that \(\Phi(1)
+\leqslant \Psi(1)\), thus we must have \(b'\leqslant \Phi(1) =
+1\). The maximum value is thus \(b'_{\max} = 1\). Finally, this
+implies that \(a'\geqslant -1\), thus \(a'_{\min} = -1\).
+
+Gathering the bounds, we hence established that
+\begin{equation*}
+n\lg n - \frac{3}{2}n + 2 < \OM{\fun{tms}}{n} < n\lg n - n + 1.
+\end{equation*}
+Trivially, we have \(\OM{\fun{tms}}{n} \sim n\lg n \sim
+\OW{\fun{tms}}{n} \sim 2 \cdot \OB{\fun{tms}}{n}\).
+\cite{FlajoletGolin_1994} proved, using complex analysis the following
+very strong result:
+\begin{equation*}
+\OM{\fun{tms}}{n} = n\lg n + B(\lg n) \cdot n + \mathcal{O}(1),
+\end{equation*}
+where \(B\)~is continuous, non\hyp{}differentiable, periodic with
+period~\(1\), of mean value \(-1.2481520\). The notation
+\(\mathcal{O}(1)\) is an instance of Bachmann's notation for an
+unknown positive constant. The maximum value of~\(B(x)\) is
+approximately \(-1.24075\), so
+\begin{equation*}
+\belowdisplayskip=0pt
+\OM{\fun{tms}}{n} = n\lg n - (1.25 \pm 0.01) \cdot n + \mathcal{O}(1).
+\end{equation*}
+\index{tms@$\OM{\fun{tms}}{n}$|)} \index{merge sort!top-down
+  $\sim$!average cost|)} \index{merge sort!top-down $\sim$|)}
+
+
+\section{Bottom-up merge sort}
+\label{sec:general_case}
+\index{merge sort!bottom-up $\sim$|(}
+
+Instead of cutting a stack of \(n\)~keys in two halves, we could split
+into \(2^{\ceiling{\lg n}-1}\) and \(n-2^{\ceiling{\lg n}-1}\) keys,
+where the first number represents the highest power of~\(2\) strictly
+smaller than~\(n\). For instance, if \(n=11=2^3+2^1+2^0\), we would
+split into \(2^3=8\) and \(2^1+2^0=3\). Of course, if \(n=2^p\), this
+strategy, called \emph{bottom\hyp{}up}, coincides with that of
+top\hyp{}down merge sort, which, in terms of cost, is expressed as
+\(\OC{\fun{bms}}{2^p} = \OC{\fun{tms}}{2^p} = \C{\Join}{p}\), where
+\fun{bms/1}\index{bms@\fun{bms/1}} implements \emph{bottom\hyp{}up
+  merge sort}. The difference between
+top-down and bottom-up merge sort can be easily seen in the
+\fig~\ref{fig:top_vs_bot}.
+\begin{figure}
+\centering
+\subfloat[Bottom-up\label{fig:bot_up}]{%
+\includegraphics{bot_up}}
+\qquad
+\subfloat[Top-down\label{fig:top_down}]{%
+\includegraphics{top_down}}
+\caption{Comparing merge sorts on \([6,3,2,4,1,5]\)
+\label{fig:top_vs_bot}}
+\end{figure}
+In all generality,
+\begin{equation}
+\OC{\fun{bms}}{0} = \OC{\fun{bms}}{1} = 0,
+\quad
+\OC{\fun{bms}}{n} = \OC{\fun{bms}}{2^{\ceiling{\lg n}-1}}
++ \OC{\fun{bms}}{n - 2^{\ceiling{\lg n}-1}}
++ \OC{\fun{mrg}}{2^{\ceiling{\lg n}-1},n - 2^{\ceiling{\lg n}-1}}.
+\index{bms@$\OC{\fun{bms}}{n}$}
+\label{eq:cost_bms}
+\end{equation}
+
+\Fig~\vref{fig:bot_up2} shows the merge tree\index{tree!merge $\sim$}
+of seven keys being sorted in that fashion. Note how the bottommost
+singleton \([4]\) is merged with \([2,6]\), a stack twice as long. The
+imbalance in length is further propagated upwards. The general case is
+better suggested by retaining at each node only the length of the
+associated stack, as shown in \fig~\vref{fig:msort_abs}.
+\begin{figure}
+\centering
+\subfloat[Merge tree of \({[}7,3,5,1,6,2,4{]}\)\label{fig:bot_up2}]{%
+\includegraphics[bb=58 632 192 721]{bot_up2}}
+\qquad
+\subfloat[Lengths only\label{fig:msort_abs}]{%
+\includegraphics[bb=71 632 161 721]{msort_abs}}
+\caption{Sorting seven keys}
+\end{figure}
+
+%\addcontentsline{toc}{subsection}{Cost}
+\mypar{Minimum cost}
+\index{merge sort!bottom-up $\sim$!minimum cost|(}
+
+Let \(\OB{\fun{bms}}{n}\)\index{bms@$\OB{\fun{bms}}{n}$|(} be the
+minimum cost for sorting \(n\)~keys, bottom\hyp{}up. Let \(n=2^p+i\),
+with \(0 < i < 2^p\). Then, from equation~\eqref{eq:cost_bms},
+\vpageref{eq:cost_bms}, and~\eqref{eq:best_merge}
+\vpageref{eq:best_merge}, we deduce
+\begin{equation*}
+\OB{\fun{bms}}{2^p+i} = \OB{\fun{bms}}{2^p} + \OB{\fun{bms}}{i} + i,
+\end{equation*}
+which we recognise as an instance of the following functional
+equations: \(f(0)=f(1)=0\), \(f(2)=1\) and \(f(2^p+i) = f(2^p) + f(i)
++ i\), where \(f=\OB{\fun{tms}}{}\) as seen in
+equation~\eqref{eq:OBtms_2m_i} \vpageref{eq:OBtms_2m_i}. Therefore,
+\begin{equation}
+\OB{\fun{bms}}{n} = \OB{\fun{tms}}{n} = \sum_{k=0}^{n-1}{\nu_k}.
+\label{eq:OBbms}
+\end{equation}
+We can thus reuse the bounds on \(\OB{\fun{tms}}{n}\):
+\begin{equation}
+\frac{1}{2}n\lg n - \left(\frac{1}{2}\lg\frac{4}{3}\right)n + \lg\frac{4}{3}
+\leqslant \OB{\fun{bms}}{n} \leqslant
+\frac{1}{2}n\lg n.
+\index{bms@$\OB{\fun{bms}}{n}$}
+\end{equation}
+The lower bound is tight for \(n=2\) and most accurate when \(n\)~is a
+Jacobsthal\index{Jacobsthal number} number (see
+equations~\eqref{eq:Jacobsthal} \vpageref{eq:Jacobsthal}). The upper
+bound is tight when \(n=2^p\).
+\index{bms@$\OB{\fun{bms}}{n}$|)}
+\index{merge sort!bottom-up $\sim$!minimum cost|)}
+
+\mypar{Maximum cost}
+\index{merge sort!bottom-up $\sim$!maximum cost|(}
+
+Let \(\OW{\fun{bms}}{n}\)\index{bms@$\OW{\fun{bms}}{n}$|(} be the
+maximum cost for sorting \(n\)~keys, bottom\hyp{}up. Let \(n=2^p+i\),
+with \(0 < i < 2^p\). Then, from equation~\eqref{eq:cost_bms},
+\vpageref{eq:cost_bms}, and~\eqref{eq:worst_merge}
+\vpageref{eq:worst_merge}, we deduce
+\begin{equation}
+\OW{\fun{bms}}{2^p+i} = \OW{\fun{bms}}{2^p} + \OW{\fun{bms}}{i} + 2^p
++ i - 1.
+\label{eq:Wbms_2p_i}
+\end{equation}
+Let us search a lower bound of \(\OW{\fun{bms}}{n}\) by induction
+based on that equation. Let us find the greatest real constants
+\(a\)~and~\(b\) such that, for \(n \geqslant 2\),
+\begin{equation*}
+n\lg n + an + b \leqslant \OW{\fun{bms}}{n}.
+\end{equation*}
+The base case is \(n=2\), that is, \(b \leqslant -2a - 1\). Let us
+assume the bound holds for \(n=i\) and let us recall
+equation~\eqref{eq:worst_power} \vpageref{eq:worst_power}, which here
+takes the guise of \(\OW{\fun{bms}}{2^p} = p2^p - 2^p  +
+1\). Then~\eqref{eq:Wbms_2p_i} yields
+\begin{equation*}
+(p2^p - 2^p + 1) + (i\lg i + ai + b) + 2^p + i - 1 \leqslant
+\OW{\fun{bms}}{2^p+i},
+\end{equation*}
+which is equivalent to \(p2^p + i\lg i + i + ai + b \leqslant
+\OW{\fun{bms}}{2^p+i}\). We want to prove the bound holds for
+\(n=2^p+i\), that is, \((2^p+i)\lg(2^p+i) + a(2^p+i) + b \leqslant
+\OW{\fun{bms}}{2^p+i}\). Clearly, this is true if the following
+stronger constraint holds:
+\begin{equation*}
+(2^p+i)\lg(2^p+i) + a(2^p+i) + b \leqslant p2^p + i\lg i + i + ai + b.
+\end{equation*}
+It is equivalent to \(a2^p \leqslant p2^p - (2^p+i)\lg(2^p+i) + i\lg i
++ i\). Let us extend~\(i\) over the real numbers by defining \(i=x2^p\),
+where \(x\)~is a real number such that \(0 < x \leqslant 1\). Then,
+the running inequality is equivalent to
+\begin{equation*}
+a \leqslant \Phi(x),\; \text{where \(\Phi(x) := x\lg x -
+  (1+x)\lg(1+x) + x\).}
+\end{equation*}
+The function~\(\Phi\) can be continuously extended at~\(0\), as
+\(\lim_{x \to 0} x\lg x = 0\), and it is differentiable on the
+closed interval \([0,1]\):
+\begin{equation*}
+\frac{d\Phi}{dx} = \lg\frac{2x}{x+1}.
+\end{equation*}
+The root of \(d\Phi/dx = 0\) is~\(1\), the derivative is negative
+before, and positive after; so~\(\Phi\) decreases until \(x=1\):
+\(a_{\max} := \min_{0 \leqslant x \leqslant 1}\Phi(x) = \Phi(1)
+= -1\). From the base case, \(b_{\max} := -2a_{\max} - 1 =
+1\). Therefore, we have
+\begin{equation*}
+n\lg n - n + 1 \leqslant \OW{\fun{bms}}{n}.
+\end{equation*}
+The bound is tight when \(x=1\), that is, \(i=2^p\), hence
+\(n=2^{p+1}\).
+
+Let us find the smallest real constants \(a'\)~and~\(b'\) such that,
+for \(n \geqslant 2\),
+\begin{equation*}
+\OW{\fun{bms}}{n} \leqslant n\lg n + a'n + b'.
+\end{equation*}
+The difference with the lower bound is that the inequalities are
+reversed and we minimise the unknowns, instead of maximising
+them. Thus, the base case here is \(b' \geqslant -2a - 1\) and the
+condition for induction is \(a' \geqslant \Phi(x)\). We know the
+behaviour of~\(\Phi\), so \(a'_{\min} := \max_{0 \leqslant x \leqslant
+  1}\Phi(x) = \Phi(0) = 0\), and \(b'_{\min} := -2a'_{\min} - 1 =
+-1\). As a conclusion,
+\begin{equation}
+n\lg n - n + 1 \leqslant \OW{\fun{bms}}{n} < n\lg n - 1.
+\label{ineq:OWbms}
+\end{equation}
+Because \(\Phi(x)\) was extended at~\(x=0\), the upper bound is best
+approched when \(i=1\), the smallest possible integer value, that is,
+when \(n=2^p+1\) (the most unbalanced merger: stacks of size \(2^p\)
+and~\(1\)). A deeper study by \cite{PannyProdinger_1995}, based on
+Fourier analysis, confirms that the linear terms of these bounds
+cannot be improved and shows the mean value of the coefficient of the
+linear term to be, approximately, \(-0.70057\).
+
+\paragraph{Alternative expression}
+
+While we already bounded \(\OW{\fun{bms}}{n}\) tightly, we may learn
+something more about it by expressing it differently from its
+definition, in a way more suitable to elementary computations as well.
+In all generality, let us set \(n := 2^{e_r} + \dots + 2^{e_1} +
+2^{e_0} > 0\), with \(e_r > \dots > e_1 > e_0 \geqslant 0\) and \(r
+\geqslant 0\).  We used this decomposition in
+\begin{wrapfigure}[9]{r}[0pt]{0pt}
+\centering
+\includegraphics[bb=71 631 202 707]{msort_gen}
+\caption{\(\sum_{j=0}^{r}2^{e_j}\) keys
+\label{fig:msort_gen}}
+\end{wrapfigure}
+equation~\eqref{eq:e_r} on page~\pageref{eq:e_r}. Let us consider in
+\fig~\ref{fig:msort_gen} the tree\index{tree!merge $\sim$|(} of all
+the mergers when we only retain the stacks lengths. The triangles are
+subtrees made of \emph{balanced mergers}, that is, mergers performed
+on stacks of same length, for which we already found the number of
+comparisons. The lengths of the \emph{unbalanced mergers} are found in
+the nodes from the root \(2^{e_r}+ \dots + 2^{e_0}\) down to \(2^{e_1}
++ 2^{e_0}\).\index{tree!merge $\sim$|)} In \fig~\vref{fig:Wn_even}
+\begin{figure}
+\centering
+\subfloat[The sum of the nodes is \(\protect\OW{\protect\fun{bms}}{n}\)
+\label{fig:w2p}]%
+{\includegraphics[bb=62 602 199 721]{w2p}}
+\qquad
+\subfloat[The sum of the nodes is \(\protect\OW{\protect\fun{bms}}{n+1}\)
+\label{fig:w2p_succ}]%
+{\includegraphics[bb=71 604 214 721]{w2p_succ}}
+\caption{Maximum-cost trees for \(n\)~even and \(n+1\)
+\label{fig:Wn_even}}
+\end{figure}
+are shown the maximum\hyp{}cost trees for \(n\)~even and \(n+1\). The
+boxed expressions are not found in the opposite tree, therefore, the
+sum in each tree of the non\hyp{}boxed terms is identical. 
+\begin{itemize}
+
+  \item \emph{If \(n\)~is even}, in \fig~\vref{fig:w2p}, this sum
+  is\index{bms@$\OW{\fun{bms}}{n}$} \(\OW{\fun{bms}}{n} - r\). It
+  equals \(\OW{\fun{bms}}{n+1} - 2^{e_0} - \OW{\fun{bms}}{2^0}\) in
+  \fig~\vref{fig:w2p_succ}. Equating both counts yields
+    \begin{equation}
+      \OW{\fun{bms}}{n} - r = \OW{\fun{bms}}{n+1} - 2^{e_0} -
+      \OW{\fun{bms}}{2^0}.
+      \label{eq:OW1}
+    \end{equation}
+    Let us explicit that \(e_0\)~is a function of~\(n\) (it is the
+    highest power of~\(2\) dividing~\(n\)): \(e_0 :=
+    \rho_n\). Furthermore, we already know \(\nu_n = r+1\) and
+    \(\OW{\fun{bms}}{1} = 0\). Setting \(n=2k\) in
+    equation~\eqref{eq:OW1} is equivalent to
+    \begin{equation}
+      \OW{\fun{bms}}{2k+1} = \OW{\fun{bms}}{2k} + 2^{\rho_{2k}} +
+      \nu_{2k} - 1.
+      \label{eq:OWbms_2k_1_tmp}
+    \end{equation}
+    The function \(\rho_n\) is the \emph{ruler
+      function} \citep{GrahamKnuthPatashnik_1994,Knuth_2011},
+    \index{ruler function@$\rho_n$|see{ruler function}}\index{ruler
+      function} which satisfies, for \(n>0\), the recurrences
+    \begin{equation}
+      \rho_{1} = 0,\qquad \rho_{2n} = \rho_{n} + 1,\qquad
+      \rho_{2n+1} = 0,\label{eq:ruler}
+    \end{equation}
+    which are easily guessed from the binary notation of~\(n\) as
+    \(\rho_n\)~simply counts the number of trailing zeros. This
+    enables us to slightly simplify equation~\eqref{eq:OWbms_2k_1_tmp}
+    into
+    \begin{equation}
+     \OW{\fun{bms}}{2k+1} = \OW{\fun{bms}}{2k} + 2 \cdot 2^{\rho_{k}}
+     + \nu_{k} - 1.
+     \label{eq:OWbms_2k_1}
+    \end{equation}
+
+  \item \emph{If \(n\)~is odd}, we make
+    \fig~\vref{fig:w2p1},
+\begin{figure}[t]
+\centering
+\subfloat[The sum of the nodes is \(\protect\OW{\protect\fun{bms}}{n}\)
+\label{fig:w2p1}]{%
+\includegraphics{w2p1}}
+\qquad
+\subfloat[The sum of the nodes is \(\protect\OW{\protect\fun{bms}}{n+1}\)
+\label{fig:w2p1_succ}]{%
+\includegraphics[bb=56 602 194 721]{w2p1_succ}}
+\caption{Maximum-cost trees for \(n\)~odd and \(n+1\)
+\label{fig:Wn_odd}}
+\end{figure}
+     where the non\hyp{}boxed expressions sum
+     \(\OW{\fun{bms}}{n} - \sum_{k=0}^{q-1}\OW{\fun{bms}}{2^k} -
+     \sum_{k=2}^{q}2^k + 2((q-1)+(r-q+1)) = \OW{\fun{bms}}{n} -
+     \sum_{k=0}^{q-1}((k-1)2^{k}+1) - \sum_{k=2}^{q}2^k + 2r =
+     \OW{\fun{bms}}{n} - (q-1)2^q - q + 2r + 1\), using
+     equation~\eqref{eq:worst_power} and \(\sum_{k=0}^{q-1}k2^k =  
+     (q-2)2^{q}+2\). Indeed, let \(S_{q} :=
+     \sum_{k=0}^{q-1}{k2^{k-1}}\). Then \(S_{q} + q2^{q-1} = \smash[t]{\sum_{k=1}^{q}{k2^{k-1}}} = \smash[t]{\sum_{k=0}^{q-1}{(k+1)2^{k}}}
+= \smash[t]{\sum_{k=0}^{q-1}{k2^{k}}} + \smash[t]{\sum_{k=0}^{q-1}{2^{k}}}
+= 2 \cdot S_{q} + 2^{q} - 1\), hence
+     \begin{equation}
+       \abovedisplayskip=4pt
+       \belowdisplayskip=4pt
+       S_{q} = \smash[t]{\textstyle\sum_{k=1}^{q-1}{k2^{k-1}}} = (q-2)2^{q-1} + 1.\label{eq:Sj}
+     \end{equation}
+     The same sum in \fig~\ref{fig:w2p1_succ}
+     equals \(\OW{\fun{bms}}{n+1} - \OW{\fun{bms}}{2^q} + (r-q+1) =
+     \OW{\fun{bms}}{n+1} - (q-1)2^{q} - q + r\). Equating the two
+     quantities and simplifying yields
+     \begin{equation*}
+       \OW{\fun{bms}}{n+1} = \OW{\fun{bms}}{n} + r + 1=
+       \OW{\fun{bms}}{n} + \nu_n.
+     \end{equation*}
+     Recalling the recurrences~\eqref{def:nu} \vpageref{def:nu} and
+     setting \(n=2k-1\), this equation is simplified into
+     \begin{equation}
+       \OW{\fun{bms}}{2k} = \OW{\fun{bms}}{2k-1} + \nu_{k-1} + 1.
+       \label{eq:OWbms_2k}
+     \end{equation}
+
+\end{itemize}
+From equations~\eqref{eq:OWbms_2k} and~\eqref{eq:OWbms_2k_1}, we deduce
+\begin{equation*}
+\OW{\fun{bms}}{2k+1} = \OW{\fun{bms}}{2k-1} + 2 \cdot 2^{\rho_k} +
+\nu_{k-1} + \nu_k,\quad \OW{\fun{bms}}{2k+2} = \OW{\fun{bms}}{2k} + 2
+\cdot 2^{\rho_k} + 2\nu_k.
+\end{equation*}
+These equations allow us to compute the values of
+\(\OW{\fun{bms}}{n}\) only with elementary operations. Furthermore,
+summing on all sides yields
+\begin{align}
+\OW{\fun{bms}}{2p+1}
+ &= \OW{\fun{bms}}{1} + 2\!\sum_{k=1}^{p} 2^{\rho_k} +
+    \!\sum_{k=1}^{p}\nu_{k-1} + \!\sum_{k=1}^p\nu_k
+  = 2 \!\sum_{k=1}^{p} 2^{\rho_k}\! + 2\!\sum_{k=1}^{p-1}\nu_k +
+    \!\nu_p.\label{eq:OWbms_2p_1}\\
+\OW{\fun{bms}}{2p}
+  &= \OW{\fun{bms}}{2} + 2\sum_{k=1}^{p-1}2^{\rho_k} +
+2\sum_{k=1}^{p-1}\nu_k
+  = 1 +  2\sum_{k=1}^{p-1}2^{\rho_k} + 2\sum_{k=1}^{p-1}\nu_k.
+\label{eq:OWbms_2p}
+\end{align}
+These expressions involve two interesting number\hyp{}theoretic
+functions, \(\sum_{k=1}^{p-1}2^{\rho_k}\) and
+\(\sum_{k=1}^{p-1}\nu_k\), the latter being \(\OB{\fun{bms}}{p}\), as
+found in equation~\eqref{eq:OBbms}.\index{bms@$\OW{\fun{bms}}{n}$|)}
+\index{merge sort!bottom-up $\sim$!maximum cost|)}
+
+
+\mypar{Average cost}
+\index{merge sort!bottom-up $\sim$!average cost|(}
+
+Let \(\OM{\fun{bms}}{n}\) be the average number of comparisons to sort
+\(n\)~keys bottom\hyp{}up. All permutations of the input stack being
+equally likely, equation~\eqref{eq:cost_bms} \vpageref{eq:cost_bms}
+becomes \(\OM{\fun{bms}}{0} = \OM{\fun{bms}}{1} = 0\)\index{bms@$\OM{\fun{bms}}{n}$} and
+\begin{equation*}
+\OM{\fun{bms}}{n} = \OM{\fun{bms}}{2^{\ceiling{\lg n}-1}}
++ \OM{\fun{bms}}{n - 2^{\ceiling{\lg n}-1}}
++ \OM{\fun{mrg}}{2^{\ceiling{\lg n}-1},n - 2^{\ceiling{\lg n}-1}},
+\end{equation*}
+which, with equation~\eqref{eq:Amrg}, in turn implies
+\(\OM{\fun{bms}}{0} = \OM{\fun{bms}}{1} = 0\) and
+\begin{equation*}
+\OM{\fun{bms}}{n} = \OM{\fun{bms}}{2^{\ceiling{\lg n}-1}}
++ \OM{\fun{bms}}{n - 2^{\ceiling{\lg n}-1}}
++ n - \frac{2^{\ceiling{\lg n}-1}}{n - 2^{\ceiling{\lg n}-1} + 1}
+- \frac{n - 2^{\ceiling{\lg n}-1}}{2^{\ceiling{\lg n}-1}+1}.
+\end{equation*}
+This definition is quite daunting, so let us turn to induction to find
+bounds, as we did for \(\OB{\fun{tms}}{n}\) in
+inequality~\eqref{ineq:McIlroy} \vpageref{ineq:McIlroy}. Let us start
+with the lower bound and set to maximise the real constants
+\(a\)~and~\(b\) in
+\begin{equation*}
+\pred{H}{n} \colon n\lg n + an + b \leqslant \OM{\fun{bms}}{n},
+\; \text{for \(n \geqslant 2\).}
+\end{equation*}
+The base case for induction is \(\pred{H}{2}\):
+\begin{equation}
+2a + b + 1 \leqslant 0.
+\label{ineq:base_lower_Btms}
+\end{equation}
+Let us assume now \(\pred{H}{n}\) for all \(2 \leqslant n \leqslant
+2^p\), and let us prove \(\pred{H}{2^p+i}\), for all \(0 < i \leqslant
+2^p\). The induction principle entails then that \(\pred{H}{n}\)
+holds for any \(n \geqslant 2\). If \(n=2^p+i\), then \(\ceiling{\lg
+  n} - 1 = p\), so
+\begin{equation}
+\OM{\fun{bms}}{2^p+i} = \OM{\fun{bms}}{2^p} + \OM{\fun{bms}}{i}
++ 2^p + i - \frac{2^p}{i+1} - \frac{i}{2^p+1}.
+\label{eq:Abms_2p_i}
+\end{equation}
+By hypothesis, \(\pred{H}{i}\) holds, that is, \(i\lg i + ai + b
+\leqslant \OM{\fun{bms}}{i}\), but, instead of using
+\(\pred{H}{2^p}\), we will use the exact value in
+equation~\eqref{eq:Mjoin} \vpageref{eq:Mjoin}, where \(\alpha :=
+\sum_{k \geqslant 0}1/(2^k+1)\). From equation~\eqref{eq:Abms_2p_i},
+we derive
+\begin{equation*}
+(p-\alpha)2^p + \sum_{k \geqslant
+    0}\frac{1}{2^{k}+2^{-p}}
++ (i\lg i + ai + b) + 2^p + i -
+\frac{2^p}{i+1} - \frac{i}{2^p+1} < \OM{\fun{bms}}{2^p+i}.
+\end{equation*}
+We want to prove \(\pred{H}{2^p+i} \colon (2^p+i)\lg(2^p+i) +
+a(2^p+i) + b \leqslant \OM{\fun{bms}}{2^p+i}\), which is thus implied
+by
+\begin{equation*}
+(2^p+i)\lg(2^p+i) + a2^p \leqslant (p - \alpha + 1)2^p -
+\frac{2^p}{i+1} + i\lg i + i - \frac{i}{2^p+1} + c_p,
+\end{equation*}
+where \(c_p := \sum_{k \geqslant 0}1/(2^{k}+2^{-p})\). Let
+\begin{equation*}
+  \Psi(p,i) := p - \alpha + 1 - \frac{1}{i+1} + \frac{i}{2^p+1} - 
+  \frac{1}{2^p}((2^p+i)\lg(2^p+i) - i\lg i - c_p).
+\end{equation*}
+Then the sufficient condition above is equivalent to \(a \leqslant
+\Psi(p,i)\). To study the behaviour of \(\Psi(p,i)\), let us fix~\(p\)
+and let~\(i\) range over the real interval \(]0,2^p]\). The partial
+derivative of~\(\Psi\) with respect to~\(i\) is
+\begin{equation*}
+\frac{\partial\Psi}{\partial i}(p,i) = \frac{1}{2^p+1}
++ \frac{1}{(i+1)^2} - \frac{1}{2^p}\lg\left(\frac{2^p}{i}+1\right).
+\end{equation*}
+Let us also determine the second derivative with respect to~\(i\):
+\begin{equation*}
+\frac{\partial^2\Psi}{\partial i^2}(p,i) = \frac{1}{(2^p+i)i\ln 2} - \frac{2}{(i+1)^3},
+\end{equation*}
+where \(\ln x\) is the natural logarithm of~\(x\). Let the cubic
+polynomial
+\begin{equation*}
+K_p(i) := i^3 + (3 - 2\ln 2)i^2 + (3 - 2^{p+1}\ln 2)i + 1.
+\end{equation*}
+Then \(\partial^2\Psi/\partial i^2 = 0 \Leftrightarrow K_p(i) = 0\)
+and the sign of \(\partial^2\Psi/\partial i^2\) is the sign of
+\(K_p(i)\). In general, a cubic equation has the form
+\begin{equation*}
+ax^3 + bx^2 + cx + d = 0, \; \text{with \(a \neq 0\)}.
+\end{equation*}
+A classic result about the nature of the roots is as follows. Let the
+\emph{discriminant}\index{discriminant|(} of the cubic be \(\Delta :=
+18abcd - 4b^3d + b^2c^2 - 4ac^3 - 27a^2d^2\).
+\begin{itemize*}
+
+  \item If \(\Delta > 0\), the equation has three distinct real roots;
+
+  \item if \(\Delta = 0\), the equation has a multiple root and all
+    its roots are real;
+
+  \item if \(\Delta < 0\), the equation has one real root and two
+    nonreal complex conjugate roots.
+
+\end{itemize*}
+Let us resume now our discussion. Let the cubic polynomial
+\begin{equation*}
+\Delta(x) \!:= (4\ln 2)x^3 - (9 - 2\ln 2)(3 + 2\ln 2)x^2 + 12(9 - 2\ln
+29)x - 4(27 - 8\ln 2).
+\end{equation*}
+Then the discriminant of \(K_p(i) = 0\) is \(\Delta(2^{p+1}) \cdot
+\ln^2 2\). The discriminant of \(\Delta(x) = 0 \) is negative, thus
+\(\Delta(x)\) has one real root~\(x_0 \simeq 8.64872\). Because the
+coefficient of~\(x^3\) is positive, \(\Delta(x)\) is negative if \(x <
+x_0\) and positive if \(x > x_0\). Since \(p \geqslant 3\) implies
+\(2^{p+1} > x_0\), the discriminant\index{discriminant|)} of \(K_p(i)
+= 0\) is positive, which means that \(K_p(i)\) has three distinct real
+roots if \(p \geqslant 3\), and so does \(\partial^2\Psi/\partial
+i^2\). Otherwise, \(K_p(i)\) has one real root if \(0 \leqslant p
+\leqslant 2\). Before we study these two cases in detail, we need a
+small reminder about cubic polynomials. Let \(\rho_0\), \(\rho_1\)
+and~\(\rho_2\) be the roots of \(P(x) = ax^3 + bx^2 + cx + d\). So
+\(P(x) = a(x-\rho_0)(x-\rho_1)(x-\rho_2) = ax^3 -
+a(\rho_0+\rho_1+\rho_2)x^2 + a(\rho_0\rho_1 + \rho_0\rho_2 + \rho_1
+\rho_2)x - a(\rho_0\rho_1\rho_2)\), so \(\rho_0\rho_1\rho_2 = -d/a\).
+\begin{itemize}
+
+\item Let \(p \in \{0,1,2\}\). We just found that \(K_p(i)\) has one
+  real root, say~\(\rho_0\), and two nonreal conjugate roots,
+  say~\(\rho_1\) and \(\rho_2=\overline{\rho_1}\). Then
+  \(\rho_0\rho_1\rho_2 = \rho_0 \len{\rho_1}^2 = -1\), so \(\rho_0 <
+  0\). Since the coefficient of~\(x^3\) is positive, this entails that
+  \(K_p(i) > 0\) if \(i > 0\), which is true for
+  \(\partial^2\Psi/\partial i^2\) as well: \(i > 0 \) implies
+  \(\partial^2\Psi/\partial i^2 > 0\), therefore
+  \(\partial\Psi/\partial i\) increases. Since
+  \begin{equation*}
+    \frac{\partial\Psi}{\partial i}(p,i) \xrightarrow[i\to 0^{+}]{}
+    -\infty < 0, \;\text{and}\; \left.\frac{\partial\Psi}{\partial
+        i}(p,i)\right|_{i=2^p} = -\frac{1}{2^p(2^p+1)^2} < 0,
+  \end{equation*}
+  we deduce that \(\partial\Psi/\partial i < 0\) if \(i > 0\), which
+  means that \(\Psi(p,i)\) decreases when \(i \in\; ]0,2^p]\). Since
+  we are looking to minimise \(\Psi(p,i)\), we have \(\min_{0 < i
+    \leqslant 2^p}\Psi(p,i) = \Psi(p,2^p)\).
+
+\item If \(p \geqslant 3\), then \(K_p(i)\) has three real
+  roots. Here, the product of the roots of \(K_p(i)\) is~\(-1\), so at
+  most two of them are positive. Since we have \(K_p(0) = 1 > 0\),
+  \(K_p(1) < 0\) and \(\lim_{i\to+\infty}K_p(i) > 0\), we see that
+  \(K_p(i)\) has one root in \(]0,1[\) and one in \(]1,+\infty[\), and
+  so does \(\partial^2\Psi/\partial i^2\). Furthermore,
+  \(\left.\partial\Psi/\partial i\right|_{i=1} > 0\) and
+  \(\left.\partial\Psi/\partial i\right|_{i=2^p} < 0\), therefore,
+  from the intermediate theorem, there exists a real~\(i_p \in\;
+  ]1,2^p[\) such that \(\left.\partial\Psi/\partial i\right|_{i=i_p} =
+  0\), and we know that it is unique because \(\partial\Psi^2/\partial
+  i^2\) changes sign only once in \(]1,+\infty[\). This also means
+  that \(\Psi(p,i)\) increases if~\(i\) increases on \([1,i_p[\),
+  reaches its maximum when \(i=i_p\), and then decreases on
+  \(]i_p,2^p]\). Since \(\lim_{i \to 0^{+}}\Psi(p,i) = -\infty\) and
+  we are searching for a lower bound of \(\Psi(p,i)\), we need to know
+  which of \(i=1\) or \(i=2^p\) minimises \(\Psi(p,i)\): actually, we
+  have \(\Psi(p,1) \geqslant \Psi(p,2^p)\), so we conclude \(\min_{0 <
+    i \leqslant 2^p}\Psi(p,i) = \Psi(p,2^p)\).
+\end{itemize}
+In any case, we need to minimise \(\Psi(p,2^p)\). We have:
+\begin{equation*}
+\Psi(p,2^p) = - \frac{1}{2^p+1} - \sum_{k=0}^{p}\frac{1}{2^k+1}.
+\end{equation*}
+We check that \(\Psi(p,2^p) > \Psi(p+1,2^{p+1})\), so the function
+decreases for integer points and \(a_{\max} = \min_{p > 0}\Psi(p,2^p)
+= \lim_{p \to \infty}\Psi(p,2^p) = -\alpha^{+}\). From
+inequation~\eqref{ineq:base_lower_Btms}, we draw \(b_{\max} =
+-2a_{\max} - 1 = 2\alpha - 1 \simeq 1.52899\). In total, by the
+principle of induction, we have established, for \(n \geqslant 2\),
+\begin{equation*}
+n\lg n - \alpha n + 2\alpha -1 < \OM{\fun{bms}}{n}.
+\end{equation*}
+This bound is better than for the average cost of top\hyp{}down merge
+sort, inequation~\eqref{ineq:lower_Atms} \vpageref{ineq:lower_Atms},
+because there, we had to decompose~\(n\) into even and odd values, not
+\(n=2^p+i\) which allowed us here to use the exact value of
+\(\OM{\fun{bms}}{2^p}\). It is even slightly better
+than~\eqref{ineq:M_join} \vpageref{ineq:M_join}, which is quite a nice
+surprise.
+
+We need now to work out an upper bound using the same technique. In
+other words, we want to minimise the real constants \(a'\)~and~\(b'\)
+in \(\OM{\fun{bms}}{n} \leqslant n\lg n + a'n + b'\), for \(n
+\geqslant 2\). The difference with the lower bound is that the
+inequations are reversed: \(a'\geqslant \Psi(p,i)\) and \(b' \geqslant
+-2a' - 1\). We revisit the two cases above:
+\begin{itemize}
+
+  \item If \(0 \leqslant p \leqslant 2\), then \(\max_{0 < i
+    \leqslant 2^p}\Psi(p,i) = \Psi(p,1)\). We easily check that
+  \(\max_{0 \leqslant p \leqslant 2}\Psi(p,1) = \Psi(0,1) = 1 -
+  \alpha\).
+
+\item If \(p \geqslant 3\), we need to express \(i_p\)~as a function
+  of~\(p\), but it is hard to solve the equation
+  \(\left.\partial\Psi/\partial i\right|_{i=i_p} = 0\), even
+  approximately.
+
+\end{itemize}
+Before giving up, we could try to differentiate~\(\Psi\) with respect
+to~\(p\), instead of~\(i\). Indeed, \((p,i,\Psi(p,i))\) defines a
+surface in space, and by privileging \(p\)~over~\(i\), we are slicing
+the surface along planes perpendicular to the \(i\)~axis. Sometimes,
+slicing in one direction instead of another makes the analysis
+easier. The problem here is to differentiate~\(c_p\). We can work our
+way round with the bound \(c_p < 2\) from~\eqref{ineq:M_join}
+\vpageref{ineq:M_join} and define
+\begin{equation*}
+  \Phi(p,i) := p - \alpha + 1 - \frac{1}{i+1} + \frac{i}{2^p+1} - 
+  \frac{1}{2^p}((2^p+i)\lg(2^p+i) - i\lg i - 2).
+\end{equation*}
+Now we have \(\Psi(p,i) < \Phi(p,i)\) and, instead of \(\Psi(p,i)
+\leqslant a'\), we can impose the stronger constraint \(\Phi(p,i)
+\leqslant a'\) and cross our fingers. In \fig~\vref{fig:phi},
+\begin{figure}
+\centering
+\includegraphics[bb=71 565 400 725]{phi} 
+\caption{\(\Phi(p,1)\), \(\Phi(p,2)\) and \(\Phi(p,3)\)\label{fig:phi}}
+\end{figure}
+are outlined \(\Phi(p,1)\), \(\Phi(p,2)\) and \(\Phi(p,3)\). (The
+starting point for each curve is marked by a white disk.)
+Differentiating with respect to~\(p\) yields
+\begin{equation*}
+\frac{\partial\Phi}{\partial p}(p,i) = 
+\frac{i}{2^p}\ln\left(\frac{2^p}{i}+1\right)
+- \frac{\ln 2}{2^{p-1}} - \frac{i2^p\ln 2}{(2^p+1)^2}.
+\end{equation*}
+To study the sign of \(\partial\Phi(p,i)/\partial p\) when~\(p\)
+varies, let us define
+\begin{equation*}
+\varphi(x,i) := \frac{x}{i\ln 2} \cdot
+                \left.\frac{\partial\Phi}{\partial
+                    p}(p,i)\right|_{p=\lg x}.
+\end{equation*}
+Because \(x \geqslant 1\) implies \(x/i\ln 2 > 0\) and \(\lg x
+\geqslant 0\), the sign of \(\varphi(x,i)\) when~\(x \geqslant 1\)
+varies is the same as the sign of \(\partial\Phi(p,i)/\partial p\)
+when~\(p \geqslant 0\) varies, bearing in mind that \(x=2^p\). We
+have
+\begin{align*}
+\varphi(x,i) &= \lg\left(\frac{x}{i}+1\right) -
+\left(\!\frac{x}{x+1}\!\right)^2 - \frac{2}{i},\\
+\frac{\partial\varphi}{\partial x}(x,i) &=
+\frac{1}{(x+i)\ln 2} - \frac{2x}{(x+1)^3}.
+\end{align*}
+This should remind us of a familiar sight:
+\begin{equation*}
+\frac{\partial\varphi}{\partial x}(x,i) =
+  x \cdot \left.\frac{\partial^2\Psi}{\partial x^2}(p,x)\right|_{p=\lg
+  i}.
+\end{equation*}
+When \(x \geqslant 1\) varies, the sign of
+\(\partial\varphi(x,i)/\partial x\) is the same as the sign of
+\(\left.\partial^2\Psi(p,x)/\partial x^2\right|_{p=\lg i}\), so we can
+reuse the previous discussion on the roots of \(K_p(i)\), while taking
+care to replace~\(i\) by~\(x\), and~\(2^p\) by~\(i\):
+\begin{itemize}
+
+\item If \(i \in \{1,2,3,4\}\), then \(\partial\varphi(x,i)/\partial x
+  > 0\) when \(x > 0\).
+
+\item If \(i \geqslant 5\), then \(\partial\varphi(x,i)/\partial x >
+  0\) when \(x \geqslant 1\).
+
+\end{itemize}
+In both cases, \(\varphi(x,i)\) increases when \(x \geqslant 1\),
+which, with the facts that \(\lim_{x\to 0^{+}}\varphi(x,i) = -\infty <
+0\) and \(\lim_{x\to\infty}\varphi(x,i) = +\infty > 0\), entails that
+there exists a unique root~\(\rho > 0\) such that \(\varphi(x,i) < 0\)
+if \(x < \rho\), and \(\varphi(x,i) > 0\) if \(x > \rho\), and the
+same holds for \(\partial\Phi/\partial p\) (with a different
+root). Concordantly, \(\Phi(p,i)\) is decreasing down to its minimum,
+and increasing afterwards. (See again \fig~\vref{fig:phi}.)
+
+Moreover \(\overline\lim_{p \to \infty}\Phi(p,i) = i/(i+1) - \alpha <
+1 - \alpha = \Phi(0,1)\), so the curves have asymptotes. Since we are
+searching for the maximum, we deduce: \(a'_{\min} = \max_{0 < i
+  \leqslant 2^p}\Phi(p,i) = 1 - \alpha \simeq -0.2645\), and the
+constant is \(b'_{\min} = -2a'_{\min} - 1 = 2\alpha - 3 \simeq
+-0.471\). In sum, we found, for \(n \geqslant 2\),
+\begin{equation}
+n\lg n - \alpha n + (2\alpha - 1) < \OM{\fun{bms}}{n} 
+< n\lg n - (\alpha - 1)n - (3 - 2\alpha).
+\label{ineq:bounds_Mbms}
+\end{equation}
+The lower bound is most accurate when \(n=2^p\). To interpret the
+values of~\(n\) for which the upper bound is most accurate, we need
+another glance at \fig~\vref{fig:phi}. We have \(i/(i+1) - \alpha \to
+1 - \alpha\), as \(p \to \infty\), but this does not tell us anything
+about~\(p\). Unfortunately, as noted earlier, for a given~\(p\), we
+cannot characterise explicitly~\(i_p\), which is the value of~\(i\)
+maximising \(\Phi(p,i)\) (in the planes perpendicular to this
+page). Anyway, the linear terms of these bounds cannot be improved
+upon. This means that the additional number of comparisons incurred by
+sorting \(n=2^p+i\) keys instead of~\(2^p\) is at most~\(n\). As with
+top\hyp{}down merge sort, more advanced mathematics by
+\cite{PannyProdinger_1995} show that \(\OM{\fun{bms}}{n} = n\lg n +
+B^*(\lg n) \cdot n\)\index{bms@$\OM{\fun{bms}}{n}$}, where \(B^*\)~is
+a continuous, non\hyp{}differentiable, periodic function whose average
+value is approximately \(-0.965\). Obviously, we have
+\(\OM{\fun{bms}}{n} \sim n\lg n \sim \OW{\fun{bms}}{n} \sim 2 \cdot
+\OB{\fun{bms}}{n}\).
+\index{merge sort!bottom-up $\sim$!average cost|)}
+
+\mypar{Program}
+\index{merge sort!bottom-up $\sim$!program}
+
+We managed to analyse the number of comparisons to sort by merging
+because the whole process can easily be depicted as a
+tree\index{tree!merge $\sim$|(}. It is time to provide a program whose
+traces conform to these merge trees. In \fig~\vref{fig:bms} is shown
+the definitions of the main sorting function
+\fun{bms/1}\index{bms@\fun{bms/1}} and several auxiliaries. The call
+\(\fun{solo}(s)\)\index{solo@\fun{solo/1}} is a stack containing
+singletons with all the keys of~\(s\) in the same order. In other
+words, it is the leaves of the merge tree. The call
+\(\fun{all}(u)\)\index{all@\fun{all/1}} is a stack containing stacks
+which are the result of merging adjacent stacks in~\(u\). In other
+words, it is the level just above~\(u\) in the merge tree. The call
+\(\fun{all}(\fun{solo}(s))\) is the sorted stack corresponding to the
+stack of singletons~\(\fun{solo}(s)\). In other words, starting with
+the leaves, it keeps building levels up by calling
+\fun{mrg/2}\index{mrg@\fun{mrg/2}} until the root of the merge tree is
+reached. What is beautiful about this program is that there is no need
+for two distinct phases, first building the perfect merge trees and
+then performing the unbalanced mergers with the roots of these: it is
+possible to achieve the same effect by interleaving rightwards and
+upwards constructions.\index{tree!merge $\sim$|)}
+\begin{figure}
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}lr@{\;}l@{\;}l}
+  \fun{bms}(\el) & \xrightarrow{\smash{\mu}} & \el;
+& \fun{solo}(\el) & \xrightarrow{\smash{\xi}} & \el;\\
+  \fun{bms}(s) & \xrightarrow{\smash{\nu}}
+               & \fun{all}(\fun{solo}(s)).
+& \fun{solo}(\cons{x}{s}) & \xrightarrow{\smash{\pi}}
+                          & \cons{[x]}{\fun{solo}(s)}.\\
+\\
+  \fun{all}([s]) & \xrightarrow{\smash{\rho}} & s;
+& \fun{nxt}(\cons{s,t}{u}) & \xrightarrow{\smash{\tau}}
+                         & \cons{\fun{mrg}(s,t)}{\fun{nxt}(u)};\\
+  \fun{all}(s) & \xrightarrow{\smash{\sigma}}
+               & \fun{all}(\fun{nxt}(s)).
+& \fun{nxt}(u) & \xrightarrow{\smash{\upsilon}} & u.\\
+\\
+\fun{mrg}(\el,t)         & \xrightarrow{\smash{\theta}} & t;\\
+\fun{mrg}(s,\el)         & \xrightarrow{\smash{\iota}} & s;\\
+\fun{mrg}(\cons{x}{s},\cons{y}{t}) & \xrightarrow{\smash{\kappa}}
+& \multicolumn{4}{@{}l}{\cons{y}{\fun{mrg}(\cons{x}{s},t)},
+\;\text{if \(x \succ y\);}}\\
+\fun{mrg}(\cons{x}{s},t) & \xrightarrow{\smash{\lambda}}
+                         & \cons{x}{\fun{mrg}(s,t)}.
+\end{array}}
+\end{equation*}
+\caption{Sorting by bottom-up mergers with \fun{bms/1}\label{fig:bms}}
+\end{figure}
+
+
+\paragraph{Additional cost}
+
+In order to determine the cost
+\(\C{\fun{bms}}{n}\)\index{bms@$\C{\fun{bms}}{n}$} we need to add to
+the number of comparisons the number of rewrite steps that do not
+involve comparisons, that is, other than by rules
+\(\kappa\)~and~\(\lambda\).
+\begin{itemize}
+
+  \item Rules \(\theta\)~and~\(\iota\) are used once to conclude each
+  merger. Let \(\OC{\ltimes}{n}\)\index{mrg@$\OC{\ltimes}{n}$} be the
+  number of comparisons to perform the unbalanced mergers when there
+  are \(n\)~keys to sort. Looking back at \fig~\vref{fig:msort_gen},
+  we see that
+    \begin{equation}
+      \OC{\ltimes}{n} :=
+      \sum_{i=1}^{r}{\OC{\fun{mrg}}{2^{e_i},2^{e_{i-1}}+\dots+2^{e_0}}}.
+      \label{eq:C_unbal}
+    \end{equation}
+    The total number of comparisons is the sum of the numbers of
+    comparisons of the balanced and unbalanced mergers:
+    \begin{equation}
+      \OC{\fun{bms}}{n}
+      = \sum_{i=0}^{r}{\C{\Join}{e_i}}
+      +
+      \OC{\ltimes}{n}
+      = \sum_{i=0}^{r}{\OC{\fun{bms}}{2^{e_i}}}
+      +
+      \sum_{i=1}^{r}{\OC{\fun{mrg}}{2^{e_i},2^{e_{i-1}}+\dots+2^{e_0}}}.
+      \label{eq:msort_gen}
+    \end{equation}
+    To find the number of mergers, let us set \(\OC{\fun{mrg}}{m,n} =
+    1\) in equation~\eqref{eq:cost_power_2}
+    \vpageref{eq:cost_power_2}, yielding \(\OC{\fun{bms}}{2^p} = 2^p -
+    1\). By plugging this result in equation~\eqref{eq:msort_gen}, we
+    draw \(\OC{\fun{bms}}{n} = n - 1\). In other words, rules
+    \(\theta\)~and~\(\iota\) are used \(n-1\)\label{eq:bms_merges}
+    times in total.\index{bms@$\OC{\fun{bms}}{n}$}
+
+  \item In rule~\(\tau\), one call
+    \(\fun{nxt}(\cons{s,t}{u})\)\index{nxt@\fun{nxt/1}} corresponds to
+    one call \(\fun{mrg}(s,t)\)\index{mrg@\fun{mrg/2}}, one for each
+    merger. Therefore, \(\tau\)~is used \(n-1\)~times.
+
+  \item Rule~\(\upsilon\) is used once for each level in the merge
+    tree\index{tree!merge $\sim$}, except the root, with~\(u\) either
+    empty or a singleton.  Let~\(\Lambda(j)\) be the number of nodes
+    at level~\(j\), where \(j=0\) represents the level of the
+    leaves. Then, the number~\(z\) we are looking for is the greatest
+    natural satisfying the equation \(\Lambda(z) = 1\), at the
+    root. Function~\fun{nxt/1}\index{nxt@\fun{nxt/1}} implies
+    \begin{equation*}
+      \Lambda(j+1) = \ceiling{\Lambda(j)/2},\; \text{with \(\Lambda(0)
+        = n\)}.
+    \end{equation*}
+    This recurrence is equivalent to the closed form \(\Lambda(j) =
+    \ceiling{n/2^j}\), as a consequence of the following theorem.
+\begin{thm}[Ceilings and Fractions]
+\label{thm:ceilings}
+\textsl{Let \(x\)~be a real number and \(q\)~a natural number. Then
+  \(\ceiling{\ceiling{x}/q} = \ceiling{x/q}\).}
+\end{thm}
+\begin{proof}
+  The equality is equivalent to the conjunction of the two
+  complementary inequalities \(\ceiling{\ceiling{x}/q} \geqslant
+  \ceiling{x/q}\) and \(\ceiling{\ceiling{x}/q} \leqslant
+  \ceiling{x/q}\). The former is direct: \(\ceiling{x} \geqslant x
+  \Rightarrow \ceiling{x}/q \geqslant x/q \Rightarrow
+  \ceiling{\ceiling{x}/q} \geqslant \ceiling{x/q}\). Since both sides
+  of the inequality are integers, \(\ceiling{\ceiling{x}/q} \leqslant
+  \ceiling{x/q}\) is equivalent to state that \(p \leqslant
+  \ceiling{\ceiling{x}/q} \Rightarrow p \leqslant \ceiling{x/q}\), for
+  any integer~\(p\). An obvious lemma is that if \(i\)~is an integer
+  and~\(y\) a real number, \(i \leqslant \ceiling{y} \Leftrightarrow i
+  \leqslant y\), so the original inequality is equivalent to \(p
+  \leqslant \ceiling{x}/q \Rightarrow p \leqslant x/q\), for any
+  integer \(p\), which is \(pq \leqslant \ceiling{x} \Rightarrow pq
+  \leqslant x\). The lemma yields this implication, achieving the
+  proof.
+\end{proof}
+    \noindent To find~\(z\), we express~\(n\) in binary:
+    \(n :=\!  \sum_{k=0}^{m-1}{b_k2^k} = (b_{m-1}\ldots
+    b_0)_2\), where \(b_k \in \{0,1\}\) and \(b_{m-1} = 1\). It is
+    easy to derive a formula for~\(b_i\). We have
+    \begin{equation}
+      \frac{n}{2^{i+1}}
+      = \frac{1}{2^{i+1}}\sum_{k=0}^{m-1}{b_k2^{k}}
+      = \frac{1}{2^{i+1}}\sum_{k=0}^{i}{b_k2^k} + (b_{m-1}\dots b_{i+1})_2.
+      \label{eq:n_on_power_2}
+    \end{equation}
+    We prove that \(\floor{n/2^{i+1}} = (b_{m-1}\dots b_{i+1})_2\) as
+    follows:
+    \begin{equation*}
+      \sum_{k=0}^{i}{2^k} < 2^{i+1}
+      \Rightarrow
+      0 \leqslant \sum_{k=0}^{i}{b_k2^k} < 2^{i+1}
+      \Leftrightarrow
+      0 \leqslant \frac{1}{2^{i+1}}\sum_{k=0}^{i}{b_k2^k} < 1.
+    \end{equation*}
+    This and equation~\eqref{eq:n_on_power_2} imply that
+    \begin{equation*}
+      \left\lceil\frac{n}{2^i}\right\rceil =
+      (b_{m-1}\dots b_i)_2
+      + \begin{cases}
+          0, & \text{if \((b_{i-1}\dots b_0)_2=0\)};\\
+          1, & \text{otherwise}.
+        \end{cases}
+    \end{equation*}
+    Therefore, \(\ceiling{n/2^z} = 1\) is equivalent to \(z=m-1\)
+    if \(n=2^{m-1}\), and \(z=m\) otherwise. Equation~\eqref{eq:e_r}
+    \vpageref{eq:e_r} states \(m = \floor{\lg n} + 1\), thus
+    \(z=\floor{\lg n}\) if \(n\)~is a power of~\(2\), and
+    \(z=\floor{\lg n} + 1\) otherwise. More simply, this means that
+    \(z=\ceiling{\lg n}\).
+
+  \item Rule~\(\rho\) is used once, at the root. Rule~\(\sigma\) is
+    used \(z\)~times.
+
+  \item The trace of \(\fun{solo}(s)\)\index{solo@\fun{solo/1}}
+    is~\(\pi^n\xi\) if~\(s\) contains \(n\)~keys, so
+    \(\C{\fun{solo}}{n} = n + 1\).
+
+  \item The contribution to the total cost of rules
+    \(\mu\)~and~\(\nu\) is simply~\(1\).
+
+\end{itemize}
+In total, \(\C{\fun{bms}}{n} = \OC{\fun{bms}}{n} + 3n + 2\ceiling{\lg
+  n} + 1\) and \(\C{\fun{bms}}{n} \sim
+\OC{\fun{bms}}{n}\).\index{bms@$\C{\fun{bms}}{n}$}
+
+\paragraph{Improvement}
+
+It is easy to improve upon \fun{bms/1} by directly building the second
+level of the merge tree\index{tree!merge $\sim$} \emph{without using
+  \fun{mrg/2}}\index{mrg@\fun{mrg/2}}. Consider the program in
+\fig~\vref{fig:bms0}, 
+\begin{figure}
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l@{\;}l}
+\fun{bms}_0(s)   & \rightarrow & \fun{all}(\fun{duo}(s)).\\
+\\
+\fun{duo}(\cons{x,y}{s}) & \rightarrow & \cons{[y,x]}{\fun{duo}(s)},
+                                       & \text{if \(x \succ y\)};\\
+\fun{duo}(\cons{x,y}{s}) & \rightarrow & \cons{[x,y]}{\fun{duo}(s)};\\
+\fun{duo}(s)             & \rightarrow & [s].\\
+\\
+\fun{all}([s]) & \rightarrow & s;\\
+\fun{all}(s)   & \rightarrow & \fun{all}(\fun{nxt}(s)).\\
+\\
+\fun{nxt}(\cons{s,t}{u}) & \rightarrow
+                         & \cons{\fun{mrg}(s,t)}{\fun{nxt}(u)};\\
+\fun{nxt}(u)             & \rightarrow & u.\\
+\\
+\fun{mrg}(\el,t)         & \rightarrow & t;\\
+\fun{mrg}(s,\el)         & \rightarrow & s;\\
+\fun{mrg}(\cons{x}{s},\cons{y}{t}) & \rightarrow
+                         & \cons{y}{\fun{mrg}(\cons{x}{s},t)},
+                         & \text{if \(x \succ y\)};\\
+\fun{mrg}(\cons{x}{s},t) & \rightarrow & \cons{x}{\fun{mrg}(s,t)}.
+\end{array}}
+\end{equation*}
+\caption{Faster bottom\hyp{}up merge sort with
+  \fun{bms\(_0\)/1}\label{fig:bms0}}
+\end{figure}
+where \fun{solo/1}\index{solo@\fun{solo/1}} has been replaced
+by~\fun{duo/1}\index{duo@\fun{duo/1}}. The number of comparisons is
+unchanged, but the cost, measured as the number of rewrites, is
+slightly smaller. The added cost
+of~\(\fun{duo}(s)\)\index{duo@\fun{duo/1}} is \(\floor{n/2}+1\), where
+\(n\)~is the length of~\(s\). On the other hand, we save the cost
+of~\(\fun{solo}(s)\)\index{solo@\fun{solo/1}}. The first rewrite by
+rule~\(\sigma\) is not performed, as well as the subsequent call
+\(\fun{nxt}(s)\)\index{nxt@\fun{nxt/1}}, to wit, \(\floor{n/2}\) calls
+to \fun{mrg/2}\index{mrg@\fun{mrg/2}} on pairs of singletons
+by~\(\kappa\) or~\(\lambda\), plus one rewrite by~\(\theta\)
+or~\(\iota\) for the last singleton or the empty stack, totalling
+\(\floor{n/2}\C{\fun{mrg}}{1,1} + 1 = 2\floor{n/2} + 1\). In the end,
+the total cost is decreased by
+\begin{equation*}
+  ((n+1) + 1 + (2\floor{n/2}+1)) - (\floor{n/2}+1) = n + \floor{n/2} +
+  2.
+\end{equation*}
+Hence, \(\C{\fun{bms}_0}{n} = \OC{\fun{bms}}{n} + \ceiling{3n/2} +
+2\ceiling{\lg n} - 1\), for \(n>0\), and \(\C{\fun{bms}_0}{0} =
+3\). Asymptotically, we have \(\C{\fun{bms}_0}{n} \sim
+\OC{\fun{bms}}{n}\).\index{bms@$\OC{\fun{bms}}{n}$}
+
+
+\section{Comparison}
+
+In this section we gather our findings about top\hyp{}down and
+bottom\hyp{}up merge sort for an easier comparison, and we also
+present new results which relate the costs of both algorithms.
+
+\mypar{Minimum cost}
+
+The minimum cost of both variants of merge sort is the same:
+\(\OB{\fun{tms}}{n} = \OB{\fun{bms}}{n}\) and
+\begin{equation*}
+\tfrac{1}{2}n\lg n - \left(\tfrac{1}{2}\lg\tfrac{4}{3}\right)n + \lg\tfrac{4}{3}
+\leqslant \OB{\fun{tms}}{n} \leqslant
+\tfrac{1}{2}n\lg n.
+\end{equation*}
+The lower bound is tight for \(n=2\) and most accurate when \(n\)~is a
+Jacobsthal\index{Jacobsthal number} number (see~\eqref{eq:Jacobsthal}
+\vpageref{eq:Jacobsthal}). The upper bound is tight when
+\(n=2^p\). These results may not be intuitive a priori.
+
+\mypar{Maximum cost}
+
+\hspace*{-8.7pt} In the previous sections, we found the following bounds:
+\begin{align*}
+n\lg n - n + 1 &\leqslant \OW{\fun{tms}}{n} <
+n\lg n - 0.91 n + 1;\\
+n\lg n - n + 1 &\leqslant \OW{\fun{bms}}{n} < n\lg n - 1.
+\end{align*}
+In both cases, the lower bound is tight if, and only if, \(n=2^p\).
+The upper bound of top\hyp{}down merge sort is most accurate when
+\(n\)~is the nearest integer to \(2^p\ln 2\). The upper bound of
+bottom\hyp{}up merge sort is most accurate if \(n=2^p+1\).
+
+It is interesting to bound \(\OW{\fun{bms}}{n}\) in term of
+\(\OW{\fun{tms}}{n}\), shedding further light on the relationship
+between these two variants of merge sort.
+
+We already noted \(\OC{\fun{bms}}{2^p} = \OC{\fun{tms}}{2^p}\), so
+\(\OW{\fun{bms}}{2^p} = \OW{\fun{tms}}{2^p}\). Furthermore, we have
+\(\OW{\fun{bms}}{2^p} = \OW{\fun{bms}}{2^p-1} + p\), thus
+\(\OW{\fun{bms}}{2^p-1} = \OW{\fun{tms}}{2^p-1}\). Another interesting
+value is \(\OW{\fun{tms}}{2^p+1} = (p-1)2^p + p + 2\), so
+\(\OW{\fun{bms}}{2^p+1} - \OW{\fun{tms}}{2^p+1} = 2^p - p - 1\). This
+leads us to conjecture the following tight bounds in relationship with
+top\hyp{}down merge sort:
+\begin{equation*}
+\OW{\fun{tms}}{n} \leqslant \OW{\fun{bms}}{n} \leqslant
+\OW{\fun{tms}}{n} + n - \ceiling{\lg n} - 1.
+\index{tms@$\OW{\fun{tms}}{n}$}
+\index{bms@$\OW{\fun{bms}}{n}$}
+\end{equation*}
+We will prove these inequalities by means of mathematical induction
+on~\(n\) and, in the process, we will discover when they become
+equalities. First, let us deduce from the general recurrence for
+the cost of bottom\hyp{}up merge sort the recurrence for the maximum
+cost:
+\begin{equation}
+\OW{\fun{bms}}{0} = \OW{\fun{bms}}{1} = 0;\quad \OW{\fun{bms}}{n} =
+\OW{\fun{bms}}{2^{\ceiling{\lg n}-1}} +
+\OW{\fun{bms}}{n-2^{\ceiling{\lg n}-1}} + n - 1.
+\label{eq:bot}
+\end{equation}
+Also, we easily check that, for all \(p \geqslant 0\),
+\begin{equation}
+\OW{\fun{tms}}{2^p} = \OW{\fun{bms}}{2^p}.
+\label{eq:2p}
+\end{equation}
+
+\paragraph{Lower bound}
+
+Let us prove, for all \(n \geqslant 0\),
+\begin{equation}
+\pred{W\(_L\)}{n} \colon \OW{\fun{tms}}{n} \leqslant
+\OW{\fun{bms}}{n}.
+\index{WL@$\predName{W}_L$}
+\label{ineq:topbot}
+\end{equation}
+From~\eqref{eq:2p}, it is clear that \(\pred{W\(_L\)}{2^0}\)
+holds. Let the induction hypothesis be \(\forall m \leqslant
+2^p.\pred{W\(_L\)}{m}\). The induction principle requires that we
+prove \(\pred{W\(_L\)}{2^p+i}\), for all \(0 < i < 2^p\). Note that we
+leave aside the case when \(i=2^p\), because
+\(\pred{W\(_L\)}{2^{p+1}}\) is already true from~\eqref{eq:2p}.
+
+Equations~\eqref{eq:bot} and~\eqref{eq:2p}
+yield\index{bms@$\OW{\fun{bms}}{n}$}
+\begin{align*}
+\OW{\fun{bms}}{2^p+i} &= 
+\OW{\fun{bms}}{2^p} + \OW{\fun{bms}}{i} + 2^p + i - 1\\
+& = \OW{\fun{tms}}{2^p} + \OW{\fun{bms}}{i} + 2^p + i - 1 \geqslant
+\OW{\fun{tms}}{2^p} + \OW{\fun{tms}}{i} + 2^p + i - 1,
+\end{align*}
+the inequality being the instance \(\pred{W\(_L\)}{i}\) of the
+induction hypothesis. Consequently, if the inequality
+\begin{equation}
+\OW{\fun{tms}}{2^p} + \OW{\fun{tms}}{i} + 2^p + i - 1 \geqslant
+\OW{\fun{tms}}{2^p+i} 
+\label{ineq:suff_cond}
+\end{equation}
+holds, the result \(\pred{W\(_L\)}{2^p+i}\) ensues. Let us try to
+prove it.
+
+Let \(n = 2^p + i\). Then \(p = \floor{\lg n}\) and \(\ceiling{\lg n}
+= \floor{\lg n} + 1\). Equation~\eqref{eq:top} \vpageref{eq:top}
+entails
+\begin{align*}
+\OW{\fun{tms}}{2^p+i} &=
+(2^p+i)(p+1)-2^{p+1}+1 = ((p-1)2^p+1)+(p+1)i\\
+&= \OW{\fun{tms}}{2^p} + (p+1)i.
+\end{align*}
+Therefore, inequation~\eqref{ineq:suff_cond} is equivalent to \(pi
+\leqslant \OW{\fun{tms}}{i} + 2^p - 1\). Using
+equation~\eqref{eq:top}, this inequality in turn is equivalent to
+\begin{equation}
+(p - \ceiling{\lg i})i \leqslant 2^p - 2^{\ceiling{\lg i}}.
+\label{conj}
+\end{equation}
+To prove it, we have two complementary cases to analyse:
+\begin{itemize}
+
+  \item \(i=2^q\), with \(0 \leqslant q < p\). Then \(\lg i = q\) and
+  equation~\eqref{conj} is equivalent to \((p-q)2^q \leqslant 2^p -
+  2^q\), that is
+  \begin{equation}
+   p-q \leqslant 2^{p-q} - 1.\label{conj0}
+  \end{equation}
+  Let \(f(x) := 2^x - x - 1\), with \(x > 0\). We have \(f(0) = f(1) =
+  0\) and \(f(x) > 0\) for \(x>1\), so the inequality~\eqref{conj0}
+  holds and is tight if, and only if, \(x=1\), that is, \(q=p-1\).
+
+  \item \(i = 2^q + j\), with \(0 \leqslant q < p\) and \(0 < j <
+    2^q\). Then \(\floor{\lg i} = q = \ceiling{\lg i} - 1\) and
+    inequation~\eqref{conj} is then equivalent to the inequality
+    \((p-q-1)i \leqslant 2^p - 2^{q+1}\), that is to say,
+    \begin{equation}
+      (p-q+1)2^q + (p-q-1)j \leqslant 2^p.\label{conj1}
+    \end{equation}
+    Since \(p-q-1 \geqslant 0\) and \(j < 2^q\), we have \((p-q-1)j
+    \leqslant (p-q-1)2^q\) (tight if \(q=p-1\)). Hence
+    \((p-q+1)2^q+(p-q-1)j \leqslant
+    (p-q)2^{q+1}\). Inequation~\eqref{conj1} is entailed if \(2(p-q)
+    \leqslant 2^{p-q}\). Let \(g(x) := 2^x - 2x\), with \(x > 0\). We
+    have \(g(1) = g(2) = 0\) and \(f(x) > 0\) for \(x > 2\). Thus,
+    inequality~\eqref{conj1} holds and is tight if, and only if,
+    \(x=1\), that is, \(q=p-1\) (the case \(x=2\) implies \(i
+    \leqslant 2^{p-1}\), which cannot be tight).\hfill\(\Box\)
+
+\end{itemize}
+
+Let us find now the shape of~\(n\) when \(\pred{W\(_L\)}{n}\) is
+tight. We proved above that if \(q=p-1\), that is, the binary notation
+of~\(n\) starts with two 1-bits, formally written as
+\((11(0+1)^*)_2\), then the following inequality holds:
+\begin{equation*}
+\OW{\fun{tms}}{2^p+i} =
+\OW{\fun{tms}}{2^p} + \OW{\fun{tms}}{i} + 2^p + i - 1 \leqslant
+\OW{\fun{tms}}{2^p} + \OW{\fun{bms}}{i} + 2^p + i - 1 =
+\OW{\fun{bms}}{2^p+i}.
+\end{equation*}
+The inequality is tight, \(\OW{\fun{tms}}{2^p+i} =
+\OW{\fun{bms}}{2^p+i}\), if, and only if, \(\OW{\fun{bms}}{i} =
+\OW{\fun{tms}}{i}\). \index{bms@$\OW{\fun{bms}}{n}$}
+\index{tms@$\OW{\fun{tms}}{n}$} Using the case analysis above, if \(i
+= 2^q + j\), we have \(\OW{\fun{tms}}{2^p+i} =
+\OW{\fun{bms}}{2^p+i}\), if, and only if, \(\OW{\fun{tms}}{2^{p-1}+j}
+= \OW{\fun{bms}}{2^{p-1}+j}\). These equivalences can be repeated,
+yielding two strictly decreasing sequences of positive integers,
+\(2^p+i > 2^{p-1}+j > 2^{p-2}+k > \dots\) and \(i > j > k > \dots\)
+The end of the latter recursive descent is simply~\(0\), which means
+that the former stops at a power of~\(2\), for which we know
+equation~\eqref{eq:2p}. In other words, the binary representation
+of~\(n\) is made of a series of one or more 1-bits (from \(2^p\),
+\(2^{p-1}\), \(2^{p-2}\), \ldots), possibly followed by successive
+0-bits, which we formally write \(n=(1^+0^*)_2\). This means that
+\(n\)~is the difference between two powers of~\(2\):
+\begin{equation}
+\boxed{\OW{\fun{bms}}{n} = \OW{\fun{tms}}{n} \Leftrightarrow n=2^p - 2^q.}
+\label{eq:Wbms_eq_Wtms}
+\end{equation}
+Note that if \(n=2^p-1\), the number of unbalanced mergers,
+bottom\hyp{}up, is maximum, and the maximum costs are the same in both
+variants. Also, the case \(n=2^p\) minimises both maximum costs.
+
+\paragraph{Upper bound}
+
+If \(n=2^p+1\), then \(p=\floor{\lg n}=\ceiling{\lg
+  n}-1\). Furthermore, definition~\eqref{eq:bot} entails
+\(\OW{\fun{bms}}{2^p+1} = p2^p+1\) and definition~\eqref{eq:top}
+\vpageref{eq:top} \(\OW{\fun{tms}}{2^p+1} = (p-1)2^p+p+2\), so
+\(\OW{\fun{bms}}{2^p+i} - \OW{\fun{tms}}{2^p+i} = 2^p - p - 1\). In
+terms of~\(n\), this means that \(\OW{\fun{bms}}{n} -
+\OW{\fun{tms}}{n} = n - \ceiling{\lg n} - 1\), if \(n=2^p+1\). We want
+to prove that this difference is maximum:
+\begin{equation}
+  \pred{W\(_U\)}{n} \colon \OW{\fun{bms}}{n} \leqslant \OW{\fun{tms}}{n} + n -
+  \ceiling{\lg n} - 1.
+\label{ineq:upper_Wbms}
+\index{WU@$\predName{W}_U$}
+\end{equation}
+Notice how equation~\eqref{eq:2p} entails
+\(\pred{W\(_U\)}{2^0}\). Consequently, let the induction hypothesis be
+\(\forall m \leqslant 2^p.\pred{W\(_U\)}{m}\) and let us prove that
+\(\pred{W\(_U\)}{2^p+i}\), for all \(0 < i < 2^p\).
+
+Let \(n=2^p+i\). Equations~\eqref{eq:bot} and~\eqref{eq:2p} yield
+\begin{align*}
+\OW{\fun{bms}}{2^p+i} &= \OW{\fun{bms}}{2^p} + \OW{\fun{bms}}{i} +
+2^p + i - 1
+= \OW{\fun{tms}}{2^p} + \OW{\fun{bms}}{i} + 2^p + i - 1\\
+&\leqslant \OW{\fun{tms}}{2^p} + \OW{\fun{tms}}{i} + 2^p + 2i -
+\ceiling{\lg i} - 2,
+\end{align*}
+where the inequality is the instance \(\pred{W\(_U\)}{i}\) of the
+induction hypothesis. Furthermore, \(n - \ceiling{\lg n} - 1 = 2^p + i
+- p - 2\). Therefore, if
+\begin{equation*}
+\OW{\fun{tms}}{2^p} + \OW{\fun{tms}}{i} +
+2^p + 2i - \ceiling{\lg i} - 2 \leqslant \OW{\fun{tms}}{2^p+i} + 2^p +
+i - p - 2,
+\end{equation*}
+then \(\pred{W\(_U\)}{2^p+i}\) would ensue. Using
+equation~\eqref{eq:top}, we deduce
+\index{bms@$\OW{\fun{bms}}{n}$}\index{tms@$\OW{\fun{tms}}{n}$}
+\begin{equation*}
+\OW{\fun{tms}}{i} = i\ceiling{\lg i} - 2^{\ceiling{\lg i}} + 1,\;\;
+\OW{\fun{tms}}{2^p} = (p-1)2^p + 1,\;\,
+\OW{\fun{tms}}{2^p+i} = \OW{\fun{tms}}{2^p} + (p+1)i.
+\end{equation*}
+The unproven inequality becomes \(\OW{\fun{tms}}{i} + i - \ceiling{\lg
+  i} \leqslant (p+1)i - p\), or
+\begin{equation}
+1 \leqslant (i-1)(p-\ceiling{\lg i}) + 2^{\ceiling{\lg i}}.
+\label{eq:conj2}
+\end{equation}
+We have two complementary cases to consider:
+\begin{itemize}
+
+  \item \(i = 2^q\), with \(0 \leqslant q < p\). Then \(\lg i = q\)
+    and inequation~\eqref{eq:conj2} is equivalent to \((p-q+1)(2^q-1)
+    \geqslant 0\). Since \(0 \leqslant q < p\) implies \(p-q+1>1\) and
+    \(2^q \geqslant 1\), the inequality is proved, the bound being
+    tight if, and only if, \(q=0\).
+
+  \item \(i = 2^q + j\), with \(0 \leqslant q < p\) and \(0 < j <
+    2^q\). Then we have \(\floor{\lg i} = q = \ceiling{\lg i} - 1\)
+    and inequation~\eqref{eq:conj2} is then equivalent to \(1
+    \leqslant (2^q + j - 1) (p-q) + 2^q\), or
+    \begin{equation}
+     1 \leqslant (p-q+1)2^q + (p-q-1)(j-1).\label{ineq:2q_j}
+    \end{equation}
+    From \(q < p\) we deduce \(p-q+1 \geqslant 2\) and \(p-q-1
+    \geqslant 0\); we also have \(2^q \geqslant 1\) and \(j \geqslant
+    1\). Consequently, \((p-q+1)2^q \geqslant 2\) and \((p-q-1)(j-1)
+    \geqslant 0\), hence inequation~\eqref{ineq:2q_j} holds but the
+    bound is never tight.\hfill\(\Box\)
+
+\end{itemize}
+As a side\hyp{}effect, we proved that if \(i=1\), that is, \(n=2^p +
+1\), then we have the following inequation:
+\begin{equation*}
+\OW{\fun{bms}}{2^p+1} = \OW{\fun{tms}}{2^p} +
+\OW{\fun{bms}}{1} + 2^p \leqslant \OW{\fun{tms}}{2^p} +
+\OW{\fun{tms}}{1} + 2^p = \OW{\fun{tms}}{2^p+1} + 2^p - p - 1.
+\end{equation*}
+But, since \(\OW{\fun{tms}}{1} = \OW{\fun{bms}}{1} = 0\), the
+inequality is actually an equality.\index{tms@$\OW{\fun{tms}}{n}$}
+\begin{equation*}
+\boxed{\OW{\fun{bms}}{n} = \OW{\fun{tms}}{n} + n - \ceiling{\lg n} - 1
+  \Leftrightarrow n=1 \;\text{or}\; n=2^p+1.}
+\end{equation*}
+
+\paragraph{Program}
+
+Although we will present the programming language \Erlang in
+part~\ref{part:implementation}, here is how to compute efficiently the
+maximum costs: \ErlangInUnchecked{max} Note how we efficiently
+computed the binary exponentiation~\(2^n\) by means of the recurrent
+equations
+\begin{equation*}
+2^0 = 1,\quad 2^{2m} = (2^m)^2,\quad 2^{2m+1} =  2(2^m)^2.
+\end{equation*}
+The cost \(\C{\fun{exp2}}{n}\) thus satisfies \(\C{\fun{exp2}}{0} =
+1\) and \(\C{\fun{exp2}}{n} = 1 + \C{\fun{exp2}}{\floor{n/2}}\), if
+\(n > 0\). Therefore, if \(n > 0\), it is \(1\)~plus the number of
+bits of~\(n\), that is to say, \(\C{\fun{exp2}}{n} = \floor{\lg n} +
+2\), else \(\C{\fun{exp2}}{0} = 1\).
+
+\mypar{Average cost}
+
+In sum, we established, for \(n \geqslant 2\),
+\begin{align*}
+n\lg n - \tfrac{3}{2}n + 2 &< \OM{\fun{tms}}{n} < n\lg n - n + 1,\\
+n\lg n - \alpha n + (2\alpha - 1) &< \OM{\fun{bms}}{n} 
+< n\lg n - (\alpha - 1)n - (3 - 2\alpha),
+\end{align*}
+where \(\alpha \simeq 1.2645\), \(2\alpha - 1 \simeq 1.52899\) and \(3
+- 2\alpha \simeq 0.471\). For top\hyp{}down merge sort, the nature
+of~\(n\) for the bounds to be most accurate was not conclusively found
+by our inductive method. For bottom\hyp{}up merge sort, the lower
+bound is most accurate when \(n=2^p\), but we could not determine the
+values of~\(n\) that make the upper bound most accurate.
+
+The previous inequalities on \(\OM{\fun{bms}}{n}\) do not allow us to
+compare the average costs of the two variants of merge sort we have
+studied. Here, we prove that top\hyp{}down merge sort performs fewer
+key comparisons than bottom\hyp{}up merge sort in average. Since we
+already proved that this is true as well in the worst case
+(see~\eqref{ineq:topbot} \vpageref{ineq:topbot}), and that their
+minimum costs are equal (see~\eqref{eq:OBbms} \vpageref{eq:OBbms}),
+this will be the last nail in the coffin of the bottom\hyp{}up
+variant, before its rebirth in section~\vref{sec:online}. We want to
+prove by induction
+\begin{equation*}
+\OM{\fun{tms}}{n} \leqslant \OM{\fun{bms}}{n}.
+\end{equation*}
+We already now that the bound is tight when \(n=2^p\), so let us check
+the inequality for \(n=2\) and let us assume that it holds up
+to~\(2^p\) and proceed to establish that it also holds for \(2^p+i\),
+with \(0 < i \leqslant 2^p\), thus reaching our goal. Let us recall
+equation~\eqref{eq:Abms_2p_i} \vpageref{eq:Abms_2p_i}:
+\begin{equation*}
+\OM{\fun{bms}}{2^p+i} = \OM{\fun{bms}}{2^p} + \OM{\fun{bms}}{i}
++ 2^p + i - \frac{2^p}{i+1} - \frac{i}{2^p+1}.
+\end{equation*}
+Since \(\OM{\fun{bms}}{2^p} = \OM{\fun{tms}}{2^p}\) and, by
+hypothesis, \(\OM{\fun{tms}}{i} \leqslant \OM{\fun{bms}}{i}\), we have
+\begin{equation}
+\OM{\fun{bms}}{2^p+i} \geqslant \OM{\fun{tms}}{2^p} + \OM{\fun{tms}}{i}
++ 2^p + i - \frac{2^p}{i+1} - \frac{i}{2^p+1}.
+\label{ineq:Atms_Abms}
+\end{equation}
+If we could show the right\hyp{}hand side to be greater than or equal
+to \(\OM{\fun{tms}}{2^p+i}\), we would win. Let us actually generalise
+this sufficient condition and express it as the following lemma:
+\begin{equation*}
+  \pred{T}{m,n} \colon
+  \OM{\fun{tms}}{m+n} \leqslant \OM{\fun{tms}}{m} + \OM{\fun{tms}}{n} +
+  m + n - \frac{m}{n+1} - \frac{n}{m+1}.
+\end{equation*}
+Let us use a lexicographic ordering on the pairs \((m,n)\) of natural
+numbers \(m\)~and~\(n\) (see definition~\eqref{def:lexico}
+\vpageref{def:lexico}). The base case, \((0,0)\), is easily seen to
+hold. We observe that the statement to be proved is symmetric,
+\(\pred{T}{m,n} \Leftrightarrow \pred{T}{n,m}\), hence we only need to
+make three cases: \((2p,2q)\), \((2p,2q+1)\) and \((2p+1,2q+1)\).
+\begin{enumerate}
+
+  \item \((m,n) = (2p,2q)\). In this case,
+    \begin{itemize}
+
+      \item \(\OM{\fun{tms}}{m+n} = \OM{\fun{tms}}{2(p+q)} =
+        2\OM{\fun{tms}}{p+q} + 2(p+q) - 2 + 2/(p+q+1)\);
+
+      \item \(\OM{\fun{tms}}{m} = \OM{\fun{tms}}{2p} =
+        2\OM{\fun{tms}}{p} + 2p - 2 + 2/(p+1)\);
+
+      \item \(\OM{\fun{tms}}{n} = \OM{\fun{tms}}{2q} = 
+        2\OM{\fun{tms}}{q} + 2q - 2 + 2/(q+1)\).
+
+    \end{itemize}
+    Then, the right\hyp{}hand side of \(\pred{T}{m,n}\) is
+    \begin{equation*}
+      r := 2\left(\OM{\fun{tms}}{p} + \OM{\fun{tms}}{q} + 2(p+q) - 2 +
+        \tfrac{1}{p+1} + \tfrac{1}{q+1} - \tfrac{p}{2q+1} - 
+        \tfrac{q}{2p+1}\right).
+    \end{equation*}
+    The induction hypothesis \(\pred{T}{p,q}\) is
+    \begin{equation*}
+      \OM{\fun{tms}}{p+q} \leqslant \OM{\fun{tms}}{p} +
+      \OM{\fun{tms}}{q} + p + q - \frac{p}{q+1} - \frac{q}{p+1}.
+    \end{equation*}
+    Therefore, \(\tfrac{1}{2}r \geqslant \OM{\fun{tms}}{p+q} + p + q -
+    2 + \tfrac{q+1}{p+1} + \tfrac{p+1}{q+1} - \tfrac{p}{2q+1} -
+    \tfrac{q}{2p+1}\). If the right\hyp{}hand side is greater than or
+    equal to \(\tfrac{1}{2}\OM{\fun{tms}}{m+n}\), then
+    \(\pred{T}{m,n}\) is proved. In other words, we need to prove
+    \begin{equation*}
+      \frac{p+1}{q+1} + \frac{q+1}{p+1} \geqslant 1 +
+      \frac{p}{2q+1} + \frac{q}{2p+1} + \frac{1}{p+q+1}.
+    \end{equation*}
+    We expand everything in order to get rid of the fractions; we then
+    observe that we can factorise~\(pq\) and the remaining bivariate
+    polynomial is~\(0\) if \(p=q\) (the inequality is tight), which
+    means that we can factorise by \(p-q\) (actually, twice). In the
+    end, this inequation is equivalent to \(pq(p-q)^2(2p+2q+3)
+    \geqslant 0\), with \(p,q \geqslant 0\), which means that
+    \(\pred{T}{m,n}\) holds.
+
+  \item \((m,n) = (2p,2q+1)\). In this case,
+    \begin{itemize}
+
+      \item \(\OM{\fun{tms}}{m+n} = \OM{\fun{tms}}{2(p+q)+1} =
+        \OM{\fun{tms}}{p+q} + \OM{\fun{tms}}{p+q+1} + 2(p+q) - 1 +
+        \tfrac{2}{p+q+2}\);
+
+      \item \(\OM{\fun{tms}}{m} = \OM{\fun{tms}}{2p} =
+        2\OM{\fun{tms}}{p} + 2p - 2 + 2/(p+1)\);
+
+      \item \(\OM{\fun{tms}}{n} = \OM{\fun{tms}}{2q+1} =
+        \OM{\fun{tms}}{q} + \OM{\fun{tms}}{q+1} + 2q - 1 + 2/(q+2)\).
+
+    \end{itemize}
+    Then, the right\hyp{}hand side of \(\pred{T}{m,n}\) is
+    \begin{equation*}
+      r := 2\OM{\fun{tms}}{p} + \OM{\fun{tms}}{q} +
+      \OM{\fun{tms}}{q+1} + 4(p+q) - 2 + \tfrac{2}{p+1} +
+      \tfrac{2}{q+2} - \tfrac{p}{q+1} - \tfrac{2q+1}{2p+1}.
+    \end{equation*}
+    The induction hypotheses \(\pred{T}{p,q}\) and \(\pred{T}{p,q+1}\)
+    are
+    \begin{itemize}
+
+      \item \(\OM{\fun{tms}}{p+q} \leqslant \OM{\fun{tms}}{p} +
+      \OM{\fun{tms}}{q} + p + q - \frac{p}{q+1} - \frac{q}{p+1}\),
+
+      \item \(\OM{\fun{tms}}{p+(q+1)} \leqslant \OM{\fun{tms}}{p} +
+      \OM{\fun{tms}}{q+1} + p + (q + 1) - \frac{p}{q+2} -
+      \frac{q+1}{p+1}\).
+
+    \end{itemize}
+    Thus, \(r \geqslant \OM{\fun{tms}}{p+q} + \OM{\fun{tms}}{p+q+1} +
+    2(p+q) - 3 + \tfrac{2q+3}{p+1} + \tfrac{p+2}{q+2} -
+    \tfrac{2q+1}{2p+1}\). If the right\hyp{}hand side is greater than
+    or equal to \(\OM{\fun{tms}}{m+n}\), then \(\pred{T}{m,n}\) is
+    proved. In other words, we need to prove
+    \begin{equation*}
+      \frac{2q+3}{p+1} + \frac{p+2}{q+2} \geqslant 2 +
+      \frac{2q+1}{2p+1} + \frac{2}{p+q+2}.
+    \end{equation*}
+    By expanding and getting rid of the fractions, we obtain a
+    bivariate polynomial with the trivial factors~\(p\) and \(p-q\)
+    (because if \(p=q\), the inequality is tight). After that, a
+    computer algebra system can finish the factorisation and the
+    inequality is found to be equivalent to \(p(p-q)(p-q-1)(2p+2q+5)
+    \geqslant 0\), therefore \(\pred{T}{m,n}\) holds.
+
+  \item \((m,n) = (2p+1,2q+1)\). In this case,
+    \begin{itemize}
+
+      \item \(\OM{\fun{tms}}{m+n} = \OM{\fun{tms}}{2(p+q+1)} =
+        2\OM{\fun{tms}}{p+q+1} + 2(p+q) + 2/(p+q+2)\);
+
+      \item \(\OM{\fun{tms}}{n} = \OM{\fun{tms}}{2p+1} =
+        \OM{\fun{tms}}{p} + \OM{\fun{tms}}{p+1} + 2p - 1 + 2/(p+2)\);
+
+      \item \(\OM{\fun{tms}}{n} = \OM{\fun{tms}}{2q+1} =
+        \OM{\fun{tms}}{q} + \OM{\fun{tms}}{q+1} + 2q - 1 + 2/(q+2)\).
+
+    \end{itemize}
+    Then, the right\hyp{}hand side of \(\pred{T}{m,n}\) is
+    \begin{equation*}
+      r := \OM{\fun{tms}}{p} + \OM{\fun{tms}}{q} + \OM{\fun{tms}}{p+1}
+      + \OM{\fun{tms}}{q+1} + 4(p+q) + \tfrac{2}{p+2} + \tfrac{2}{q+2}
+      - \tfrac{2p+1}{2q+2} - \tfrac{2q+1}{2p+2}.
+    \end{equation*}
+    The (symmetric) induction hypotheses \(\pred{T}{p,q+1}\) and
+    \(\pred{T}{p+1,q}\):
+    \begin{itemize}
+
+      \item \(\OM{\fun{tms}}{p+(q+1)} \leqslant \OM{\fun{tms}}{p} +
+        \OM{\fun{tms}}{q+1} + p + q + 1 - \tfrac{p}{q+2} 
+        - \tfrac{q+1}{p+1}\);
+
+      \item \(\OM{\fun{tms}}{(p+1)+q} \leqslant \OM{\fun{tms}}{p+1} +
+        \OM{\fun{tms}}{q} + p + q + 1 - \tfrac{p+1}{q+1} -
+        \tfrac{q}{p+2}\).
+
+    \end{itemize}
+    Thus, \(r \geqslant 2\OM{\fun{tms}}{p+q+1} + 2(p+q) - 2 +
+    \tfrac{q+1}{p+1} + \tfrac{q}{p+2} + \tfrac{p+1}{q+1} +
+    \tfrac{p}{q+2} + \tfrac{2}{p+2} + \tfrac{2}{q+2} -
+    \tfrac{2p+1}{2q+2} - \tfrac{2q+1}{2p+2}\). If the right\hyp{}hand
+    side is greater than or equal to \(\OM{\fun{tms}}{m+n}\), then
+    \(\pred{T}{m,n}\) is proved. In other words, we need to prove
+    \begin{equation*}
+      \frac{q+1}{p+1} + \frac{q+2}{p+2} + \frac{p+2}{q+2} +
+      \frac{p+1}{q+1} \geqslant 2 + \frac{2p+1}{2q+2} +
+      \frac{2q+1}{2p+2} + \frac{2}{p+q+2}.
+    \end{equation*}
+    After expansion to form a positive polynomial, we note that the
+    inequality is tight if \(p=q\), so the polynomial has a factor
+    \(p-q\). After division, another factor \(p-q\) is clear. The
+    inequality is thus equivalent to \((p-q)^2(2p^2(q+1) + p(2q^2 + 9q
+    + 8) + 2(q+2)^2) \geqslant 0\), so \(\pred{T}{m,n}\) holds in this
+    case as well.
+
+\end{enumerate}
+In total, \(\pred{T}{m,n}\) holds in each case, therefore the lemma is
+true for all \(m\)~and~\(n\). By applying the lemma
+to~\eqref{ineq:Atms_Abms}, we prove the theorem \(\OM{\fun{tms}}{n}
+\leqslant \OM{\fun{bms}}{n}\), for all~\(n\). Collecting all the cases
+where the bound is tight shows what we would expect: \(m=n\),
+\(m=n+1\) or \(n=m+1\). For~\eqref{ineq:Atms_Abms}, this means
+\(i=2^p\) or \(i=2^p-1\). In other words,
+\begin{equation*}
+\boxed{\OM{\fun{tms}}{n} = \OM{\fun{bms}}{n} \Leftrightarrow n=2^p
+  \;\text{or}\; n=2^p-1, \text{with \(p \geqslant
+    0\)}.}
+\end{equation*}
+
+\paragraph{Program}
+
+In \Erlang, we would implement as follows the computation of the
+average costs of top\hyp{}down and bottom\hyp{}up merge sort:
+\ErlangInUnchecked{mean}
+
+\mypar{Merging vs.\@ inserting}
+\index{merge sort!vs. insertion sort|(}
+
+Let us compare insertion sort and bottom\hyp{}up merge sort in their
+fastest variant. We found in equation~\eqref{eq:ave_i2wb}
+\vpageref{eq:ave_i2wb} the average cost of balanced 2-way insertion
+sort:
+\begin{equation*}
+\M{\fun{i2wb}}{n}\index{12wb@$\M{\fun{i2wb}}{n}$}
+  = \frac{1}{8}(n^2 + 13n - \ln 2n + 10) + \epsilon_n,\;
+\text{with \(0 < \epsilon_n < \frac{7}{8}\)}.
+\end{equation*}
+We also just found that the cost in addition to comparisons is
+\(\ceiling{3n/2} + 2\ceiling{\lg n} - 1\) for
+\fun{bms\(_0\)/1}\index{bms0@\fun{bms\(_0\)/1}}, and
+\(\OC{\fun{bms\(_0\)}}{n} = \OC{\fun{bms}}{n}\). Moreover, we found
+bounds on \(\OM{\fun{bms}}{n}\) in~\eqref{ineq:bounds_Mbms}
+\vpageref{ineq:bounds_Mbms}, the upper one being excellent. Therefore
+\begin{align*}
+\M{\fun{bms\(_0\)}}{n} &< (n\lg n - (\alpha - 1)n - (3-2\alpha))
++ (\ceiling{3n/2} + 2\ceiling{\lg n} - 1)\\
+& < (n+2)\lg n + 1.236n + 1.529;\\
+\M{\fun{bms\(_0\)}}{n} &> (n\lg n - 1.35n + 1.69) + (\ceiling{3n/2} +
+2\ceiling{\lg n} - 1)\\
+&> (n+2)\lg n + 0.152n + 0.69;
+\end{align*}
+\begin{equation*}
+(n^2 + 13n - \ln 2n + 10)/8 < \M{\fun{i2wb}}{n} < (n^2 + 13n - \ln 2n + 17)/8.
+\end{equation*}
+where \(\alpha \simeq 1.2645\) and \(\ceiling{x} < x + 1\).
+
+Hence, \((n+2)\lg n + 1.236n + 1.529 < (n^2 + 13n - \ln 2n + 10)/8\)
+implies \(\M{\fun{bms\(_0\)}}{n} < \M{\fun{i2wb}}{n}\), and also
+\((n^2 + 13n - \ln 2n + 17)/8 < (n+2)\lg n + 0.152n + 0.69\) implies
+\(\M{\fun{i2wb}}{n} < \M{\fun{bms\(_0\)}}{n}\). With the help of a
+computer algebra system, we find that \(\M{\fun{bms\(_0\)}}{n} <
+\M{\fun{i2wb}}{n}\) if \(n \geqslant 43\), and \(\M{\fun{i2wb}}{n} <
+\M{\fun{bms\(_0\)}}{n}\) if \(3 \leqslant n \leqslant 29\). For the
+case \(n=2\), we find: \(\M{\fun{i2wb}}{2} = 11/2 > 5 =
+\M{\fun{bms\(_0\)}}{2}\). If we set aside this peculiar case, we may
+conclude that insertion sort is faster, in average, for stacks of less
+than \(30\)~keys, and the opposite is true for stacks of at
+least~\(43\) keys. In\hyp{}between, we don't know, but we can compute
+efficiently the average costs and use dichotomy on the interval from
+\(30\)~to~\(43\). By using the \Erlang program above, we quickly find
+that insertion sort is first beaten by bottom\hyp{}up merge sort at
+\(n=36\). This suggests to drop \fun{duo/1} in favour of a function
+that constructs chunks of \(35\)~keys from the original stack, then
+sorts them using balanced 2-way insertions and, finally, if there are
+more than \(35\)~keys, starts merging those sorted stacks. This
+improvement amounts to not constructing the first \(35\)~levels in the
+merge tree\index{tree!merge $\sim$} but, instead, build the \(35\)th
+level by insertions.
+
+Despite the previous analysis, we should be aware that it relies on a
+measure based on the number of function calls, which assumes that each
+function call is indeed performed by the run\hyp{}time system (no
+inlining), that all context switchings have the same duration, that
+other operations take a negligible time in comparison, that cache,
+jump predictions and instruction pipelining have no effect etc. Even
+using the same compiler on the same machine does not exempt from
+careful benchmarking.
+
+\index{merge sort!vs. insertion sort|)}
+\index{merge sort!bottom-up $\sim$|)}
+
+\section{On-line merge sort}
+\label{sec:online}
+\index{merge sort!on-line $\sim$|(}
+
+Sorting algorithms can be distinguished depending on whether they
+operate on the whole stack of keys, or key by key. The former are said
+\emph{off\hyp{}line}, as keys are not sorted while they are coming in,
+and the latter are called \emph{on\hyp{}line}, as the sorting process
+can be temporally interleaved with the input process. Bottom\hyp{}up
+merge sort is an off\hyp{}line algorithm, but it can be easily
+modified to become on\hyp{}line by remarking that balanced mergers
+can be repeated whenever a new key arrives, and the unbalanced
+mergers are performed only when the sorted stack is required.
+
+More precisely, consider again \fig~\ref{fig:msort_gen}
+\vpageref{fig:msort_gen} without the unbalanced mergers. The addition
+of another key (at the right) yields two cases: if~\(n\) is even, that
+is, \(e_0>0\), then nothing is done as the key becomes a singleton,
+sorted stack of length \(2^0\); otherwise, a cascade of mergers
+between stacks of identical lengths \(2^{e_i}\), with \(e_i=i\), is
+triggered until \(e_j > j\). This is exactly the binary addition
+of~\(1\) to~\(n\), except that mergers, instead of bitwise additions,
+are performed as long as a carry is issued and propagated.
+
+To our knowledge, only \cite{Okasaki_1998a} mentions this variant; he
+shows that it can be efficiently implemented with purely functional
+data structures, just as the off\hyp{}line version. (Notice that his
+context is nevertheless different from ours as he relies on lazy
+evaluation and amortised analysis.)
+
+Our code is shown in \fig~\ref{fig:oms}\index{merge sort!on-line
+  $\sim$!program}.
+\begin{figure}
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{oms}(s)   & \xrightarrow{\smash{\phi}}
+               & \fun{unb}(\fun{sum}(s,\el),\el).\\
+\\
+\fun{sum}(\el,t)         & \xrightarrow{\smash{\chi}} & t;\\
+\fun{sum}(\cons{x}{s},t) & \xrightarrow{\smash{\psi}}
+                         & \fun{sum}(s,\fun{add}([x],t)).\\
+\\
+\fun{add}(s,\el) & \xrightarrow{\smash{\omega}} & [\fun{one}(s)];\\
+\fun{add}(s,\cons{\fun{zero}()}{t})
+                    & \xrightarrow{\smash{\gamma}}
+                    & \cons{\fun{one}(s)}{t};\\
+\fun{add}(s,\cons{\fun{one}(u)}{t}) & \xrightarrow{\smash{\delta}}
+                    & [\fun{zero}()|\fun{add}(\fun{mrg}(s,u),t)].\\
+\\
+\fun{unb}(\el,u) & \xrightarrow{\smash{\mu}} & u;\\
+\fun{unb}(\cons{\fun{zero}()}{s},u)
+                 & \xrightarrow{\smash{\nu}} & \fun{unb}(s,u);\\
+\fun{unb}(\cons{\fun{one}(t)}{s},u)
+                 & \xrightarrow{\smash{\xi}}
+                 & \fun{unb}(s,\fun{mrg}(t,u)).\\
+\\
+\fun{mrg}(\el,t)         & \xrightarrow{\smash{\theta}} & t;\\
+\fun{mrg}(s,\el)         & \xrightarrow{\smash{\iota}} & s;\\
+\fun{mrg}(\cons{x}{s},\cons{y}{t}) & \xrightarrow{\smash{\kappa}}
+                         & \cons{y}{\fun{mrg}(\cons{x}{s},t)},\;
+                           \text{if \(x \succ y\)};\\
+\fun{mrg}(\cons{x}{s},t) & \xrightarrow{\smash{\lambda}}
+                         & \cons{x}{\fun{mrg}(s,t)}.
+\end{array}}
+\end{equation*}
+\caption{On-line merge sort with \fun{oms/1}\label{fig:oms}}
+\end{figure}
+We use \(\fun{zero}()\)\index{zero@\fun{zero/0}} to represent a
+\(0\)-bit in the binary notation of the number of currently sorted
+keys. Dually, the call \(\fun{one}(s)\)\index{one@\fun{one/1}} denotes
+a \(1\)-bit, where the stack~\(s\) holds a number of sorted keys equal
+to the associated power of two in the binary notation. Each call to
+\fun{one/1} corresponds to a subtree\index{tree!merge $\sim$} in
+\fig~\vref{fig:msort_gen}. For instance, \([\fun{one}([4]),
+\fun{zero}(), \fun{one}([3,6,7,9])]\) corresponds to the binary number
+\((101)_2\), hence the stack holds \(1 \cdot 2^2 + 0 \cdot 2^1 + 1
+\cdot 2^0 = 5\) keys in total. Keep in mind that the bits are reversed
+in the stack, as the subsequent processing of key~\(5\) would yield
+\([\fun{zero}(),\fun{one}([4,5]),\fun{one}([3,6,7,9])]\).
+
+Note that the program in \fig~\vref{fig:oms} does not capture the
+normal use case of on\hyp{}line merge sort, as, in practice, the
+argument~\(s\) of the call \(\fun{oms}(s)\)\index{oms@\fun{oms/1}}
+would not be known in its entirety, so
+\fun{add/2}\index{add@\fun{add/2}} would only be called whenever a key
+becomes available. In the following analysis, however, we are
+interested in the number of comparisons of a sequence of updates
+by~\fun{sum/2}\index{sum@\fun{sum/2}} (a framework we used in
+section~\ref{sec:queueing}), followed by a series of unbalanced
+mergers by~\fun{unb/2}\index{unb@\fun{unb/2}} (\emph{unbalanced}) in
+order to obtain a sorted stack; therefore, our program is suitable
+because we do want to assess~\(\OC{\fun{oms}}{n}\)\index{oms@$\OC{\fun{oms}}{n}$}.
+
+Let us note \(\OC{\fun{add}}{n}\)\index{add@$\OC{\fun{add}}{n}$} the
+number of comparisons to add a new key to a current stack of
+length~\(n\) and recall that
+\(\OC{\fun{mrg}}{m,n}\)\index{mrg@$\OC{\fun{mrg}}{m,n}$} is the number
+of comparisons to merge two stacks of lengths \(m\)~and~\(n\) by
+calling \fun{mrg/2}\index{mrg@\fun{mrg/2}}. If \(n\)~is even, then
+there are no comparisons, as this is similar to adding~\(1\) to a
+binary sequence \((\Xi{0})_2\), where \(\Xi\)~is an arbitrary bit
+string. Otherwise, a series of balanced mergers of size~\(2^i\) are
+performed, as this is dual to adding~\(1\) to \((\Xi{011}\ldots
+1)_2\), where \(\Xi\)~is arbitrary. Therefore
+\begin{equation*}
+\abovedisplayskip=2pt
+\belowdisplayskip=2pt
+\OC{\fun{add}}{2j} = 0,\qquad 
+\OC{\fun{add}}{2j-1} = \sum_{i=0}^{\rho_{2j}}{\OC{\fun{mrg}}{2^i,2^i}},
+\end{equation*}
+where \(\rho_n\)~is the highest power of~\(2\) dividing~\(n\) (ruler
+function)\index{ruler function}.  Let
+\(\OC{\fun{sum}}{n}\)\index{sum@$\OC{\fun{sum}}{n}$} be the number of
+comparisons to add \(n\)~keys to \(\el\). We have
+\begin{gather}
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\OC{\fun{sum}}{n} = \sum_{k=0}^{n-1}{\OC{\fun{add}}{k}}.\notag\\[0mm]
+\OC{\fun{sum}}{2p} = \OC{\fun{sum}}{2p+1}
+= \sum_{k=1}^{2p-1}{\OC{\fun{add}}{k}}
+= \sum_{j=1}^{p}{\OC{\fun{add}}{2j-1}}
+= \sum_{j=1}^{p}\sum_{i=0}^{1+\rho_{j}}{\OC{\fun{mrg}}{2^i,2^i}}.
+\label{eq:sum_2p}
+\end{gather}
+From~\eqref{eq:C_unbal}, the number of comparisons of the
+unbalanced mergers is
+\begin{equation}
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\OC{\fun{unb}}{n}
+= \OC{\ltimes}{n}
+= \sum_{i=1}^{r}{\OC{\fun{mrg}}{2^{e_i},2^{e_{i-1}}+\dots+2^{e_0}}}.
+\index{unb@$\OC{\fun{unb}}{n}$}
+\label{eq:cost_unb}
+\end{equation}
+Let \(\OC{\fun{oms}}{n}\)\index{oms@$\OC{\fun{oms}}{n}$} the number of
+comparisons to sort \(n\)~keys on\hyp{}line. We have
+\begin{equation}
+\OC{\fun{oms}}{n} = \OC{\fun{sum}}{n} + \OC{\fun{unb}}{n}.
+\index{sum@$\OC{\fun{sum}}{n}$}
+\label{eq:ocost_online}
+\end{equation}
+
+%\addcontentsline{toc}{subsection}{Cost}
+\paragraph{Minimum cost}
+\index{merge sort!on-line $\sim$!minimum cost|(}
+
+Replacing~\(\Cost\) by~\(\Best\) in equation~\eqref{eq:sum_2p}, we
+obtain the equations for the minimum number of comparisons, allowing
+us to simplify~\(\OB{\fun{sum}}{n}\)\index{sum@$\OB{\fun{sum}}{n}$}
+with the help of equation~\eqref{eq:best_merge}
+\vpageref{eq:best_merge}:
+\begin{equation}
+\OB{\fun{sum}}{2p}
+  = \OB{\fun{sum}}{2p+1}
+  = \sum_{j=1}^{p}\sum_{i=0}^{1+\rho_{j}}{\OB{\fun{mrg}}{2^i,2^i}}
+  = \sum_{j=1}^{p}\sum_{i=0}^{1+\rho_{j}}{2^{i}}
+  = 4\sum_{j=1}^{p}{2^{\rho_{j}}} - p.
+\label{eq:B_oplus}
+\end{equation}
+Let \(T_p := \sum_{j=1}^{p}{2^{\rho_{j}}}\). The recurrences on the
+ruler function\index{ruler function} \eqref{eq:ruler}
+\vpageref{eq:ruler} help us in finding a recurrence for~\(T_p\) as
+follows:
+\begin{align*}
+T_{2q} &= \sum_{k=0}^{\smash[t]{q-1}}{2^{\rho_{2k+1}}} +
+\sum_{k=1}^{q}{2^{\rho_{2k}}} = q + 2 \cdot T_{q},\\[2mm]
+T_{2q+1}
+&= \sum_{j=1}^{\smash[t]{2q+1}}{2^{\rho_{j}}} = 1 + T_{2q} = (q + 1) +
+2 \cdot T_{q}.
+\end{align*}
+Equivalently, \(T_{p} = 2 \cdot T_{\floor{p/2}} + \ceiling{p/2} = 2
+\cdot T_{\floor{p/2}} + p - \floor{p/2}\). Therefore, unravelling a
+few terms of the recurrence quickly reveals the equation
+\begin{equation*}
+2 \cdot T_p = 2p + \sum_{j=1}^{\floor{\lg p}}
+            {\left\lfloor{\frac{p}{2^j}}\right\rfloor 2^j},
+\end{equation*}
+using Theorem~\vref{thm:floors}. By definition, \(\{x\} := x -
+\floor{x}\), thus
+\begin{equation*}
+2 \cdot T_p = p\floor{\lg p} + 2p - \sum_{j=1}^{\floor{\lg
+    p}}\left\lbrace\frac{p}{2^j}\right\rbrace 2^j.
+\end{equation*}
+Using \(0 \leqslant \{x\} < 1\), we obtain the bounds
+\begin{equation*}
+p\floor{\lg p} + 2p - 2^{\floor{\lg p}+1} + 2 < 2 \cdot T_p \leqslant
+p\floor{\lg p} + 2p.
+\end{equation*}
+Furthermore, \(x - 1 < \floor{x} \leqslant x\) and \(\floor{x} = x -
+\{x\}\), therefore
+\begin{align*}
+p(\lg p - \{\lg p\}) + 2p - 2^{\lg p - \{\lg p\} +
+  1} + 2 < 2 \cdot T_p &\leqslant p\lg p + 2p,\\
+p\lg p + 2p + 2 - p \cdot \theta_L(\{\lg p\}) < 2 \cdot T_p 
+&\leqslant p\lg p + 2p,
+\end{align*}
+with \(\theta_L(x) := x + 2^{1 - x}\). Since \(\max_{0 \leqslant x <
+  1}\theta_L(x) = \theta_L(0) = 2\), we conclude:
+\begin{equation*}
+p\lg p + 2 < 2 \cdot T_p \leqslant p\lg p + 2p.
+\end{equation*}
+The upper bound is tight if \(p=2^q\). Applying these bounds to the
+definition of~\(\OB{\fun{sum}}{2p}\) in~\eqref{eq:B_oplus} yields
+\begin{equation}
+2p\lg p - p + 4 < \OB{\fun{sum}}{2p} \leqslant 2p\lg p + 3p.
+\label{ineq:B_oplus_2p}
+\end{equation}
+Consequently, \(\OB{\fun{sum}}{2p} = \OB{\fun{sum}}{2p+1} \sim 2p\lg
+p\), hence \(\OB{\fun{sum}}{n} \sim n\lg n\).\index{sum@$\OB{\fun{sum}}{n}$}
+
+\bigskip
+
+\noindent Equation~\eqref{eq:best_merge} and~\eqref{eq:cost_unb} imply
+\(\OB{\fun{unb}}{n} = \sum_{i=1}^{r}{\min\{2^{e_i},2^{e_{i-1}} + \dots
+  + 2^{e_0}\}}\)\index{unb@$\OB{\fun{unb}}{n}$|(}. Let us commence by
+noting that \(\sum_{j=0}^{i}{2^{e_j}} \leqslant \sum_{j=0}^{e_i}{2^j}
+= 2 \cdot 2^{e_i} - 1\). This is equivalent to a given binary number
+being always lower than or equal to the number with the same number of
+bits all set to~\(1\), for example, \((10110111)_2 \leqslant
+(11111111)_2\). By definition of~\(e_i\), we have \(e_{i-1} + 1
+\leqslant e_i\), so \(\sum_{j=0}^{i-1}{2^{e_j}} \leqslant
+2^{e_{i-1}+1} - 1 \leqslant 2^{e_i} - 1 < 2^{e_i}\) and
+\(\min\{2^{e_i},2^{e_{i-1}} + \dots + 2^{e_0}\} = 2^{e_{i-1}} + \dots
++ 2^{e_0}\). We have now
+\begin{equation}
+\OB{\fun{unb}}{n} = \sum_{i=1}^{r}\sum_{j=0}^{i-1}{2^{e_j}} < n.
+\label{ineq:OBunb}
+\end{equation}
+Trivially, \(0 < \OB{\fun{unb}}{n}\), so
+equation~\eqref{eq:ocost_online} entails \(\OB{\fun{oms}}{n}
+\sim n\lg n \sim 2 \cdot \OB{\fun{bms}}{n}\).
+\index{merge sort!on-line $\sim$!minimum cost|)}
+\index{unb@$\OB{\fun{unb}}{n}$|)}
+
+\paragraph{Maximum cost}
+\index{merge sort!on-line $\sim$!maximum cost|(}
+
+Replacing~\(\Cost\) by~\(\Worst\) in equation~\eqref{eq:sum_2p}
+\vpageref{eq:sum_2p}, we obtain equations for the maximum number of
+comparisons, which we can simplify with the help of
+equation~\eqref{eq:worst_merge} \vpageref{eq:worst_merge} into
+\begin{equation}
+\OW{\fun{sum}}{2p}
+  = \OW{\fun{sum}}{2p+1}
+  = \sum_{j=1}^{p}\sum_{i=0}^{1+\rho_{j}}{\OW{\fun{mrg}}{2^i,2^i}}
+%  = \sum_{j=1}^{p}\sum_{i=0}^{1+\rho_{j}}{(2^{i+1}-1)}\\
+  = 8\sum_{j=1}^{p}{2^{\rho_j}} - \sum_{j=1}^{p}\rho_j - 4p.
+\label{eq:OW_sum_2p}
+\index{sum@$\OW{\fun{sum}}{n}$}
+\end{equation}
+\index{bit sum|(} \index{ruler function|(} We can reach a closed form
+for \(\sum_{j=1}^{p}\rho_j\) if we think of the carry propagation and
+the number of~\(1\)-bits when adding~\(1\) to a binary number (since
+\(j\)~ranges over successive integers). This amounts to finding a
+relationship between \(\rho_j\), \(\rho_{j+1}\), \(\nu_j\) and
+\(\nu_{j+1}\). Let us assume that \(2n+1 = (\Xi 01^a)_2\), where
+\(\Xi\)~is an arbitrary bit string and \((1^a)_2\)~is a 1-bit string
+of length~\(a\). Then \(\nu_{2n+1} = \nu_{\Xi} + a\) and \(\rho_{2n+1}
+= 0\). The next integer is \(2n+2 = (\Xi 10^a)_2\), so \(\nu_{2n+2} =
+\nu_{\Xi} + 1\) and \(\rho_{2n+2} = a\). Now, we can relate
+\(\rho\)~and~\(\nu\) by means of~\(a\): \(\rho_{2n+2} = \nu_{2n+1} -
+\nu_{\Xi} = \nu_{2n+1} - (\nu_{2n+2} - 1) = 1 + \nu_{2n+1} -
+\nu_{2n+2}\). We can check now that the same pattern also works
+for~\(\rho_{2n+1}\) by simply using the definitions of
+\(\rho\)~and~\(\nu\): \(\rho_{2n+1} = 1 + \nu_{2n} -
+\nu_{2n+1}\). This achieves to establish, for any integer \(n>0\),
+that \(\rho_n = 1 + \nu_{n-1} - \nu_{n}\). Summing on both sides
+yields
+\begin{equation*}
+\sum_{j=1}^{p}{\rho_j} = p - \nu_p.
+\end{equation*}
+Interestingly, we already met \(p - \nu_p\) \index{bit
+  sum|)}\index{ruler function|)} in equation~\eqref{eq:ruler_nu},
+\vpageref{eq:ruler_nu}. We can now further
+simplify~\eqref{eq:OW_sum_2p} as follows:
+\begin{equation*}
+\OW{\fun{sum}}{2p}
+ = \OW{\fun{sum}}{2p+1}
+ = 8\sum_{j=1}^{p}{2^{\rho_j}} - 5p - \nu_p
+ = 2 \cdot \OB{\fun{sum}}{2p} - 3p - \nu_p.
+\index{sum@$\OW{\fun{sum}}{n}$}
+\end{equation*}
+Reusing the bounds on~\(\OB{\fun{sum}}{2p}\)
+in~\eqref{ineq:B_oplus_2p} leads to \(\OW{\fun{sum}}{2p} =
+\OW{\fun{sum}}{2p+1} \sim 4p\lg p\). Equations~\eqref{eq:worst_merge}
+and~\eqref{eq:cost_unb} and inequation~\eqref{ineq:OBunb} imply
+\begin{equation*}
+\OW{\fun{unb}}{n} = \sum_{i=1}^{r}\sum_{j=0}^{i}{2^{e_j}} - \nu_n + 1
+                  = \OB{\fun{unb}}{n} + n - \rho_n - \nu_n + 1
+                  < 2n + 1.
+\end{equation*}
+Therefore, \(\OW{\fun{oms}}{n} \sim 2n\lg n \sim 2
+\cdot \OW{\fun{bms}}{n}\).
+\index{merge sort!on-line $\sim$!maximum cost|)}
+
+\paragraph{Additional cost}
+
+Let us account now for all the rewrites in the evaluation of a call
+\(\fun{oms}(s)\). Let
+\(\C{\fun{oms}}{n}\)\index{oms@$\C{\fun{oms}}{n}$} be this number. We
+already know the contribution due to the comparisons,
+\(\OC{\fun{oms}}{n}\)\index{oms@$\OC{\fun{oms}}{n}$}, either in
+rule~\(\kappa\) or~\(\lambda\), so let us assess \(\C{\fun{oms}}{n} -
+\OC{\fun{oms}}{n}\):
+\begin{itemize}
+
+  \item Rule~\(\phi\) is used once.
+
+  \item Rules \(\chi\)~and~\(\psi\) are involved in the subtrace
+    \(\psi^n\chi\), hence are used \(n+1\)~times.
+
+  \item Rules \(\omega\), \(\gamma\) and~\(\delta\) are used \(F(n) =
+    2n - \nu_n\) times, as seen in equation~\eqref{eq:ruler_nu}. We
+    also must account for the rules \(\theta\)~and~\(\iota\) requested
+    by the calls \(\fun{mrg}(s,u)\) in rule~\(\delta\). Each \(1\)-bit
+    in the binary notations of the numbers from \(1\)~to~\(n-1\)
+    triggers such a call, that is, \(\sum_{k=1}^{n-1}\nu_k\).
+
+  \item Rules \(\nu\)~and~\(\xi\) are used for each bit in the binary
+    notation of~\(n\) and rule~\(\mu\) is used once, making up
+    \(\floor{\lg n} + 2\) calls. We also need to add the number of
+    calls \(\fun{mrg}(t,u)\)\index{mrg@\fun{mrg/2}} in rule~\(\xi\),
+    witnessing the application of rules \(\theta\)~and~\(\iota\). This
+    is the number of \(1\)-bits in~\(n\), totalling~\(\nu_n\).
+
+\end{itemize}
+In total, we have \(\C{\fun{oms}}{n} - \OC{\fun{oms}}{n} = 3n +
+\floor{\lg n} + \sum_{k=1}^{n-1}\nu_k + 2\). Equation~\eqref{eq:OBbms}
+\vpageref{eq:OBbms} entails \(\C{\fun{oms}}{n} = \OC{\fun{oms}}{n} +
+3n + \floor{\lg n} + \OB{\fun{bms}}{n} +
+2\). Bounds~\eqref{ineq:bounds_Btms} \vpageref{ineq:bounds_Btms} imply
+\(\OB{\fun{bms}}{n} \sim \tfrac{1}{2}n\lg n\), thus \(\C{\fun{oms}}{n}
+\sim \OC{\fun{oms}}{n}\).  \index{merge sort|)} \index{merge
+  sort!on-line $\sim$|)}
+
+\section*{Exercises}
+
+\begin{enumerate}
+
+  \item Prove \(\fun{mrg}(s,t) \equiv \fun{mrg}(t,s)\).
+
+  \item Prove that \(\fun{mrg}(s,t)\)\index{mrg@\fun{mrg/2}} is a sorted
+  stack if \(s\)~and~\(t\) are sorted.
+
+  \item Prove that all the keys of~\(s\) and~\(t\) are in
+  \(\fun{mrg}(s,t)\).
+
+  \item Prove the termination of \(\fun{bms/1}\), \(\fun{oms/1}\) and
+    \(\fun{tms/1}\).\index{bms@\fun{bms/1}}\index{oms@\fun{oms/1}}
+    \index{tms@\fun{tms/1}}
+
+  \item Is \fun{bms/1} stable? What about \fun{tms/1}?
+
+  \item Find \(\C{\fun{tms}}{n} - \OC{\fun{tms}}{n}\). \emph{Hint:}
+    mind equation~\eqref{eq:ruler_nu} \vpageref{eq:ruler_nu}.
+
+  \item Page~\pageref{eq:bms_merges}, we found that the number of
+    mergers of \(\fun{bms}(s)\) is~\(n-1\) if~\(n\) is the number of
+    keys in~\(s\). Show that \(\fun{tms}(s)\) performs the same number
+    of mergers. (\emph{Hint}: Consider equation~\eqref{eq:cost_tms}
+    \vpageref{eq:cost_tms}.)
+
+  \item Find a counting argument on the table of \fig~\vref{fig:bits}
+    showing that 
+    \begin{equation*}
+      \sum_{k=1}^{p-1}{2^{\rho_k}}
+      = \sum_{i=0}^{\ceiling{\lg p}-1}%
+      {\left\lceil\frac{p-2^i}{2^{i+1}}\right\rceil 2^i}.
+    \end{equation*}
+
+  \item Compare the number of (\texttt{|})-nodes created by
+    \fun{bms/1} and \fun{tms/1}.
+
+\end{enumerate}

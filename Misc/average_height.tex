@@ -1,0 +1,444 @@
+As mentioned earlier, the \emph{height} of a tree is the number of
+nodes on a maximal path from the root to a leaf, that is, a node
+without subtrees; for example, we can follow down and count the
+nodes~\((\circ)\) in \fig~\ref{fig:catalan_tree}. A tree reduced to a
+single leaf has height~\(0\).
+
+We begin with the key observation that a Catalan tree with \(n\)~edges
+and height~\(h\) is in bijection with a Dyck path of length~\(2n\)
+\emph{and height \(h-1\)} (see \fig~\vref{fig:catalan_tree} and
+\fig~\ref{fig:bijection}). This simple fact allows us to reckon on the
+height of the Dyck paths and transfer the result back to Catalan
+trees.
+
+Let~\(h_n\) be the average height of Catalan trees with \(n\)~edges
+and \(H_{n,h}\) the number of Catalan trees with \(n\)~edges and
+height~\(h\). We then have \(h_n = S_n/C_{n}\), where \(S_n := \sum_{h
+  \geqslant 1} h \cdot H_{n,h}\). We need to gain a purchase on that
+sum. For example, we might define~\(A_{n,h}\) as being the number of
+trees with \(n\)~edges and height less than or equal to~\(h\). Of
+course, \(A_{n,h} = A_{n,n+1} = C_{n}\), if \(h > n\). Then \(H_{n,h}
+= A_{n,h}-A_{n,h-1}\). Formulas can be further simplified by
+letting~\(B_{n,h}\) be the number of trees with \(n\)~edges with
+height greater than~\(h\):
+\begin{equation}
+S_n = \sum_{h \geqslant 1}h(A_{n,h}-A_{n,h-1})
+    = \sum_{h \geqslant 1}h(B_{n,h-1}-B_{n,h}) = \sum_{h\geqslant 0} B_{n,h}.
+\label{eq:Sn}
+\end{equation} 
+
+With the determination of~\(A_{n,h}\) in mind, let us consider in
+\fig~\ref{fig:height} a Dyck path of length~\(2n\) and height~\(h-1\).
+\begin{figure}[t]
+\centering
+\subfloat[Dyck path of length~\(2n\) and
+height \(h-1\) \label{fig:height}]{
+\includegraphics[scale=0.9,bb=71 565 247 721]{height}}
+\quad
+\subfloat[Path from \(A\) to \(\Omega\) avoiding \(y=x+s\) and
+\(y=x-t\)\label{fig:mohanty}]{
+\includegraphics[scale=0.9,bb=71 621 219 721]{mohanty}}
+\caption{Paths avoiding diagonal boundaries\label{fig:boundaries}}
+\end{figure}
+The double lines are boundaries which cannot be attained by the
+path. This is in fact a special case of a general monotonic path
+between two diagonal boundaries, as shown in \fig~\ref{fig:mohanty},
+where \(s\)~denotes the vertical distance from~\(A\), and \(t\)~the
+horizontal distance from~\(A\). It is well known that the number of
+monotonic paths from~\(A(0,0)\) to~\(\Omega(a,b)\) avoiding the
+boundaries is
+\begin{equation}
+\left\lvert\mathcal{L}(a,b;t,s)\right\rvert = \sum_{k \in \mathbb{Z}}\left[\binom{a+b}{b+k(t+s)} - \binom{a+b}{b+k(t+s)+t}\right].
+\label{eq:mohanty}
+\end{equation}
+
+The proof by \citet[p.~6]{Mohanty_1979} of this formula is based on
+the reflection principle and the principle of inclusion and exclusion,
+whereby a superset is taken and a subset is retracted, because both
+sets are easier to enumerate than the whole --~we used it implicitly
+to find formula~\eqref{eq:Cn}. We quote his proof here verbatim
+because it is not often found in print nowadays.
+\begin{proof}
+  (\textbf{Mohanty}) For brevity, call the boundaries \(x=y+t\) and
+  \(x=y-s\), \(\mathcal{L}^{+}\) and \(\mathcal{L}^{-}\),
+  respectively. Denote by~\(A_1\) the set of paths that reach
+  \(\mathcal{L}^{+}\), by~\(A_2\) the set of paths that reach
+  \(\mathcal{L}^{+}\), \(\mathcal{L}^{-}\) in that order, and in
+  general by~\(A_i\) the set of paths reaching \(\mathcal{L}^{+}\),
+  \(\mathcal{L}^{-}\), \(\mathcal{L}^{+}\), \ldots (\(i\)~times) in
+  the specified order. Similarly, let~\(B_i\) be the set of paths
+  reaching \(\mathcal{L}^{-}\), \(\mathcal{L}^{+}\),
+  \(\mathcal{L}^{-}\), \ldots (\(i\)~times) in the specified order. An
+  application of the usual inclusion\--exclusion method yields
+  \begin{equation}
+    \left\lvert\mathcal{L}(a,b;t,s)\right\rvert = \binom{a+b}{b} +
+    \sum_{i \geqslant 1}(-1)^{i}(\lvert{A_i}\rvert +
+    \lvert{B_i}\rvert),\label{eq:L}
+  \end{equation}
+  where~\(\lvert{A_i}\rvert\) and~\(\lvert{B_i}\rvert\) are evaluated
+  by using the reflection principle repeatedly. For example,
+  consider~\(A_3\). Since every path in~\(A_3\) must
+  reach~\(\mathcal{L}^{+}\), \(A_3\) when reflected about
+  \(\mathcal{L}^{+}\) becomes the set of paths from \((t,-t)\) to
+  \((a,b)\) each of which reaches~\(\mathcal{L}^{+}\) after reaching
+  \(\mathcal{L}^{-}\). Another reflection about \(\mathcal{L}^{-}\)
+  would make~\(A_3\) equivalent to the set of paths from
+  \((-s-t,s+t)\) to \((a,b)\) that reach~\(\mathcal{L}^{+}\), which in
+  turn can be written as \(R(a+s+t,b-s-t; 2s+3t)\). [Note:
+    \(R(a,b;t)\) is the set of paths from \((0,0)\) to \((a,b)\)
+    reflected about~\(\mathcal{L}^{+}\).] Thus, since
+  \(\lvert{R(a,b;t)}\rvert = \binom{a+b}{a-t}\),
+\begin{equation*}
+\left\lvert{A_3}\right\rvert = \binom{a+b}{a-s-2t},
+\end{equation*}
+and, more generally,
+\begin{equation*}
+\left\lvert{A_{2j}}\right\rvert = \binom{a+b}{a+j(s+t)}
+\quad\text{and}\quad
+\left\lvert{A_{2j+1}}\right\rvert = \binom{a+b}{a-j(s+t)-t}.
+\end{equation*}
+The expressions for \(\lvert{B_{2j}}\rvert\),
+\(\lvert{B_{2j+1}}\rvert\), \(j=0, 1, 2, \dots\), with
+\(\lvert{A_0}\rvert\), \(\lvert{B_0}\rvert\) being \(\binom{a+b}{b}\),
+are obtained by interchanging \(a\)~with~\(b\) and
+\(s\)~with~\(t\). Substitution of these values in~\eqref{eq:L}
+yields~\eqref{eq:mohanty} after some simplifications.
+\end{proof}
+
+Resuming our argument, if we match the figures in
+\fig~\ref{fig:boundaries}, we find \(s=h\), \(t=1\), \(a=b=n\),
+hence \(a+b=2n\) and \(b+k(s+t)=n+k(h+1)\),
+which we plug into formula~\eqref{eq:mohanty} and change \(h\)~into \(h-1\):
+\begin{equation*}
+A_{n,h-1} = \sum_{k \in \mathbb{Z}}\left[\binom{2n}{n+kh} -
+           \binom{2n}{n+1+kh}\right].
+\end{equation*}
+After splitting the sum into \(k<0\), \(k=0\) and \(k>0\), then
+changing the sign of~\(k\) in the first case, using \(\binom{p}{q} =
+\binom{p}{p-q}\) in the second and last, then gathering the remaining
+sums ranging over \(k \geqslant 1\), we reach
+\begin{align*}
+A_{n,h-1}
+  &= - \sum_{k \geqslant 1}\left[\binom{2n}{n+1-kh} -
+    2\binom{2n}{n-kh} + \binom{2n}{n-1-kh}\right]\\
+  &\phantom{=}\; + \binom{2n}{n} - \binom{2n}{n-1}.
+\end{align*}
+Recognising \(C_n\) as in page~\pageref{eq:Ann}, we settle for
+\begin{equation*}
+C_n - A_{n,h-1}
+  = \sum_{k \geqslant 1}\left[\binom{2n}{n+1-kh} -
+    2\binom{2n}{n-kh} + \binom{2n}{n-1-kh}\right].
+\end{equation*}
+Finally, recalling that \(B_{n,h} = A_{n,n+1} - A_{n,h}\) and \(C_n =
+A_{n,n+1}\), we arrive at the formula
+\begin{equation}
+B_{n,h-1} = \sum_{k \geqslant 1}
+            \left[\binom{2n}{n+1-kh} - 2\binom{2n}{n-kh}
+            + \binom{2n}{n-1-kh}\right].
+\label{eq:Bn}
+\end{equation}
+
+\citet*{KnuthdeBruijnRice_1972} published a landmark paper where they
+obtain the same result using much more involved mathematics. They
+start by modelling the problem with a generating function
+\citep{Wilf_1990} which satisfies a recurrent equation whose solution
+expresses the generating function in terms of continued fractions of
+Fibonacci polynomials. Integration over complex numbers is utilised to
+obtain formula~\eqref{eq:Bn}. Alternatively, generating functions can
+be used on monotonic lattice paths instead of Catalan trees
+\citep[page~64]{Kemp_1984} \citep{FlajoletNebelProdinger_2006}.
+
+\citet*{SedgewickFlajolet_1996} \citep{FlajoletSedgewick_2009} use
+analytic combinatorics and real analysis to obtain the asymptotic
+approximation of~\(B_{n,h}\). They
+write~\cite[p.~260]{SedgewickFlajolet_1996}: ``This analysis is the
+hardest nut that we are cracking in this book. It combines techniques
+for solving linear recurrences and continued fractions, generating
+function expansions, especially by the Lagrange inversion theorem, and
+binomial approximations and Euler\--Maclaurin summations.'' It is not
+possible to go into the details here, but we can sketch how that
+asymptotic approximation can be carried out.
+
+Equation~\eqref{eq:Sn} entails \(S_{n} = \sum_{h \geqslant 1}
+B_{n,h-1}\), therefore
+\begin{equation*}
+S_{n} = \sum_{k' \geqslant 1}d(k') \cdot
+         \left[\binom{2n}{n+1-k'} - 2\binom{2n}{n-k'}
+         + \binom{2n}{n-1-k'}\right],
+\end{equation*}
+where~\(d(k')\) is the number of positive divisors of~\(k'\), but
+complex analysis is needed
+\citep{KnuthdeBruijnRice_1972,FlajoletGourdonDumas_1995}. Another way
+is to express the binomials in terms of \(\binom{2n}{n-kh}\) as
+follows:
+\begin{align*}
+\binom{2n}{n-m+1} &= \frac{(2n)!}{(n-m+1)!\,(n+m-1)!}\\
+                  &= \frac{(2n)!\,(n+m)}{(n-m)!\,(n-m+1)(n+m)!} 
+                   = \frac{n+m}{n-m+1}\binom{2n}{n-m},\\
+\binom{2n}{n-m-1} &= \frac{(2n)!}{(n-m-1)!\,(n+m+1)!}\\
+                  &= \frac{(2n)!\,(n-m)}{(n-m)!\,(n+m)!\,(n+m+1)}
+                   = \frac{n-m}{n+m+1}\binom{2n}{n-m}.
+\end{align*}
+Therefore,
+\begin{equation*}
+\binom{2n}{n-m+1} - 2\binom{2n}{n-m} + \binom{2n}{n-m-1}
+= 2 \cdot \frac{2m^2-(n+1)}{(n+1)^2-m^2}\binom{2n}{n-m}.
+\end{equation*}
+Let \(F_n(m) = (2m^2-n)/(n^2-m^2)\). We have
+\begin{equation*}
+S_{n} = 2 \cdot \sum_{h \geqslant 1}\sum_{k \geqslant 1} F_{n+1}(kh)
+\cdot \binom{2n}{n-kh}.
+\end{equation*}
+From equation~\eqref{eq:Cn} and \(h_n = S_n/C_n\), we deduce \(h_{n} =
+(n+1)S_{n}{\binom{2n}{n}}^{-1}\), hence we must approximate
+\((n+1)F_{n+1}(m)\) and \(\binom{2n}{n-m}\binom{2n}{n}^{-1}\). On the
+one hand, we have
+\begin{equation*}
+F_{n+1}(m) \sim \frac{2m^2-n}{n^2} \sim \frac{2m^2-n}{n(n+1)},
+\end{equation*}
+so \((n+1)F_{n+1}(kh) \sim 2k^2h^2\!/n-1\). On the other hand,
+\citet*[4.6, 4.8]{SedgewickFlajolet_1996} show
+\begin{equation*}
+\binom{2n}{n-m}{\binom{2n}{n}}^{-1} \sim e^{-m^2\!/n}.
+\end{equation*}
+Assuming that the tails (the implicit error terms) of the two previous
+approximations decrease exponentially, we have
+\begin{equation*}
+h_{n} \sim \sum_{h \geqslant 1}\sum_{k \geqslant 1}
+(4k^2h^2\!/n - 2)e^{-k^2h^2\!/n}
+= \sum_{h \geqslant 1}H(h/\!\sqrt{n}), 
+\end{equation*}
+with \(H(x) := \sum_{k \geqslant 1}(4k^2x^2-2)e^{-k^2x^2}\). Finally,
+\citet*[5.9]{SedgewickFlajolet_1996}, as well as
+\citet*[9.6]{GrahamKnuthPatashnik_1994}, use real analysis to conclude
+\begin{equation*}
+h_{n} \sim \sum_{h \geqslant 1}H(h/\!\sqrt{n})
+\sim \sqrt{n} \int_0^{\infty}\!\!H(x) dx \sim \sqrt{\pi n}.
+\end{equation*}
+The end of this derivation, after \(B_{n,h-1}\) has been obtained, is
+difficult and not even fully formal because the error terms in the
+bivariate asymptotic approximations should be carefully checked, as
+the referenced authors do. Unfortunately, this also means that this
+part is unlikely to be simplified further.
+As mentioned earlier, the \emph{height} of a tree is the number of
+nodes on a maximal path from the root to a leaf, that is, a node
+without subtrees; for example, we can follow down and count the
+nodes~\((\circ)\) in \fig~\ref{fig:catalan_tree}. A tree reduced to a
+single leaf has height~\(0\).
+
+We begin with the key observation that a Catalan tree with \(n\)~edges
+and height~\(h\) is in bijection with a Dyck path of length~\(2n\)
+\emph{and height \(h-1\)} (see \fig~\vref{fig:catalan_tree} and
+\fig~\ref{fig:bijection}). This simple fact allows us to reckon on the
+height of the Dyck paths and transfer the result back to Catalan
+trees.
+
+Let~\(h_n\) be the average height of Catalan trees with \(n\)~edges
+and \(H_{n,h}\) the number of Catalan trees with \(n\)~edges and
+height~\(h\). We then have \(h_n = S_n/C_{n}\), where \(S_n := \sum_{h
+  \geqslant 1} h \cdot H_{n,h}\). We need to gain a purchase on that
+sum. For example, we might define~\(A_{n,h}\) as being the number of
+trees with \(n\)~edges and height less than or equal to~\(h\). Of
+course, \(A_{n,h} = A_{n,n+1} = C_{n}\), if \(h > n\). Then \(H_{n,h}
+= A_{n,h}-A_{n,h-1}\). Formulas can be further simplified by
+letting~\(B_{n,h}\) be the number of trees with \(n\)~edges with
+height greater than~\(h\):
+\begin{equation}
+S_n = \sum_{h \geqslant 1}h(A_{n,h}-A_{n,h-1})
+    = \sum_{h \geqslant 1}h(B_{n,h-1}-B_{n,h}) = \sum_{h\geqslant 0} B_{n,h}.
+\label{eq:Sn}
+\end{equation} 
+
+With the determination of~\(A_{n,h}\) in mind, let us consider in
+\fig~\ref{fig:height} a Dyck path of length~\(2n\) and height~\(h-1\).
+\begin{figure}[t]
+\centering
+\subfloat[Dyck path of length~\(2n\) and
+height \(h-1\) \label{fig:height}]{
+\includegraphics[scale=0.9,bb=71 565 247 721]{height}}
+\quad
+\subfloat[Path from \(A\) to \(\Omega\) avoiding \(y=x+s\) and
+\(y=x-t\)\label{fig:mohanty}]{
+\includegraphics[scale=0.9,bb=71 621 219 721]{mohanty}}
+\caption{Paths avoiding diagonal boundaries\label{fig:boundaries}}
+\end{figure}
+The double lines are boundaries which cannot be attained by the
+path. This is in fact a special case of a general monotonic path
+between two diagonal boundaries, as shown in \fig~\ref{fig:mohanty},
+where \(s\)~denotes the vertical distance from~\(A\), and \(t\)~the
+horizontal distance from~\(A\). It is well known that the number of
+monotonic paths from~\(A(0,0)\) to~\(\Omega(a,b)\) avoiding the
+boundaries is
+\begin{equation}
+\left\lvert\mathcal{L}(a,b;t,s)\right\rvert = \sum_{k \in \mathbb{Z}}\left[\binom{a+b}{b+k(t+s)} - \binom{a+b}{b+k(t+s)+t}\right].
+\label{eq:mohanty}
+\end{equation}
+
+The proof by \citet[p.~6]{Mohanty_1979} of this formula is based on
+the reflection principle and the principle of inclusion and exclusion,
+whereby a superset is taken and a subset is retracted, because both
+sets are easier to enumerate than the whole --~we used it implicitly
+to find formula~\eqref{eq:Cn}. We quote his proof here verbatim
+because it is not often found in print nowadays.
+\begin{proof}
+  (\textbf{Mohanty}) For brevity, call the boundaries \(x=y+t\) and
+  \(x=y-s\), \(\mathcal{L}^{+}\) and \(\mathcal{L}^{-}\),
+  respectively. Denote by~\(A_1\) the set of paths that reach
+  \(\mathcal{L}^{+}\), by~\(A_2\) the set of paths that reach
+  \(\mathcal{L}^{+}\), \(\mathcal{L}^{-}\) in that order, and in
+  general by~\(A_i\) the set of paths reaching \(\mathcal{L}^{+}\),
+  \(\mathcal{L}^{-}\), \(\mathcal{L}^{+}\), \ldots (\(i\)~times) in
+  the specified order. Similarly, let~\(B_i\) be the set of paths
+  reaching \(\mathcal{L}^{-}\), \(\mathcal{L}^{+}\),
+  \(\mathcal{L}^{-}\), \ldots (\(i\)~times) in the specified order. An
+  application of the usual inclusion\--exclusion method yields
+  \begin{equation}
+    \left\lvert\mathcal{L}(a,b;t,s)\right\rvert = \binom{a+b}{b} +
+    \sum_{i \geqslant 1}(-1)^{i}(\lvert{A_i}\rvert +
+    \lvert{B_i}\rvert),\label{eq:L}
+  \end{equation}
+  where~\(\lvert{A_i}\rvert\) and~\(\lvert{B_i}\rvert\) are evaluated
+  by using the reflection principle repeatedly. For example,
+  consider~\(A_3\). Since every path in~\(A_3\) must
+  reach~\(\mathcal{L}^{+}\), \(A_3\) when reflected about
+  \(\mathcal{L}^{+}\) becomes the set of paths from \((t,-t)\) to
+  \((a,b)\) each of which reaches~\(\mathcal{L}^{+}\) after reaching
+  \(\mathcal{L}^{-}\). Another reflection about \(\mathcal{L}^{-}\)
+  would make~\(A_3\) equivalent to the set of paths from
+  \((-s-t,s+t)\) to \((a,b)\) that reach~\(\mathcal{L}^{+}\), which in
+  turn can be written as \(R(a+s+t,b-s-t; 2s+3t)\). [Note:
+    \(R(a,b;t)\) is the set of paths from \((0,0)\) to \((a,b)\)
+    reflected about~\(\mathcal{L}^{+}\).] Thus, since
+  \(\lvert{R(a,b;t)}\rvert = \binom{a+b}{a-t}\),
+\begin{equation*}
+\left\lvert{A_3}\right\rvert = \binom{a+b}{a-s-2t},
+\end{equation*}
+and, more generally,
+\begin{equation*}
+\left\lvert{A_{2j}}\right\rvert = \binom{a+b}{a+j(s+t)}
+\quad\text{and}\quad
+\left\lvert{A_{2j+1}}\right\rvert = \binom{a+b}{a-j(s+t)-t}.
+\end{equation*}
+The expressions for \(\lvert{B_{2j}}\rvert\),
+\(\lvert{B_{2j+1}}\rvert\), \(j=0, 1, 2, \dots\), with
+\(\lvert{A_0}\rvert\), \(\lvert{B_0}\rvert\) being \(\binom{a+b}{b}\),
+are obtained by interchanging \(a\)~with~\(b\) and
+\(s\)~with~\(t\). Substitution of these values in~\eqref{eq:L}
+yields~\eqref{eq:mohanty} after some simplifications.
+\end{proof}
+
+Resuming our argument, if we match the figures in
+\fig~\ref{fig:boundaries}, we find \(s=h\), \(t=1\), \(a=b=n\),
+hence \(a+b=2n\) and \(b+k(s+t)=n+k(h+1)\),
+which we plug into formula~\eqref{eq:mohanty} and change \(h\)~into \(h-1\):
+\begin{equation*}
+A_{n,h-1} = \sum_{k \in \mathbb{Z}}\left[\binom{2n}{n+kh} -
+           \binom{2n}{n+1+kh}\right].
+\end{equation*}
+After splitting the sum into \(k<0\), \(k=0\) and \(k>0\), then
+changing the sign of~\(k\) in the first case, using \(\binom{p}{q} =
+\binom{p}{p-q}\) in the second and last, then gathering the remaining
+sums ranging over \(k \geqslant 1\), we reach
+\begin{align*}
+A_{n,h-1}
+  &= - \sum_{k \geqslant 1}\left[\binom{2n}{n+1-kh} -
+    2\binom{2n}{n-kh} + \binom{2n}{n-1-kh}\right]\\
+  &\phantom{=}\; + \binom{2n}{n} - \binom{2n}{n-1}.
+\end{align*}
+Recognising \(C_n\) as in page~\pageref{eq:Ann}, we settle for
+\begin{equation*}
+C_n - A_{n,h-1}
+  = \sum_{k \geqslant 1}\left[\binom{2n}{n+1-kh} -
+    2\binom{2n}{n-kh} + \binom{2n}{n-1-kh}\right].
+\end{equation*}
+Finally, recalling that \(B_{n,h} = A_{n,n+1} - A_{n,h}\) and \(C_n =
+A_{n,n+1}\), we arrive at the formula
+\begin{equation}
+B_{n,h-1} = \sum_{k \geqslant 1}
+            \left[\binom{2n}{n+1-kh} - 2\binom{2n}{n-kh}
+            + \binom{2n}{n-1-kh}\right].
+\label{eq:Bn}
+\end{equation}
+
+\citet*{KnuthdeBruijnRice_1972} published a landmark paper where they
+obtain the same result using much more involved mathematics. They
+start by modelling the problem with a generating function
+\citep{Wilf_1990} which satisfies a recurrent equation whose solution
+expresses the generating function in terms of continued fractions of
+Fibonacci polynomials. Integration over complex numbers is utilised to
+obtain formula~\eqref{eq:Bn}. Alternatively, generating functions can
+be used on monotonic lattice paths instead of Catalan trees
+\citep[page~64]{Kemp_1984} \citep{FlajoletNebelProdinger_2006}.
+
+\citet*{SedgewickFlajolet_1996} \citep{FlajoletSedgewick_2009} use
+analytic combinatorics and real analysis to obtain the asymptotic
+approximation of~\(B_{n,h}\). They
+write~\cite[p.~260]{SedgewickFlajolet_1996}: ``This analysis is the
+hardest nut that we are cracking in this book. It combines techniques
+for solving linear recurrences and continued fractions, generating
+function expansions, especially by the Lagrange inversion theorem, and
+binomial approximations and Euler\--Maclaurin summations.'' It is not
+possible to go into the details here, but we can sketch how that
+asymptotic approximation can be carried out.
+
+Equation~\eqref{eq:Sn} entails \(S_{n} = \sum_{h \geqslant 1}
+B_{n,h-1}\), therefore
+\begin{equation*}
+S_{n} = \sum_{k' \geqslant 1}d(k') \cdot
+         \left[\binom{2n}{n+1-k'} - 2\binom{2n}{n-k'}
+         + \binom{2n}{n-1-k'}\right],
+\end{equation*}
+where~\(d(k')\) is the number of positive divisors of~\(k'\), but
+complex analysis is needed
+\citep{KnuthdeBruijnRice_1972,FlajoletGourdonDumas_1995}. Another way
+is to express the binomials in terms of \(\binom{2n}{n-kh}\) as
+follows:
+\begin{align*}
+\binom{2n}{n-m+1} &= \frac{(2n)!}{(n-m+1)!\,(n+m-1)!}\\
+                  &= \frac{(2n)!\,(n+m)}{(n-m)!\,(n-m+1)(n+m)!} 
+                   = \frac{n+m}{n-m+1}\binom{2n}{n-m},\\
+\binom{2n}{n-m-1} &= \frac{(2n)!}{(n-m-1)!\,(n+m+1)!}\\
+                  &= \frac{(2n)!\,(n-m)}{(n-m)!\,(n+m)!\,(n+m+1)}
+                   = \frac{n-m}{n+m+1}\binom{2n}{n-m}.
+\end{align*}
+Therefore,
+\begin{equation*}
+\binom{2n}{n-m+1} - 2\binom{2n}{n-m} + \binom{2n}{n-m-1}
+= 2 \cdot \frac{2m^2-(n+1)}{(n+1)^2-m^2}\binom{2n}{n-m}.
+\end{equation*}
+Let \(F_n(m) = (2m^2-n)/(n^2-m^2)\). We have
+\begin{equation*}
+S_{n} = 2 \cdot \sum_{h \geqslant 1}\sum_{k \geqslant 1} F_{n+1}(kh)
+\cdot \binom{2n}{n-kh}.
+\end{equation*}
+From equation~\eqref{eq:Cn} and \(h_n = S_n/C_n\), we deduce \(h_{n} =
+(n+1)S_{n}{\binom{2n}{n}}^{-1}\), hence we must approximate
+\((n+1)F_{n+1}(m)\) and \(\binom{2n}{n-m}\binom{2n}{n}^{-1}\). On the
+one hand, we have
+\begin{equation*}
+F_{n+1}(m) \sim \frac{2m^2-n}{n^2} \sim \frac{2m^2-n}{n(n+1)},
+\end{equation*}
+so \((n+1)F_{n+1}(kh) \sim 2k^2h^2\!/n-1\). On the other hand,
+\citet*[4.6, 4.8]{SedgewickFlajolet_1996} show
+\begin{equation*}
+\binom{2n}{n-m}{\binom{2n}{n}}^{-1} \sim e^{-m^2\!/n}.
+\end{equation*}
+Assuming that the tails (the implicit error terms) of the two previous
+approximations decrease exponentially, we have
+\begin{equation*}
+h_{n} \sim \sum_{h \geqslant 1}\sum_{k \geqslant 1}
+(4k^2h^2\!/n - 2)e^{-k^2h^2\!/n}
+= \sum_{h \geqslant 1}H(h/\!\sqrt{n}), 
+\end{equation*}
+with \(H(x) := \sum_{k \geqslant 1}(4k^2x^2-2)e^{-k^2x^2}\). Finally,
+\citet*[5.9]{SedgewickFlajolet_1996}, as well as
+\citet*[9.6]{GrahamKnuthPatashnik_1994}, use real analysis to conclude
+\begin{equation*}
+h_{n} \sim \sum_{h \geqslant 1}H(h/\!\sqrt{n})
+\sim \sqrt{n} \int_0^{\infty}\!\!H(x) dx \sim \sqrt{\pi n}.
+\end{equation*}
+The end of this derivation, after \(B_{n,h-1}\) has been obtained, is
+difficult and not even fully formal because the error terms in the
+bivariate asymptotic approximations should be carefully checked, as
+the referenced authors do. Unfortunately, this also means that this
+part is unlikely to be simplified further.

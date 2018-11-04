@@ -1,0 +1,19 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\usepackage{mathpartir}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=20pt,treesep=7pt,treemode=U]{\TR{\TirName{Trans}}}{
+  \pstree{\TR{\TirName{Push}}}{
+    \TR{\TirName{Swap}}
+  }
+  \TR{\TirName{Swap}}
+}
+\endTeXtoEPS
+
+\end{document}

@@ -1,0 +1,23 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesepA=0pt,nodesepB=1pt,levelsep=24pt,treesep=20pt]{\TCircle{$x$}~[tnpos=l,tnsep=8pt]{\raisebox{0.5pt}{\rnode[b]{x_in}{$i$}}}~[tnpos=r,tnsep=0pt]{\raisebox{-2pt}{\rnode[b]{x_out}{$\pair{k}{\fun{int}(i,t'_1,t'_2)}$}}}}{
+  \psset{levelsep=30pt}
+\TR{$t_1$}~[tnpos=l]{\raisebox{7pt}{\rnode[tr]{t1_in}{\rnode[b]{t1_down}{$i+1$}}}}~[tnpos=r]{\raisebox{8.3pt}{\rnode[t]{t1_out}{\rnode[b]{t1_up}{$\pair{j}{t'_1}$}}}}
+\TR{$t_2$}~[tnpos=l,tnsep=8pt]{\raisebox{7pt}{\rnode[t]{t2_in}{\rnode[b]{t2_down}{$j$}}}}~[tnpos=r,tnsep=5pt]{\raisebox{8.3pt}{\rnode[t]{t2_out}{\rnode[b]{t2_up}{$\pair{k}{t'_2}$}}}}
+}
+\ncline[nodesep=2pt]{->}{x_in}{t1_in}
+\ncline[nodesep=2pt]{->}{t2_out}{x_out}
+\nccurve[nodesep=2pt,angleA=45,angleB=145,ncurv=0.7]{->}{t1_out}{t2_in}
+\nccurve[nodesep=2pt,angleA=-60,angleB=-120,ncurv=0.9]{->}{t2_down}{t2_up}
+\nccurve[nodesep=2pt,angleA=-65,angleB=-120,ncurv=0.9]{->}{t1_down}{t1_up}
+\endTeXtoEPS
+
+\end{document}

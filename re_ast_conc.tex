@@ -1,0 +1,19 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{pstricks,pst-tree,pst-eps}
+\usepackage{amsmath,xspace}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=20pt, nodesepA=2pt]{\TR{\(\cdot\)}}{
+  \Tr[ref=t]{\pstribox{s}}
+  \Tr[ref=t]{\pstribox{t}}
+  }
+\endTeXtoEPS
+
+\end{document}
+
+\begin{document}

@@ -1,0 +1,33 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pstricks,pst-tree,pst-eps}
+
+\newcommand\element[1]{\Tr{\texttt{#1}}}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=1cm,nodesep=2pt,treesep=8pt]{\element{item()}}{
+  \element{attribute()}
+  \Tn
+  \Tn
+  \pstree{\element{node()}}{
+    \psset{nodesepB=0pt}
+    \element{element()}
+    \element{text()}
+  }
+  \psset{thistreesep=-60pt}
+  \begin{skiplevels}{1}
+    \pstree{\Tr{\emph{primitive}}}{
+      \element{xs:integer}
+      \element{xs:float}
+      \element{xs:string}
+      \element{xs:boolean}
+    }
+  \end{skiplevels}
+}
+\endTeXtoEPS
+
+\end{document}

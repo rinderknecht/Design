@@ -1,0 +1,4 @@
+flat(       []) -> [];
+flat(   [[]|T]) -> flat(T);
+flat([[X|S]|T]) -> flat([X,S|T]);
+flat(    [X|T]) -> [X|flat(T)].

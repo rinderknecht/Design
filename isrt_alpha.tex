@@ -1,0 +1,6 @@
+\begin{alltt}
+isrt(   [])             \(\smashedrightarrow{\beta}\) [];
+isrt([X|S])             \(\smashedrightarrow{\gamma}\) ins(isrt(S),X).
+ins([Y|S],X) when X > Y \(\smashedrightarrow{\delta}\) [Y|ins(S,X)];
+ins(    S,X)            \(\smashedrightarrow{\epsilon}\) [X|S].
+\end{alltt}

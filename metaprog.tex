@@ -1,0 +1,46 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\framebox{\(
+\begin{array}{@{}r@{\;}c@{\;}l@{}}
+\fun{mp}_0(t)                    & \rightarrow & \fun{zero}(t,0).\\
+\\
+\fun{zero}(\cons{\fun{a}()}{t},j) & \rightarrow & \fun{one}(t,j+1);\\
+\fun{zero}(\cons{a}{t},j)         & \rightarrow & \fun{zero}(t,j+1);\\
+\fun{zero}(\el,j)                 & \rightarrow & \fun{absent}().\\
+\\
+\fun{one}(\cons{\fun{b}()}{t},j) & \rightarrow & \fun{two}(t,j+1);\\
+\fun{one}(t,j)                   & \rightarrow & \fun{zero}(t,j).\\
+\\
+\fun{two}(\cons{\fun{a}()}{t},j) & \rightarrow & \fun{three}(t,j+1);\\
+\fun{two}(t,j)                   & \rightarrow & \fun{zero}(t,j).\\
+\\
+\fun{three}(\cons{\fun{c}()}{t},j)
+                                 & \rightarrow & \fun{four}(t,j+1);\\
+\fun{three}(t,j)                 & \rightarrow & \fun{one}(t,j).\\
+\\
+\fun{four}(\cons{\fun{a}()}{t},j) & \rightarrow & \fun{five}(t,j+1);\\
+\fun{four}(t,j)                   & \rightarrow & \fun{zero}(t,j).\\
+\\
+\fun{five}(\cons{\fun{b}()}{t},j) & \rightarrow & \fun{six}(t,j+1);\\
+\fun{five}(t,j)                   & \rightarrow & \fun{one}(t,j).\\
+\\
+\fun{six}(\cons{\fun{a}()}{t},j) & \rightarrow & \fun{seven}(t,j+1);\\
+\fun{six}(t,j)                   & \rightarrow & \fun{two}(t,j).\\
+\\
+\fun{seven}(\cons{\fun{c}()}{t},j)
+                                 & \rightarrow & \fun{factor}(j-6);\\
+\fun{seven}(t,j)                 & \rightarrow & \fun{three}(t,j).
+\end{array}\)}
+\endTeXtoEPS
+
+\end{document}

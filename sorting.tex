@@ -1,0 +1,663 @@
+\section{Optimal sorting}
+\label{sec:opt_sort}
+\index{sorting}
+
+Sorting is the process of rearranging a series of objects, called
+\emph{keys}\index{sorting!key}, to conform with a predefined
+order. According to \cite{Knuth_1998}, the first sorting algorithms
+were invented and automated as tabulating machines in the late
+nineteenth century, in order to support the establishment of the
+census of the United States of America.
+
+\paragraph{Permutations}
+\label{par:permutations}
+\index{permutation}
+
+We saw \vpageref{par:mean_sort} that the average cost of a
+comparison\hyp{}based sorting algorithm is defined as the arithmetic
+mean of the costs of sorting all permutations of a given length. A
+permutation of \((1,2,\dots,n)\) is another tuple
+\((a_1,a_2,\dots,a_n)\) such that \(a_i \in \{1,\dots,n\}\) and \(a_i
+\neq a_j\) for all~\(i \neq j\). For example, all the permutations
+of~\((1,2,3)\) are
+\begin{equation*}
+(1,2,3) \quad (1,3,2) \quad (2,1,3) \quad (2,3,1) \quad (3,1,2) \quad
+(3,2,1).
+\end{equation*}
+Given all the permutations of~\((1,2,\dots,n-1)\), let us build
+inductively all the permutations of
+\((1,2,\dots,n)\). If~\((a_1,a_2,\dots,a_{n-1})\) is a permutation of
+\((1,2,\dots,n-1)\), then we can construct \(n\)~permutations
+of~\((1,2,\dots,n)\) by inserting~\(n\) at all possible places
+in~\((a_1,a_2,\dots,a_{n-1})\):
+\begin{equation*}
+(\boldsymbol{n},a_1,a_2,\dots,a_{n-1})\quad
+(a_1,\boldsymbol{n},a_2,\dots,a_{n-1})\quad \ldots \quad
+(a_1,a_2,\dots,a_{n-1},\boldsymbol{n}).
+\end{equation*}
+For example, it is obvious that all the permutations of \((1,2)\) are
+\((1,2)\) and \((2,1)\). The method leads from \((1,2)\) to
+\((\boldsymbol{3},1,2)\), \((1,\boldsymbol{3},2)\) and
+\((1,2,\boldsymbol{3})\); and from \((2,1)\) to
+\((\boldsymbol{3},2,1)\), \((2,\boldsymbol{3},1)\) and
+\((2,1,\boldsymbol{3})\). If we name~\(p_n\) the number of
+permutations on \(n\)~elements, we draw from this the recurrence \(p_n
+= n \cdot p_{n-1}\), which, with the additional obvious \(p_1 = 1\),
+leads to \({p_n = n!}\), for all \({n > 0}\), exactly as expected. If
+the \(n\)~objects to permute are not \((1,2,\dots,n)\) but, for
+example, \((\textsf{b},\textsf{d},\textsf{a},\textsf{c})\), simply
+associate each of them to their index in the tuple, for example,
+\textsf{b}~is represented by~\(1\), \textsf{d}~by~\(2\),
+\textsf{a}~by~\(3\) and \textsf{c}~by~\(4\), so the tuple is then
+associated to \((1,2,3,4)\) and, for instance, the permutation
+\((4,1,2,3)\) means~\((\textsf{c},\textsf{b},\textsf{d},\textsf{a})\).
+
+\paragraph{Factorial}\index{factorial}
+
+We encountered the factorial function in the introduction and here
+again. There is a simple derivation enabling the characterisation of
+its asymptotic growth, proposed by
+\cite{GrahamKnuthPatashnik_1994}. We start by squaring the factorial
+and regrouping the factors as follows:
+\begin{equation*}
+n!^2 = (1 \cdot 2 \cdot \ldots \cdot n) (n \cdot \ldots \cdot 2 \cdot
+1) = \prod_{k=1}^{n}{k(n+1-k)}.
+\end{equation*}
+The parabola \(P(k) := k(n+1-k) = -k^2 + (n+1)k\) reaches its maximum
+where its derivative is zero: \(P'(k_{\max}) = 0 \Leftrightarrow
+k_{\max}=(n+1)/2\). The corresponding ordinate is \(P(k_{\max}) =
+((n+1)/2)^2 = k_{\max}^2\). When \(k\)~ranges from~\(1\) to~\(n\), the
+minimal ordinate, \(n\), is reached at absissas \(1\)~and~\(n\), as
+shown in \fig~\vref{fig:parabola}.
+\begin{figure}
+\centering
+\includegraphics[bb=55 563 205 730]{parabola}
+\caption{Parabola \(P(k) := k(n+1-k)\)\label{fig:parabola}}
+\end{figure}
+Hence, \(1 \leqslant k \leqslant k_{\max}\) implies
+\begin{equation*}
+P(1) \leqslant P(k) \leqslant P(k_{\max}),\quad \text{that is,} \quad
+n \leqslant k(n+1-k) \leqslant \left(\frac{n+1}{2}\right)^2.
+\end{equation*}
+Multiplying the sides by varying~\(k\) over the discrete interval
+\([1..n]\) yields
+\begin{gather*}
+n^n = \prod_{k=1}^{n}{n} \leqslant n!^2 
+\leqslant
+\prod_{k=1}^{n}{\left(\!\frac{n+1}{2}\!\right)^2} \!\!=
+\left(\!\frac{n+1}{2}\!\right)^{2n}
+\!\!\!\Rightarrow\!
+n^{n/2} \leqslant n! \leqslant \left(\!\frac{n+1}{2}\!\right)^n.
+\end{gather*}
+It is clear now that \(n!\)~is \emph{exponential}, so it
+asymptotically outgrows any polynomial. Concretely, a function whose
+cost is proportional to a factorial is useless even for small
+inputs. For the cases where an equivalence is preferred, Stirling's
+formula\index{Stirling's formula} states that
+\begin{equation}
+n! \sim n^n e^{-n} \sqrt{2\pi n}.\label{eq:Stirling}
+\end{equation}
+
+\paragraph{Enumerating all permutations}
+
+Let us write a program computing all the permutations of a given
+stack. We define the function~\fun{perm/1}\index{perm@\fun{perm/1}}
+such that \(\fun{perm}(s)\) is the stack of all permutations of the
+items in stack~\(s\). We implement the inductive method presented
+above, which worked by inserting a new object into all possible places
+of a shorter permutation.
+\begin{equation*}
+\fun{perm}(\el)         \xrightarrow{\smash{\alpha}} \el;\quad
+\fun{perm}([x])         \xrightarrow{\smash{\beta}} [[x]];\quad
+\fun{perm}(\cons{x}{s}) \xrightarrow{\gamma}
+                          \fun{dist}(x,\fun{perm}(s)).
+\end{equation*}
+The function~\fun{dist/2}\index{dist@\fun{dist/2}} (\emph{distribute})
+is such that \(\fun{dist}(x,s)\) is the stack of all stacks obtained
+by inserting the item~\(x\) at all different places in
+stack~\(s\). Because such an insertion into a permutation of
+length~\(n\) yields a permutation of length~\(n+1\), we must join the
+new permutations to the previously found others of same length:
+\begin{equation*}
+\fun{dist}(x,\el)         \xrightarrow{\smash{\delta}} \el;\quad
+\fun{dist}(x,\cons{p}{t}) \xrightarrow{\smash{\epsilon}}
+                            \fun{cat}(\fun{ins}(x,p),\fun{dist}(x,t)).
+\end{equation*}
+The call~\(\fun{ins}(x,p)\)\index{ins@\fun{ins/2}} computes the stack
+of permutations resulting from inserting~\(x\) at all places in the
+permutation~\(p\). We thus derive
+\begin{equation*}
+\fun{ins}(x,\el) \xrightarrow{\smash{\zeta}} [[x]];\quad
+\fun{ins}(x,\cons{j}{s}) \xrightarrow{\smash{\eta}}
+ \cons{\cons{x,j}{s}}{\fun{push}(j,\fun{ins}(x,s))}.
+\end{equation*}
+where the function~\fun{push/2}\index{push@\fun{push/2}} (not to be
+confused with the function of same name and arity in
+section~\ref{sec:persistence}) is such that any
+call~\(\fun{push}(x,t)\) pushes item~\(x\) on all the permutations of
+the stack of permutations~\(t\). The order is left unchanged:
+\begin{equation*}
+\fun{push}(x,\el) \xrightarrow{\smash{\theta}} \el;\quad
+\fun{push}(x,\cons{p}{t}) \xrightarrow{\smash{\iota}}
+ \cons{\cons{x}{p}}{\fun{push}(x,t)}.
+\end{equation*}
+Now we can compute all the permutations of \((4,1,2,3)\) or
+\((\fun{c}, \fun{b}, \fun{d}, \fun{a})\) by calling
+\(\fun{perm}([4,1,2,3])\) or \(\fun{perm}([\fun{c}, \fun{b}, \fun{d},
+  \fun{a}])\). Note that, after computing the permutations of
+length~\(n+1\), the permutations of length~\(n\) are not needed
+anymore, which would allow an implementation to reclaim the
+corresponding memory for further uses (a process called \emph{garbage
+  collection}\index{garbage collection}). As far as the costs are
+concerned, the definition of \fun{push/2} yields
+\begin{equation*}
+\C{\fun{push}}{0} \eqn{\theta} 1;\qquad
+\C{\fun{push}}{n+1} \eqn{\iota} 1 + \C{\fun{push}}{n},\quad
+\text{with \(n \geqslant 0\)}.
+\end{equation*}
+We easily deduce \(\C{\fun{push}}{n} = n +
+1\).\index{push@$\C{\fun{push}}{n}$} We know that the result of
+\(\fun{ins}(x,p)\) is a stack of length~\(n+1\) if~\(p\) is a
+permutation of \(n\)~objects into which we insert one more
+object~\(x\). Hence, the definition of \fun{ins/2} leads to
+\begin{equation*}
+\C{\fun{ins}}{0}   \eqn{\zeta} 1;\quad
+\C{\fun{ins}}{k+1} \eqn{\eta} 1 + \C{\fun{push}}{k+1} +
+\C{\fun{ins}}{k} = 3 + k + \C{\fun{ins}}{k}, \quad \text{with \(k
+                   \geqslant 0\)},
+\end{equation*}
+where~\(\C{\fun{ins}}{k}\) is the cost of \(\fun{ins}(x,p)\)
+with~\(p\) of length~\(k\). By summing for all~\(k\) from
+\(0\)~to~\(n-1\), for~\(n>0\), on both sides we draw
+\begin{equation*}
+\sum_{k=0}^{n-1}{\C{\fun{ins}}{k+1}}
+  = \sum_{k=0}^{n-1}{3} + \sum_{k=0}^{n-1}{k}
+     + \sum_{k=0}^{n-1}{\C{\fun{ins}}{k}}.
+\end{equation*}
+By cancelling identical terms in the sums (telescoping)
+\(\sum_{k=0}^{n-1}{\C{\fun{ins}}{k+1}}\) and
+\(\sum_{k=0}^{n-1}{\C{\fun{ins}}{k}}\), we draw\index{ins@$\C{\fun{ins}}{n}$}
+\begin{equation*}
+\C{\fun{ins}}{n}
+  = 3n + \tfrac{1}{2}n(n-1) + \C{\fun{ins}}{0}
+  = \tfrac{1}{2}{n^2} + \tfrac{5}{2}{n} + 1.
+\end{equation*}
+This last equation is actually valid even if \(n =
+0\). Let~\(\C{\fun{dist}}{n!}\) be the cost for distributing an item
+among \(n!\)~permutations of length~\(n\). The definition of
+\fun{dist/2}\index{dist@\fun{dist/2}} shows that it repeats calls to
+\fun{cat/2}\index{cat@\fun{cat/2}} and
+\fun{ins/2}\index{ins@\fun{ins/2}} whose arguments are always of
+length \(n+1\)~and~\(n\), respectively, because all processed
+permutations here have the same length. We deduce, for~\(k \geqslant
+0\), that
+\begin{equation*}
+\C{\fun{dist}}{0} \eqn{\delta} 1;\quad
+\C{\fun{dist}}{k+1}
+  \eqn{\epsilon} 1 + \C{\fun{cat}}{n+1} + \C{\fun{ins}}{n}
+                    + \C{\fun{dist}}{k}
+  = \tfrac{1}{2}{n^2} + \tfrac{7}{2}{n} + 4 + \C{\fun{dist}}{k},
+\end{equation*}
+since we already know that \(\C{\fun{cat}}{n} = n +
+1\)\index{cat@$\C{\fun{cat}}{n}$} and the value
+of~\(\C{\fun{ins}}{n}\). By summing both sides of the last equation
+for all~\(k\) from \(0\)~to~\(n!-1\), we can eliminate most of the
+terms and find a non\hyp{}recursive definition of
+\(\C{\fun{dist}}{n!}\)\index{dist@$\C{\fun{dist}}{n}$}:
+\begin{align*}
+\sum_{k=0}^{n!-1}{\C{\fun{dist}}{k+1}}
+   &= \sum_{k=0}^{n!-1}{\left(\frac{1}{2}{n^2}
+      + \frac{7}{2}{n} + 4\right)}
+      + \sum_{k=0}^{n!-1}{\C{\fun{dist}}{k}},\\
+\C{\fun{dist}}{n!}
+  &= \left(\frac{1}{2}{n^2}+\frac{7}{2}{n}+4\right)n! +
+\C{\fun{dist}}{0} = \frac{1}{2}(n^2 + 7n + 8)n! + 1.
+\end{align*}
+Let us finally compute the cost of \(\fun{perm}(s)\), noted
+\(\C{\fun{perm}}{k}\)\index{perm@$\C{\fun{perm}}{n}$|(}, where \(k\)~is
+the length of the stack~\(s\). From rules \clause{\alpha}
+to~\clause{\gamma}, we deduce the following equations, where \(k >
+0\):
+\begin{align*}
+\C{\fun{perm}}{0}   &\eqn{\alpha} 1;\qquad
+\C{\fun{perm}}{1}   \eqn{\beta} 1;\\
+\C{\fun{perm}}{k+1}
+  &\eqn{\gamma} 1 + \C{\fun{perm}}{k} + \C{\fun{dist}}{k!}
+   = \tfrac{1}{2}(k^2 + 7k + 8)k! + 2 + \C{\fun{perm}}{k}.
+\intertext{Again, summing both sides, most of the terms cancel out:}
+\sum_{k=1}^{n-1}{\C{\fun{perm}}{k+1}}
+  &= \frac{1}{2}\sum_{k=1}^{n-1}{(k^2+7k+8)k!} + \sum_{k=1}^{n-1}{2}
+     + \sum_{k=1}^{n-1}{\C{\fun{perm}}{k}},\\
+\C{\fun{perm}}{n}
+  &= \frac{1}{2}\sum_{k=1}^{n-1}{(k^2 + 7k + 8)k!}
+     + 2(n-1) + \C{\fun{perm}}{1}\\
+  &= \frac{1}{2}\sum_{k=1}^{n-1}{((k+2)(k+1)+6+4k)k!} + 2n - 1\\
+  &= \frac{1}{2}\sum_{k=1}^{n-1}{(k+2)(k+1)k!}
+     + 3 \sum_{k=1}^{n-1}{k!} + 2 \sum_{k=1}^{n-1}{kk!} + 2n - 1\\
+  &= \frac{1}{2}\sum_{k=1}^{n-1}{(k+2)!}
+     + 3 \sum_{k=1}^{n-1}{k!} + 2 \sum_{k=1}^{n-1}{kk!} + 2n - 1\\
+  &= \frac{1}{2}\sum_{k=3}^{n+1}{k!}
+     + 3 \sum_{k=1}^{n-1}{k!} + 2 \sum_{k=1}^{n-1}{kk!} + 2n - 1\\
+%  &= \left(\frac{1}{2}((n+1)! + n! - 2! - 1!)
+%     + \frac{1}{2}\sum_{k=1}^{n-1}{k!}\right)
+%     + 3 \sum_{k=1}^{n-1}{k!}\\
+%  &\phantom{= x} + 2 \sum_{k=1}^{n-1}{kk!} + 2n - 1.\\
+  &= \frac{1}{2}{(n+2)n!} + \frac{7}{2}\sum_{k=1}^{n-1}{k!}
+     + 2 \sum_{k=1}^{n-1}{kk!} + 2n - \frac{5}{2}.
+\end{align*}
+This last equation is actually valid even if~\(n = 1\). One sum has a
+simple closed form:
+\begin{equation*}
+\sum_{k=1}^{n-1}{kk!} = \sum_{k=1}^{n-1}((k+1)! - k!) =
+\sum_{k=2}^{n}{k!} - \sum_{k=1}^{n-1}{k!} = n! - 1.
+\end{equation*}
+Resuming our previous derivation,
+\begin{align*}
+\C{\fun{perm}}{n}
+  &= \frac{1}{2}{nn!} + n! + \frac{7}{2}\sum_{k=1}^{n-1}{k!}
+     + 2(n! - 1) + 2n - \frac{5}{2}\\
+  &= \frac{1}{2}{nn!} + 3n! 
+     + 2n - \frac{9}{2} + \frac{7}{2}\sum_{k=1}^{n-1}{k!},\quad
+     \text{with \(n > 0\)}.
+\end{align*}
+The remaining sum is called the \emph{left factorial}
+\citep{Kurepa_1971}\index{factorial!left $\sim$} and is usually
+defined as
+\begin{equation*}
+!n := \sum_{k=1}^{n-1}{k!},\quad \text{with \(n > 0\)}.
+\end{equation*}
+Unfortunately, no closed expression of the left factorial is
+known. This is actually a common situation when determining the cost
+of relatively complex functions. The best course of action is then to
+study the asymptotic approximation of the cost. Obviously, \(n!
+\leqslant !(n+1)\). Also,
+\begin{equation*}
+!(n+1) - n! \leqslant (n-2) \cdot (n-2)! + (n-1)! \leqslant
+(n-1) \cdot (n-2)! + (n-1)! = 2 (n-1)!
+\end{equation*}
+Therefore,
+\begin{equation*}
+1 \leqslant \frac{!(n+1)}{n!} \leqslant \frac{n! + 2(n-1)!}{n!} = 1 +
+\frac{2}{n} \;\Rightarrow\; !n \sim (n-1)!
+\end{equation*}
+Also, \((n+1)! = (n+1)n!\), so \((n+1)!/(nn!) = 1 + 1/n\), hence \(nn!
+\sim (n+1)!\). Consequently,
+\begin{equation*}
+\abovedisplayshortskip=0pt
+\abovedisplayskip=0pt
+%\belowdisplayskip=0pt
+\C{\fun{perm}}{n} \sim \frac{1}{2}(n+1)! + 3n! + \frac{7}{2}(n-1)!
++ 2n - \frac{9}{2} \sim \frac{1}{2}(n+1)!
+\end{equation*}
+This is an unbearably slow program, as expected. We should not hope to
+compute \(\C{\fun{perm}}{11}\) \index{perm@$\C{\fun{perm}}{n}$|)}
+easily and there is no way to improve significantly the cost because
+the number of permutations it computes is inherently exponential, so
+it would even suffice to spend only one function call per permutation
+to obtain an exponential cost. In other words, the memory necessary to
+hold the result has a size which is exponential in the size of the
+input, therefore, the cost is at least exponential, because at least
+one function call is necessary to allocate some memory. For a deep
+study on the enumeration of all permutations, refer to the survey of
+\cite{Knuth_2011}.
+
+\paragraph{Permutations and sorting}
+
+Permutations\index{permutation|(} are worth studying in detail because
+of their intimate relationship with sorting. A permutation can be
+thought of as scrambling originally ordered keys and a sorting
+permutation puts them back to their place. A slightly different
+notation for permutations is helpful here, one which shows the indexes
+together with the keys. For example, instead of writing \(\pi_1 =
+(2,4,1,5,3)\), we write
+\begin{equation*}
+\pi_1 =
+\begin{pmatrix}
+1 & 2 & 3 & 4 & 5\\
+2 & 4 & 1 & 5 & 3
+\end{pmatrix}.
+\end{equation*}
+The first line is made of the ordered indexes and the second line
+contains the keys. In general, a permutation \(\pi =
+(a_1,a_2,\dots,a_n)\) is equivalent to
+\begin{equation*}
+\pi =
+\begin{pmatrix}
+     1 &      2 & \dots &     n\\
+\pi(1) & \pi(2) & \dots & \pi(n)
+\end{pmatrix},
+\end{equation*}
+where~\(a_i = \pi(i)\), for all~\(i\) from \(1\)~to~\(n\). The
+following permutation~\(\pi_s\) sorts the keys of~\(\pi_1\):
+\begin{equation*}
+\pi_s =
+\begin{pmatrix}
+1 & 2 & 3 & 4 & 5\\
+3 & 1 & 5 & 2 & 4
+\end{pmatrix}.
+\end{equation*}
+To see why, we define the composition\index{permutation!composition}
+of two permutations\index{permutation} \(\pi_a\)~and~\(\pi_b\):
+\begin{equation*}
+\pi_b \circ \pi_a :=
+\begin{pmatrix}
+              1 &               2 & \dots & n\\
+\pi_b(\pi_a(1)) & \pi_b(\pi_a(2)) & \dots & \pi_b(\pi_a(n)) 
+\end{pmatrix}.
+\end{equation*}
+Then \(\pi_s~\circ~\pi_1 = \mathcal{I}\), where the \emph{identity
+  permutation}~\(\mathcal{I}\)\index{permutation!identity} is such
+that \(\mathcal{I}(k) = k\), for all indexes~\(k\). In other words,
+\(\pi_s = \pi_1^{-1}\), that is, \emph{sorting a permutation consists
+  in building its inverse}\index{permutation!inverse}:
+\begin{equation*}
+\begin{pmatrix}
+1 & 2 & 3 & 4 & 5\\
+3 & 1 & 5 & 2 & 4
+\end{pmatrix}
+\circ
+\begin{pmatrix}
+1 & 2 & 3 & 4 & 5\\
+2 & 4 & 1 & 5 & 3
+\end{pmatrix}
+=
+\begin{pmatrix}
+1 & 2 & 3 & 4 & 5\\
+1 & 2 & 3 & 4 & 5
+\end{pmatrix}.
+\end{equation*}
+
+An alternative representation of permutations and their
+composition\index{permutation!composition} is based on considering
+them as bijections from an interval onto itself, denoted by
+\emph{bipartite graphs}\index{graph!bipartite
+  $\sim$}\index{permutation!bigraph}, also called
+\emph{bigraphs}\index{bigraph|see{graph, bipartite}}. Such
+graphs are made of two disjoint, ordered sets of vertices of same
+cardinal, the indexes and the keys, and the edges always go from an
+index to a key, without sharing the vertices with other edges. For
+example, permutation~\(\pi_1\) is shown in \fig~\vref{fig:perm1}
+\begin{figure}
+\centering
+\subfloat[Bigraph of \(\pi_1 = (2,4,1,5,3)\)\label{fig:perm1}]{%
+\includegraphics[bb=79 662 206 721]{perm1}
+}
+\qquad\qquad
+\subfloat[Bigraph of \(\pi_1^{-1} = (3,1,5,2,4)\)\label{fig:perm3}]{%
+\includegraphics[bb=77 662 208 721]{perm3}
+}
+\caption{Permutation \(\pi_1\) and its inverse \(\pi_1^{-1}\)
+\label{fig:pi_1}\index{permutation!inverse}}
+\end{figure}
+and its inverse \(\pi_1^{-1}\) is displayed in
+\fig~\vref{fig:perm3}. The composition\index{permutation!composition}
+of~\(\pi_1^{-1}\) and~\(\pi_1\) is then obtained by identifying the
+key vertices of~\(\pi_1\) with the index vertices of~\(\pi_1^{-1}\),
+as shown in \fig~\vref{fig:perm4}.
+\begin{figure}[t]
+\centering
+\subfloat[\(\pi_1^{-1} \circ \pi_1\)\label{fig:perm4}]{%
+\includegraphics[bb=81 634 204 721]{perm4}
+}%
+\qquad\qquad
+\subfloat[\(\mathcal{I} = \pi_1^{-1} \circ \pi_1\)\label{fig:perm2}]{%
+\includegraphics[bb=81 634 204 721]{perm2}
+}
+\caption{Applying \(\pi_1\) to \(\pi_1^{-1}\).}
+\end{figure}
+The identity permutation\index{permutation!identity} is obtained by
+replacing two adjacent edges by their transitive
+closure\index{transitive closure} and erasing the intermediate
+vertices, as shown in \fig~\ref{fig:perm2}
+page~\pageref{fig:perm2}. Note that a permutation may equal its
+inverse, like
+\begin{equation*}
+\pi_3 =
+\begin{pmatrix}
+1 & 2 & 3 & 4 & 5\\
+3 & 4 & 1 & 2 & 5
+\end{pmatrix}.
+\end{equation*}
+In \fig~\ref{fig:involution}
+\begin{figure}
+\centering
+\subfloat[\(\pi_3 \circ \pi_3\)\label{fig:inv1}]{%
+\includegraphics[bb=81 634 204 721]{inv1}
+}
+\qquad\qquad
+\subfloat[\(\pi_3 \circ \pi_3\)]{%
+\includegraphics[bb=81 634 204 721]{inv2}
+}
+\caption{Involution \(\pi_3\) sorts itself\label{fig:involution}}
+\end{figure}
+is shown that \(\pi_3~\circ~\pi_3 = \pi_3\), so \(\pi_3\) is an
+\emph{involution}\index{permutation!involution}\index{permutation!inverse}.
+
+Studying permutations and their basic properties helps understanding
+sorting algorithms, particularly their average cost. They also provide
+a way to quantify disorder. Given \((1,3,5,2,4)\), we can see that
+only the pairs of keys \((3,2)\), \((5,2)\) and~\((5,4)\) are out of
+order. In general, given \((a_1, a_2, \dots, a_n)\), the pairs
+\((a_i,a_j)\) such that~\(i < j\) and~\(a_i > a_j\) are called
+\emph{inversions}\index{permutation!inversion}. The more inversions,
+the greater the disorder. As expected, the identity
+permutation\index{permutation!identity} has no inversions and the
+previously studied permutation \(\pi_1 = (2,4,1,5,3)\) has~\(4\). When
+considering permutations as represented by
+bigraphs\index{graph!bipartite $\sim$}\index{permutation!bigraph}, an
+inversion\index{permutation!inversion} corresponds to an intersection
+of two edges, more precisely, it is the pair made of the keys pointed
+at by two arrows. Therefore, the number of
+inversions\index{permutation!inversion} is the number of edge
+crossings, so, for instance, \(\pi_1^{-1}\)~has \(4\)~inversions. In
+fact, \emph{the inverse\index{permutation!inverse} of a permutation
+  has the same number of inversions\index{permutation!inversion} as
+  the permutation\index{permutation} itself}. This can be clearly seen
+when comparing the bigraphs\index{permutation!bigraph} of~\(\pi_1\)
+and~\(\pi_1^{-1}\) in \fig~\vref{fig:pi_1}: in order to deduce the
+bigraph of~\(\pi_1^{-1}\) from the one corresponding to~\(\pi_1\), let
+us reverse each edge, that is, the direction in which the arrows are
+pointing, then swap the indexes and the keys, that is, exchange the
+two lines of vertices. Alternatively, we can imagine that we fold down
+the paper along the key line, then look through and reverse the
+arrows. Anyhow, the crossings are invariant. The horizontal symmetry
+is obvious in \figs~\ref{fig:perm4} and~\ref{fig:inv1}.
+
+\paragraph{Minimax}
+\label{par:minimax}
+
+After analysing the cost of a sorting algorithm based on comparisons,
+we will need to know how close it is to an optimal sorting
+algorithm\index{sorting!optimality|(}. The first theoretical problem
+we examine is that of the best worst case, so called the
+\emph{minimax}\index{cost!minimax}\index{sorting!minimax|(}. \Fig~\vref{fig:cmp_tree}
+features the tree of all possible comparisons \index{tree!comparison
+  $\sim$|see{sorting}} for sorting three numbers.
+\begin{figure}[b]
+\centering
+\includegraphics[bb=71 636 327 723]{cmp_tree}
+\caption{A comparison tree for sorting three keys
+\label{fig:cmp_tree}}
+\end{figure}
+The \emph{external nodes}\index{binary tree!external
+  node}\label{def:external_node} are all the
+permutations\index{permutation|)} of \((a_1,a_2,a_3)\). The
+\emph{internal nodes}\index{binary tree!internal node} are comparisons
+between two keys \(a_i\)~and~\(a_j\), noted \(a_i?a_j\). Note that
+leaves, in this setting, are internal nodes with two external nodes as
+children. If \(a_i < a_j\), then this property holds everywhere in the
+left subtree,
+\begin{wrapfigure}[9]{r}[0pt]{0pt}
+% [9] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\includegraphics[bb=71 638 217 723]{red_cmp}
+\caption{Useless \(a_1 > a_3\)\label{fig:red_cmp}}
+\end{wrapfigure}
+otherwise \(a_i >
+a_j\) holds in the right subtree. This tree is one possible amongst
+many: it corresponds to an algorithm which starts by comparing
+\(a_1\)~and~\(a_2\) and there are, of course, many other
+strategies. But it does not contain redundant comparisons: if a path
+from the root to a leaf includes \(a_i < a_j\) and \(a_j < a_k\), we
+do not expect the useless \(a_i < a_k\). \Fig~\vref{fig:red_cmp} shows
+an excerpt of a comparison tree with such a useless comparison. The
+special external node~\(\bot\) corresponds to no permutation because
+the comparison \(a_1 < a_3\) cannot fail as it is implied by
+transitivity of the previous comparisons on the path from the root.
+\begin{center}
+  \emph{A comparison tree for \(n\)~keys without redundancy has
+    \(n!\)~external nodes.}
+\end{center}
+Because we are investigating minimum\hyp{}comparison sorting, we shall
+consider henceforth optimal comparison trees with \(n!\)~external
+nodes. Furthermore, amongst them, we want to determine the trees such
+that the maximum number of comparisons is minimum.
+
+An \emph{external path}\index{binary tree!external path} is a path
+from the root to an external node. Let the \emph{height}\index{binary
+  tree!height} of a tree be the length (that is, the number of edges)
+of its longest external path. In \fig~\ref{fig:cmp_tree}, the height
+is~\(3\) and there are~\(4\) external paths of length~\(3\), like
+\((a_1 < a_2) \rightarrow (a_2 > a_3) \rightarrow (a_1 > a_3)
+\rightarrow (a_3,a_1,a_2)\).
+
+The maximality constraint means that we must consider the height of
+the comparison tree because the number of internal nodes (comparisons)
+along the maximum external paths is an upper bound for the number of
+comparisons needed for sorting \emph{all} the
+permutations\index{permutation}\index{sorting}.
+
+The minimality constraint in the problem statement above then
+signifies that \emph{we want a lower bound on the height of a
+  comparison tree with \(n!\)~external nodes.}
+
+% Wrapping figure better declared before a paragraph
+%
+\setlength{\intextsep}{0pt}
+\begin{wrapfigure}[]{r}[0pt]{0pt}
+% {r} mandatory right placement (better because of a list)
+\centering
+\includegraphics{comp_tree}
+\caption{Perfect binary tree of height~\(3\)\label{fig:comp_tree}}
+\end{wrapfigure}
+A \emph{perfect binary tree}\index{binary tree!perfect $\sim$} is a
+binary tree whose internal nodes have children which are either two
+internal nodes or two external nodes. If such a tree has height~\(h\),
+then it has \(2^h\)~external nodes. For instance,
+\fig~\vref{fig:comp_tree} shows the case where the height~\(h\)
+is~\(3\) and there are indeed \(2^h=8\) external nodes, figured as
+squares. Since, by definition, minimum\hyp{}comparison trees have
+\(n!\)~external nodes and height~\(S(n)\), they must contain fewer
+external nodes than a perfect binary tree of identical height, that
+is, \(n! \leqslant 2^{S(n)}\), therefore
+\begin{equation*}
+S(n) \geqslant \ceiling{\lg n!},
+\end{equation*}
+where \(\ceiling{x}\) (\textsl{ceiling of~\(x\)})
+\index{ceiling@$\ceiling{x}$|see{ceiling function}} \index{ceiling
+  function} is the least integer greater than or equal to~\(x\). To
+deduce a good lower bound on~\(S(n)\), we need the following theorem.
+\setlength{\intextsep}{12pt}
+\begin{thm}[Sum and integral]
+\label{thm:integral_bounds}
+Let \(f\colon [a,b] \rightarrow \mathbb{R}\) be an integrable,
+monotonically increasing function. Then
+\begin{equation}
+\abovedisplayskip=0pt
+\sum_{k=a}^{b-1}f(k) \leqslant \int_{a}^{b}{\!\!f(x)} \,dx
+                   \leqslant \sum_{k=a+1}^{b}{\!\!\!f(k)}.
+\tag*{\(\blacksquare\)}
+\end{equation}
+\end{thm}
+\noindent Let us take \(a:=1\), \(b:=n\) and \(f(x) := \lg x\). The
+theorem implies
+\begin{equation*}
+n\lg n - \frac{n}{\ln 2} + \frac{1}{\ln 2}
+= \int_{1}^{n}{\!\!\lg x} \,dx \leqslant \sum_{k=2}^{n}{\lg k}
+= \lg n! \leqslant S(n).
+\end{equation*}
+A more powerful but more complex approach in real analysis, known as
+Euler-Maclaurin summation, yields Stirling's formula
+\citep[chap.~4]{SedgewickFlajolet_1996}\index{Stirling's formula},
+which is a very precise lower bound for \(\lg n!\):
+\begin{equation}
+\Big(n + \frac{1}{2}\Big)\lg n - \frac{n}{\ln 2} + \lg\sqrt{2\pi}
+< \lg n! \leqslant S(n).
+\label{ineq:S_lower}
+\end{equation}
+
+\paragraph{Minimean}
+\label{par:opt_sort:minimean}
+\index{cost!minimean|(}
+\index{sorting!minimean|(}
+\index{binary tree!external path length|(}
+
+We investigate here the best mean case, or \emph{minimean}. Let us
+call the sum of the lengths of all the external paths the
+\emph{external path length of the
+  tree}\label{sorting__external_path_length}\index{binary
+  tree!external path length}. Then, the average number of comparisons
+is the mean external path length. In \fig~\vref{fig:cmp_tree}, this is
+\((2+3+3+3+3+2)/3!=8/3\). Our problem here therefore consists in
+determining the shape of the optimal comparison trees of minimum
+external path length.
+
+These trees have their external nodes on one or two successive levels
+and are thus \emph{almost perfect}.\index{binary tree!almost perfect
+  $\sim$} Let us consider a binary tree where this is not the case, so
+the topmost external nodes are located at level~\(l\) and the
+bottommost at level~\(L\), with \(L \geqslant l + 2\). If we exchange
+a leaf at level~\(L-1\) with an external node at level~\(l\), the
+external path length is decreased by \((l+2L) - (2(l+1) + (L-1)) = L -
+l - 1 \geqslant 1\). Repeating these exchanges yields the expected
+shape.
+
+The external paths are made up of \(p\)~paths ending at the
+penultimate level~\(h-1\) and \(q\)~paths ending at the bottommost
+level~\(h\). (The root has level~\(0\).) Let us find two equations
+whose solutions are \(p\)~and~\(q\).
+\begin{itemize}
+
+  \item From the minimax problem\index{sorting!minimax|)}, we know
+    that an optimal comparison tree for \(n\)~keys has \(n!\)~external
+    nodes: \(p+q=n!\).
+
+  \item If we replace the external nodes at level~\(h-1\) by leaves,
+    the level~\(h\) becomes full with~\(2^h\) external nodes:
+    \(2p+q=2^h\).
+
+\end{itemize}
+We now have two linear equations satisfied by~\(p\) and~\(q\), whose
+solutions are \(p=2^h-n!\) and \(q=2n!-2^h\). Furthermore, we can now
+express the minimal external path length as follows: \((h-1)p + hq =
+(h+1)n! - 2^h\). Finally, we need to determine the height~\(h\) of the
+tree in terms of~\(n!\). This can be done by remarking that, by
+contruction, the last level may be incomplete, so \(0 < q \leqslant
+2^h\), or, equivalently, \(h = \ceiling{\lg n!}\). We conclude that
+the minimum external path length is
+\begin{equation*}
+(\ceiling{\lg n!} + 1) n! - 2^{\ceiling{\lg n!}}.
+\end{equation*}
+Let \(M(n)\) \label{def:Mn} be the minimum average number of
+comparisons of an optimal sorting algorithm. We have
+\begin{equation*}
+M(n) = \ceiling{\lg n!} + 1 - \frac{1}{n!}2^{\ceiling{\lg n!}}.
+\end{equation*}
+We have \(\ceiling{\lg n!} = \lg n! + x\), with \(0 \leqslant x < 1\),
+therefore, if we set the function \(\theta(x) := 1 + x - 2^x\), we
+draw
+\begin{equation*}
+M(n) = \lg n! + \theta(x).
+\end{equation*}
+We have \(\max_{0\leqslant x < 1}\theta(x) = 1 - (1 + \ln\ln 2)/\!\ln 2
+\simeq 0.08607\), therefore,
+\begin{equation}
+\lg n! \leqslant M(n) < \lg n! + 0.09.
+\label{ineq:Mn}
+\end{equation}
+\index{sorting!optimality|)}
+\index{cost!minimean|)}
+\index{sorting!minimean|)}
+\index{binary tree!external path length|)}

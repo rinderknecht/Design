@@ -1,0 +1,45 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pstricks,pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\psset{radius=5pt,nodesep=0pt,levelsep=23pt,treesep=15pt}
+\pstree{\TC*}{
+  \pstree{\TC}{
+    \psset{nodesepB=2pt,doubleline=true}
+    \TR{\(\mathcal{L}_1\)}}
+  \psset{doubleline=true}
+  \TR{\phantom{H}}
+  \psset{doubleline=false}
+  \pstree{\TC}{
+    \psset{nodesepB=2pt,doubleline=true}
+    \TR{\(\mathcal{L}_l\)}}
+  \psset{treesep=2pt}
+  \pstree{\TC}{
+    \psset{nodesepB=2pt,doubleline=true}
+    \TR{\(\mathcal{B}_1\)}}
+  \psset{doubleline=true}
+  \TR{\phantom{H}}
+  \psset{doubleline=false}
+  \pstree{\TC}{
+    \psset{nodesepB=2pt,doubleline=true}
+    \TR{\(\mathcal{B}_d\)}}
+  \psset{treesep=15pt}
+  \pstree{\TC[name=R1]}{
+    \psset{nodesepB=2pt,doubleline=true}
+    \TR{\(\mathcal{R}_1\)}}
+  \psset{doubleline=true}
+  \TR{\phantom{H}}
+  \psset{doubleline=false}
+  \pstree{\TC[name=Rl]}{
+    \psset{nodesepB=2pt,doubleline=true}
+    \TR{\(\mathcal{R}_l\)}}
+}
+\ncbox[linearc=.3,boxsize=.3,linestyle=dashed,nodesep=.4]{R1}{Rl}
+\endTeXtoEPS
+
+\end{document}

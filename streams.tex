@@ -1,0 +1,817 @@
+\section{Scannerless parsing of streams}
+
+In this section, we present a technique to write
+descent\hyp{}recursive parsers based on \emph{streams}, a lazy data
+structure available to \OCaml by means of \CamlpF, which is
+distributed separately. We will not explain how to install \CamlpF and
+we refer the reader to any textbook on compilers for the basics on
+context\hyp{}free grammars and, in particular, LL($k$) grammars.
+
+Our technique assumes that we already have an LL(1) grammar, and we
+wish to implement a parser to recognise the language it generates. In
+passing, it enables also a style called \emph{scannerless parsing},
+meaning that both the lexer, also called scanner, and the parser can
+be expressed with the same feature, namely streams.
+
+We will use the following formalism to express context\hyp{}free
+grammars. A grammar is a set of production rules, each one associating
+a non\hyp{}terminal symbol to a possibly empty sequence of terminals
+and non\hyp{}terminals. These rules can be conceived as rewrite rules
+whereby the non\hyp{}terminal symbol, on the left\hyp{}hand side, is
+rewritten into a series of symbols in the right\hyp{}hand side, and
+that is why we separate both sides with a rightwards
+arrow. Non\hyp{}terminals are names whose first letter is capitalised,
+whereas terminals are named whose first letter is in lowercase. A word
+is a sequence of non\hyp{}terminals. To avoid leaving blanks on the
+page, we will note~\(\varepsilon\) the empty word. A Greek letter in
+lowercase represents a possibly empty concatenation of terminals and
+non\hyp{}terminals, in general, which means that the series may, in
+particular, be a word. We will write \(A \stackrel{*}{\Rightarrow}
+\alpha\) the relationship `$A$~derives~$\alpha$'. Consider for example
+the following ambiguous, context\hyp{}free grammar for Boolean
+expressions:
+\begin{equation*}
+B \rightarrow B \, \textsf{||} \, B \; \mid \; B \, \textsf{\&\&} \, B
+\; \mid \; \textsf{!}B \; \mid \; \textsf{(}B\textsf{)}
+\; \mid \; \textsf{true} \; \mid \; \textsf{false}
+\end{equation*}
+We will augment the formalism with rational operators, in order to
+have a more compact notation: \(\alpha^*\), \(\alpha^+\),
+\([\alpha]\), \(\{ A \, a \dots \}^*\) and \(\{ A \, a \dots
+\}^+\). Each occurrence of these operators can always be replaced by a
+non\hyp{}terminal whose defining rule is shown in
+\fig~\vref{fig:bnf_rel_op}.
+\begin{figure}
+\centering
+\(
+\begin{array}{llc}
+\toprule
+  \multicolumn{1}{c}{\text{Notation}}
+& \multicolumn{1}{c}{\text{Definition}}
+& \multicolumn{1}{c}{\text{Constraint}}\\
+\midrule
+  X \rightarrow \alpha^* 
+& X \rightarrow \alpha X \mid \varepsilon
+& \neg(\alpha \stackrel{*}{\Rightarrow} \varepsilon)\\
+  X \rightarrow \alpha^+ 
+& X \rightarrow \alpha \alpha^*
+& \neg(\alpha \stackrel{*}{\Rightarrow} \varepsilon)\\
+  X \rightarrow [\alpha]
+& X \rightarrow \alpha \mid \varepsilon
+& \neg(\alpha \stackrel{*}{\Rightarrow} \varepsilon)\\
+  X \rightarrow \{A \, a \ldots\}^*
+& X \rightarrow \varepsilon \mid A \, (a A)^*
+& \neg(A \stackrel{*}{\Rightarrow} \varepsilon)\\
+  X \rightarrow \{A \, a \ldots\}^+
+& X \rightarrow A \, (a A)^*
+& \neg(A \stackrel{*}{\Rightarrow} \varepsilon)\\
+\bottomrule
+\end{array}\)
+\caption{Rational operators for context\hyp{}free grammars
+\label{fig:bnf_rel_op}}
+\end{figure}
+These rules are LL(1) and it is suitable now that we define that
+property. LL(1) grammars are context\hyp{}free grammars which can be
+used to recognise languages in a top\hyp{}down way, with one token of
+look\hyp{}ahead. By `top\hyp{}down', we actually mean rightwards in
+the sense of the rules: Left to right scanning of the input, building
+a Leftmost derivation (according to the production rules) with One
+token of look\hyp{}ahead. In order to define them formally, we need
+first to define a couple of functions. Let us note~\(\mathcal{N}\) the
+set of the non\hyp{}terminals and~\(\Sigma\) the set of the terminal
+symbols.
+
+\paragraph{The function \emph{First}}
+
+The function `First', noted~\(\mathcal{P}\), maps each
+non\hyp{}terminal to the set of terminals that start any derivation
+from it. We have, for all non\hyp{}terminal~\(A\),
+\begin{equation*}
+\first{A} := \{ x \in \Sigma \mid A \stackrel{*}{\Rightarrow} x
+\alpha\}.
+\end{equation*}
+
+\paragraph{The function \emph{Follow}}
+
+The function `Follow', noted~\(\mathcal{S}\), maps each
+non\hyp{}terminal to the set of terminals that may follow each
+occurrences of the non\hyp{}terminal. Formally, for all
+non\hyp{}terminal~\(A\),
+\begin{equation*}
+\follow{A} := \{x \in \Sigma \mid \exists B \in \mathcal{N}.B
+\stackrel{*}{\Rightarrow} \alpha A x \beta\}.
+\end{equation*}
+
+\paragraph{The LL(1) property}
+
+We can now formally define LL(1) grammars as a set of production rules
+\(A \rightarrow \alpha_1 \mid \alpha_2 \mid \ldots \mid \alpha_n\)
+satisfying
+\begin{gather}
+\neg(A \stackrel{*}{\Rightarrow} A \alpha);\label{P1}\\
+\bigcap_{i=1}^{n} \first{\alpha_i} = \varnothing;\label{P2}\\
+\alpha_i \stackrel{*}{\Rightarrow} \varepsilon \quad \text{implies} \quad
+\first{\alpha_j} \cap \follow{A} = \varnothing, \quad \text{for all}
+\; j.\label{P3}
+\end{gather}
+The first constraint states that no rule can be left\hyp{}recursive,
+neither directly, nor indirectly; the second affirms that no two words
+produced by the same non\hyp{}terminal can start with the same
+terminal; the third and last states that, if a word produced by a
+non\hyp{}terminal~\(A\) derives the empty word (it might derive
+non\hyp{}empty words as well), then the words derived from~\(A\)
+should not start with a terminal following~\(A\) in the grammar.
+
+These constraints can be extended to the rational operators we
+introduced in \fig~\vref{fig:bnf_rel_op}, and the whole new definition
+can be given an algorithmic style in \fig~\vref{fig:first_ext}.
+\begin{figure}[!t]
+\centering
+\begin{framed}
+\begin{align*}
+\first{\varepsilon} &= \{\varepsilon\},\\
+\first{x \gamma} &= \{x\},\\
+\first{B \gamma} &= \first{B},\\
+\first{[\beta] \gamma} &= \first{\beta} \cup \first{\gamma},\\
+\first{\{B \; b \ldots\}^* \gamma} &= \first{B} \cup \first{\gamma},\\
+\first{\{B \; b \ldots\}^+ \gamma} &= \first{B},\\
+\first{\beta^*\gamma} &= \first{\beta} \cup \first{\gamma},\\
+\first{\beta^+\gamma} &= \first{\beta},\\
+\first{A} &= \cup_{i=1}^{n}\first{\alpha_i}, \quad \text{if} \; A
+\rightarrow \alpha_1 \mid \alpha_2 \mid \ldots \mid \alpha_n.
+\end{align*}
+\end{framed}
+\caption{Extended definition of function First\label{fig:first_ext}}
+\end{figure}
+Note that we extended the definition of~\(\mathcal{P}\)
+to~\(\varepsilon\), even though it is not a non\hyp{}terminal,
+and~\(\gamma\) may derive~\(\varepsilon\) (it is \emph{nullable}). As
+for~\(\mathcal{S}\), the redefinition is seen in
+\fig~\vref{fig:follow_ext}.
+\begin{figure}
+\centering
+\(\begin{array}{@{}ll@{}}
+\toprule
+\multicolumn{1}{c}{\text{Rule}} & \multicolumn{1}{c}{\text{Constraint}}\\
+\midrule
+  X \rightarrow \ldots \mid \alpha A B \beta
+& \first{B} \subseteq \follow{A};\\
+  X \rightarrow \ldots \mid \alpha A \{B \; b \dots\}^+ \beta
+& \first{B} \subseteq \follow{A};\\
+  X \rightarrow \ldots \mid \alpha A [\beta] \gamma
+& \first{\beta} \cup (\first{\gamma} \setminus
+  \{\varepsilon\}) \cup \follow{X} \subseteq \follow{A},\\
+& \text{if} \; \gamma \stackrel{*}{\Rightarrow} \varepsilon, \;
+  \text{else} \; \first{\beta} \cup \first{\gamma} \subseteq \follow{A};\\
+  X \rightarrow \ldots \mid \alpha A \beta^* \gamma
+& \first{\beta} \cup (\first{\gamma} \setminus
+  \{\varepsilon\}) \cup \follow{X} \subseteq \follow{A},\\
+& \text{if} \; \gamma \stackrel{*}{\Rightarrow} \varepsilon, \;
+  \text{else} \; \first{\beta} \cup \first{\gamma} \subseteq \follow{A};\\
+  X \rightarrow \ldots \mid \alpha A
+& \follow{X} \subseteq \follow{A};\\
+  X \rightarrow \ldots \mid \alpha A x \beta
+& x \in \follow{A};\\
+  X \rightarrow \ldots \mid \alpha A \beta^+ \gamma
+& \first{\beta} \subseteq \follow{A};\\
+  X \rightarrow \ldots \mid \alpha A \{B \; b \ldots \}^* \beta
+& \first{B} \cup (\first{\beta} \setminus \{\varepsilon\}) \cup
+  \follow{X} \subseteq \follow{A},\\
+& \text{if} \; \beta \stackrel{*}{\Rightarrow} \varepsilon,
+  \text{else} \; \first{B} \cup \first{\beta} \subseteq \follow{A};\\
+  X \rightarrow \ldots \mid \alpha \{A \; a \dots\}^* \beta
+& \{a\} \cup (\first{\beta} \setminus \{\varepsilon\}) \cup \follow{X}
+  \subseteq \follow{A},\\
+& \text{if} \; \beta \stackrel{*}{\Rightarrow} \varepsilon,
+  \text{else} \; \{a\} \cup \first{\beta} \subseteq \follow{A};\\
+  X \rightarrow \ldots \mid \alpha \{A \; a \dots\}^+ \beta
+& \{a\} \cup (\first{\beta} \setminus \{\varepsilon\}) \cup \follow{X}
+  \subseteq \follow{A},\\
+& \text{if} \; \beta \stackrel{*}{\Rightarrow} \varepsilon,
+  \text{else} \; \{a\} \cup \first{\beta} \subseteq \follow{A}.\\
+\bottomrule
+\end{array}\)
+\caption{Extended definition of function Follow\label{fig:follow_ext}}
+\end{figure}
+Any place where it is possible, we replace~\(A\) by \([A]\), \(A^*\)
+or~\(A^+\) --~the first replacement is mandatory for the
+implementation technique we propose. Notice as well that the
+algorithmic definition of~\(\mathcal{S}\) consists in a collection of
+inclusion constraints \(\ldots \subseteq \follow{A}\), whose smallest
+solution is then~\(\follow{A}\). (Contrast this with the definition
+of~\(\mathcal{P}\).)
+
+For reasons that will become apparent later, we will impose that our
+grammars do not contain explicitly the empty word, therefore, in the
+case of the rational expressions, the LL(1) property~\vref{P3} takes
+the shape
+\begin{equation*}
+\begin{array}{ll}
+\toprule
+\multicolumn{1}{c}{\text{Rule}} & \multicolumn{1}{c}{\text{Constraint}}\\
+\midrule
+  X \rightarrow \alpha^*
+& \first{\alpha} \cup \follow{X} = \varnothing\\
+  X \rightarrow \alpha^+
+& \first{\alpha} \cup \follow{X} = \varnothing\\
+  X \rightarrow [\alpha]
+& \first{\alpha} \cup \follow{X} = \varnothing\\
+  X \rightarrow \{A \; a \ldots\}^*
+& (\first{A} \cup \{a\}) \cap \follow{X} = \varnothing\\
+  X \rightarrow \{A \; a \ldots\}^+
+& \{a\} \cap \follow{X} = \varnothing\\
+\bottomrule
+\end{array}
+\end{equation*}
+
+\paragraph{Stream constraints}
+
+The method we propose in this section relies on LL(1) grammars with
+additional constraints due to the semantics of streams; it will allow
+us to specify error messages only in the rules that may fail to parse
+the input, so they can be tailored, without knowledge of the lexical
+context. Higher\hyp{}order parser will be used to implement rational
+operators, so the functions matching stream patterns will be
+isomorphic to the constrained grammar, greatly improving the
+maintenance of the program.
+
+Let us begin by the sort of constraints arising from the use of
+streams for parsing. Simply put, we cannot implement as is the
+production rules which are left\hyp{}recursive:
+\begin{equation*}
+A \rightarrow X \, B \mid C, \quad \text{where} \; X
+\stackrel{*}{\Rightarrow} A.
+\end{equation*}
+Indeed, since each non\hyp{}terminal will be transformed into a
+function matching a stream, the parser for~\(A\) will try to match a
+lexeme by calling itself, recursively, which yields
+non\hyp{}termination. Another issue arises in the case
+\begin{equation*}
+A \rightarrow X \, B \mid C, \quad \text{where} \; X
+\stackrel{*}{\Rightarrow} \varepsilon.
+\end{equation*}
+If~\(B\) fails, the exception \texttt{Stream.Failure} raised by the
+parser associated with~\(B\) becomes an exception
+\texttt{Stream.Error} in the parser associated with~\(A\)
+because~\(B\) is not at the head of a rule, which interrupts the
+syntax analysis, event though~\(C\) might have succeeded. It is clear
+that there was never any danger in pursuing the analysis since no
+lexeme had been consumed from the stream by~\(X\). This limitation is
+justified by a simpler semantics for streams and can be overcome by
+rewriting the LL(1) grammar. Therefore, after making sure that the
+grammar is not left\hyp{}recursive, we must transform it according to
+the following table:
+\begin{equation*}
+\begin{array}{@{}lcl@{}}
+\toprule
+  X \rightarrow [\alpha] \beta
+& \textit{becomes} 
+& X \rightarrow \alpha \beta \mid \beta\\
+  X \rightarrow \alpha^* \beta
+& \textit{becomes}
+& X \rightarrow \alpha^+ \beta \mid \beta\\
+  X \rightarrow \{A \; a \ldots\}^* \beta
+& \textit{becomes}
+& X \rightarrow \{A \; a \ldots\}^+ \beta \mid \beta\\
+\bottomrule
+\end{array}
+\end{equation*}
+Note that we assume that the language does not contain the empty word.
+
+These constraints are relevant to our analysis method and it is
+perhaps suitable now to explain why parsers on streams are good tools
+in general, despite the constraints we just have mentioned. First, it
+is wrong to believe that these allow us to only analyse LL(1)
+grammars. Let us consider the famous case of the `dangling else'. Let
+the grammar
+\begin{equation*}
+\begin{array}{@{}ccl@{}}
+S & \rightarrow & \textsf{if} \; \textit{BoolExpr} \;
+                  \textsf{then} \; S \, S'
+                  \mid \textit{OtherInstr}\\
+S' & \rightarrow & \textsf{else} \; S \mid \varepsilon
+\end{array}
+\end{equation*}
+This grammar defines a conditional construct and it yields a
+shift/reduce conflict in parsers generated by tools like \textsc{Yacc}
+when the lexical right\hyp{}context is \textsf{else}. That conflict
+boils down to decide whether a \textsf{else} clause should be
+associated to the last \textsf{if} or not, as in the sentence
+\begin{equation*}
+\textsf{if} \; b_1 \; \textsf{then} \; \textsf{if} \; b_2 \;
+\textsf{then} \; i_1 \; \textsf{else} \; i_2.
+\end{equation*}
+The usual way to resolve this matter is to systematically associate a
+\textsf{else} to the last \textsf{if} encountered, from left to
+right. In \OCaml with parsers on streams, the same effect is simply
+achieved by writing the pattern matching corresponding to
+\(\textsf{else} \; S\) first, so it is tried before~\(\varepsilon\).
+
+In fact, \OCaml with parsers on streams can recognise contextual
+languages, thanks to higher\hyp{}order functions. Let us consider the
+language \(\{wcw \,\mid\, w \in (a+b)^*\}\), where \(a\), \(b\)
+and~\(c\) are terminal symbols. This is a contextual language because,
+in order to recognise the second occurrence of~\(w\), we need to
+somehow `remember' (here goes the context) the first occurrence. In
+\OCaml, we recognise the prefix~\(w\), then we dynamically build a
+parser for it, then, after reading~\(c\), we apply this previously
+constructed parser to the stream to find the suffix~\(w\). First, let
+us write the parser for~\(w\):
+\begin{alltt}
+\textbf{let} \textbf{rec} wd = \textbf{parser}
+  [< ''a'; w=wd >] \(\rightarrow\) (\textbf{parser} [< ''a' >] \(\rightarrow\) "a")::w
+| [< ''b'; w=wd >] \(\rightarrow\) (\textbf{parser} [< ''b' >] \(\rightarrow\) "b")::w
+|             [<>] \(\rightarrow\) []
+\end{alltt}
+The type of \texttt{wd} is \topout{char stream $\rightarrow$ (char
+  Stream.t $\rightarrow$ string) list}. The higher\hyp{}order parser,
+which takes as an argument the list of parsers generated by
+\texttt{wd}, and applies them to the current stream is defined as
+follows:
+\begin{alltt}
+\textbf{let} \textbf{rec} wu = \textbf{function}
+  p::pl \(\rightarrow\) (\textbf{parser} [< x=p; w=wu pl >] \(\rightarrow\) x^w)
+|    [] \(\rightarrow\) (\textbf{parser} [<>] \(\rightarrow\) "")
+\end{alltt}
+whose type is \topout{($\alpha$ Stream.t $\rightarrow$ string) list
+  $\rightarrow$ $\alpha$ Stream.t $\rightarrow$ string}. Finally, the
+parser for our toy language is
+\begin{alltt}
+\textbf{let} wcw = \textbf{parser} [< pl=wd; ''c'; w=wu pl >] \(\rightarrow\) w
+\end{alltt}
+whose type is \topout{char Stream.t $\rightarrow$ string}. Then, we
+can use it as follows:
+
+\bigskip
+
+\noindent\topin{wcw (Stream.of\_string "abaacabaa")}
+
+\noindent\topout{-~:~string = "abaa"}
+
+
+\paragraph{Error handling}
+
+Since we rewrite any given LL(1) grammar so that the empty word does
+not occur, we can use the stream pattern \texttt{[<>]} or \texttt{[< s
+    >]} to detect failures, but, first, let us define a type with two
+constant constructors which are passed to all parsers, denoting, in
+case of failure, whether the analysis should stop with an error
+message (abort), or resume (fail):
+\begin{alltt}
+\textbf{type} mode = Abort | Fail
+\end{alltt}
+To allow for the partial application of the parsers, we put the
+argument of type \texttt{mode} in first position, and the general
+shape of the parsers is
+\begin{alltt}
+\textbf{let} my\_parser mode = \textbf{parser}
+  [< ... >] \(\rightarrow\) ...
+| ...
+| [< ... >] \(\rightarrow\) ...
+|   [< s >] \(\rightarrow\) \textbf{match} mode \textbf{with}
+                 Fail  \(\rightarrow\) raise Stream.Failure
+               | Abort \(\rightarrow\) syntax\_error \emph{message} s
+\end{alltt}
+where \texttt{syntax\_error} is a function which prints the error
+message about the first lexeme at the head of the stream~\texttt{s}
+and stops the execution, for example by raising the predefined
+exception \texttt{(Stream.Error s)}. We call \texttt{(my\_parser
+  Fail)} in head of a stream pattern, and \texttt{(my\_parser Abort)}
+in tail of a stream pattern. We will later see how to optimise this
+general pattern, for instance, in case we know that
+\texttt{my\_parser} can never stop the parsing because it never occurs
+in tail of a stream pattern. We understand now why we take care of
+rewriting the grammar so it does not produce the empty word: the
+stream pattern \texttt{[< s >]} can then be used for error handling.
+
+\paragraph{Parser combinators}
+
+The rational operators we have seen above are implemented by means of
+higher\hyp{}order parsers: their first parameter is the parser to
+apply, the second is the parsing mode (of type \texttt{mode} above)
+and the last is the stream to parse. This order makes it possible to
+partially evaluate a rational operator on its first argument and use
+the resulting first\hyp{}order parser as an argument to another
+higher\hyp{}order parser, giving rise to \emph{parser combinators}.
+\begin{itemize}
+
+  \item \(X \rightarrow \alpha^*\)\\ The definition of~\(\alpha^*\),
+    called the \emph{Kleene star}, is \(X \rightarrow \alpha X \mid
+    \varepsilon\). Its \OCaml implementation will evaluate in the list
+    of the parsed lexemes. As seen earlier, for the LL(1) property to
+    hold, the lexeme following \(\alpha^*\) in the grammar must not be
+    recognisable by~\(\alpha\). Moreover, we impose that~\(\alpha\)
+    does not derive the empty word~\(\varepsilon\). The general shape
+    of the implementation is then:
+\begin{alltt}
+\textbf{let rec} star p m = \textbf{parser} [< x=p Fail; y=star p m >] \!\(\rightarrow\)\! x::y
+                        |                       [<>] \!\(\rightarrow\) \![]
+\end{alltt}
+    Note that the mode~\texttt{m} is not used because the call
+    to~\texttt{p} must always be allowed to fail, with possibility to
+    resume parsing.
+
+  \item \(X \rightarrow \alpha^+\)\\
+     The definition of this operator is \(X \rightarrow \alpha
+     \alpha^*\). Its \OCaml implementation relies on \texttt{star} and
+     evaluates in the list of the parsed lexemes:
+\begin{alltt}
+\textbf{let} plus p m = \textbf{parser} [< x=p m; y=star p m >] \(\rightarrow\) x::y
+\end{alltt}
+     Recall that the mode~\texttt{m} in \texttt{star} is not used
+     because \texttt{p} is called there with \texttt{Fail}. This
+     entails that, in general, the call \texttt{(plus p Abort)} implies
+     the calls \texttt{(p Abort)} and \texttt{(p Fail)}.
+
+  \item \(X \rightarrow [\alpha]\)\\
+    The definition of this operator is \(X \rightarrow \alpha \mid
+    \varepsilon\). We have the following straightforward
+    implementation:
+\begin{alltt}
+\textbf{let} opt p m = \textbf{parser} [< x=p Fail >] \(\rightarrow\) [x] | [<>] \(\rightarrow\) []
+\end{alltt}
+    Just as with the operator~\(\alpha^*\), the parser~\texttt{p} must
+    always be allowed to fail, hence the mode~\texttt{m} is
+    useless. An alternative implementation could evaluate in a value
+    of the predefined type \texttt{option}:
+\begin{alltt}
+\textbf{let} opt p m = \textbf{parser} [< x=p Fail >] \!\(\rightarrow\)\! Some x | [<>] \!\(\rightarrow\)\! None
+\end{alltt}
+
+  \item \(X \rightarrow \{A \; a \ldots\}^+\)\\
+    The definition of this operator is \(X \rightarrow A \, (a
+    A)^*\). If~\texttt{p} is the parser for~\(A\) and~\texttt{a}
+    denotes~\(a\), the implementation is as follows:
+\begin{alltt}
+\textbf{let} list\_plus p a m =
+  \textbf{let} aux m = \textbf{parser} [< 'b \textbf{when} a=b; c=p Abort >] \(\rightarrow\) a::c
+\textbf{in parser} [< x=p m; y=star aux m >] \(\rightarrow\) x::y
+\end{alltt}
+    Note that the call \texttt{(list\_plus p a Fail)} entails the
+    calls \texttt{(p Fail)} and \texttt{(p Abort)}.
+
+  \item \(X \rightarrow \{A \; a \ldots\}^*\)\\
+    The definition of this
+    operator is \(X \rightarrow \varepsilon \mid A \, (a A)^*\), hence
+\begin{alltt}
+\textbf{let} list\_star p a m =
+  \textbf{let} aux m = \textbf{parser} [< 'b \textbf{when} a=b; c=p Abort >] \(\rightarrow\) a::c
+\textbf{in parser} [< x=p Fail; y=star aux m >] \(\rightarrow\) x::y | [<>] \(\rightarrow\) []
+\end{alltt}
+    Note the two calls \texttt{(p Fail)} and \texttt{(p Abort)} and
+    how the mode~\texttt{m} is useless.
+
+\end{itemize}
+
+
+\paragraph{Optimisation}
+
+All parsers have the same type, in particular they all take a mode as
+an argument. This mode can sometimes be useless when the parser in
+question is always at the head of a stream pattern or always in the
+tail: if the former, this is equivalent to always have the
+\texttt{Fail} mode, whereas, in the latter, it is always
+\texttt{Abort}. We can partially evaluate these parsers accordingly
+and we can do the same with the parser combinators implementing the
+rational operators. The pros are twofold: we create fewer closures at
+run\hyp{}time and we eliminate useless code; the cons are also
+twofold: we need another analysis of the grammar and we lose the
+possibility to combine arbitrarily our parsers because their types may
+vary. The parser combinators are modified as follows.
+\begin{itemize}
+
+  \item \(X \rightarrow \alpha^*\)\\ We have seen above that the
+    parsing mode is irrelevant, so we can remove it and assume that,
+    if no lexeme can be recognised, the parser~\texttt{p} may fail by
+    raising \texttt{Stream.Failure}, but not abort by raising
+    \texttt{Stream.Error} or an exception defined by the
+    programmer. We have the new definition
+\begin{alltt}
+\textbf{let rec} star p = \textbf{parser} [< x=p; y=star p >] \(\rightarrow\) x::y
+                      |                [<>] \(\rightarrow\) []
+\end{alltt}
+
+  \item \(X \rightarrow \alpha^+\)\\ We must retain the parsing mode
+    for~\texttt{plus} because it needs to be passed along to the
+    parser~\texttt{p}. According to the optimisation of~\(\alpha^*\)
+    above, we evaluate partially now~\texttt{p} with the
+    mode~\texttt{Fail}:
+\begin{alltt}
+\textbf{let} plus p m = \textbf{parser} [< x=p m; y=star (p Fail) >] \(\rightarrow\) x::y
+\end{alltt}
+
+  \item \(X \rightarrow [\alpha]\)\\
+    We remove the parsing mode, as with~\texttt{star} above:
+\begin{alltt}
+\textbf{let} opt p = \textbf{parser} [< x=p >] \(\rightarrow\) [x] | [<>] \(\rightarrow\) []
+\end{alltt}
+
+  \item \(X \rightarrow \{A \; a \ldots\}^+\)\\ We keep the parsing
+    mode, as with~\texttt{plus} above:
+\begin{alltt}
+\textbf{let} list\_plus p a m =
+  \textbf{let} aux = \textbf{parser} [< 'b \textbf{when} a=b; c=p Abort >] \(\rightarrow\) a::c
+\textbf{in parser} [< x=p m; y=star aux >] \(\rightarrow\) x::y
+\end{alltt}
+
+  \item \(X \rightarrow \{A \; a \ldots\}^*\)\\ We remove the parsing
+    mode, as with~\texttt{star} above:
+\begin{alltt}
+\textbf{let} list\_star p a =
+  \textbf{let} aux = \textbf{parser} [< 'b \textbf{when} a=b; c=p Abort >] \(\rightarrow\) a::c
+\textbf{in parser} [< x=p Fail; y=star aux >] \(\rightarrow\) x::y | [<>] \(\rightarrow\) []
+\end{alltt}
+
+\end{itemize}
+These optimisations give rise to three kinds of parsers:
+\begin{enumerate*}
+
+  \item \emph{passing parsers}, which may fail by raising
+    \texttt{Stream.Failure};
+
+  \item \emph{blocking parsers}, which may stop parsing, for example
+    by raising \texttt{Stream.Error};
+
+  \item \emph{mixed parsers}, which may or may not stop parsing,
+    depending on the call context.
+
+\end{enumerate*}
+The grammar must be analysed to categorise all the non\hyp{}terminals
+with respect to these three kinds. First, we ignore the rational
+operators. If a non\hyp{}terminal always appear at the start of a
+production, the corresponding parser is passing; if it always occur
+inside a production, the parser is blocking; otherwise, it is
+mixed. Second, we assume that the non\hyp{}terminals appearing only
+inside rational operators are passing. Third, we consider the rational
+operators:
+\begin{itemize}
+
+  \item \(\alpha^*\)\\ We distinguish the first word of~\(\alpha\):
+    it is a non\hyp{}terminal whose parser was deemed blocking, then
+    it becomes mixed. For each following non\hyp{}terminal, if their
+    parser was passing, it becomes mixed.
+
+  \item \(\alpha^+\)\\ Let us leave aside the first word
+    of~\(\alpha\). For each subsequent non\hyp{}terminal, if the
+    corresponding parser was passing, it becomes mixed. We now
+    distinguish depending on the position of~\(\alpha^+\) in the
+    grammar. If it occurs at the start of a production and if the
+    parser of the first word of~\(\alpha\) was blocking, then it
+    becomes mixed. If~\(\alpha^+\) does not occur at the start of a
+    production and if the parser of the first word of~\(\alpha\)
+    was passing, then it becomes mixed.
+
+  \item \([\alpha]\)\\ Same as~\(\alpha^*\).
+
+  \item \(\{A \; a \ldots\}^*\)\\ The parser of~\(A\) becomes (or
+    remains) mixed.
+
+  \item \(\{A \; a \ldots\}^+\)\\ Same as~\(\alpha^+\).
+
+\end{itemize}
+All mixed parsers require a parameter for the parsing mode. Some
+passing or blocking parsers may also require such a parameter only for
+typing reasons, for example if it is passed itself as an argument to
+the parser combinators \texttt{plus} or \texttt{list\_plus}. The
+blocking parsers have the shape
+\begin{alltt}
+\textbf{let} my\_parser \emph{mode\(\sp{\text{opt}}\)} = \textbf{parser}
+  [< ... >] \(\rightarrow\) ...
+| ...
+| [< ... >] \(\rightarrow\) ...
+|   [< s >] \(\rightarrow\) syntax\_error \emph{message} s
+\end{alltt}
+Note that \texttt{\emph{mode\(^{\text{opt}}\)}} means that the
+parameter \texttt{mode} may be required for typing reasons. The
+passing parsers have the shape
+\begin{alltt}
+\textbf{let} my\_parser \emph{mode\(\sp{\text{opt}}\)} = \textbf{parser}
+  [< ... >] \(\rightarrow\) ...
+| ...
+| [< ... >] \(\rightarrow\) ...
+\end{alltt}
+Note that there is no pattern \texttt{[<>]} or \texttt{[< s >]}
+because the semantics of stream matching would naturally see an
+exception \texttt{Stream.Failure} raised if the first lexeme in the
+stream matches no pattern. The mixed parsers have the shape we gave
+earlier, before considering any optimisations.
+
+\paragraph{An example}
+
+Let us consider an example based on a real formal language called
+\emph{Abstract Syntax Notation One} (ASN.1)~\citep{Larmouth_1999,
+  Dubuisson_2001}, notoriously difficult to
+parse~\citep{Rinderknecht_1995}. To keep things simple, we will only
+parse the header of a module, not the assignments it contains.
+
+The name of the scanned file containing the module is set in a global
+reference:
+\begin{alltt}
+\textbf{let} file = ref ""
+\end{alltt}
+and a location in that file is a pair of integer coordinates (line,
+column):
+\begin{alltt}
+\textbf{type} loc = int \(\times\) int
+\end{alltt}
+The keywords here are a small subset of all ASN.1 keywords:
+\begin{alltt}
+\textbf{type} kwd = ALL | AUTOMATIC | BEGIN | DEFINITIONS
+| END | EXPLICIT | EXPORTS | EXTENSIBILITY | FROM
+| IMPLICIT | IMPLIED | IMPORTS | TAGS
+\end{alltt}
+Symbols are also in small number in our presentation:
+\begin{alltt}
+\textbf{type} sym =
+  Assign | Lbrace | Rbrace | Comma | Lparen | Rparen | SemiColon
+\end{alltt}
+To understand what these data constructors stand for, here is the
+function that provides their concrete syntax:
+\begin{alltt}
+\textbf{let} string\_of\_sym = \textbf{function}
+  Assign \(\rightarrow\) "::=" | Lbrace \(\rightarrow\) "{" | Rbrace \(\rightarrow\) "}" | Comma \(\rightarrow\) ","
+| Lparen \(\rightarrow\) "(" | Rparen \(\rightarrow\) ")" | SemiColon \(\rightarrow\) ";"
+\end{alltt}
+The concrete syntax of keywords is obvious, but we need a function
+nonetheless:
+\begin{alltt}
+\textbf{let} string\_of\_kwd = \textbf{function}
+  ALL \(\rightarrow\) "ALL" | AUTOMATIC \(\rightarrow\) "AUTOMATIC" | BEGIN \(\rightarrow\) "BEGIN"
+| DEFINITIONS \(\rightarrow\) "DEFINITIONS" | END \(\rightarrow\) "END" | TAGS \(\rightarrow\) "TAGS"
+| EXPLICIT \(\rightarrow\) "EXPLICIT" | EXPORTS \(\rightarrow\) "EXPORTS" | FROM \(\rightarrow\) "FROM" 
+| EXTENSIBILITY \(\rightarrow\) "EXTENSIBILITY" | IMPLICIT \(\rightarrow\) "IMPLICIT"
+| IMPLIED \(\rightarrow\) "IMPLIED" | IMPORTS \(\rightarrow\) "IMPORTS"
+\end{alltt}
+The type for the tokens is
+\begin{alltt}
+\textbf{type} token =
+  Low    \textbf{of} (loc \(\times\) string)  (* Lowercase-starting identifier *)
+| Up     \textbf{of} (loc \(\times\) string)  (* Uppercase-starting identifier *)
+| ModRef \textbf{of} (loc \(\times\) string)  (* Module reference *)
+| Nat    \textbf{of} (loc \(\times\) string)  (* Natural number *)
+| Str    \textbf{of} (loc \(\times\) string)  (* String *)
+| Kwd    \textbf{of} (loc \(\times\) kwd)     (* Keyword *)
+| Sym    \textbf{of} (loc \(\times\) sym)     (* Symbol *)
+| EOF    \textbf{of} loc              (* End of file (virtual token) *)
+\end{alltt}
+The only parser combinator we need are the following:
+\begin{alltt}
+\textbf{let} opt p = \textbf{parser} [< x=p >] \(\rightarrow\) Some x | [<>] \(\rightarrow\) None
+
+\textbf{let rec} star p = \textbf{parser} [< x=p; y=star p >] \(\rightarrow\) x::y
+                      |                [<>] \(\rightarrow\) []
+\end{alltt}
+Note that the constraints and optimisations above apply. We also need
+\texttt{plus}, which requires parsing modes:
+\begin{alltt}
+\textbf{type} mode = Fail | Abort
+
+\textbf{let} plus p m = \textbf{parser} [< x=p m; y=star (p Fail) >] \(\rightarrow\) x::y 
+\end{alltt}
+At the head of a stream pattern, we shall use \texttt{(plus p Fail)},
+otherwise \texttt{(plus p Abort)}. We need an exception to signal
+syntax errors, and a way to print them:
+\begin{alltt}
+\textbf{exception} Error \textbf{of} (loc \(\times\) string)
+
+\textbf{let} get\_loc = \textbf{function}
+  Low a | Up a | ModRef a | Str a | Nat a -> fst a
+| Sym (loc,\_) | Kwd (loc,\_) | EOF loc \(\rightarrow\) loc
+
+\textbf{let} stop token msg = raise (Error (get\_loc token, msg))
+
+\textbf{let} check msg = \textbf{function}
+   Fail \(\rightarrow\) raise Stream.Failure
+| Abort \(\rightarrow\) \textbf{parser} [< 't >] \(\rightarrow\) stop t msg
+\end{alltt}
+The function \texttt{check} performs the action corresponding to the
+parsing mode. We continue with the definitions of auxiliary parsers
+dedicated to tokens to be recognised in pattern tails, so we must stop
+parsing if they are not found:
+\begin{alltt}
+\textbf{let} modref = \textbf{parser}
+  [< 'ModRef \_ >] \(\rightarrow\) ()
+| [< 't >] \(\rightarrow\) stop t "Module reference expected."
+
+\textbf{let} kwd k = \textbf{parser}
+  [< 'Kwd (\_,k') \textbf{when} k=k' >] \(\rightarrow\) ()
+| [< 't >] \(\rightarrow\) stop t ("Keyword "^ string\_of\_kwd k ^ " expected.")
+
+\textbf{let} sym s = \textbf{parser}
+  [< 'Sym (\_,s') \textbf{when} s=s' >] \(\rightarrow\) ()
+| [< 't >] \(\rightarrow\) stop t ("Symbol " ^ string\_of\_sym s ^ " expected.")
+
+\textbf{let} nat = \textbf{parser} [< 'Nat \_ >] \(\rightarrow\) ()
+               | [< 't >] \(\rightarrow\) stop t "Natural number expected."
+\end{alltt}
+Finally, we can define the parser for ASN.1 modules:
+\begin{alltt}
+\textbf{let rec} moduleDefinition = \textbf{parser}
+  [< \_=moduleIdentifier;
+     ()=kwd DEFINITIONS;
+     \_=opt tagDefault;
+     \_=opt extensionDefault;
+     ()=sym Assign;
+     ()=kwd BEGIN;
+     s=moduleSuffix >] \(\rightarrow\) s
+
+\textbf{and} moduleIdentifier = \textbf{parser}
+  [< 'ModRef \_; \_=opt definitiveIdentification >] \(\rightarrow\) ()
+| [< 't >] \(\rightarrow\) stop t "Module identifier expected"
+
+\textbf{and} definitiveIdentification = \textbf{parser}
+  [< 'Sym (\_,Lbrace); \_=plus definitiveObjIdComponent Abort;
+     ()=sym Rbrace; \_=opt iriValue >] \(\rightarrow\) ()
+
+\textbf{and} iriValue = \textbf{parser} [< 'Str \_ >] \(\rightarrow\) ()
+
+\textbf{and} definitiveObjIdComponent mode = \textbf{parser}
+  [< 'Nat \_ >] \(\rightarrow\) ()
+| [< 'Low \_; \_=opt num >] \(\rightarrow\) ()
+| [< s >] \(\rightarrow\) check "OID component expected." mode s
+
+\textbf{and} num = \textbf{parser}
+  [< 'Sym (\_,Lparen); ()=nat; ()=sym Rparen >] \(\rightarrow\) ()
+
+\textbf{and} tagDefault = \textbf{parser}
+  [< 'Kwd (\_,EXPLICIT);  ()=kwd TAGS >] \(\rightarrow\) ()
+| [< 'Kwd (\_,IMPLICIT);  ()=kwd TAGS >] \(\rightarrow\) ()
+| [< 'Kwd (\_,AUTOMATIC); ()=kwd TAGS >] \(\rightarrow\) ()
+
+\textbf{and} extensionDefault = \textbf{parser}
+  [< 'Kwd (\_,EXTENSIBILITY); ()=kwd IMPLIED >] \(\rightarrow\) ()
+
+\textbf{and} moduleSuffix = \textbf{parser}
+  [< 'Kwd (\_,EXPORTS); \_=opt exports; ()=sym SemiColon;
+     \_=opt imports; a=assignmentList >] \(\rightarrow\) a
+|     [< \_=imports; a=assignmentList >] \(\rightarrow\) a
+|                [< a=assignmentList >] \(\rightarrow\) a
+
+\textbf{and} exports = \textbf{parser} [< \_=symbolList Fail >] \(\rightarrow\) ()
+                   |      [< 'Kwd (\_,ALL) >] \(\rightarrow\) ()
+
+\textbf{and} imports = \textbf{parser}
+  [< 'Kwd (\_,IMPORTS); \_=opt imp1; ()=sym SemiColon >] \(\rightarrow\) ()
+
+\textbf{and} imp1 = \textbf{parser} [< \_=symbolList Fail; \_=from >] \(\rightarrow\) ()
+
+\textbf{and} from = \textbf{parser} [< ()=kwd FROM; \_=modref; \_=opt imp2 >] \(\rightarrow\) ()
+
+\textbf{and} imp2 = \textbf{parser}
+  [< \_=obj; \_=opt imp1 >] \(\rightarrow\) ()
+| [< 'Up \_; \_=opt braces; \_=opt moreSymbols; \_=from >] \(\rightarrow\) ()
+| [< 'Low \_; \_=opt imp3 >] \(\rightarrow\) ()
+
+\textbf{and} obj = \textbf{parser}
+  [< 'Sym (\_,Lbrace); \_=plus objIdComponents Abort;
+     ()=sym Rbrace >] \(\rightarrow\) ()
+
+\textbf{and} braces = \textbf{parser} [< 'Sym (\_,Lbrace); ()=sym Rbrace >] \(\rightarrow\) ()
+
+\textbf{and} moreSymbols = \textbf{parser}
+  [< 'Sym (\_,Comma); \_=symbolList Abort >] \(\rightarrow\) ()
+
+\textbf{and} imp3 = \textbf{parser}
+  [< \_=braces; \_=opt moreSymbols; \_=from >] \(\rightarrow\) ()
+|               [< \_=moreSymbols; \_=from >] \(\rightarrow\) ()
+| [< 'Kwd (\_,FROM); \_=modref; \_=opt imp2 >] \(\rightarrow\) ()
+|                              [< \_=imp1 >] \(\rightarrow\) ()
+
+\textbf{and} objIdComponents mode = \textbf{parser}
+                            [< \_=obj >] \(\rightarrow\) ()
+| [< \_=definitiveObjIdComponent Fail >] \(\rightarrow\) ()
+| [< s >] \(\rightarrow\) check "OID component expected." mode s
+
+\textbf{and} symbolList mode = \textbf{parser}
+  [< \_=symbol; \_=opt moreSymbols >] \(\rightarrow\) ()
+| [< s >] \(\rightarrow\) check "Reference expected." mode s
+
+\textbf{and} symbol = \textbf{parser} [< \_=reference; \_=opt braces >] \(\rightarrow\) ()
+
+\textbf{and} reference = \textbf{parser} [< 'Up \_ >] \(\rightarrow\) () | [< 'Low \_ >] \(\rightarrow\) ()
+
+\textbf{and} assignmentList = \textbf{parser}
+  [< 'Kwd(\_,END); s >] \(\rightarrow\) after\_END s
+|  [< 'EOF \_ \textbf{as} eof >] \(\rightarrow\) stop eof "Keyword END expected."
+|          [< 't; s >] \(\rightarrow\) [< 't; assignmentList s >]
+
+\textbf{and} after\_END = \textbf{parser}
+  [< 'EOF \_ \textbf{as} eof >] \(\rightarrow\) [< 'eof >]
+|            [< 't >] \(\rightarrow\) stop t "End of file expected."
+\end{alltt}
+Note that \texttt{objIdComponents} and \texttt{symbolList} retained
+their parsing mode parameter because the former is used as an argument
+to the parser combinator \texttt{plus}, and the latter is used both at
+the head (passing parser) and in the tail (blocking parser) of stream
+patterns. As explained earlier, the parsers have been derived from the
+standard grammar, which has been transformed into LL(1) form first,
+then the restrictions for streams were applied, for instance, not
+having a parser combinator for the empty word at the head of a
+pattern.
+
+The next step would be building up symbol tables for imported and
+exported definitions in the semantic actions, that is, on the
+right\hyp{}hand side of the arrows in parsers, and then write another
+parser to recognise the tokens currently passed along by
+\texttt{assignmentList} (third pattern), that is, the actual contents
+of the ASN.1 modules.

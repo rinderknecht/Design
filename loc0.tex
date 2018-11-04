@@ -1,0 +1,39 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath,amssymb}
+\usepackage{mathpartir}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\framebox[0.5\columnwidth]{\vbox{%
+\begin{gather*}
+\begin{array}{r@{\;}c@{\;}l}
+\fun{loc}_0(p,t)   & \rightarrow & \fun{loc}_0(p,t,0).\\
+\\
+\fun{pre}(\el,t) & \rightarrow & \fun{true}();\\
+\fun{pre}(\cons{a}{p},\cons{a}{t}) & \rightarrow & \fun{pre}(p,t);\\
+\fun{pre}(p,t) & \rightarrow & \fun{false}().\\
+\\
+\fun{loc}_0(\cons{x}{p},\el,j) & \rightarrow & \fun{absent}();\\
+\end{array}
+\\
+\inferrule
+  {\fun{pre}(p,t) \twoheadrightarrow \fun{true}()}
+  {\fun{loc}_0(p,t,j) \rightarrow \fun{factor}(j)};
+\\
+\inferrule
+  {\fun{pre}(p,\cons{a}{t}) \twoheadrightarrow \fun{false}()}
+  {\fun{loc}_0(p,\cons{a}{t},j) \rightarrow \fun{loc}_0(p,t,j+1)}.
+\end{gather*}
+}}
+\endTeXtoEPS
+
+\end{document}

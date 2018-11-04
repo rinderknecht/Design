@@ -1,0 +1,68 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\input{ocaml_macros}
+\input{ocaml_syntax}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=20pt,treesep=10pt]{
+\mknode{\TR[name=root]{\cst{BinOp}}}
+       {}
+       {\raisebox{4pt}{\Rnode{fifteen}{\num{3*5\textbf{=}15}}}}}{
+  \TR{\cst{Mult}}
+  \pstree{\mknode{\TR{\cst{BinOp}}}
+                 {}
+                 {\raisebox{2pt}{\Rnode{three}{\num{1+2\textbf{=}3}}}}}{
+    \TR{\cst{Add}}
+    \pstree{\mknode{\TR{\cst{Const}}}
+                   {}
+                   {\Rnode{one}{\num{1}}}}{
+      \TR[name=leaf_one]{\num{1}}
+    }
+    \pstree{\mknode{\TR{\cst{Const}}}
+                   {}
+                   {\Rnode{two}{\num{2}}}}{
+      \TR[name=leaf_two]{\num{2}}
+    }
+  }
+  \pstree{\mknode{\TR{\cst{BinOp}}}
+                 {}
+                 {\raisebox{2pt}{\Rnode{div}{\num{5/1\textbf{=}5}}}}}{
+    \TR{\cst{Div}}
+    \pstree{\mknode{\TR{\cst{Const}}}
+                   {}
+                   {\Rnode{five}{\num{5}}}}{
+      \TR[name=leaf_five]{\num{5}}
+    }
+    \pstree{\mknode{\TR{\cst{Const}}}
+                   {}
+                   {
+                    \Rnode{app}{\num{1}}}}{
+      \TR[name=leaf_x]{\num{1}}
+    }
+  }
+}
+\ncline[linestyle=dotted,nodesepA=1pt,nodesepB=1pt]{->}{leaf_one}{one}
+\ncline[linestyle=dotted,nodesepA=1pt,nodesepB=1pt]{->}{leaf_two}{two}
+\ncline[linestyle=dotted,nodesepA=1pt,nodesepB=1pt]{->}{leaf_five}{five}
+\ncline[linestyle=dotted,nodesepA=1pt,nodesepB=1pt]{->}{leaf_x}{app}
+\ncarc[linestyle=dotted,nodesepA=1pt]{->}{one}{three}
+\nccurve[linestyle=dotted,angleA=130,angleB=340,nodesepA=1pt]{->}{two}{three}
+\ncarc[linestyle=dotted,nodesepA=1pt]{->}{five}{div}
+\ncline[linestyle=dotted,nodesepA=1pt]{->}{app}{div}
+\ncarc[linestyle=dotted,nodesepB=1pt]{->}{three}{fifteen}
+\ncarc[linestyle=dotted,arcangle=-5,nodesepA=1pt,nodesepB=1pt]{->}{div}{fifteen}
+\ncline[linestyle=dotted,nodesepA=1pt,nodesepB=1pt]{->}{root_env}{B}
+\ncline[linestyle=dotted,nodesepA=1pt,nodesepB=1pt]{->}{B}{BB}
+\ncline[linestyle=dotted,nodesepA=1pt,nodesepB=1pt]{->}{B}{BC}
+\ncarc[linestyle=dotted,arcangle=-8,nodesepA=1pt,nodesepB=1pt]{->}{root_env}{C}
+\ncline[linestyle=dotted,nodesepA=1pt,nodesepB=1pt]{->}{C}{CB}
+\ncline[linestyle=dotted,nodesepA=1pt,nodesepB=1pt]{->}{C}{CC}
+\ncarc[linestyle=dotted,arcangle=-35,nodesepA=1pt,nodesepB=1pt]{->}{CC}{rho}
+\endTeXtoEPS
+
+\end{document}

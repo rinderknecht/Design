@@ -1,0 +1,26 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{pstricks,pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=1cm, nodesep=2pt]{\TR{entity}}{
+  \pstree{\TR{parsed}}{ 
+    \pstree{\TR{predefined}}{
+      \TR{named}
+      \TR{numbered}
+    }
+    \pstree{\TR{user-defined}}{
+      \TR{internal}
+      \TR{external}
+    }
+  }
+  \Tn
+  \TR{unparsed}
+}
+\endTeXtoEPS
+
+\end{document}

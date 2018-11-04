@@ -1,0 +1,239 @@
+\section{Specification of tokens}
+
+\Fig~\vref{fig:lexer_parser}
+\begin{figure}[b]
+\centering
+\includegraphics[bb=71 640 368 721]{lexer_parser}
+\caption{Lexer and parser\label{fig:lexer_parser}}
+\end{figure}
+shows that the lexical analyser is the first phase of a compiler. Its
+main task is to read the input characters and produce a sequence of
+tokens that the syntax analyser uses. Upon receiving a request for a
+token (\emph{get token}) from the parser, the lexical analyser reads
+input characters until a lexeme is identified and returned to the
+parser together with the corresponding token. Usually, a lexical
+analyser is in charge of
+\begin{itemize*}
+
+  \item stripping out from the source program comments and white
+    spaces, in the form of blank, tabulation and newline characters;
+
+  \item keeping trace of the position of the lexemes in the source
+    program, so the error handler can refer to exact positions in
+    error messages.
+
+\end{itemize*}
+A \emph{token} is a set of strings which are interpreted in the same
+way, for a given source language. For instance, \tokenName{id} is a
+token denoting the set of all possible identifiers. A \emph{lexeme} is
+a string belonging to a token. For example, \verb+5.4+ is a lexeme of
+the token \tokenName{num}. Tokens are defined by means of
+\emph{patterns}. A pattern is a kind of compact rule describing all
+the lexemes of a token. A pattern is said to \emph{match} each lexeme
+in the token. For example, in the \Pascal statement
+\begin{verbatim}
+const pi = 3.14159;
+\end{verbatim}
+the substring \texttt{pi} is a lexeme for the token \tokenName{id}
+(\emph{identifier}).
+
+Most recent programming languages distinguish a finite set of strings
+that match the identifiers but are not part of the identifier token:
+the \emph{keywords}. For example, in \Ada, \texttt{function} is a
+keyword and, as such, is not a valid identifier. In~C, \texttt{int} is
+a keyword and, as such, cannot be used as an identifier, for instance
+to declare a variable. Nevertheless, it is common not to create
+explicitly a \tokenName{keyword} token and let each keyword lexeme be
+the only one of its own token, as displayed in
+\fig~\vref{fig:tokens_lexemes}.
+\begin{figure}
+\centering
+\begin{tabular}{@{}>{\bfseries\sffamily}l|>{\tt}c|l@{}}
+\toprule
+  \multicolumn{1}{c}{\textsc{Token}}
+& \multicolumn{1}{c}{\textsc{Sample lexemes}} 
+& \multicolumn{1}{c}{\textsc{Informal pattern}}\\
+\midrule
+id       & pi count D2 \dots & letter followed by letters and digits\\
+relop    & < <= = >= >   & \texttt{<} or \texttt{<=} or \texttt{<} or \texttt{=} or \texttt{>=} or \texttt{>}\\
+const    & const         & \texttt{const}\\
+if       & if            & \texttt{if}\\
+num      & 3.14 4 .2E2 \ldots  & numeric constant\\
+literal  & "message" ""  \ldots & characters between \texttt{"} and \texttt{"} except \texttt{"}\\
+\bottomrule
+\end{tabular}
+\caption{Examples of tokens and lexemes\label{fig:tokens_lexemes}}
+\end{figure}
+
+Regular expressions are an important notation for specifying
+patterns. Each pattern matches a set of strings, so regular
+expressions will serve as names for sets of strings. The term
+\emph{alphabet} denotes any finite set of symbols. Typical examples of
+symbols are letters and digits, for example, the set \(\{0, 1\}\) is
+the \emph{binary alphabet}; \textsc{ascii} is another example of
+computer alphabet.
+
+A \emph{string} over some alphabet is a finite sequence of symbols
+drawn from that alphabet. The terms \emph{sentence} and \emph{word}
+are often used as synonyms. The length of string~\(s\), usually
+noted~\(\strlen{s}\), is the number of occurrences of symbols
+in~\(s\). For example, \texttt{banana} is a string of
+length~\(6\). The \emph{empty string}, denoted~\(\varepsilon\), is a
+special string of length zero. More informal definitions are given in
+the table in \fig~\vref{fig:table}.
+\begin{figure}
+\centering
+\setlength\tymin{70pt}
+\begin{tabulary}{\linewidth}{@{}CL@{}}
+\toprule
+  \textsc{Term}
+& \multicolumn{1}{c}{\textsc{Informal definition}}\\
+\midrule
+  \emph{prefix} of \(s\)
+& A string obtained by removing zero or more trailing symbols of
+  string~\(s\); \emph{e.g.,} \texttt{ban} is a prefix of \texttt{banana}.\\
+\hline
+  \emph{suffix} of \(s\)
+& A string formed by deleting zero or more of the leading symbols
+  of~\(s\); \emph{e.g.,} \texttt{nana} is a suffix of \texttt{banana}.\\
+\hline
+  \emph{substring} of \(s\)
+& A string obtained by deleting a prefix and a suffix from~\(s\);
+\emph{e.g.,} \texttt{nan} is a substring a \texttt{banana}. Every prefix and
+every suffix of~\(s\) is a substring~\(s\), but not every substring
+of~\(s\) is a prefix or a suffix of~\(s\). For every string~\(s\),
+both \(s\)~and~\(\varepsilon\) are prefixes, suffixes and substrings
+of~\(s\).\\
+\hline
+  \emph{proper} prefix, suffix or substring of~\(s\)
+& Any non-empty string~\(x\), that is, respectively, a prefix, suffix,
+  substring of~\(s\) such that \(s \neq x\); \emph{e.g.,}
+  \(\varepsilon\)~and \texttt{banana} are \emph{not} proper prefixes
+  of \texttt{banana}.\\
+\hline
+  \emph{subsequence} of~\(s\)
+& Any string formed by deleting zero or more not necessarily
+  contiguous symbols from~\(s\); \emph{e.g.,} \texttt{baaa} is a subsequence
+  of \texttt{banana}.\\
+\bottomrule
+\end{tabulary}
+\caption{Formal language glossary\label{fig:table}}
+\end{figure}
+
+The term \emph{language} denotes any set of strings over some fixed
+alphabet. The \emph{empty set}, noted~\(\varnothing\),
+or~\(\{\varepsilon\}\), the set containing only the empty word are
+languages. The set of valid C~programs is an infinite
+language. If~\(x\) and~\(y\) are strings, then the
+\emph{concatenation} of~\(x\) and~\(y\), written \(xy\) or \(x \cdot
+y\), is the string formed by appending \(y\)~to~\(x\). For example, if
+\(x = \texttt{dog}\) and \(y = \texttt{house}\), then \(xy =
+\texttt{doghouse}\). The empty string is the identity element under
+concatenation: \(s \varepsilon = \varepsilon s = s\). If we think of
+concatenation as a product, we can define string exponentiation as
+follows:
+\begin{itemize*}
+
+  \item \(s^0 = \varepsilon\),
+
+  \item \(s^{n} = s^{n-1} s\), if \(n > 0\).
+
+\end{itemize*}
+Since \(\varepsilon s = s\) and \(s^1 = s\), we have \(s^2 = ss\) and
+\(s^3 = sss\), etc.
+
+We can now revisit in \fig~\vref{fig:table_formal} the definitions we
+gave in \fig~\vref{fig:table} using a formal notation, where \(L\)~is
+the language under consideration.
+\begin{figure}
+\centering
+\begin{tabular}{c>{$}c<{$}}
+\toprule
+  \textsc{Term}
+& \multicolumn{1}{c}{\textsc{Formal definition}}\\
+\midrule
+  \(x\)~is a \emph{prefix} of~\(s\)
+& \exists y \in L. s = x y\\
+  \(x\)~is a \emph{suffix} of~\(s\)
+& \exists y \in L.s = y x\\
+  \(x\)~is a \emph{substring} of~\(s\)
+& \exists u, v \in L. s = u x v\\
+  \(x\)~is a \emph{proper prefix} of~\(s\)
+& \exists y \in L. y \neq \varepsilon \; \text{and} \; s = x y\\
+  \(x\)~is a \emph{proper suffix} of~\(s\)
+& \exists y \in L. y \neq \varepsilon \; \text{and} \; s = y x\\
+  \(x\)~is a \emph{proper substring} of~\(s\)
+& \exists u, v \in L. u v \neq \varepsilon \; \text{and} \; s = u x
+v\\
+\bottomrule
+\end{tabular}
+\caption{Formal definitions of \fig~\vref{fig:table}\label{fig:table_formal}}
+\end{figure}
+
+\paragraph{Operations on languages}
+
+It is possible to define operations on languages. For lexical
+analysis, we are interested mainly in \emph{union},
+\emph{concatenation} and \emph{closure}. Consider
+\fig~\vref{fig:operations}, where let~\(L\) and~\(M\) be two
+languages.
+\begin{figure}[b]
+\centering
+\begin{tabular}{c>{$}c<{$}}
+\toprule
+  \textsc{Operation}
+& \multicolumn{1}{c}{\textsc{Formal definition}}\\
+\midrule
+  \emph{union} of \(L\) and \(M\)
+& L \cup M = \{ s \mid s \in L \; \text{or} \; s \in M\}\\
+  \emph{concatenation} of \(L\) and \(M\)
+& L M = \{s t \mid s \in L \; \text{and} \; t \in M\}\\
+  \emph{Kleene closure} of \(L\)
+& L^{*} = \bigcup_{i=0}^{\infty}{L^{i}} \; \text{where} \; L^0
+  = \{\varepsilon\}\\
+  \emph{positive closure} of \(L\)
+& L^{+} = \bigcup_{i=1}^{\infty}{L^{i}}\\
+\bottomrule
+\end{tabular}
+\caption{Operations on formal languages\label{fig:operations}}
+\end{figure}
+\(L^{*}\) means `zero or more concatenations of~\(L\)', and
+\(L^{+}\)~means `at least one concatenation of~\(L\).' Clearly,
+\(L^{*} = \{\varepsilon\} \cup L^{+}\). For instance, let \(L =
+\{\texttt{A}, \texttt{B}, \ldots, \texttt{Z}, \texttt{a}, \texttt{b},
+\ldots, \texttt{z}\}\) and \(D = \{\texttt{0}, \texttt{1}, \ldots,
+\texttt{9}\}\). Then
+\begin{enumerate*}
+
+  \item \(L\)~is the alphabet consisting of the set of upper and lower
+    case letters and \(D\)~is the alphabet of the decimal digits;
+
+  \item since a symbol is a string of length one, the sets
+    \(L\)~and~\(D\) are finite languages too.
+
+\end{enumerate*}
+These two ways of considering \(L\)~and~\(D\) and the operations on
+languages allow us to create new languages from other languages
+defined by their alphabet. Here are some examples of new languages
+created from~\(L\) and~\(D\): 
+\begin{itemize*}
+
+  \item \(L \cup D\) is the language of letters and digits;
+
+  \item \(L D\) is the language whose words consist of a letter followed
+  by a digit;
+
+  \item \(L^{4}\) is the language whose words are four\hyp{}letter
+  strings;
+
+  \item \(L^{*}\) is the language made up on the alphabet~\(L\),
+  \emph{i.e.,} the set of all strings of letters, including the empty
+  string~\(\varepsilon\);
+
+  \item \(L(L \cup D)^{*}\) is the language whose words consist of
+  letters and digits and beginning with a letter;
+
+  \item \(D^{+}\) is the language whose words are made of one or more
+  digits, \emph{i.e.,} the set of all decimal integers.
+
+\end{itemize*}

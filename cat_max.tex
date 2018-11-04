@@ -1,0 +1,28 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\fun{cat}}}{
+  \pstree{\TR{\fun{cat}}}{
+    \psset{linewidth=1.5pt,linestyle=dotted}
+    \pstree[linewidth=0.8pt,linestyle=solid]{\TR{\fun{cat}}}{
+      \TR{\([x_1,\dots,x_{n}]\)}
+      \TR{\texttt{[]}}
+    }
+    \psset{linewidth=0.8pt,linestyle=solid}
+    \Tn
+    \TR{\texttt{[]}}
+  }
+  \Tn
+  \TR{\texttt{[]}}
+}
+\endTeXtoEPS
+
+\end{document}

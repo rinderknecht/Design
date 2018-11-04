@@ -1,0 +1,33 @@
+%% This TeX file expects
+%%
+%% macro \erlscr be the path to the Erlang sources,
+%% macro \erlurl be the URL to the Erlang sources.
+
+\RequirePackage{verbatim}
+
+\newcommand\ErlangHREF[2]{\href{\erlurl/#1}{#2}}
+
+\newcommand\erlcomp[2]{%
+\immediate\write18{erlc #1/#2.erl > /dev/null}%
+\IfFileExists{#2.beam}%
+  {\immediate\write18{rm -f #2.beam}}%
+  {\errmessage{Erlang compiler: Error in file #2.erl => Run \erlc #1/#2.erl}}%
+}
+
+\newcommand\smallErlangIn[1]{
+\erlcomp{\erlsrc}{#1}
+{\small\verbatiminput{\erlsrc/#1.erl}}
+}
+
+\newcommand\smallNoCheckIn[1]{
+{\small\verbatiminput{\erlsrc/#1.erl}}
+}
+
+\newcommand\ErlangIn[1]{%
+\erlcomp{\erlsrc}{#1}%
+\verbatiminput{\erlsrc/#1.erl}%
+}
+
+\newcommand\ErlangInUnchecked[1]{%
+\verbatiminput{\erlsrc/#1.erl}
+}

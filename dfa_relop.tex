@@ -1,0 +1,53 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{xspace}
+\usepackage{vaucanson-g}
+\usepackage{pst-eps}
+
+%\ShowGrid
+
+\input{token}
+\input{grammar}
+\input{dfa_macros}
+
+\begin{document}
+
+\TeXtoEPS
+\VCDraw{%
+\begin{VCPicture}{(0,0)(10,6)}
+% States
+\State[1]{(4,6)}{A}
+\Initial[n]{A}
+\State[2]{(1,3)}{B}
+\State[3]{(8,3)}{C}
+\FinalState[4]{(0,0)}{D}
+\FinalState[5]{(2,0)}{E}
+\FinalState[6]{(4,0)}{F}
+\FinalState[7]{(6,0)}{G}
+\FinalState[8]{(8,0)}{H}
+\FinalState[9]{(10,0)}{I}
+% Edges & labels
+\LArcR[0.5]{A}{B}{\exc{>}}
+\LArcL[0.5]{A}{C}{\exc{<}}
+\LArcR{B}{D}{\exc{=}}
+\LArcL{B}{E}{\scriptsize \other}
+\EdgeR{A}{F}{\exc{=}}
+\LArcR[0.5]{C}{G}{\scriptsize \other}
+\EdgeL{C}{H}{\exc{>}}
+\LArcL[0.5]{C}{I}{\exc{=}}
+% Node labels
+\nput{-100}{D}{\large \itoken{relop}{GE}}
+\nput{0}{E}{\huge *}
+\nput{-95}{E}{\large \itoken{relop}{GT}}
+\nput{-90}{F}{\large \itoken{relop}{EQ}}
+\nput{0}{G}{\huge *}
+\nput{-85}{G}{\large \itoken{relop}{LT}}
+\nput{-80}{H}{\large \itoken{relop}{NE}}
+\nput{-75}{I}{\large \itoken{relop}{LE}}
+\end{VCPicture}
+}
+\endTeXtoEPS
+
+\end{document}

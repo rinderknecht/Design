@@ -1,0 +1,34 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath}
+\usepackage{array,hhline}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\(
+\begin{array}{|c|ccc||l|}
+\hhline{|----||-|}
+\multicolumn{4}{|c||}{\text{Bits of \(n\)}} & 
+\multicolumn{1}{c|}{n}\\
+\hhline{====::=:}
+0 & 0 & \ldots & 0 & 0\\
+\vdots & & \multicolumn{1}{c}{\OB{\fun{tms}}{2^p}} & & \vdots\\
+0 & 1 & \ldots & 1 & 2^p-1\\
+\hhline{|-|---||-|}
+1 & 0 & \ldots & 0 & 2^p\\
+\vdots & & \multicolumn{1}{c}{\OB{\fun{tms}}{i}} & & \vdots\\
+1 & & \ldots & & 2^p+i-1\\
+\hhline{|-|---||-|}
+ & & & & 2^p+i\\
+\hhline{|----||-|}
+\end{array}
+\)
+\endTeXtoEPS
+
+\end{document}

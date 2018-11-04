@@ -1,0 +1,48 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{booktabs}
+
+\newcommand\floor[1]{\lfloor{#1}\rfloor}
+
+\begin{document}
+
+\TeXtoEPS
+\framebox{\(
+\begin{array}{lr}
+2^0 &      1\\
+\hline
+\addlinespace[1pt]
+2^1 &     10\\
+    &     11\\
+\hline
+\addlinespace[1pt]
+2^2 &    100\\
+    &    101\\
+    &    110\\
+    &    111\\
+\hline
+\addlinespace[1pt]
+2^3 &   1000\\
+    &   1001\\
+    &   1010\\
+    &   1011\\
+    &   1100\\
+    &   1101\\
+    &   1110\\
+    &   1111\\
+\hline
+\vdots & \vdots\\
+\addlinespace[2pt]
+\hline
+\addlinespace[1pt]
+2^{\floor{\lg n}} & \ldots\\
+       & \vdots\\
+       & n
+\end{array}
+\)}
+\endTeXtoEPS
+
+\end{document}

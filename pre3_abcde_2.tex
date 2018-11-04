@@ -1,0 +1,34 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\raisebox{-3pt}{\(\xrightarrow{\delta}\)}
+\pstree[nodesep=0pt,levelsep=17pt,treesep=14pt]{\TCircle{\fun{d}}}{
+  \Tf[framesize=6pt]
+  \Tf[framesize=6pt]
+}
+\;\;
+\Tf[framesize=6pt]
+\;\;
+\raisebox{-3pt}{\(\xrightarrow{\delta}\)}
+\;\;
+\Tf[framesize=6pt]
+\;\;
+\Tf[framesize=6pt]
+\;\;
+\Tf[framesize=6pt]
+\;\;
+\raisebox{-3pt}{\(\xrightarrow{\gamma^3}\)}
+\;
+\TR{\texttt{[]}}
+\endTeXtoEPS
+
+\end{document}

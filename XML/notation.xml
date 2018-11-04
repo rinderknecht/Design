@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE doc [
+  <!ELEMENT doc (para,graphic)>
+  <!ELEMENT para (#PCDATA)>
+  <!ELEMENT graphic EMPTY>
+  <!ATTLIST graphic image   CDATA #REQUIRED  
+                    alt     CDATA #IMPLIED>
+  <!NOTATION gif 
+     SYSTEM "CompuServe Graphics Interchange Format 87a">
+  <!ENTITY picture SYSTEM "picture.gif" NDATA gif>
+  <!ENTITY me "Christian Rinderknecht">
+]>
+<doc>
+  <para>The following element refers to my picture:</para>
+  <graphic image="picture" alt="A picture of &me;"/>
+</doc>

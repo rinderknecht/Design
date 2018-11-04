@@ -1,0 +1,41 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath,amssymb}
+\usepackage{mathpartir}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+%\abovedisplayskip=0pt
+%\belowdisplayskip=0pt
+\framebox[0.91\columnwidth]{\vbox{%
+\begin{gather*}
+\inferrule
+  {\fun{deq}(\fun{bfn}(0,\fun{q}(\el,[t]))) \twoheadrightarrow
+   \pair{\fun{q}(\el,\el)}{t'}}
+  {\fun{bfn}_3(t) \twoheadrightarrow t'}.
+\\
+\inferrule{}{\fun{bfn}_4(i,\fun{q}(\el,\el)) \rightarrow
+             \fun{q}(\el,\el)};
+\quad
+\inferrule
+  {\fun{deq}(q) \twoheadrightarrow \pair{q'}{\fun{ext}()}}
+  {\fun{bfn}_4(i,q) \twoheadrightarrow \fun{enq}(\fun{ext}(),\fun{bfn}_4(i,q'))};
+\\
+\inferrule
+  {\fun{deq}(q) \twoheadrightarrow \pair{q_1}{\fun{int}(x,t_1,t_2)}
+   \\
+   \fun{deq}(\fun{bfn}_4(i+1,\fun{enq}(t_2,\fun{enq}(t_1,q_1))))
+   \twoheadrightarrow \pair{q_2}{t'_2}
+   \\
+   \fun{deq}(q_2) \twoheadrightarrow \pair{q'}{t'_1}}
+  {\fun{bfn}_4(i,q) \twoheadrightarrow \fun{enq}(\fun{int}(i,t'_1,t'_2),q')}
+\end{gather*}}}
+\endTeXtoEPS
+
+\end{document}

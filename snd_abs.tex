@@ -1,0 +1,66 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\input{ocaml_syntax}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=20pt]{\TR[name=outer-x-let]{\cst{Let}}}{
+  \TR{\str{x}}
+  \pstree{\TR{\cst{Const}}}{
+    \TR{\num{1}}
+  }
+  \pstree{\TR{\cst{Let}}}{
+    \TR{\str{f}}
+    \pstree{\TR[name=outer-fun]{\cst{Fun}}}{
+      \TR{\str{y}}
+      \pstree{\TR{\cst{BinOp}}}{
+        \TR{\cst{Add}}
+        \pstree{\TR[name=in-outer-fun-x]{\cst{Var}}}{
+          \TR{\str{x}}
+        }
+        \pstree{\TR[name=in-outer-fun-y]{\cst{Var}}}{
+          \TR{\str{y}}
+        }
+      }
+    }
+    \pstree{\TR[name=inner-x-let]{\cst{Let}}}{
+      \TR{\str{x}}
+      \pstree{\TR{\cst{Const}}}{
+        \TR{\num{2}}
+      }
+      \pstree{\TR{\cst{App}}}{
+        \pstree{\TR[name=inner-fun]{\cst{Fun}}}{
+          \TR{\str{y}}
+          \pstree{\TR{\cst{BinOp}}}{
+            \TR{\cst{Add}}
+            \pstree{\TR[name=in-inner-fun-x]{\cst{Var}}}{
+              \TR{\str{x}}
+            }
+            \pstree{\TR[name=in-inner-fun-y]{\cst{Var}}}{
+              \TR{\str{y}}
+            }
+          }
+        }
+        \pstree{\TR[name=inner-x-occur]{\cst{Var}}}{
+          \TR{\str{x}}
+        }      
+      }
+    }
+  }
+}
+\nccurve[linestyle=dotted,nodesepA=1pt,nodesepB=1pt,angleA=225,angleB=180,ncurv=1.25]{->}{in-inner-fun-x}{outer-x-let}
+
+\ncarc[linestyle=dotted,nodesepA=1pt,arcangle=-60]{->}{inner-x-occur}{inner-x-let}
+
+\nccurve[linestyle=dotted,nodesepA=1pt,nodesepB=1pt,angleA=225,angleB=225,ncurv=1.2]{->}{in-outer-fun-x}{outer-x-let}
+
+\ncarc[linestyle=dotted,nodesepA=1pt,arcangle=-20]{->}{in-outer-fun-y}{outer-fun}
+\ncarc[linestyle=dotted,nodesepA=1pt,arcangle=-20]{->}{in-inner-fun-y}{inner-fun}
+\nccurve[linestyle=dashed,nodesepA=1pt,nodesepB=1pt,angleA=225,angleB=210,ncurv=1.5]{->}{in-inner-fun-x}{inner-x-let}
+\endTeXtoEPS
+
+\end{document}

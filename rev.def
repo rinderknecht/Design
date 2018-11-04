@@ -1,0 +1,3 @@
+rev(S)        -> rcat(S,[]).
+rcat(   [],T) -> T;
+rcat([X|S],T) -> rcat(S,[X|T]).

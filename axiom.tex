@@ -1,0 +1,23 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{pstricks,pst-tree,pst-eps}
+
+\newcommand\pcdata[1]{\Tr{\psframebox{\rule{0pt}{7pt}\texttt{#1}}}}
+\newcommand\element[1]{\Tr{#1}}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=1cm,nodesep=2pt,treesep=8pt,framearc=.4]{\element{axiom}}{
+  \psset{nodesepB=0pt}
+  \pcdata{The empty set}
+  \psset{nodesepB=2pt}
+  \element{varnothing}
+  \psset{nodesepB=0pt}
+  \pcdata{contains no elements.}
+}
+\endTeXtoEPS
+
+\end{document}

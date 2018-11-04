@@ -1,0 +1,46 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pstricks,pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\psset{radius=5pt,nodesep=0pt,levelsep=23pt,treesep=10pt}
+\pstree[doubleline=true]{\TC}{
+  \psset{nodesepB=2pt}
+  \TR{\(\mathcal{L}_1\)}
+  \psset{doubleline=false,nodesep=0pt}
+  \pstree{\TC}{
+    \psset{doubleline=true,nodesepB=2pt}
+    \TR{\(\mathcal{L}_2\)}
+    \psset{doubleline=false,nodesep=0pt,linestyle=dotted}
+    \pstree{\TC[linestyle=solid]}{
+      \psset{doubleline=true,nodesepB=2pt,linestyle=solid}
+      \TR{\(\mathcal{L}_l\)}
+      \psset{doubleline=false,nodesep=0pt,linestyle=solid}
+      \pstree{\TC*}{
+        \pstree[doubleline=true,nodesepB=2pt]{\TC}{
+          \TR{\(\mathcal{B}_1\)}}
+        \pstree[doubleline=true,nodesepB=2pt]{\TC}{
+          \TR{\(\mathcal{B}_2\)}}
+        \psset{doubleline=true}
+        \TR{\phantom{H}}
+        \psset{doubleline=false}
+        \pstree[doubleline=true,nodesepB=2pt]{\TC}{
+          \TR{\(\mathcal{B}_d\)}}
+      }
+      \psset{doubleline=true,nodesepA=0pt,nodesepB=2pt, 
+             linestyle=solid}
+      \TR{\(\mathcal{R}_l\)}
+    }
+    \psset{doubleline=true,nodesepA=0pt,nodesepB=2pt,linestyle=solid}
+    \TR{\(\mathcal{R}_2\)}
+  }
+  \psset{doubleline=true,nodesepA=0pt,nodesepB=2pt}
+  \TR{\(\mathcal{R}_1\)}
+}
+\endTeXtoEPS
+
+\end{document}

@@ -1,0 +1,47 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{xspace}
+\usepackage{vaucanson-g}
+\usepackage{pst-eps}
+
+%\ShowGrid
+
+\input{token}
+\input{grammar}
+\input{dfa_macros}
+
+\begin{document}
+
+\TeXtoEPS
+\VCDraw{%
+\begin{VCPicture}{(0,0)(6,6)}
+% States
+\State[1]{(2,6)}{A}
+\Initial[n]{A}
+\FinalState[2]{(0,3)}{B}
+\FinalState[3]{(5,3)}{C}
+\FinalState[4]{(0,0)}{D}
+\FinalState[6]{(2,0)}{E}
+\FinalState[8]{(4,0)}{F}
+\FinalState[9]{(6,0)}{G}
+% Edges & labels
+\EdgeR{A}{B}{\exc{>}}
+\EdgeL{A}{C}{\exc{<}}
+\EdgeR{B}{D}{\exc{=}}
+\EdgeL{A}{E}{\exc{=}}
+\EdgeR{C}{F}{\exc{>}}
+\EdgeL{C}{G}{\exc{=}}
+% Node labels
+\nput{-100}{D}{\large \itoken{relop}{GE}}
+\nput{180}{B}{\large \itoken{relop}{GT}}
+\nput{0}{C}{\large \itoken{relop}{LT}}
+\nput{-90}{E}{\large \itoken{relop}{EQ}}
+\nput{-80}{F}{\large \itoken{relop}{NE}}
+\nput{-75}{G}{\large \itoken{relop}{LE}}
+\end{VCPicture}
+}
+\endTeXtoEPS
+
+\end{document}

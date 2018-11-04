@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- initially, the default namespace is "books" -->
+<book xmlns='http://loc.gov/books'
+      xmlns:isbn='http://isbn.org/0-395-36341-6'
+      xml:lang="en" lang="en">
+  <title>Cheaper by the Dozen</title>
+  <isbn:number>1568491379</isbn:number>
+  <notes>
+    <!-- make HTML the default namespace
+         for a hypertext commentary -->
+    <p xmlns='http://www.w3.org/1999/xhtml'>
+        This is also available
+        <a href="http://www.w3.org/">online</a>.
+    </p>
+  </notes>
+</book>

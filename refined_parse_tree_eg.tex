@@ -1,0 +1,44 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\input{token}
+
+\usepackage{xspace} % Required by common.tex
+\usepackage{pstricks,pst-tree,pst-eps}
+
+\newcommand{\mknode}[2]{\TR{\token{#1}{#2}}}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=21pt,nodesep=2pt,treesep=12pt]{\TR{\emph{assignment}}}{
+  \pstree{\TR{\emph{identifier}}}{
+    \TR{\token{ID}{position}}
+  }
+  \TR{\token{SYM}{:=}}
+  \pstree{\TR{\emph{expression}}}{
+    \pstree{\TR{\emph{expression}}}{
+      \pstree{\TR{\emph{identifier}}}{
+        \TR{\token{ID}{initial}}
+      }
+    }
+    \TR{\token{OP}{+}}
+    \pstree{\TR{\emph{expression}}}{
+      \pstree{\TR{\emph{expression}}}{
+        \pstree{\TR{\emph{identifier}}}{
+          \TR{\token{ID}{rate}}
+        }
+      }
+      \TR{\token{OP}{*}}
+      \pstree{\TR{\emph{expression}}}{
+        \pstree{\TR{\emph{number}}}{
+          \TR{\token{NUM}{60}}
+        }
+      }
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}

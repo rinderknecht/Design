@@ -1,0 +1,47 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pstricks,pst-eps}
+
+% Tables
+%
+%\usepackage{arydshln}
+%\setlength\dashlinedash{1pt}
+%\setlength\dashlinegap{1pt}
+\usepackage{hhline}
+\usepackage{multirow}
+
+% AMS Maths and St Mary's Road nice symbols
+%
+\usepackage{amssymb,amsmath,stmaryrd}
+
+\renewcommand\arraystretch{0.95}
+
+\begin{document}
+
+\TeXtoEPS
+\begin{tabular}{||c|c||rrrrrrrrrr||}
+\hhline{~~|t:==========:t|}
+\multicolumn{1}{c}{} &   & \multicolumn{10}{c||}{\(k\)}\\
+\hhline{~~||----------||}
+\multicolumn{2}{c||}{\raisebox{1.9ex}[0cm][0cm]{\(\dbinom{r}{k}\)}}
+          & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9\\
+\hhline{|t:==::==========:|}
+\multirow{10}{1.7mm}{\(r\)}
+      & 0 & \textbf{1} & 0 &  0 &  0 &   0 &   0 &  0 &  0 & 0 & 0\\
+      & 1 & \textbf{1} & \textbf{1} &  0 &  0 &   0 &   0 &  0 &  0 & 0 & 0\\
+      & 2 & \textbf{1} & \textbf{2} &  \textbf{1} &  0 &   0 &   0 &  0 &  0 & 0 & 0\\
+      & 3 & \textbf{1} & \textbf{3} &  \textbf{3} &  \textbf{1} &   0 &   0 &  0 &  0 & 0 & 0\\
+      & 4 & \textbf{1} & \textbf{4} &  \textbf{6} &  \textbf{4} &   \textbf{1} &   0 &  0 &  0 & 0 & 0\\
+      & 5 & \textbf{1} & \textbf{5} & \textbf{10} & \textbf{10} &   \textbf{5} &   \textbf{1} &  0 &  0 & 0 & 0\\
+      & 6 & \textbf{1} & \textbf{6} & \textbf{15} & \textbf{20} &  \textbf{15} &   \textbf{6} &  \textbf{1} &  0 & 0 & 0\\
+      & 7 & \textbf{1} & \textbf{7} & \textbf{21} & \textbf{35} &  \textbf{35} &  \textbf{21} &  \textbf{7} &  \textbf{1} & 0 & 0\\
+      & 8 & \textbf{1} & \textbf{8} & \textbf{28} & \textbf{56} &  \textbf{70} &  \textbf{56} & \textbf{28} &  \textbf{8} & \textbf{1} & 0\\
+      & 9 & \textbf{1} & \textbf{9} & \textbf{36} & \textbf{84} & \textbf{126} & \textbf{126} & \textbf{84} & \textbf{36} & \textbf{9} & \textbf{1}\\
+\hhline{|b:==:b:==========:b|}
+\end{tabular}
+\endTeXtoEPS
+
+\end{document}

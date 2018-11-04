@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<!DOCTYPE spain [
+  <!ELEMENT spain (#PCDATA)>
+  <!ENTITY n "&#241;">
+]>
+<spain>
+Viva Espa&n;a!
+</spain>

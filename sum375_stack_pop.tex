@@ -1,0 +1,82 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath,amssymb}
+
+\input{commands}
+
+\newcommand\ghostnode{\TR{\phantom{\texttt{[]}}}}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[arrows=->,nodesepA=-1pt,nodesepB=2pt,levelsep=20pt,treesep=14pt]{\TR{\(\circ\)}}{
+  \ghostnode
+}
+%%
+\hspace*{-4pt}
+\raisebox{-3pt}{\(\dashleftarrow\)}
+\hspace*{-3pt}
+%%
+\pstree[arrows=->,nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\fun{sum}}}{
+  \ghostnode
+}
+\hspace*{-4pt}
+\pstree[arrows=->,nodesepA=-1pt,nodesepB=2pt,levelsep=20pt,treesep=14pt]{\TR{\(\circ\)}}{
+  \ghostnode
+}
+%%
+\hspace*{-2pt}\raisebox{-3pt}{\(\dashleftarrow\)}\hspace*{0pt}
+%%
+\pstree[arrows=->,nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\fun{sum}}}{
+  \ghostnode
+}
+\hspace*{-10pt}
+\pstree[arrows=->,nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\(+\)}}{
+  \ghostnode
+  \ghostnode
+}
+%%
+\hspace*{-10pt}\raisebox{-3pt}{\(\dashleftarrow\)}\hspace*{0pt}
+%%
+\pstree[arrows=->,nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\fun{sum}}}{
+  \ghostnode
+}
+\hspace*{-10pt}
+\pstree[nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\(+\)}}{
+  \psset{arrows=->}
+  \ghostnode
+  \psset{arrows=-,levelsep=12pt}
+  \pstree[arrows=->,levelsep=20pt]{\TR{\fun{sum}}}{
+    \ghostnode
+  }
+}
+\hspace*{-10pt}
+\pstree[arrows=->,nodesepA=-1pt,nodesepB=2pt,levelsep=20pt,treesep=14pt]{\TR{\(\circ\)}}{
+  \ghostnode
+}
+%%
+\hspace*{-2pt}\raisebox{-3pt}{\(\dashleftarrow\)}\hspace*{0pt}
+%%
+\pstree[arrows=->,nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\fun{sum}}}{
+  \ghostnode
+}
+\hspace*{-10pt}
+\pstree[nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\(+\)}}{
+  {\psset{arrows=->}\ghostnode}
+  \pstree[arrows=->]{\TR{\fun{sum}}}{
+    \ghostnode
+  }
+}
+\hspace*{-14pt}
+\pstree[arrows=->,nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\(+\)}}{
+  \ghostnode
+  \ghostnode
+
+}
+\endTeXtoEPS
+
+\end{document}

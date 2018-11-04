@@ -1,0 +1,52 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\input{ocaml_syntax}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=20pt]{\TR[name=outer-x-let]{\cst{Let}}}{
+  \TR{\str{x}}
+  \pstree{\TR{\cst{Const}}}{
+    \TR{\num{1}}
+  }
+  \pstree{\TR[name=f-let]{\cst{Let}}}{
+    \TR{\str{f}}
+    \pstree{\TR[name=fun]{\cst{Fun}}}{
+      \TR{\str{y}}
+      \pstree{\TR{\cst{BinOp}}}{
+        \TR{\cst{Add}}
+        \pstree{\TR[name=outer-x-occur]{\cst{Var}}}{
+          \TR{\str{x}}
+        }
+        \pstree{\TR[name=y]{\cst{Var}}}{
+          \TR{\str{y}}
+        }
+      }
+    }
+    \pstree{\TR[name=inner-x-let]{\cst{Let}}}{
+      \TR{\str{x}}
+      \pstree{\TR{\cst{Const}}}{
+        \TR{\num{2}}
+      }
+      \pstree{\TR{\cst{App}}}{
+        \pstree{\TR[name=f-occur]{\cst{Var}}}{
+          \TR{\str{f}}
+        }
+        \pstree{\TR[name=inner-x-occur]{\cst{Var}}}{
+          \TR{\str{x}}
+        }      
+      }
+    }
+  }
+}
+\ncarc[linestyle=dotted,nodesepA=1pt,arcangle=-20]{->}{y}{fun}
+\ncarc[linestyle=dotted,nodesepA=1pt,arcangle=-60]{->}{inner-x-occur}{inner-x-let}
+\nccurve[linestyle=dotted,nodesepA=1pt,nodesepB=1pt,angleA=225,angleB=270]{->}{f-occur}{f-let}
+\nccurve[linestyle=dotted,nodesepA=1pt,nodesepB=1pt,angleA=225,angleB=225,ncurv=1.2]{->}{outer-x-occur}{outer-x-let}
+\endTeXtoEPS
+
+\end{document}

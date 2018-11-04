@@ -1,0 +1,28 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath,amssymb}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\(
+\boxed{
+\begin{array}{@{}r@{\;}c@{\;}l@{}}
+\fun{flat}_1(\el)                   & \rightarrow & \el;\\
+\fun{flat}_1(\cons{\el}{t})         & \rightarrow & \fun{flat}_1(t);\\
+\fun{flat}_1(\cons{[x]}{t})         & \leadsto & \fun{flat}_1(\cons{x}{t});\\
+\fun{flat}_1(\cons{\cons{x}{s}}{t}) & \rightarrow 
+                                    & \fun{flat}_1(\cons{x,s}{t});\\
+\fun{flat}_1(\cons{y}{t})           & \rightarrow  & \cons{y}{\fun{flat}_1(t)}.
+\end{array}}
+\)
+\endTeXtoEPS
+
+\end{document}
+
+

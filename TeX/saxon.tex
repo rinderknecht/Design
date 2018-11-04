@@ -1,0 +1,39 @@
+%% This TeX file expects
+%%   (1) macro \java to be the path to some Java Virtual Machine,
+%%   (2) macro \saxlib to be the path to the Saxon library (a Java
+%%       bytecode archive),
+%%
+%% Package `verbatim' is required.
+%%
+%% Moreover, depending on the macro used, it may expect
+%%   (3) macro \xmlURL to be a full URL (http://...) to a directory
+%%       containing XML documents,
+%%   (4) macro \xsltURL to be a full URL (http://...) to a directory
+%%       containing XST stylesheets.
+%%   (5) macro \XMLdir to be a file system path to the same
+%%       directory as pointed by \xmlURL,
+%%   (6) macro \XSLTdir to be a file system path to the same
+%%       directory as pointed by \xmlSLT.
+
+%% IMPORTANT NOTE: The created file, if modified (e.g., by means of
+%% another creation), will outdate the DVI, because AutomaTeX
+%% recomputes the dependences based on the TeX log file, where this
+%% file appears. Therefore, we must remove it after creation.
+
+\RequirePackage{verbatim}
+
+\newcommand\saxon[3]{%
+  \immediate\write18{\java -jar \saxlib -o:#1 \XMLdir/#2.xml \XSLTdir/#3.xsl}%
+  \IfFileExists{#1}%
+    {{\verbatiminput{#1}}%
+     {\immediate\write18{rm -f #1}}}%
+    {\errmessage{Saxon: Error applying \XSLTdir/#3.xsl to \XMLdir/#2.xml}}%
+}
+
+\newcommand\saxonCut[3]{%
+  \immediate\write18{\java -jar \saxlib \XMLdir/#2.xml \XSLTdir/#3.xsl | sed '/^[ ]*$/d' >| #1}
+  \IfFileExists{#1}%
+    {{\verbatiminput{#1}}%
+     {\immediate\write18{rm -f #1}}}%
+    {\errmessage{Saxon: Error transforming \XMLdir/#2.xml with \XSLTdir/#3.xsl}}
+}

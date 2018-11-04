@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE numbers SYSTEM "csv.dtd">
+
+<numbers>
+  <hexa>0</hexa>
+  <hexa>1</hexa>
+  <hexa>A</hexa>
+  <hexa>B</hexa>
+  <hexa>C</hexa>
+</numbers>

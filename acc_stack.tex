@@ -1,0 +1,37 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath}
+\usepackage[scaled=0.8]{beramono}
+
+\newcommand\erlcode[1]{\texttt{#1}}
+\newcommand\erlnode[1]{\TR{\erlcode{#1}}}
+\newcommand\erlbox[1]{\TR{\fbox{\erlcode{#1}}}}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\erlnode{|}}{
+  \pstree{\erlnode{\{k3,\textvisiblespace\}}}{
+    \TR{\(I_1\)}
+  }
+  \pstree{\erlnode{|}}{
+    \pstree{\erlnode{\{k1,\textvisiblespace,\textvisiblespace\}}}{
+      \TR{\(V\)}
+      \TR{\(E\)}
+    }
+    \pstree{\erlnode{|}}{
+      \pstree{\erlnode{\{k3,\textvisiblespace\}}}{
+        \TR{\(I_2\)}
+      }
+      \erlnode{[]}
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}
+

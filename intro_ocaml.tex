@@ -1,0 +1,1270 @@
+Let us start by presenting a subset of the functional core of \OCaml
+(previously known as \emph{Objective Caml}). Contrary to previous
+chapters, the following introduction will be more formal, relying on a
+systematic classification of the syntactic constructs and their
+semantics. The reader is advised to keep in mind that what follows is
+a very concise and limited introduction to \OCaml, with the aim to
+show what a semi\hyp{}formal definition of a programming language
+looks like. Afterwards, we will show how \OCaml can be used to parse
+other languages, presenting along the way the basic theoretical
+concepts borrowed from compiler construction and formal language
+theory.
+
+A \emph{sentence}, or global definition, is defined by the following
+cases, where~\(e\) denotes an expression, \(x\)~and~\(f\) are
+variables and \Xlet and~\Xrec are keywords:
+
+\bigskip
+
+\noindent
+\begin{tabular}{rll}
+    $\bullet$ 
+  & \emph{global definition}
+  & \phrase{$\Xlet \,\, x = e$}\\
+    $\bullet$
+  & \emph{global recursive definition}
+  & \phrase{$\Xlet \,\, \Xrec \,\, f = e$}
+\end{tabular}
+
+\bigskip
+
+Global definitions can be optionally followed by two semicolons: these
+are necessary when inputting the sentences in the toplevel loop
+(prompted after running the command \texttt{ocaml} from a Unix
+shell). In contrast with \Erlang, note that the keyword \Xrec is
+necessary to enable recursion. A program is a sequence of
+sentences. When we write that \(e\)~is an expression, we mean that
+\(e\)~denotes a part of a sentence which is classified as an
+expression according to its syntax. We say that \(e\)~is a
+\emph{metavariable} because, being a name, it is a variable, but that
+variable does not belong to the language being described (\OCaml) and,
+instead, exists only in the descriptive language. In other words, it
+is not an \OCaml program but a notation to refer to fragments of
+\OCaml programs, perhaps an infinity. For instance, the metavariable
+\(x\)~denotes a set of \OCaml variables and we must not confuse it
+with the \OCaml variable~\ident{x}. Similarly, the metavariable
+\(e_1\)~denotes an infinity of expressions.
+
+\paragraph{Expressions}
+
+An expression \(e\)~is recursively defined by the following cases:
+
+\bigskip
+
+\noindent
+\begin{tabular}{rll}
+    $\bullet$
+  & \emph{variable}
+  & $f, g, h$ (function); $x, y, z$ (other). \\
+    $\bullet$
+  & \emph{function} (or \emph{abstraction})
+  & $\Xfun \,\, x \rightarrow e$\\
+    $\bullet$
+  & \emph{call} (or \emph{application})
+  & $e_1 \,\, e_2$ \\ 
+    $\bullet$
+  & \emph{arithmetic operator}
+  & \lpar\texttt{+}\rpar \ \lpar\texttt{-}\rpar \ \lpar\texttt{/}\rpar
+    \ \lpar\texttt{*}\rpar\\
+    $\bullet$
+  & \emph{arithmetic operation}
+  & $e_1$ \texttt{+} $e_2$ or $e_1$ \texttt{-} $e_2$
+    or $e_1$ \texttt{/} $e_2$ or $e_1$ \texttt{*} $e_2$\\
+    $\bullet$
+  & \emph{unit or integer constant}
+  & \unit \ or \textsf{0} or \textsf{1} or \textsf{2} etc.\\
+    $\bullet$
+  & \emph{parentheses}
+  & $\lpar{e}\rpar$\\
+    $\bullet$
+  & \emph{local definition}
+  & $\Xlet \,\, x = e_1 \,\, \Xin \,\, e_2$
+\end{tabular}
+
+\bigskip
+
+Note that what we print nicely as `\(\rightarrow\)' is actually
+written \texttt{->} in the source code. Here is an example of a
+program, where the keywords are set in bold for greater clarity:
+\begin{alltt}
+\textbf{let} x = 0
+\textbf{let} id = \textbf{fun} x \(\rightarrow\) x
+\textbf{let} y = 2 \textbf{in} id y
+\textbf{let} x = (\textbf{fun} x \(\rightarrow\) \textbf{fun} y \(\rightarrow\) x + y) 1 2
+\textbf{let} z = x+1
+\end{alltt}
+\noindent Let us remark the following:
+\begin{itemize}
+
+  \item Variables must start with a lowercase character.
+
+  \item The arrow is right-associative, so the expression
+    \begin{equation*}
+      \Xfun \,\, x_1 \rightarrow \Xfun \,\, x_2 \rightarrow \ldots
+      \rightarrow \Xfun \,\, x_n \rightarrow e
+    \end{equation*}
+    is equivalent to
+     \(\Xfun \,\, x_1 \rightarrow (\Xfun \,\, x_2 \rightarrow
+     (\ldots \rightarrow (\Xfun \,\, x_n \rightarrow e)) \ldots)\).
+
+  \item Function calls are left\hyp{}associative, so the
+  expression \(e_1 \, e_2 \, e_3 \, \ldots \, e_n\) is equivalent
+  to \((((\ldots (e_1 \, e_2) \, e_3) \ldots) \, e_n)\).
+
+  \item Function calls have higher priority than operator calls, for
+  example, \(f \, 3 + 4\) is equivalent to \((f \, 3) + 4\).
+
+  \item Operator calls have higher syntactic priority than
+  abstractions, for instance, \(\Xfun \, x \rightarrow x + y \) is
+  equivalent to \(\Xfun \, x \rightarrow (x + y)\).
+
+\end{itemize}
+A program, that is, a series of global definitions, can always be
+rewritten into a single sentence by means of nested local
+definitions. The previous program is thus equivalent to
+\begin{alltt}
+\textbf{let} x = 0 \textbf{in}
+  \textbf{let} id = \textbf{fun} x \(\rightarrow\) x \textbf{in}
+  \textbf{let} _ = \textbf{let} y = 2 \textbf{in} id y \textbf{in}
+  \textbf{let} x = (\textbf{fun} x \(\rightarrow\) \textbf{fun} y \(\rightarrow\) x + y) 1 2
+\textbf{in} x+1
+\end{alltt}
+The symbol `\texttt{\_}' denotes a variable whose name is globally
+unique, that is, it is different from any other, but purposefully
+omitted. Without loss of generality, we will consider programs reduced
+to a single expression. The meaning of a program is
+the \emph{evaluation} of \texttt{x+1}.
+
+\section*{Abstract syntax}
+
+As with any programming language, before considering the evaluation of
+\OCaml, we must specify the notion of \emph{scope of variables}, that
+is to say, what is denoted by a given variable at a particular
+location in the source file. With this aim, a graphical representation
+of programs (let us remember that expressions are enough) as trees
+proves very handy.
+\begin{center}
+\begin{tabular}{l|c}
+\toprule
+  \multicolumn{1}{c}{Expression}
+& \multicolumn{1}{c}{Tree}\\
+\toprule
+    $x$
+  & $x$\\
+    $\Xfun \,\, x \rightarrow e$
+  & \includegraphics[bb=72 697 93 721]{fun_tree}\\
+    $e_1 \,\, e_2$ 
+  & \includegraphics[bb=72 695 101 720]{app_tree}\\
+\bottomrule
+\end{tabular}
+\end{center}
+Intuitively, the method for constructing abstract syntax trees
+consists in first parenthesising fully the expression making up the
+program. Each parenthesis corresponds to a subexpression and each
+subexpression corresponds to a subtree. The tree is built from the
+root, down to the leaves, by traversing subexpressions from the
+outermost to the innermost, that is, the most embedded ones. For
+instance, consider
+\fig~\vref{fig:abs_trees}.
+\begin{figure}
+\centering
+\subfloat[\texttt{(1+2)*(5/1)}]{\includegraphics{arith_tree1}}
+\qquad
+\subfloat[\texttt{let x = 1 in (1+2)*(5/1)}]{%
+  \includegraphics{arith_tree2}}
+\qquad
+\subfloat[\texttt{let x = 1 in ((let x = 2 in x) + x)}]{
+  \includegraphics[bb=71 658 160 721]{arith_tree3}
+}
+\caption{Concrete and abstract syntax\label{fig:abs_trees}}
+\end{figure}
+Again, note that $x$~and~\texttt{x} are different: the former is a
+metavariable, standing for \emph{any} \OCaml variable, whilst the
+latter is a particular \OCaml variable.
+
+\paragraph{Static scoping and environment}
+
+A sentence associates an expression~\(e\) to a variable~\(x\): we
+speak of \emph{binding}, which we write \(x \mapsto e\). A subprogram
+then defines a set of bindings called an \emph{environment}. A binding
+is \emph{static} if we can determine at compile\hyp{}time, that is, by
+examining the source code, what expression a given variable refers
+to. For instance, in
+\begin{alltt}
+\textbf{let} x = 0 \textbf{in}
+  \textbf{let} id = \textbf{fun} x \(\rightarrow\) x \textbf{in}
+  \textbf{let} y = id x \textbf{in}
+  \textbf{let} x = (\textbf{fun} x \(\rightarrow\) \textbf{fun} y \(\rightarrow\) x + y) 1 2 
+\textbf{in} x+1
+\end{alltt}
+the variable~\texttt{x} in the expression \texttt{x+1} denotes the
+expression bound to the variable~\texttt{x} in the previous line, not
+the first. Bindings are ordered in the environment \emph{by the order
+of their definitions}. Thus
+\begin{enumerate}
+
+  \item the environment is initially empty: \{\};
+
+  \item with \texttt{\textbf{let} x = 0 \textbf{in} \ldots}, it
+    becomes $\{\ident{x} \mapsto 0\}$;
+
+  \item with \texttt{\textbf{let} id = \textbf{fun} x $\rightarrow$ x
+    \textbf{in} \ldots}, it is
+    $\{\ident{id} \mapsto \Xfun \,\, \ident{x} \rightarrow \ident{x}; \ident{x} \mapsto
+    0\}$;
+
+  \item \texttt{\textbf{let} y = id x \textbf{in} \ldots} yields
+    $\{\ident{y} \mapsto \ident{id} \, \ident{x}; \ident{id} \mapsto \Xfun \,\, \ident{x} \rightarrow \ident{x}; \ident{x} \mapsto
+    0\}$;
+
+  \item with \texttt{\textbf{let} x = \ldots}, it is
+      $\{\underline{\ident{x} \mapsto \ldots}; \ident{y} \mapsto \ident{id} \, \ident{x}; \ident{id} \mapsto \Xfun \,\, \ident{x} \rightarrow \ident{x}; \underline{\ident{x} \mapsto
+      0}\}$.
+
+\end{enumerate}
+The binding $\ident{x} \mapsto 0$ is therefore hidden, or out of
+scope, in \texttt{x+1}. We will write~\(\rho(x)\) the first binding
+of~\(x\) in the environment~\(\rho\), if any.
+
+\paragraph{Free variables}
+
+The local definition \Xlet $x$ = $e_1$ \Xin $e_2$ binds $e_1$~to~$x$,
+which we write $x \mapsto e_1$, in~$e_2$. It may be the case that,
+in~\(e_2\), another local definition binds the same variable. To
+clearly understand that situation, we proceed as follows on the
+abstract syntax tree of the program. From each variable occurrence, we
+move up, towards the root. If we encounter a \Xlet binding that
+variable, we create an oriented edge between the variable location and
+that \Xlet, and we stop. Otherwise, if we reach the root (no such
+\Xlet has been found), and the variable is said to be \emph{free} in the
+expression. We note \(\mathcal{F}(e)\) the set of the variables free
+in~\(e\). See for instance \fig~\vref{fig:free_var1}.
+\begin{figure}
+\centering
+\subfloat[\texttt{\textbf{let} x = 1 \textbf{in} (\textbf{let} x = 2
+  \textbf{in} x) + x}\label{fig:free_var1}]{
+\includegraphics[bb=71 658 160 721]{free_var1}}
+\qquad\qquad
+\subfloat[\texttt{\textbf{fun} y \(\rightarrow\) x + (\textbf{fun} x \(\rightarrow\) x)
+  y}\label{fig:free_var2}]{
+  \includegraphics{free_var2}}
+\caption{Graphical representation of bindings}
+\end{figure}
+A similar situation arises with functions. Indeed, in the body~\(e\)
+of \Xfun $x \rightarrow e$, the parameter~\(x\) may shadow (hide)
+another variable~\(x\) bound at an upper level in the tree. We must
+then consider that \Xfun is a binder, just like \Xlet. See
+\fig~\vref{fig:free_var2} for an example.
+
+\paragraph{Closed expressions}
+
+A \emph{closed} expression is an expression without free
+variables. Only a closed program can be evaluated (executed). Indeed,
+what would be the value of the program reduced to the simple
+expression~\texttt{x}? That is why the first static analysis performed
+by compilers consists in determining the variables which are free in
+expressions. If the program is not closed, it is rejected. In the case
+of~\texttt{x}, the \OCaml compiler prints
+\begin{center}
+\texttt{Unbound value x}
+\end{center}
+and stops. It is useful that this open expression is rejected at
+compile\hyp{}time and does not cause a run\hyp{}time error.
+
+\section{Evaluation}
+
+The evaluation of an expression, therefore of a program, is a partial
+function from expressions to \emph{values}. A partial function models
+the fact that an evaluation may not terminate or can be interrupted
+because of an error. The values~\(v\) of \OCaml are almost a strict
+subset of the expressions, defined recursively by the following cases:
+
+\bigskip
+
+\begin{tabular}{rll}
+    $\bullet$
+  & \emph{unit or integer constant}
+  & \unit \ or \textsf{0} or \textsf{1} or \textsf{2} etc.\\
+    $\bullet$
+  & \emph{closure}
+  & $\langle\Xfun \,\, x \rightarrow e, \rho\rangle$,\\
+  && where $\rho$ is an environment.\\
+  && For the operators: $\langle\lpar{\texttt{+}}\rpar, \rho\rangle$
+  etc.
+\end{tabular}
+
+\bigskip
+
+A \emph{closure} is a pair made of a function and an environment. This
+means in particular that functions are values, that is, they can be
+the result of the evaluation of an \OCaml program --~indeed, this is
+the characteristic feature of a functional language.
+
+In order to define the evaluation, we must modify the concept of
+binding: a binding will now associate a variable to a \emph{value}
+--~and not an expression anymore. Evaluation, and perhaps the
+resulting value, will depend on the environment at the occurrence of
+the expression. Let us note \((x \mapsto v) \oplus \rho\) the
+environment resulting from extending the environment~\(\rho\) with the
+binding \(x \mapsto v\), shadowing any other binding for~\(x\) that
+might exist in~\(\rho\).
+
+For each expression~\(e\), let us define an evaluation rule in an
+environment~\(\rho\), yielding the value~\(v\), as follows:
+
+\bigskip
+
+\begin{tabular}{@{}rll@{}}
+    $\bullet$
+  & $x$ 
+  & Look up the \emph{first} value bound to~\(x\) in~\(\rho\).\\[2mm]
+    $\bullet$
+  & $\Xfun \,\, x \rightarrow e$
+  & The value is $\langle\Xfun \,\, x \rightarrow e, \rho\rangle$.\\[2mm]
+    $\bullet$
+  & \texttt{+} \ \texttt{-} \ \texttt{/} \ \texttt{*}
+  & The value is $\langle\lpar\texttt{+}\rpar, \rho\rangle$ etc.\\[2mm]
+    $\bullet$
+  & $e_1$ \texttt{+} $e_2$ \ etc.
+  & Evaluate $e_1$ and $e_2$ in $\rho$, and sum, etc.\\[2mm]
+    $\bullet$
+  & \unit \ or \textsf{0} or \textsf{1} or \textsf{2} etc.
+  & The value is \unit or \textsf{0} or \textsf{1} etc.\\[2mm]
+    $\bullet$
+  & $\lpar{e}\rpar$
+  & Evaluate $e$ into $v$ in $\rho$.\\[2mm]
+    $\bullet$
+  & $\Xlet \,\, x = e_1 \,\, \Xin \,\, e_2$
+  & Evaluate $e_1$ into $v_1$ in $\rho$;\\
+  & 
+  & evaluate $e_2$ into $v$ in $(x \mapsto v_1) \oplus \rho$.\\[2mm]
+    $\bullet$
+  & $e_1 \,\, e_2$
+  & Evaluate $e_1$ and $e_2$ into $v_1$ and $v_2$ in $\rho$\\
+  &
+  & (order left unspecified);\\
+  &
+  & $v_1$ must be of the form $\langle\Xfun \,\, x \rightarrow
+    e,\rho'\rangle$;\\
+  &
+  & evaluate $e$ in $(x \mapsto v_2) \oplus \rho'$:\\
+  && the value is $v$.
+\end{tabular}
+
+\bigskip
+
+\paragraph{Example}
+
+The environment is initially empty: \(\rho = \{\}\). Let us evaluate
+\begin{alltt}
+\textbf{let} x = 0 \textbf{in}
+  \textbf{let} id = \textbf{fun} x \(\rightarrow\) x \textbf{in}
+  \textbf{let} y = id x \textbf{in}
+  \textbf{let} x = (\textbf{fun} x \(\rightarrow\) \textbf{fun} y \(\rightarrow\) x + y) 1 2 
+\textbf{in} x+1
+\end{alltt}
+\begin{itemize}
+
+\item The evaluation of \texttt{\textbf{let} x = 0 \textbf{in} \ldots}
+  imposes the prior evaluation of~\texttt{0}, which, obviously,
+  yields~\(0\). Then, we create the binding $\ident{x} \mapsto 0$, we
+  add it to~\(\rho\), which results in $\{\ident{x} \mapsto 0\}$, and
+  we evaluate the subexpression elided with this new environment.
+
+\item The evaluation of \texttt{\textbf{let} id = \textbf{fun} x \(\rightarrow\) x
+    \textbf{in} \ldots} is performed within the environment
+  $\{\ident{x} \mapsto 0\}$. The value~\(v\) is then the closure
+  $\langle\Xfun \,\, \ident{x} \rightarrow \ident{x}, \{\ident{x} \mapsto
+  0\}\rangle$. We extend the current environment with
+  $\ident{id} \mapsto v$ and we evaluate the subexpression with it.
+
+\item The evaluation of \texttt{\textbf{let} y = id x \textbf{in}
+    \ldots} is done within the environment $\{\ident{id} \mapsto
+  \langle\Xfun \,\, \ident{x} \rightarrow \ident{x}, \{\ident{x}
+  \mapsto 0\}\rangle; \ident{x} \mapsto 0\}$.
+    \begin{itemize}
+
+      \item We evaluate first (\texttt{id x}) in the current
+        environment (we used parentheses for better readability). In
+        order to do so, we evaluate~\texttt{id} and~\texttt{x}
+        separately. These are both variables, thus we look them up in
+        the environment to retrieve the first corresponding
+        binding: \(\ident{id} \mapsto \langle\Xfun \,\, \ident{x} \rightarrow \ident{x}, \{\ident{x} \mapsto
+        0\}\rangle\), and \(\texttt{x} \mapsto 0\). We need to
+        evaluate~\texttt{x} in the environment $(\ident{x} \mapsto
+        0) \oplus \{\ident{x} \mapsto 0\}$, which yields~\(0\).
+
+      \item We create the binding $\ident{y} \mapsto 0$, we add it to
+        the current environment and we evaluate the elided
+        subexpression with the new environment.
+ 
+    \end{itemize}
+
+  \item The evaluation of \texttt{\textbf{let} x = (\textbf{fun} x \(\rightarrow\)
+      \textbf{fun} y \(\rightarrow\) x + y) 1 2 \textbf{in} \ldots}
+      uses the environment $\{\ident{y} \mapsto 0; \ident{id} \mapsto
+    \langle\Xfun \,\, \ident{x} \rightarrow \ident{x}, \{\ident{x}
+    \mapsto 0\}\rangle; \ident{x} \mapsto 0\}$.
+
+\end{itemize}
+
+\paragraph{Formal definition}
+
+If we note \(\evalf{e}{\rho}\) the value obtained by evaluating the
+expression~\(e\) in the environment~\(\rho\), then we can resume the
+evaluation of \OCaml programs as follows:
+\begin{align*}
+\evalf{\overline{n}}{\rho} &= \dot{n}, \;\, \text{with
+  $\overline{n}$ an \OCaml integer and $\dot{n} \in \mathbb{N}$};\\
+\evalf{e_1 \texttt{+} \, e_2}{\rho} &= \evalf{e_1}{\rho} +
+\evalf{e_2}{\rho},\;\, \text{etc.};\\
+\evalf{\lpar{e}\rpar}{\rho} &= \evalf{e}{\rho};\\
+\evalf{x}{\rho} &= \rho(x), \;\, \text{(the first binding of~$x$
+  in~$\rho$)};\\
+\evalf{\Xfun \,\, x \rightarrow e}{\rho} &= \langle\Xfun \,\, x
+\rightarrow e, \rho\rangle;\\
+\evalf{\Xlet \,\, x = e_1 \,\, \Xin \,\, e_2}{\rho} &= \evalf{e_2}{((x
+  \mapsto \evalf{e_1}{\rho}) \oplus \rho)};\\
+\evalf{e_1 \,\, e_2}{\rho} &= \evalf{e}{((x \mapsto \evalf{e_2}{\rho})
+  \oplus \rho')},\\
+&\phantom{=\llbracket} \textnormal{where} \ \ \evalf{e_1}{\rho} =
+\langle\Xfun \,\, x \rightarrow e,\rho'\rangle.
+\end{align*}
+The evaluation consists in applying the equations from left to right,
+until termination or an error occurs.
+
+We establish directly that $\evalf{\lpar\Xfun \; x \rightarrow
+  e_2\rpar \; e_1}{\rho} = \evalf{\Xlet \,\, x = e_1 \,\, \Xin \,\,
+  e_2}{\rho}$, that is, the local binding is not necessary, at least
+  as long as there is no type system.
+
+\paragraph{Applications}
+
+If closures are values, they can be the value of a function call. For
+instance,
+\begin{alltt}
+\textbf{let} add = \textbf{fun} x \(\rightarrow\) \textbf{fun} y \(\rightarrow\) x + y \textbf{in}
+  \textbf{let} incr = add 1
+\textbf{in} incr 5
+\end{alltt}
+The call (\texttt{add 1}) is a \emph{partial application}, as opposed
+to a \emph{complete application} like (\texttt{add 1 5}): a partial
+application results in a closure. Like all applications, operations
+can also be partially evaluated:
+\begin{alltt}
+\textbf{let} incr = (+) 1 \textbf{in} incr 5
+\end{alltt}
+where the parentheses in~\texttt{(+)} mean that the operator has to be
+considered in prefix position, not infix, as usual.
+
+\paragraph{Termination}
+
+We can already compute with our tiny subset of \OCaml everything that
+is computable with the underlying computer. For instance, we can write
+the following non\hyp{}terminating program:
+\begin{center}
+\texttt{\textbf{let} omega = \textbf{fun} f \(\rightarrow\) f f \textbf{in} omega omega}
+\end{center}
+We have the evaluation
+\begin{gather*}
+\evalf{\texttt{\textbf{let} omega = \textbf{fun} f \(\rightarrow\) f f \textbf{in} omega omega}}{\rho}\\
+\begin{align*}
+&= \evalf{\texttt{omega omega}}{((\texttt{omega} \mapsto
+\evalf{\texttt{\textbf{fun} f \(\rightarrow\) f f}}{\rho}) \oplus \rho)}\\
+&= \evalf{\texttt{f f}}{((\texttt{\small f} \mapsto
+    \langle\texttt{\textbf{fun} f \(\rightarrow\) f f},\rho\rangle) \oplus \rho)}\\
+&= \text{\emph{idem.}}
+\end{align*}
+\end{gather*}
+
+\paragraph{Recursion}
+
+To demonstrate the expressive power of \OCaml, let us see how we can
+simulate recursive function by means of the auto\hyp{}applicative
+function \texttt{omega}. First, let us define a function \texttt{fix},
+traditionally called the \emph{Y combinator}:
+\begin{alltt}
+\textbf{let} omega = \textbf{fun} f \(\rightarrow\) f f
+\textbf{let} fix = \textbf{fun} g \(\rightarrow\) omega (\textbf{fun} h \(\rightarrow\) \textbf{fun} x \(\rightarrow\) g (h h) x)
+\end{alltt}
+
+\noindent It is tedious to show that, for all function~\(f\) and
+variable~\(x\),
+\begin{equation*}
+\evalf{\lpar\ident{fix} \; f\rpar{} \, x}{\rho} = \evalf{f \;
+  \lpar\ident{fix} \; f\rpar{} \, x}{\rho}.
+\end{equation*}
+In other words, we have $\lpar\ident{fix} \; f\rpar{} \equiv f \;
+\lpar\ident{fix} \; f\rpar$. Moreover, by definition, the fixed
+point~\(p\) of a function~\(f\) satisfies the equation \(p =
+f(p)\). Therefore, the fixed point of a function~\ident{f}, \emph{if
+  it exists}, is the value of \lpar\ident{fix} \ident{f}\rpar{}.
+
+It is possible to define the semantics (the evaluation) of a family of
+fixed\hyp{}point operators (and not just one as previously) by
+declaring that such operators must satisfy
+\begin{equation*}
+\evalf{\ident{fix} \,\, e}{\rho} = \evalf{e_1}{(f \mapsto
+  \evalf{\ident{fix} \, \lpar\Xfun \, f \rightarrow e_1\rpar}{\rho}
+  \oplus \rho')},
+\end{equation*}
+where $\evalf{e}{\rho} = \langle\Xfun \, f \rightarrow
+e_1,\rho'\rangle$.
+
+Let us consider the following definitions:
+\begin{alltt}
+\textbf{let} pre\_fact =
+  \textbf{fun} f \(\rightarrow\) \textbf{fun} n \(\rightarrow\) \textbf{if} n=1 \textbf{then} 1 \textbf{else} n * f(n-1)
+\textbf{let} fact = fix pre\_fact
+\end{alltt}
+We see that \texttt{fact} is the fixed point of \texttt{pre\_fact}, if
+it exists, that is,
+\begin{align*}
+\evalf{\texttt{fact}}{\rho} &= \evalf{\texttt{pre\_fact fact}}{\rho}\\
+&= \evalf{\texttt{\textbf{fun} n \(\rightarrow\) \textbf{if} n=1 \textbf{then} 1 \textbf{else} n * fact(n-1)}}{\rho}
+\end{align*}
+Therefore, \texttt{fact} is the factorial function. We can then
+predefine the fixed\hyp{}point operator \texttt{fix} (not necessarily
+the one we used above) and allow the programmer to use it directly,
+but, instead, we are going to extend our description of the subset of
+\OCaml with a native recursive binder:
+\begin{equation*}
+\evalf{\Xlet \; \Xrec \; f = e_1 \, \Xin \, e_2}{\rho} =
+\evalf{\Xlet \; f = \textsf{fix} \, \lpar\Xfun \, f \rightarrow
+e_1\rpar \, \Xin \, e_2}{\rho}.
+\end{equation*}
+
+\section*{Extensions}
+
+Let us add the following expressions:
+
+\bigskip
+
+\begin{tabular}{rll} 
+    $\bullet$
+  & \emph{Boolean constants}
+  & \Xtrue{} or \Xfalse\\
+    $\bullet$
+  & \emph{Boolean operators}
+  & \texttt{(\&\&)} or \texttt{(||)} or \textsf{\textbf{not}}\\
+    $\bullet$
+  & \emph{$n$-tuple}
+  & $e_1, \ldots, e_n$\\
+    $\bullet$
+  & \emph{conditional}
+  & \Xif{} $e_0$ \Xthen{} $e_1$ \Xelse{} $e_2$\\
+    $\bullet$
+  & \emph{local recursive binding}
+  & \Xlet{} \Xrec{} $f$ = $e_1$ \Xin{} $e_2$
+\end{tabular}
+
+\bigskip
+
+\noindent Note that parentheses are recommended around tuples.
+
+\paragraph{Irrefutable patterns}
+
+Let us distinguish the variables occurring after \Xlet{} and \Xfun{},
+because they are \emph{irrefutable patterns}, noted $\ipat{p}$:
+
+\bigskip
+
+\begin{tabular}{rll}
+    $\bullet$
+  & \emph{function}
+  & $\Xfun \,\, \ipat{p} \rightarrow e$\\
+    $\bullet$
+  & \emph{local definition}
+  & \(\Xlet \,\, \textrm{[}\Xrec\textrm{]} \,\, \ipat{p} = e_1 \,\,
+    \Xin \,\, e_2\)
+\end{tabular}
+
+\bigskip
+
+\noindent An irrefutable pattern $\ipat{p}$ is defined recursively by
+the following cases:
+
+\bigskip
+
+\begin{tabular}{rll}
+    $\bullet$
+  & \emph{variable}
+  & $f, g, h$ (functions) and $x, y, z$ (others). \\
+    $\bullet$
+  & \emph{unit}
+  & \unit\\
+    $\bullet$
+  & \emph{$n$-tuple}
+  & $\ipat{p}_1, \ldots, \ipat{p}_n$\\
+    $\bullet$
+  & \emph{parentheses}
+  & $\lpar\ipat{p}\rpar$\\
+    $\bullet$
+  & \emph{underscore}
+  & {\Large \_}
+\end{tabular}
+
+\bigskip
+
+Note that, from the syntactic point of view, irrefutable patterns are
+special cases of expressions, except the underscore, which is a
+special case avoiding the creation of a binding.
+
+\paragraph{Additional rules for expressions}
+
+The comma takes priority over the arrow: $(\Xfun \,\, x \rightarrow x,
+y)$ is equivalent to $\Xfun \,\, x \rightarrow (x,y)$. In order to
+alleviate the notation
+$\Xfun \,\, \ipat{p}_1 \rightarrow \ldots \rightarrow \Xfun \,\, \ipat{p}_n \rightarrow
+e$, we define the equivalent constructs:
+
+    \medskip
+
+    \begin{tabular}{rll}
+      $\bullet$
+      & \phrase{$\Xlet \,\,
+        \textrm{[}\Xrec\textrm{]} \,\, f 
+        = \Xfun \,\, \ipat{p}_1 \; \ipat{p}_2 \; \ldots \; \ipat{p}_n \rightarrow e$}
+      & (new expression)\\
+        $\bullet$
+      & \phrase{$\Xlet \,\,
+        \textrm{[}\Xrec\textrm{]} \,\, f 
+        \,\, \ipat{p}_1 \; \ipat{p}_2 \; \ldots \; \ipat{p}_n = e$}
+      & (new sentence)
+    \end{tabular}
+
+    \medskip
+
+\noindent For example,  we would write
+\begin{alltt}
+\textbf{let} mult = \textbf{fun} x y \(\rightarrow\) x * y \textbf{in}
+  \textbf{let} eq x y = (x = y) \textbf{in}
+  \textbf{let rec} fact n = \textbf{if} eq n 1 \textbf{then} 1 \textbf{else} mult n (fact(n-1))
+\textbf{in} fact 9
+\end{alltt}
+We also extend the syntax to alleviate certain expressions. By
+definition,
+\begin{equation*}
+\Xlet \,\, \ipat{p}_1 = e_1 \,\,
+    \Xand \,\, \ipat{p}_2 = e_2 \, \ldots \,\,
+    \Xand \,\, \ipat{p}_n = e_n \,\, \Xin \,\, e
+\end{equation*}
+is equivalent to
+\begin{equation*}
+\Xlet \,\, \ipat{p}_1, \ldots, \ipat{p}_n = e_1, \ldots, e_n \,\, \Xin \,\, e.
+\end{equation*}
+Similarly, let us introduce mutually recursive definitions:
+\begin{equation*}
+\Xlet \,\, \Xrec \,\, \ipat{p}_1 = e_1 \,\,
+    \Xand \,\, \ipat{p}_2 = e_2 \, \ldots \,\, \Xand \,\, \ipat{p}_n =
+      e_n \,\, \Xin \,\, e.
+\end{equation*}
+Furthermore, the sentence~\(e\) is equivalent to \(\Xlet \,\, \_ =
+e\). Let us consider the case where the irrefutable patterns are
+variables:
+\begin{equation*}
+\Xlet \,\, x = e_1 \,\, \Xand \,\, y = e_2 \,\, \Xin \,\,
+e, \; \text{where} \, x \neq y.
+\end{equation*}
+If~\(x\) is free in~\(e_2\), that is, $x \in \mathcal{F} (e_2)$, then
+the previous construct is defined as being equivalent to
+\begin{center}
+\begin{minipage}{0.3\linewidth}
+\begin{tabbing}
+\underline{\Xlet} \= \underline{$z$ \equal{} $x$ \Xin}\\
+\> \Xlet{} $x$ \equal{} $e_1$ \Xin\\
+\> \Xlet{} $y$ \equal{} \underline{\Xlet{} $x$ \equal{} $z$ \Xin} $e_2$\\
+\Xin $e$
+\end{tabbing}
+\end{minipage}
+\end{center}
+where \(z \not\in \mathcal{F}(e_1) \cup \mathcal{F}(e_2) \cup
+\mathcal{F}(e)\), in order to avoid being captured by~\(e_1\),
+\(e_2\)~or~\(e\). It is thus not an elementary construct.
+
+The multiple \Xlet{} \Xrec{} (with \Xand) can always be reduced to a
+simple \Xlet{} \Xrec{} (with \Xin) by parameterising one of the
+definitions by the other. Consider the following sentence
+\begin{equation*}
+\Xlet \; \Xrec \; x \; \equal \; e_1 \; \Xand \; y \; \equal \; e_2 \;
+\Xin \; e
+\end{equation*}
+where $x \neq y$. It is equivalent, by definition, to
+\begin{center}
+\begin{minipage}{0.3\linewidth}
+\begin{tabbing}
+\Xlet{} \= \Xrec{} $x$ \equal{} \underline{\Xfun{} $y$
+  $\rightarrow$} $e_1$ \Xin\\
+\> \Xlet{} \Xrec{} $y$ \equal{} \underline{\Xlet{} $x$ \equal{} $x \,
+y$ \Xin} $e_2$ \Xin\\
+\> \underline{\Xlet{} $x$ \equal{} $x \, y$}\\
+\underline{\Xin} $e$
+\end{tabbing}
+\end{minipage}
+\end{center}
+Therefore, it is not an elementary construct either.
+
+The addition of new expressions to the language forces us to extend
+the values as well, which are now defined by
+
+\bigskip
+
+\begin{tabular}{rll}
+    $\bullet$
+  & \emph{unit or constants}
+  & \unit \ or \textsf{0} or \Xtrue{} etc.\\
+    $\bullet$
+  & \emph{closure}
+  & $\langle\Xfun \,\, x \rightarrow e, \rho\rangle$, where~$\rho$ is
+    an environment.\\
+  & 
+  & For the operators: $\langle\lpar{\texttt{+}}\rpar, \rho\rangle$
+    etc.\\
+    $\bullet$
+  & \emph{$n$-tuple}
+  & $v_1, \ldots, v_n$
+\end{tabular}
+
+\bigskip
+
+\paragraph{Curryfied functions}
+
+A function is \emph{curryfied} --~after the name of the logician
+Curry~-- if it returns a closure, thus enabling partial
+applications. By the way, let us not forget that an \OCaml function
+always takes exactly one argument: if we wish to simultaneously pass
+multiple values, we have to employ a data structure, for example, a
+tuple. In the following, the sentences are input one by one into
+the \OCaml toplevel, which runs on top of a virtual machine, like
+the \Erlang shell does, therefore they are terminated with a special
+token, two semicolons:
+
+\bigskip
+
+\noindent\topin{\textbf{let} add x y = x + y}
+
+\noindent\topout{\textbf{val} add~:~int $\rightarrow$ int $\rightarrow$ int}
+
+\noindent\topin{\textbf{let} add' (x,y) = x + y}
+
+\noindent\topout{\textbf{val} add'~:~int $\times$ int $\rightarrow$ int}
+
+\bigskip
+
+\noindent The function \texttt{add} is curryfied and \texttt{add'} is
+not.
+
+Earlier, we saw a static analysis which yields the variables that are
+free in a given expression. Moreover, the evaluation of a closed
+expression cannot fail for lack of a necessary binding. Most compilers
+reject open programs, but, by doing so, they sometimes reject innocent
+programs, like \Xif{} \Xtrue{} \Xthen{} \num{1} \Xelse{} \ident{x},
+where \ident{x} is unbound. In order to accept this kind of example,
+the compiler should be able to predict the control flow, here, which
+branch of the conditional is used for all possible evaluations. In the
+case above, this is trivial, but, in general, the problem is
+undecidable.
+
+\section{Types}
+
+Types are terms associated to expressions, either by the programmer or
+the compiler, and they summarise some invariant properties which can
+be automatically composed and checked. A type~$t$ is a term defined
+recursively by the following cases:
+
+\bigskip
+
+\begin{tabular}{rll}
+    $\bullet$
+  & \emph{simple}
+  & \textsf{char}, \textsf{bool}, \textsf{int}, \textsf{string},
+    \textsf{float}, \textsf{unit}\\
+    $\bullet$
+  & \emph{Cartesian product}
+  & $t_1 \times \ldots \times t_n$\\
+    $\bullet$
+  & \emph{functional}
+  & $t_1 \rightarrow t_2$\\
+    $\bullet$
+  & \emph{parenthesised}
+  & $(t)$\\
+    $\bullet$
+  & \emph{free variable}
+  & $\alpha$, $\beta$, $\gamma$ etc. \\
+    $\bullet$
+  & \emph{parameterised}
+  & $\alpha$ \textsf{list}
+\end{tabular}
+
+\bigskip
+
+Until now, we have not encountered values of the type \textsf{float},
+\textsf{char} or \textsf{string}, but they are fairly obvious.
+
+We write $\times$, $\alpha$, $\beta$ etc. what is
+written \textsf{*}, \textsf{'a}, \textsf{'b} etc. in \textsc{ascii}.
+
+The Cartesian product takes multiple arguments, instead of being
+binary like in mathematics, because $(\times)$~is not associative
+in \OCaml: $t_1 \times t_2 \times t_3 \neq (t_1 \times t_2) \times
+t_3 \neq t_1 \times (t_2 \times t_3)$.
+
+The arrow is used in types too, where it is also
+right\hyp{}associative: $t_1 \rightarrow
+t_2 \rightarrow \ldots \rightarrow t_n$ is equivalent to
+$t_1 \rightarrow (t_2 \rightarrow (\ldots (t_{n-1} \rightarrow
+t_n)) \ldots)$.
+
+The Cartesian product has priority over the arrow: $t_1 \times
+t_2 \rightarrow t_3$ is equivalent to $(t_1 \times t_2) \rightarrow
+t_3$.
+
+The \OCaml compiler associates a type to each expression in a program:
+this is called \emph{static type inference}. For the simple constants,
+we have
+\begin{center}
+\begin{tabular}{l|l|c}
+\toprule
+\multicolumn{1}{c}{Type} & \multicolumn{1}{c}{Values}
+& \multicolumn{1}{c}{Some functions}\\
+\midrule
+    \textsf{unit}
+  & \unit
+  & \\
+    \textsf{bool}
+  & \Xtrue \ \Xfalse
+  & \texttt{\&\&} \ \texttt{||} \ \texttt{not} \\
+    \textsf{int}
+  & \textsf{1} \, \textsf{2} \ \textsf{max\_int} \ etc.
+  & \texttt{+} \ \texttt{-} \ \texttt{*} \ \texttt{/} \ etc.\\
+    \textsf{float}
+  & \textsf{1.0} \, \textsf{2.} \ \textsf{1e4} \ etc.
+  & \texttt{+.} \ \texttt{-.} \ \texttt{*.} \ \texttt{/.} \
+    \texttt{cos} \ etc.\\
+    \textsf{char}
+  & \textsf{'a'} \ \textsf{'}\verb+\+\textsf{n'} \
+    \textsf{'}\verb+\+\textsf{097'} \ etc.
+  & \textsf{Char.code} \, \textsf{Char.chr} \ etc.\\
+    \textsf{string}
+  & \textsf{"a}\verb+\+\textsf{tb}\verb+\+\textsf{010c}\verb+\+\textsf{n"}
+    \ etc.
+  & \verb+(^)+ \, \textsf{s.[i]} \ etc.\\
+\bottomrule
+\end{tabular}
+\end{center}
+Operations on floating point numbers are written differently from
+their equivalent counterparts on integers. Moreover, we extend the
+syntax of the sentences to allow the binding of a type to a name,
+or \emph{type aliasing}, just as we have aliasing on expressions:
+
+\bigskip
+
+\begin{tabular}{rll}
+    $\bullet$
+  & \emph{type binding}
+  & \(\textsf{type} \,\, q = t\)\\
+    $\bullet$
+  & \emph{recursive types}
+  & $\textsf{type} \,\, q_1 = t_1 \,\, \textrm{[}\Xand
+     \,\, q_2 = t_2 \,\, \ldots\textrm{]}$\\
+    $\bullet$
+  & \emph{type variable}
+  & $q$
+\end{tabular}
+
+\bigskip
+
+\noindent We can now write, for instance, the following:
+\begin{alltt}
+\textbf{type} abscissa = float
+\textbf{type} ordinate = float
+\textbf{type} point = abscissa \(\times\) ordinate
+\end{alltt}
+
+\paragraph{Type inference}
+
+Tuples contain data of the same type and their arity is part of their
+type, for instance, the pair \textsf{(1,2)} has type \textsf{int}
+$\times$ \textsf{int}, and the triplet \textsf{(1,2,3)} has type
+\textsf{int} $\times$ \textsf{int} $\times$ \textsf{int}, thus
+are incompatible. Consider also the following different types:
+
+\bigskip
+
+\noindent\topin{\textbf{let} middle x y = (x+y)/2}
+
+\noindent\topout{\textbf{val} middle~:~int $\rightarrow$ int $\rightarrow$ int}
+
+\noindent\topin{\textbf{let} middle (x,y) = (x+y)/2}
+
+\noindent\topout{\textbf{val} middle~:~int $\times$ int $\rightarrow$ int}
+
+\paragraph{Polymorphism}
+
+Projections are polymorphic on tuples of same arity, so \Xfun $(x, y,
+z) \rightarrow x$ has type $(\alpha \times \beta \times \gamma)
+\rightarrow \alpha$. Consider the session:
+
+\bigskip
+
+\noindent\topin{\textbf{let} compose f g = \textbf{fun} x \(\rightarrow\) f (g x)}
+
+\noindent\topout{\textbf{val} compose~: $(\alpha \rightarrow \beta) \rightarrow
+  (\gamma \rightarrow \alpha) \rightarrow \gamma \rightarrow \beta =
+  \topclos$}
+\begin{alltt}
+\textbf{\# let rec} power f n = \textbf{if} n \(\leqslant\) 0 \textbf{then fun} x \(\rightarrow\) x
+                                \textbf{else} compose f (power f (n-1));;
+\end{alltt}
+\vspace{-4mm}
+\noindent\topout{\textbf{val} power~:~($\alpha \rightarrow \alpha$)
+  $\rightarrow$ int $\rightarrow$ ($\alpha \rightarrow \alpha$) =
+  $\topclos$}
+
+\bigskip
+
+\noindent The type of the function \textsf{compose} is inferred as follows:
+\begin{itemize}
+
+  \item the first argument~\textsf{f} is an arbitrary function, hence
+    of type \(\alpha \rightarrow \beta\);
+
+  \item the second argument~\textsf{g} is a function whose result is
+    the argument of~\textsf{f}, therefore of type~\(\alpha\);
+
+  \item the domain of~\textsf{g} is arbitrary, hence \textsf{g}~has
+    type \(\gamma \rightarrow \alpha\);
+
+  \item the function \textsf{compose} has an argument~\textsf{x} which
+    is passed to~\textsf{g}, hence has type~\(\gamma\); finally, the
+    result of \textsf{compose} is returned by~\textsf{f}, hence of
+    type~\(\beta\).
+
+\end{itemize}
+\noindent The equality operator in \OCaml is polymorphic and thus is
+built in:
+
+\noindent\topin{(=)}
+
+\noindent\topout{- : $\alpha \rightarrow \alpha \rightarrow \texttt{bool} = \topclos$}
+
+\bigskip
+
+\noindent We must be very careful that it coincides with our
+intended notion of equality, because the compiler will always accept
+it on non\hyp{}functional values. It consists in the syntactical
+equality: two values are equal if they have the same structure and if
+their respective parts are equal, recursively. In particular, it will
+not apply to functions --~this is different from
+\Erlang, where the abstract syntax trees of the functions are compared
+at run\hyp{}time.
+
+\bigskip
+
+\noindent\topin{1 = 1 \&\& [1;2] = [1;2] \&\& \str{yes} = \str{yes}}
+
+\noindent\topout{- : bool = true}
+
+\noindent\topin{(\textbf{fun} x \(\rightarrow\) x) = (\textbf{fun} x \(\rightarrow\) x)}
+
+\error{Exception: Invalid\_argument "equal: functional value".}
+
+%We note \texttt{<>} the negation of equality.
+
+
+\section{Pattern matching}
+
+Let us extend further the expressions with \emph{matchings} against
+\emph{patterns}:
+\begin{center}
+  \Xmatch{} $e$ \Xwith{} $p_1 \rightarrow e_1 \mid \ldots \mid
+    p_n \rightarrow e_n$, where the~$p_i$ are patterns.
+\end{center}
+
+\noindent Patterns are recursively defined by the following cases:
+
+\bigskip
+
+\begin{tabular}{rll}
+    $\bullet$
+  & \emph{variable}
+  & $f, g, h$ (functions) and $x, y, z$ (others). \\
+    $\bullet$
+  & \emph{unit or constant}
+  & \unit \ or \textsf{0} or \Xtrue{} etc.\\
+    $\bullet$
+  & \emph{$n$-tuple}
+  & $p_1, \ldots, p_n$\\
+    $\bullet$
+  & \emph{parentheses}
+  & $\lpar{p}\rpar$\\
+    $\bullet$
+  & \emph{underscore}
+  & {\Large \_}
+\end{tabular}
+
+\bigskip
+
+\noindent Note that irrefutable patterns are patterns. Typically,
+pattern matching is used to define functions case by case, as commonly
+done in mathematics. For example,
+\begin{alltt}
+\textbf{let rec} fib n = \textbf{match} n \textbf{with} 0 \(\rightarrow\) 1
+                           | 1 \(\rightarrow\) 1
+                           | \_ \(\rightarrow\) fib(n-1) + fib(n-2)
+\end{alltt}
+As in mathematics, the cases are ordered by the order of writing and
+the previous definition is read as follows: `If the value
+of~\texttt{n} has the shape~\texttt{0}, then \texttt{fib(n)} has the
+value~\texttt{1}; else, if the value of~\texttt{b} has the
+shape~\texttt{1}, then \texttt{fib(n)} has the value~\texttt{1};
+otherwise, \texttt{fib(n)} has the value of \texttt{fib(n-1) +
+fib(n-2)}.' What is the meaning of the relation `\(v\)~has the
+shape~\(p\)'?  Or, equivalently, `\(p\)~matches~\(v\)'?
+\begin{itemize}
+
+  \item A constant, including \unit, has the shape of itself in a
+    pattern;
+
+  \item a \(n\)-tuple has the shape of a \(n\)-tuple in a pattern;
+
+  \item any value has the shape of a variable in a pattern or
+    of the underscore `{\Large \_}'.
+
+\end{itemize}
+Note that patterns do not match closures, which means that the~\(e\)
+in `\Xmatch{} $e$ \Xwith{}' must not have a closure as a value. In the
+case of constants, including \unit, matching coincides with equality.
+
+Matching is the evaluation of a \Xmatch construct. Informally, the
+evaluation of `\Xmatch{} $e$ \Xwith{} $p_1 \rightarrow e_1 \mid
+\ldots \mid p_n \rightarrow e_n$' begins with that of~$e$
+in~$v$. Next, \(v\)~is compared to the patterns~\(p_i\) in the order
+of writing. If~\(p_i\) is the first pattern to match~\(v\), then the
+value of the matching is the value of~\(e_i\). For instance, here is
+the curryfied definition of the logical disjunction:
+\begin{alltt}
+\textbf{let} disj = \textbf{fun} (x,y) \(\rightarrow\) \textbf{match} (x,y) \textbf{with} (\textbf{false}, \textbf{false}) \(\rightarrow\) \textbf{false}
+                                       | \_ \(\rightarrow\) \textbf{true}
+\end{alltt}
+
+\paragraph{Variant types}
+
+Variant types are a generalisation of enumerations. For instance,
+Boolean values can be (re)defined as
+\begin{alltt}
+\textbf{type} boolean = True | False
+\textbf{let} t = True \textbf{and} f = False
+\end{alltt}
+Note that data constructors, like \texttt{True} or
+\texttt{False}, must begin with an uppercase letter. Pattern matching
+enables the examination of the values of a variant type:
+\begin{alltt}
+\textbf{let} int\_of\_boolean b = \textbf{match} b \textbf{with} True  \(\rightarrow\) 1 | False \(\rightarrow\) 0
+\end{alltt}
+Data constructors can also carry information beyond their mere name,
+for instance, a pack of playing cards can be defined as
+\begin{alltt}
+\textbf{type} card = Card \textbf{of} ordinary | Joker
+\textbf{and} ordinary = suit \(\times\) face
+\textbf{and} suit = Heart | Diamond | Spade | Club
+\textbf{and} face = Ace | King | Queen | Jack | Simple \textbf{of} int
+\end{alltt}
+
+\noindent Let us define the cards and functions creating them:
+
+\bigskip
+
+\noindent\topin{\textbf{let} jack\_of\_spade = Card (Spade, Jack)}
+
+\noindent\topout{\textbf{val} jack\_of\_spade : card = Card (Spade, Jack)}
+
+\medskip
+
+\noindent\topin{\textbf{let} card f c = Card (c,f)}
+
+\noindent\topout{\textbf{val} card : face $\rightarrow$ suit $\rightarrow$ card
+  = $\topclos$}
+
+\medskip
+
+\noindent\topin{\textbf{let} king = card King}
+
+\noindent\topout{\textbf{val} king : suit $\rightarrow$ card = $\topclos$}
+
+\begin{alltt}
+\textbf{let} value c = \textbf{match} c \textbf{with} Card Ace        \(\rightarrow\) 14
+                         | Card King       \(\rightarrow\) 13
+                         | Card Queen      \(\rightarrow\) 12
+                         | Card Jack       \(\rightarrow\) 11
+                         | Card (Simple k) \(\rightarrow\) k
+                         | Joker           \(\rightarrow\) 0
+\end{alltt}
+A pattern can capture several cases at once:
+\begin{alltt}
+\textbf{let} is\_smaller c = \textbf{match} c \textbf{with} Card (Simple \_) \(\rightarrow\) \textbf{true}
+                              | \_ \(\rightarrow\) \textbf{false}
+\end{alltt}
+
+\paragraph{Incomplete patterns}
+
+We have already seen that, when a value~\(v\) is matched with \(p_1
+\rightarrow e_1 \mid \ldots \mid p_n \rightarrow e_n\), the
+expression~\(e_i\) of the first pattern~\(p_i\) which matches~\(v\) is
+evaluated in the current environment extended with the bindings
+introduced by~\(p_i\), if any. The pattern matching is incomplete if
+there exists at least a value which cannot be matched by any
+pattern. In that case, a warning is printed at compile\hyp{}time
+because it is strongly advised to avoid incomplete pattern matchings.
+
+\bigskip
+
+\noindent\topin{\textbf{let} simple c = \textbf{match} c \textbf{with} Card (\_, Simple k) $\rightarrow$ k}
+
+\noindent\error{Characters 15-51}
+
+\noindent\error{Warning: this pattern-matching is not exhaustive.}
+
+\noindent\error{Here is an example of a value that is not matched:
+  Joker}
+
+\noindent\topout{\textbf{val} simple : card $\rightarrow$ int = $\topclos$}
+
+\bigskip
+
+\paragraph{Linearity}
+
+Contrary to \Erlang, a variable cannot be bound twice or more in the
+same pattern, because this would imply a default equality to be used
+during pattern matching. Such a pattern is said to be
+\emph{non\hyp{}linear}.
+
+\medskip
+
+\noindent\topin{\textbf{fun} (x,y) $\rightarrow$ \textbf{match} (x,y) \textbf{with} (Card z, z) $\rightarrow$ \textbf{true}}
+
+\noindent\error{Characters 40-41}
+
+\noindent\error{This variable is bound several times in this
+  matching.}
+
+\paragraph{Lists}
+
+Lists can be defined as a polymorphic, recursive variant type:
+\begin{alltt}
+\textbf{type} \(\alpha\) mylist = Nil | Cons \textbf{of} \(\alpha\) \(\times\) \(\alpha\) mylist
+\end{alltt}
+The data constructors \texttt{Nil} and \texttt{Cons} are traditional
+in the community of functional languages. The former denotes the empty
+list; the latter represents a non\hyp{}empty list. A non\hyp{}empty
+list is then modelled as a pair whose first component is an element
+(of type~\(\alpha\)) of the list and the second component is the
+remainder of the list, or a sublist (of
+type \(\alpha\)~\texttt{mylist}). For instance:
+\begin{alltt}
+\textbf{let} empty= Nil
+\textbf{let} singleton1 = Cons ('a', empty)
+\textbf{let} singleton2 = Cons (7, empty)
+\textbf{let} long = Cons (1, Cons (2, Cons (3, singleton2)))
+\end{alltt}
+By default, the \OCaml system predefines a
+type \(\alpha\)~\texttt{list}, whose constructor for the empty list
+is~\texttt{[]}, and those of the non\hyp{}empty list is~\texttt{::},
+used in infix position. The function catenating two lists is also
+predefined and noted~\texttt{(@)}. Note that it is \emph{not} a
+constructor. Here are equivalent lists:
+\begin{alltt}
+\textbf{let} l = 1::(2::3::(4::[]))
+\textbf{let} l = 1::2::3::4::[]
+\textbf{let} l = [1;2;3;4]
+\end{alltt}
+The standard library supplies a module \textsf{List} with useful
+functions on lists. For example, the reversal of a list:
+\begin{alltt}
+\textbf{let} \textbf{rec} reverse l = \textbf{match} l \textbf{with}
+                      [] \(\rightarrow\) []
+                    | h::l \(\rightarrow\) (reverse l) @ [h]
+\end{alltt}
+or, more efficiently, using an accumulator:
+\begin{alltt}
+\textbf{let} reverse l = 
+  \textbf{let rec} rev\_aux acc l = \textbf{match} l \textbf{with}
+                            [] \(\rightarrow\) acc
+                          | h::t \(\rightarrow\) rev\_aux (h::acc) t
+\textbf{in} rev\_aux [] l
+\end{alltt}
+
+\section{Exceptions}
+
+Exceptions are values of the same type \textsf{exn}. They behave in
+the following manner.
+\begin{itemize*}
+
+  \item The predefined type \textsf{exn} is an \emph{open} variant
+    type, that is, it is extensible;
+
+  \item throwing an exception stops the current evaluation and returns
+    an exceptional value of type \textsf{exn};
+
+  \item an exception can be matched if the expression where it was
+    raised is embedded in a construct `\textsf{\textbf{try}
+    $e$ \textbf{with} $m$}', or if any pending function call was
+    embedded in such a way.
+    \begin{itemize*}
+ 
+      \item If the evaluation of~\(e\) results in a normal value, that
+        value is the value of the \textsf{\textbf{try}} block, without
+        considering the patterns in~\(m\);
+
+      \item otherwise, the exception is matched against the patterns
+        in~\(m\); if one of those patterns, say~\(p_i\), matches the
+        exception, then \(e_i\)~is evaluated, else the exception is
+        propagated backwards in the control flow (call graph) until a
+        handler matches it or the execution stops with an error. Note
+        that the patterns for exceptions need not be complete, whence
+        a source of potential problems because the programmer has to
+        keep track of the set of exceptions potentially raised by a
+        given expression. (Contrary to \Java, exceptions in \OCaml are
+        no part of the type of functions, because this would be deemed
+        cumbersome in the presence of higher\hyp{}order functions,
+        like \textsf{List.map}.)
+    
+    \end{itemize*}
+
+  \item It is possible to observe an exception, that is, to match it
+    and reraise it: \texttt{\textbf{try} f x \textbf{with} Failure
+    s \textbf{as} x $\rightarrow$ prerr\_string s; raise x}.
+
+\end{itemize*}
+Let us consider an example, the linear search in a list:
+\begin{alltt}
+\textbf{exception} Not_found
+
+\textbf{let rec} find key l =
+  \textbf{match} l \textbf{with}
+    (h,v)::t \(\rightarrow\) \textbf{if} h = key \textbf{then} v \textbf{else} find key t
+  |       [] \(\rightarrow\) raise Not_found
+  
+\textbf{let} k = \textbf{try}
+          find "Louis" [("Georges",14); ("Louis",5)]
+        \textbf{with} Not_found \(\rightarrow\) 10
+\end{alltt}
+
+\noindent Formally, we write
+
+\bigskip
+
+\begin{tabular}{ll}
+\toprule
+Definition (sentence) & \phrase{\textbf{exception} $C$ [\textbf{of} $t$]}\\
+\midrule
+Raising (expression) & \phrase{raise $e$}\\
+Matching (expression) & \phrase{\textbf{try} $e$ \textbf{with}
+$p_1 \rightarrow e_1 \mid \ldots \mid p_n \rightarrow e_n$}\\
+\bottomrule
+\end{tabular}
+
+\bigskip
+
+\noindent Notice the analogy with the pattern matching on
+  non\hyp{}exceptional values.

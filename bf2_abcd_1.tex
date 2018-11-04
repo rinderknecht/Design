@@ -1,0 +1,49 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath,amssymb}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\medskip
+\Tcircle{\(1\)}
+\qquad
+\pstree[nodesep=1pt,levelsep=17pt,treesep=14pt,linestyle=none]%
+  {\TR{\(\downarrow\)}}{
+  \pstree[linestyle=solid,nodesepB=0pt]{\TR{\fun{d}}}{
+    \Tf[framesize=6pt]
+    \Tf[framesize=6pt]
+  }
+  \pstree[linestyle=solid,nodesepB=0pt]{\TR{\fun{b}}}{
+    \Tf[framesize=6pt]
+    \psset{nodesepB=1pt}
+    \pstree{\TR{\fun{c}}}{
+      \psset{nodesepB=0pt}
+      \Tf[framesize=6pt]
+      \Tf[framesize=6pt]
+    }
+  }
+}
+\raisebox{-3pt}{\hphantom{\(\twoheadrightarrow\)}}
+\pstree[nodesep=1pt,levelsep=17pt,treesep=14pt,linestyle=none]{\TR{\(\uparrow\)}}{
+    \pstree[linestyle=solid,nodesepB=0pt]{\TR{\(1\)}}{
+      \Tf[framesize=6pt]
+      \psset{nodesepB=1pt}
+      \pstree[nodesepB=0pt]{\TR{\(3\)}}{
+        \Tf[framesize=6pt]
+        \Tf[framesize=6pt]
+      }
+    }
+    \pstree[linestyle=solid,nodesepB=0pt]{\TR{\(2\)}}{
+      \Tf[framesize=6pt]
+      \Tf[framesize=6pt]
+    }
+}
+\endTeXtoEPS
+
+\end{document}

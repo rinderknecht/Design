@@ -1,0 +1,37 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\input{ocaml_syntax}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=20pt]{\TR[name=outer-let]{\cst{Let}}}{
+  \TR{\str{x}}
+  \pstree{\TR{\cst{Const}}}{
+    \TR{\num{1}}
+  }
+  \pstree{\TR{\cst{BinOp}}}{
+    \TR{\cst{Add}}
+    \pstree{\TR[name=inner-let]{\cst{Let}}}{
+      \TR{\str{x}}
+      \pstree{\TR{\cst{Const}}}{
+        \TR{\num{2}}
+      }
+      \pstree{\TR[name=inner-var]{\cst{Var}}}{
+        \TR{\str{x}}
+      }      
+    }
+    \pstree{\TR[name=outer-var]{\cst{Var}}}{
+      \TR{\str{x}}
+    }
+  }
+}
+\ncarc[linestyle=dotted,nodesepA=1pt,nodesepB=1pt,arcangle=-40]{->}{inner-var}{inner-let}
+\ncarc[linestyle=dotted,nodesepA=1pt,nodesepB=1pt,arcangle=-40]{->}{outer-var}{outer-let}
+\endTeXtoEPS
+
+\end{document}

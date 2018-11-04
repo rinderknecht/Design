@@ -1,0 +1,16 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[scaled=0.8]{beramono}
+\usepackage{amsmath}
+
+\newcommand\erlcode[1]{\texttt{#1}}
+
+\begin{document}
+\thispagestyle{empty}
+\begin{equation*}
+\overbrace{\underbrace{\erlcode{fact(N)}}_{\textrm{\normalsize head}} \; \underbrace{\erlcode{\textbf{when} N > 1}}_{\textrm{\normalsize guard}} \; \erlcode{->} \; \underbrace{\erlcode{N * fact(N-1)}}_{\textrm{\normalsize body}}}^{\textrm{\normalsize clause}}
+\end{equation*}
+\end{document}

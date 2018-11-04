@@ -1,0 +1,39 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{pstricks,pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=22pt,nodesep=2pt]{\TR{\emph{assignment}}}{
+  \pstree{\TR{\emph{identifier}}}{
+    \TR{\texttt{position}}
+  }
+  \TR{\texttt{:=}}
+  \pstree{\TR{\emph{expression}}}{
+    \pstree{\TR{\emph{expression}}}{
+      \pstree{\TR{\emph{identifier}}}{
+        \TR{\texttt{initial}}
+      }
+    }
+    \TR{\texttt{+}}
+    \pstree{\TR{\emph{expression}}}{
+      \pstree{\TR{\emph{expression}}}{
+        \pstree{\TR{\emph{identifier}}}{
+          \TR{\texttt{rate}}
+        }
+      }
+      \TR{\texttt{*}}
+      \pstree{\TR{\emph{expression}}}{
+        \pstree{\TR{\emph{number}}}{
+          \TR{\texttt{60}}
+        }
+      }
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}

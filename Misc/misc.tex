@@ -1,0 +1,320 @@
+%%%%%%%
+
+Here, we will follow \cite{Fang:2002}, with our own
+improvements, as he stroke a good balance between accuracy and
+technical difficulty. Let us start by gathering
+deduction~\eqref{eq:num_of_bits}, definition~\eqref{eq:F} and
+equation~\eqref{eq:ruler_nu} into what may be considered an
+alternative definition of~\(\nu_i\):
+\begin{equation*}
+\abovedisplayskip=2pt
+\belowdisplayskip=0pt
+\nu_i = i - \sum_{j=1}^{\floor{\lg n}}
+\left\lfloor{\frac{i}{2^j}}\right\rfloor.
+\end{equation*}
+Therefore,
+\begin{equation*}
+\abovedisplayskip=0pt
+\belowdisplayskip=2pt
+\OB{\fun{tms}}{n} = \frac{1}{2}n(n-1) -
+\sum_{i=1}^{n-1}\sum_{j=1}^{\floor{\lg i}}
+\left\lfloor{\frac{i}{2^j}}\right\rfloor
+= \frac{1}{2}n(n-1) -
+\sum_{j=1}^{\floor{\lg n}}\sum_{i=1}^{n-1}
+\left\lfloor{\frac{i}{2^j}}\right\rfloor.
+\index{tms@$\OB{\fun{tms}}{n}$}
+\end{equation*}
+The inversion of summations is valid because \(\floor{i/2^j} = 0\) for
+any \(j > \floor{\lg i}\). In order to evaluate the new inner sum, let
+us consider the table in \fig~\vref{fig:bits},
+which shows the enumeration of the first integers in binary. The
+quantity \(\floor{i/2^j}\) is therein interpreted as the \(i\)th row
+with the \(j\)th rightmost bits discarded. For instance,
+\(\floor{9/2^2} = 2\) because \((1001)_2=9\) is cut to
+\((10)_2=2\). The sum \(\sum_{i=1}^{n-1}\floor{i/2^j}\) is the sum of
+the binary numbers lying at the left of a vertical line set between
+the \(j\)th and \((j+1)\)th bits. (We advise the reader to write a
+longer table and take as an example \(n=(110110)_2=54\) and \(j=3\).)
+Under close examination, two chunks of the tables appear to make up
+the sum we are interested in:
+\begin{enumerate}
+
+  \item Starting at row~\(2^j\), the number at the left of the
+    vertical line is~\(1\) and it is repeated \(2^j\)~times; further
+    down, the number \((10)_2=2\) is repeated \(2^j\)~times etc. until
+    \(\floor{n/2^j}-1\) is repeated \(2^j\)~times. This amounts to
+    \(\frac{1}{2}\floor{n/2^j}(\floor{n/2^j}-1)2^j\).
+
+  \item Remains a piece which may be incomplete when reaching
+    \(n-1\). It can be seen to be \(\floor{n/2^j}(n \bmod{2^j}) =
+    \floor{n/2^j}(n-\floor{n/2^j}2^j)\).
+
+\end{enumerate}
+Adding these two partial sums, we obtain
+\begin{equation*}
+\sum_{i=1}^{n-1}\left\lfloor\frac{i}{2^j}\right\rfloor
+= -\frac{1}{2}\left\lfloor\frac{n}{2^j}\right\rfloor 2^j
+  + \left(n\left\lfloor\frac{n}{2^j}\right\rfloor
+  - \frac{1}{2}\left\lfloor\frac{n}{2^j}\right\rfloor^22^j\right).
+\end{equation*}
+We can now return back at our double summation:
+\begin{equation*}
+\OB{\fun{tms}}{n} =
+    \frac{1}{2}n(n-1)
+  + \frac{1}{2}\sum_{j=1}^{\floor{\lg n}}
+      \left\lfloor\frac{n}{2^j}\right\rfloor{2^j}
+  - \sum_{j=1}^{\floor{\lg n}}
+      \left(n\left\lfloor\frac{n}{2^j}\right\rfloor
+      - \frac{1}{2}\left\lfloor\frac{n}{2^j}\right\rfloor^22^j\right).
+\index{tms@$\OB{\fun{tms}}{n}$}
+\end{equation*}
+Let us introduce now the \emph{fractional part}\index{fractional
+  part@$\{x\}$|see{fractional part}}\index{fractional part} of a
+real~\(x\) as \(\{x\} := x - \floor{x}\). In particular, we have \(0
+\leqslant \{x\} < 1\). Then
+\begin{equation*}
+\sum_{j=1}^{\floor{\lg n}}
+      \left(n\left\lfloor\frac{n}{2^j}\right\rfloor
+      - \frac{1}{2}\left\lfloor\frac{n}{2^j}\right\rfloor^22^j\right)
+= \frac{1}{2}n^2 - \frac{n^2}{2^{\floor{\lg n}+1}}
+  - \frac{1}{2}\sum_{j=1}^{\floor{\lg n}}\left\lbrace\frac{n}{2^j}\right\rbrace^22^j,
+\end{equation*}
+because \(\sum_{j=1}^{\floor{\lg n}}{1/2^j} = 1 - 1/2^{\floor{\lg
+    n}}\). Similarly, we have
+\begin{equation*}
+\sum_{j=1}^{\floor{\lg n}}
+      \left\lfloor\frac{n}{2^j}\right\rfloor{2^j}
+= n\floor{\lg n}
+- \sum_{j=1}^{\floor{\lg n}}\left\lbrace\frac{n}{2^j}\right\rbrace 2^j.
+\end{equation*}
+We can now express \(\OB{\fun{tms}}{n}\) in terms of~\(n\) and isolate
+the fractional parts:
+\begin{equation*}
+2 \cdot \OB{\fun{tms}}{n} =
+  n\floor{\lg n} + \frac{n^2}{2^{\floor{\lg n}}}
+  - n
+  - \sum_{j=1}^{\floor{\lg n}}
+    \left(\left\lbrace\frac{n}{2^j}\right\rbrace -
+    \left\lbrace\frac{n}{2^j}\right\rbrace^2\right)2^j.
+\end{equation*}
+We now approximate the fractional parts \emph{together}. Since we have
+the tight bounds \(0 \leqslant x - x^2 \leqslant \myfrac{1}/{4}\) if
+\(0 \leqslant x \leqslant 1\), and \(\sum_{j=1}^{\floor{\lg n}}2^j =
+2^{\floor{\lg n}+1} - 2\),
+\begin{equation*}
+n\floor{\lg n} + n^22^{-\floor{\lg n}} - n - 2^{\floor{\lg n}-1} +
+\tfrac{1}{2} < 2 \cdot \OB{\fun{tms}}{n} \leqslant n\floor{\lg n} +
+n^22^{-\floor{\lg n}} - n.
+\end{equation*}
+Now, let us approximate the bounds by making apparent \(\{\lg
+n\}\). Let \(L_n\) be the lower bound and \(U_n\) the upper bound. We
+have
+\begin{equation*}
+L_n = n\lg n + \theta_L(\{\lg n\}) \cdot n,\; \text{with
+  \(\theta_L(x) := 2^x - 2^{-x-1} - x - 1\)}.
+\end{equation*}
+The derivative of \(\theta_L(x)\) tells us that \(\min_{0 \leqslant x
+  < 1}\theta_L(x) = \theta_L(0) = -\myfrac{1}/{2}\). Since \(0
+\leqslant \{\lg n\} < 1\), we draw \(L_n \geqslant n\lg n +
+\theta_L(0) \cdot n = n\lg n - \frac{1}{2}n\). Also,
+\begin{equation*}
+U_n = n\lg n + \theta_U(\{\lg n\}) \cdot n,\; \text{with
+  \(\theta_U(x) := 2^x - x - 1\)}.
+\end{equation*}
+The derivative of \(\theta_U(x)\) implies that \(\max_{0 \leqslant x <
+  1}\theta_U(x) = \theta_U(0) = 0\), so \(U_n \leqslant n\lg n +
+\theta_U(0) \cdot n = n\lg n\). Gathering both approximations yields
+\begin{equation}
+\tfrac{1}{2}n\lg n - \tfrac{1}{4}n + \tfrac{1}{4}
+< \OB{\fun{tms}}{n} \leqslant
+\tfrac{1}{2}n\lg n.
+\label{ineq:Fang}\index{tms@$\OB{\fun{tms}}{n}$}
+\end{equation}
+The upper bound is reached when \(n=2^p\), as
+equation~\eqref{eq:best_power} \vpageref{eq:best_power} shows. This
+can also directly be seen in equation~\eqref{eq:OB_tms}
+\vpageref{eq:OB_tms} and \fig~\vref{fig:bits}, as \(n-1=2^p-1\)
+maximises the number of \(1\)-bits for a fixed total number of
+bits. Unfortunately, we do not know~\(n\) when
+\(\OB{\fun{tms}}{n}\)\index{tms@$\OB{\fun{tms}}{n}$} is minimum and
+the lower bound itself can be improved.
+
+%%%
+
+This is about \(4.2\%\)~better than the linear coefficient
+\(-\myfrac{1}/{4}\) in~\eqref{ineq:Fang}
+
+%%%
+
+\begin{equation}
+\OW{\fun{bms}}{n} < n\lg n - 1.
+\label{ineq:OWbms_up}
+\end{equation}
+\index{bms@$\OW{\fun{bms}}{n}$|)}
+ If we do not accept these sums as closed
+forms, we nevertheless can use them to obtain bounds on the maximum
+cost.
+
+Let \(U_n := \sum_{j=1}^{n-1}2^{\rho_j}\). We have \(U_1 = 0\) and
+reusing definitions~\eqref{eq:ruler}:
+\begin{align*}
+U_{2p}   &= \sum_{k=0}^{p-1}2^{\rho_{2k+1}} + \sum_{k=1}^{p-1}2^{\rho_{2k}}
+         = p + 2 \cdot U_p,\\
+U_{2p+1} &= \sum_{k=0}^{p-1}2^{\rho_{2k+1}} + \sum_{k=1}^{p}2^{\rho_{2k}} 
+        = p + 2 \cdot U_{p+1}.
+\end{align*}
+In other words, \(U_n = 2 \cdot U_{\ceiling{n/2}} + \floor{n/2} = 2
+\cdot U_{\ceiling{n/2}} + n - \ceiling{n/2}\), since \(\floor{n/2} +
+\ceiling{n/2} = n\). Unrolling the recursion reveals the equation
+\begin{equation*}
+2 \cdot U_n = 2n + \sum_{k=1}^{\floor{\lg
+    n}}\left\lceil{\frac{n}{2^k}}\right\rceil 2^k - 2^{\floor{\lg
+    n}+1},
+\end{equation*}
+if we mind that \(2^{\floor{\lg n}}\) is the highest power of~\(2\) in
+the binary notation of~\(n\), so \(0 \leqslant n/2^{\floor{\lg n}+1} <
+1\), and if we use the following theorem.
+\begin{thm}[Ceilings and Fractions]
+\label{thm:ceilings}
+\textsl{Let \(x\)~be a real number and \(q\)~a natural number. Then
+  \(\ceiling{\ceiling{x}/q} = \ceiling{x/q}\).}
+\end{thm}
+\begin{proof}
+  The equality is equivalent to the conjunction of the two
+  complementary inequalities \(\ceiling{\ceiling{x}/q} \geqslant
+  \ceiling{x/q}\) and \(\ceiling{\ceiling{x}/q} \leqslant
+  \ceiling{x/q}\). The former is straightforward: \(\ceiling{x}
+  \geqslant x \Rightarrow \ceiling{x}/q \geqslant x/q \Rightarrow
+  \ceiling{\ceiling{x}/q} \geqslant \ceiling{x/q}\). Next, because
+  both sides of the inequality are integers, \(\ceiling{\ceiling{x}/q}
+  \leqslant \ceiling{x/q}\) is equivalent to state that \(p \leqslant
+  \ceiling{\ceiling{x}/q} \Rightarrow p \leqslant \ceiling{x/q}\), for
+  any integer~\(p\). An obvious lemma is that if \(i\)~is an integer
+  and~\(y\) a real number, \(i \leqslant \ceiling{y} \Leftrightarrow i
+  \leqslant y\), so the original inequality is equivalent to \(p
+  \leqslant \ceiling{x}/q \Rightarrow p \leqslant x/q\), for any
+  integer \(p\), which is \(pq \leqslant \ceiling{x} \Rightarrow pq
+  \leqslant x\). The lemma yields this implication, thereby achieving
+  the proof.
+\end{proof}
+\noindent Using the standard inequalities \(x \leqslant \ceiling{x} <
+x + 1\) yields
+\begin{equation*}
+n\floor{\lg n} + 2n - 2^{\floor{\lg n}+1}
+\leqslant 2 \cdot U_n < n\floor{\lg n} + 2n - 2.
+\end{equation*}
+Using \(\floor{x} = x - \{x\}\) we derive
+\begin{equation*}
+n\lg n + 2n - n\cdot\theta_L(\{\lg n\})
+\leqslant 2 \cdot U_n < n\lg n + 2n - 2,
+\end{equation*}
+with \(\theta_L(x) := x + 2^{1 - x}\). Since \(\max_{0 \leqslant x <
+  1}\theta_L(x) = \theta_L(0) = 2\), we conclude
+\begin{equation}
+n\lg n \leqslant 2 \cdot U_n < n\lg n + 2n - 2.
+\label{ineq:Un}
+\end{equation}
+The lower bound is tight if \(n=2^p\).
+
+Let \(T_n := \sum_{j=1}^{n}{2^{\rho_{j}}}\). We thus have \(T_n = U_n
++ 2^{\rho_n}\) and reusing the bounds~\eqref{ineq:Un} yields \(n\lg n
++ 2 \leqslant 2 \cdot T_n < n\lg n + 4n - 2\), since \(1 \leqslant
+2^{\rho_n} \leqslant n\). But the upper bound is far too bad, because
+\(n=2^{\rho_n}\) when the \emph{lower} bound on~\(T_n\) is
+tight. Therefore, we should apply to~\(T_n\) the same technique we
+used to bound~\(U_n\). The recurrences on the ruler
+function\index{ruler function} \eqref{eq:ruler} help us in finding a
+recurrence for~\(T_n\) as follows:
+\begin{align*}
+T_{2p} &= \sum_{k=0}^{\smash[t]{p-1}}{2^{\rho_{2k+1}}} +
+\sum_{k=1}^{p}{2^{\rho_{2k}}} = p + 2 \cdot T_{p},\\
+ T_{2p+1}
+&= \sum_{j=1}^{\smash[t]{2p+1}}{2^{\rho_{j}}} = 1 + T_{2p} = (p + 1) +
+2 \cdot T_{p}.
+\end{align*}
+Equivalently, \(T_{n} = 2 \cdot T_{\floor{n/2}} + \ceiling{n/2} = 2
+\cdot T_{\floor{n/2}} + n - \floor{n/2}\). Therefore, unravelling a
+few terms of the recurrence quickly reveals the equation
+\begin{equation*}
+2 \cdot T_n = 2n + \sum_{j=1}^{\floor{\lg n}}
+            {\left\lfloor{\frac{n}{2^j}}\right\rfloor 2^j}.
+\end{equation*}
+if we mind the following lemma.
+\begin{thm}[Floors and Fractions]
+\label{thm:floors}
+\textsl{Let \(x\)~be a real number and \(q\)~a natural number. Then
+  \(\floor{\floor{x}/q} = \floor{x/q}\).}
+\end{thm}
+\begin{proof}
+  The equality is equivalent to the conjunction of the two
+  complementary inequalities \(\floor{\floor{x}/q} \leqslant
+  \floor{x/q}\) and \(\floor{x/q} \leqslant \floor{\floor{x}/q}\). The
+  former is straightforward because it is a consequence of \(\floor{x}
+  \leqslant x\). In the latter, because both sides of the inequality
+  are integers, \(\floor{x/q} \leqslant \floor{\floor{x}/q}\) is
+  equivalent to state that \(p \leqslant \floor{x/q} \Rightarrow p
+  \leqslant \floor{\floor{x}/q}\), for any integer~\(p\). An obvious
+  lemma is that if \(i\)~is an integer and \(y\)~a real number, \(i
+  \leqslant \floor{y} \Leftrightarrow i \leqslant y\), so the original
+  inequality is equivalent to \(p \leqslant x/q \Rightarrow p
+  \leqslant \floor{x}/q\), which is trivially equivalent to \(pq
+  \leqslant x \Rightarrow pq \leqslant \floor{x}\). Since \(pq\)~is an
+  integer, this implication is true from the same lemma.
+\end{proof}
+\noindent By definition, \(\{x\} := x - \floor{x}\), thus
+\begin{equation*}
+2 \cdot T_n = n\floor{\lg n} + 2n - \sum_{j=1}^{\floor{\lg
+    n}}\left\lbrace\frac{n}{2^j}\right\rbrace 2^j.
+\end{equation*}
+Using \(0 \leqslant \{x\} < 1\), we obtain the bounds
+\begin{equation*}
+n\floor{\lg n} + 2n - 2^{\floor{\lg n}+1} + 2 < 2 \cdot T_n \leqslant
+n\floor{\lg n} + 2n.
+\end{equation*}
+Furthermore, \(x - 1 < \floor{x} \leqslant x\) and \(\floor{x} = x -
+\{x\}\), therefore
+\begin{align*}
+n(\lg n - \{\lg n\}) + 2n - 2^{\lg n - \{\lg n\} +
+  1} + 2 < 2 \cdot T_n &\leqslant n\lg n + 2n,\\
+n\lg n + 2n + 2 - n \cdot \theta_L(\{\lg n\}) < 2 \cdot T_n 
+&\leqslant n\lg n + 2n,
+\end{align*}
+with \(\theta_L(x) := x + 2^{1 - x}\). Since \(\max_{0 \leqslant x <
+  1}\theta_L(x) = \theta_L(0) = 2\), we conclude:
+\begin{equation}
+n\lg n + 2 < 2 \cdot T_n \leqslant n\lg n + 2n.
+\label{ineq:Tn}
+\end{equation}
+The upper bound is tight if \(n=2^p\).
+
+We can now proceed to bound
+\(\OW{\fun{bms}}{2p}\)\index{bms@$\OW{\fun{bms}}{n}$|(} and
+\(\OW{\fun{bms}}{2p+1}\) from equations~\eqref{eq:OWbms_2p}
+and~\eqref{eq:OWbms_2p_1}, but we shall only care for an upper
+bound. First, we have
+\begin{align*}
+\OW{\fun{bms}}{2p+1} = 2 \cdot T_p + 2 \cdot \OB{\fun{bms}}{p} +
+\nu_p,
+\quad
+\OW{\fun{bms}}{2p} = 2 \cdot U_p + 2 \cdot \OB{\fun{bms}}{p} + 1.
+\end{align*}
+Next, we appeal to~\eqref{ineq:Tn}, above,
+and~\eqref{ineq:bounds_Btms}, \vpageref{ineq:bounds_Btms}:
+\begin{equation*}
+\OW{\fun{bms}}{2p+1}
+  \leqslant (p\lg p + 2p) + p\lg p + \nu_p
+   \leqslant (2p+1)\lg p + 2p + 1.
+\end{equation*}
+Setting \(n=2p+1\) entails \(\OW{\fun{bms}}{n} \leqslant
+n\lg(\tfrac{1}{2}(n-1)) + n = n\lg(n-1)\). On the other hand,
+recalling inequalities~\eqref{ineq:Un} and~\eqref{ineq:bounds_Btms}
+brings us
+\begin{equation*}
+\OW{\fun{bms}}{2p} < 1 + (p\lg p + 2p - 2) + (p\lg p)
+             = 2p\lg p + 2p - 1,
+\end{equation*}
+which is \(\OW{\fun{bms}}{n} < n\lg n - 1\), if we set \(n = 2p\).
+
+Retaining the maximum of the upper bounds for
+\(\OW{\fun{tms}}{2p}\) and \(\OW{\fun{tms}}{2p+1}\), we can bound
+\(\OW{\fun{bms}}{n}\) for any~\(n > 2\):

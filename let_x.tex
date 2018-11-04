@@ -1,0 +1,34 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\input{ocaml_syntax}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=20pt]{\TR{\cst{Let}}}{
+  \TR{\str{x}}
+  \pstree{\TR{\cst{Const}}}{
+    \TR{\num{1}}
+  }
+  \pstree{\TR{\cst{BinOp}}}{
+    \TR{\cst{Add}}
+    \pstree{\TR{\cst{Let}}}{
+      \TR{\str{x}}
+      \pstree{\TR{\cst{Const}}}{
+        \TR{\num{2}}
+      }
+      \pstree{\TR{\cst{Var}}}{
+        \TR{\str{x}}
+      }      
+    }
+    \pstree{\TR{\cst{Var}}}{
+      \TR{\str{x}}
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}

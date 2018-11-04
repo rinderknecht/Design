@@ -1,0 +1,87 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{amssymb}
+\usepackage{pst-tree,pst-eps}
+
+\input{ocaml_macros}
+\input{ocaml_syntax}
+
+\begin{document}
+
+\TeXtoEPS 
+\pstree[nodesep=2pt,levelsep=20pt,treesep=6pt]
+  {\mknode{\TR{\cst{Let}}}
+          {\raisebox{4pt}{\Rnode{empty_env}{$\varnothing$}}}
+          {\raisebox{4pt}{\Rnode{top_fifteen}{\num{15}}}}}{
+  \TR{\str{x}}
+  \pstree{\mknode{\TR{\cst{Const}}}
+                 {\raisebox{4pt}{\Rnode{empty_env_down}{$\varnothing$}}}
+                 {\raisebox{4pt}{\Rnode{x_val_up}{\num{1}}}}}{
+    \TR[name=x_val]{\num{1}}
+  }
+\pstree{
+\mknode{\TR[name=subexpr]{\cst{BinOp}}}
+       {\raisebox{4pt}{\Rnode{subexpr_env}{\ident{env}}}}
+       {\raisebox{4pt}{\Rnode{fifteen}{\num{3*5\textbf{=}15}}}}}{
+  \TR{\cst{Mult}}
+  \pstree{\mknode{\TR{\cst{BinOp}}}
+                 {\raisebox{2pt}{\Rnode{B}{\ident{env}}}}
+                 {\raisebox{2pt}{\Rnode{three}{\num{1+2\textbf{=}3}}}}}{
+    \TR{\cst{Add}}
+    \pstree{\mknode{\TR{\cst{Const}}}
+                   {\Rnode{BB}{\ident{env}}}
+                   {\Rnode{one}{\num{1}}}}{
+      \TR[name=leaf_one]{\num{1}}
+    }
+    \pstree{\mknode{\TR{\cst{Const}}}
+                   {\Rnode{BC}{\ident{env}}}
+                   {\Rnode{two}{\num{2}}}}{
+      \TR[name=leaf_two]{\num{2}}
+    }
+  }
+  \pstree{\mknode{\TR{\cst{BinOp}}}
+                 {\Rnode{C}{\ident{env}}}
+                 {\raisebox{2pt}{\Rnode{div}{\num{5/1\textbf{=}5}}}}}{
+    \TR{\cst{Div}}
+    \pstree{\mknode{\TR{\cst{Const}}}
+                   {\Rnode{CB}{\ident{env}}}
+                   {\Rnode{five}{\num{5}}}}{
+      \TR[name=leaf_five]{\num{5}}
+    }
+    \pstree{\mknode{\TR{\cst{Var}}}
+                   {\Rnode{CC}{\ident{env}}}
+                   {\Rnode{rho}{\ident{env}}
+                    \Rnode{app}{\textsf{\str{x} \textbf{=} 1}}}}{
+      \TR[name=leaf_x]{\str{x}}
+    }
+  }
+}
+}
+
+\ncarc[nodesepA=1pt,nodesepB=1pt,arcangle=20]{->}{x_val_up}{subexpr_env}
+\ncline[nodesepA=1pt,nodesepB=1pt]{->}{empty_env}{empty_env_down}
+\ncline[nodesepA=1pt,nodesepB=1pt]{->}{fifteen}{top_fifteen}
+\ncline[linestyle=dashed,nodesepA=1pt,nodesepB=1pt]{->}{x_val}{x_val_up}
+\ncline[linestyle=dashed,nodesepA=1pt,nodesepB=1pt]{->}{leaf_one}{one}
+\ncline[linestyle=dashed,nodesepA=1pt,nodesepB=1pt]{->}{leaf_two}{two}
+\ncline[linestyle=dashed,nodesepA=1pt,nodesepB=1pt]{->}{leaf_five}{five}
+\ncline[linestyle=dashed,nodesepA=1pt,nodesepB=1pt]{->}{leaf_x}{app}
+\ncarc[nodesepA=1pt]{->}{one}{three}
+\nccurve[angleA=130,angleB=340,nodesepA=1pt]{->}{two}{three}
+\ncarc[nodesepA=1pt]{->}{five}{div}
+\ncline[nodesepA=1pt]{->}{app}{div}
+\ncarc[nodesepB=1pt]{->}{three}{fifteen}
+\ncarc[arcangle=-5,nodesepA=1pt,nodesepB=1pt]{->}{div}{fifteen}
+\ncline[nodesepA=1pt,nodesepB=1pt]{->}{subexpr_env}{B}
+\ncline[nodesepA=1pt,nodesepB=1pt]{->}{B}{BB}
+\ncline[nodesepA=1pt,nodesepB=1pt]{->}{B}{BC}
+\ncarc[arcangle=-8,nodesepA=1pt,nodesepB=1pt]{->}{subexpr_env}{C}
+\ncline[nodesepA=1pt,nodesepB=1pt]{->}{C}{CB}
+\ncline[nodesepA=1pt,nodesepB=1pt]{->}{C}{CC}
+
+\ncarc[arcangle=-35,nodesepA=1pt,nodesepB=1pt]{->}{CC}{rho}
+\endTeXtoEPS
+
+\end{document}

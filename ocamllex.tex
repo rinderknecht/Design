@@ -1,0 +1,333 @@
+\section{Lexing with \ocamllex}
+
+In this section we show how to use \ocamllex, a tool distributed with
+the compiler for \OCaml, which takes a specification for a lexer and
+outputs \OCaml code implementing that specification. For a general
+presentation of lexing, please refer to the Annex,
+part~\ref{part:annex}.
+
+With \ocamllex, the regular expressions defining the lexemes have a
+traditional form, but characters occur between quotes, after the
+convention of \OCaml, for example, \textsf{['a'-'z']\texttt{+}
+  ['a'-'z' 'A'-'Z' '0'-'9' '\_']*} instead of the usual
+\textsf{[a-z]\texttt{+} [a-zA-Z0-9\_]*}. The \OCaml type representing
+internally the lexemes is generally not defined in the lexer
+specification, which has the file extension \texttt{.mll}. For
+instance, that type could be
+\begin{tabbing}
+ \Xtype \type{token} \= \equal \= \Tint \Xof \type{int} \vbar{}
+ \Tident \Xof \type{string} \vbar{} \Ttrue \vbar{} \Tfalse\\
+ \> \vbar \> \Tplus \vbar{} \Tminus \vbar{} \Ttimes \vbar{} \Tslash
+ \vbar{} \Tequal \vbar{} \Tarrow\\
+ \> \vbar \> \Tlpar \vbar{} \Trpar \vbar{} \Tlet \vbar{} \Tin \vbar{} \Trec\\
+ \> \vbar \> \Tfun \vbar{}
+ \Tif \vbar{} \Tthen \vbar{} \Telse \vbar{} \Tand \vbar{} \Tor \vbar{}
+ \Tnot \vbar{} \Teof
+\end{tabbing}
+Note that it is a good practice to always have a special lexeme \Teof
+to denote the end of the file. The specification of a lexer in
+\ocamllex follows the general shape
+\begin{tabbing}
+\{ \emph{Optional \OCaml code as a prologue} \}\\
+\Xlet \(r\sb{1}\) \equal \emph{regexp}\\
+\ldots\\
+\Xlet \(r\sb{p}\) \equal \emph{regexp}\\
+\Xrule \= \emph{rule}\(\sb{1}\) \(x\sb{1,1} \dots\, x\sb{1,m}\) \equal \Xparse\\
+\> \ \ \ \emph{regexp}\(\sb{1,1}\) \{ \emph{\OCaml code known as
+  \emph{action}} \}\\
+\> \vbar{} \ \ldots\\
+\> \vbar{} \ \emph{regexp}\(\sb{1,n}\) \{ \emph{\OCaml code known as \emph{action}} \}\\
+\Xand \= \emph{rule}\(\sb{2}\) \(x\sb{2,1} \dots\, x\sb{2,m}\) \equal \Xparse\\
+\> \ldots\\
+\Xand \ldots\\
+\{ \emph{Optional \OCaml code as an epilogue} \}
+\end{tabbing}
+Consider the following example:
+\begin{tabbing}
+\{ \= \Xopen \cst{Parser}\\
+   \> \Xexception \cst{Illegal\_char} \Xof \type{string} \}\\
+\\
+\Xlet \ident{ident} \equal \textsf{['a'-'z'] ['\_' 'A'-'Z' 'a'-'z' '0'-'9']*}\\
+\Xrule \= \ident{token} \equal \Xparse\\
+  \> \ \ \textsf{['{\tt\char`\ }' '\(\backslash\)n' '\(\backslash\)t'
+   '\(\backslash\)r']} \= \{ \ident{token} \ident{lexbuf} \}\\
+  \> \vbar{} \str{let} \> \{ \Tlet \}\\
+  \> \vbar{} \str{rec} \> \{ \Trec \}\\
+  \> \vbar{} \str{=}   \> \{ \Tequal \}\\
+  \> \ldots \\
+  \> \vbar{} \ident{ident} \Xas \ident{id} \> \{ \Tident \ident{id} \}\\
+  \> \vbar{} \textsf{['0'-'9']\texttt{+}} \Xas \ident{n} \> \{ \Tint
+     \lpar\ident{int\_of\_string} \ident{n}\rpar{} \}\\
+  \> \vbar{} \ident{eof} \> \{ \Teof \}\\
+  \> \vbar{} {\large \_} \Xas \ident{c} \> \{ \ident{raise} 
+     \lpar\cst{Illegal\_char} \ident{c} \rpar{} \}
+\end{tabbing}
+The prologue opens the module \textsf{Parser} because it contains the
+definition of the type \textsf{token}, whose data constructors are
+applied in the actions (\cst{LET}, \cst{REC}, etc.). This style is
+often used in conjunction with the parsers produced by \menhir or
+\ocamlyacc. If we specify a standalone lexer (for example, for
+performing unit testing), we then would have a module \textsf{Token}
+containing the definition of the lexemes.
+
+Exceptions used in the actions and/or the epilogue are declared in the
+prologue --~here we have \textsf{Illegal\_char}.
+
+A regular expression called \textsf{ident} is defined, as well as a
+unique parser \textsf{token}. Note that, although the \ocamllex
+keyword is \textbf{\textsf{parse}}, it declares a lexer. The rules are
+introduced by the keyword \textbf{\textsf{rule}} and, in the actions,
+the rules are seen to be functions whose first arguments, like
+\(x_{1,1} \dots x_{1,m}\), are arbitrary \OCaml values, then the next
+argument is the lexing buffer (matched after the keyword
+\textbf{\textsf{parse}}), always implicitly called \textsf{lexbuf}. An
+example of this is the action \texttt{\{token lexbuf\}}, which is
+typical when we want to skip some characters from the input. This
+recursive call works because, in the action, the characters recognised
+by the corresponding regular expression have been implicitly removed
+from the input stream.
+
+The module \textsf{Lexing} of the standard library of \OCaml contains
+some functions whose aim is to manipulate the input stream of
+characters. For example, to create an input stream of characters from
+the standard input, we would write: \Xlet \ident{char\_flow} \equal{}
+\ident{Lexing.from\_channel} \ident{stdin} \Xin{} \ldots
+
+There is a built\hyp{}in regular expression named \ident{eof} which
+filters the end of file. It is recommended to match it in order to
+produce a \emph{virtual token} \Teof because the implicit behaviours
+of the applications with respect to the end of file may vary from one
+operating system to another. (See below for another reason.)
+
+Notice too a special regular expression `\textsf{\large \_}' which
+matches any kind of character. The order of the regular expressions
+matters, therefore this particular expression must be the last one,
+otherwise any subsequent expression would be ignored.
+
+If the \ocamllex specification is a file named \textsf{lexer.mll},
+then the compilation will take place in two steps:
+\begin{enumerate*}
+
+   \item \texttt{ocamllex lexer.mll} will generate either an error or
+     \textsf{lexer.ml}; then
+
+   \item \texttt{ocamlc -c lexer.ml} will produce either an error or
+     the compiled units \textsf{lexer.cmo} and \textsf{lexer.cmi}, the
+     latter only if there is no interface \textsf{lexer.mli} for the
+     lexer.
+
+\end{enumerate*}
+In theory, the actions linked to the regular expressions are not
+compelled to return a lexeme, as the programmer may seek to write a
+standalone preprocessor, for example, instead of the combination of a
+lexer and a parser, as usually found in compilers. In any case, the
+resulting \OCaml code has the shape
+\begin{tabbing}
+\emph{Prologue}\\
+\Xlet \= \Xrec \emph{rule}\(\sb{1}\) \(x\sb{1,1} \dots\, x\sb{1,m}\) \ident{lexbuf} \equal\\
+\> \ldots{} \= \Xmatch \ldots{} \Xwith\\
+\>\> \; \ldots{} \(\rightarrow\) \emph{action}\\
+\>\> \vbar{} \ldots{}\\
+\>\> \vbar{} \ldots{} \(\rightarrow\) \emph{action}\\
+\Xand \emph{rule}\(\sb{2}\) \(x\sb{2,1} \dots\, x\sb{2,m}\)
+\ident{lexbuf} \equal\\
+\> \ldots\\
+\Xand \ldots\\
+\emph{Epilogue}
+\end{tabbing}
+where \texttt{lexbuf} has the type \textsf{Lexing.lexbuf}.
+
+\paragraph{Lexing inline comments}
+
+Comments are recognised during lexical analysis, but they are usually
+discarded. Some lexers examine the contents of comments, looking for
+instance for metadata or embedded comments, and thus may signal errors
+inside those. The simplest type of comments is that of~\Cpp{}, whose
+scope is the rest of the line after it starts:
+\begin{tabbing}
+\Xrule \= \ident{token} \equal \Xparse\\
+\> \ \ \ \ldots\\
+\> \vbar{} \textsf{"//"\ \ \ [\symbol{94} '\(\backslash\)n']*
+  \ \ '\(\backslash\)n'?} \{ \ident{token} \ident{lexbuf} \}
+\end{tabbing}
+The regular expression identifies the comment opening, then skips any
+character different from an end of line, and finally terminates by
+reading an optional end of line. (We assume that the underlying
+operating system is \Unix, so an end of line can also terminate a
+file.)
+
+\paragraph{Lexing non-nested block comments}
+
+In order to analyse non\hyp{}embedded block comments, we need a more
+complex specification:
+\begin{tabbing}
+\{ \ldots{} \Xexception \cst{Open\_comment} \}\\
+\\
+\Xrule \= \ident{token} \equal \Xparse\\
+\> \ \ \ \ldots\\
+\> \vbar{} \str{/*} \{ \ident{in\_comment} \ident{lexbuf} \}\\
+\Xand \= \ident{in\_comment} \equal \Xparse\\
+\> \ \ \ \str{*/} \= \{ \ident{token} \ident{lexbuf} \}\\
+\> \vbar{} \ident{eof} \> \{ \ident{raise} \cst{Open\_comment} \}\\
+\> \vbar{} {\large \_} \> \{ \ident{in\_comment} \ident{lexbuf} \}
+\end{tabbing}
+The rule \textsf{token} recognises the comment opening and its action
+calls the additional rule \textsf{in\_comment}, which skips all
+characters until the closing of the block and signals an error if the
+closing is missing (open comment). When the block is closed, and since
+a comment does not yield a lexeme in our context, we need to perform a
+recursive call to \textsf{token} to get one --~This is the other
+reason why we need the virtual token \Teof, as alluded to previously.
+
+\paragraph{Lexing nested block comments}
+
+Comments in the language~\Clang can be nested, which allows the
+programmer to temporarily comment out pieces of source code that may
+already contain block comments. If these comments were not nestable,
+we could write a single regular expression to recognise them, but,
+above, we chose not to do so for readability's sake and to easily
+signal the lack of a proper closing. In the nested case, no such
+expression can exist, on theoretical grounds: regular languages cannot
+be well parenthesised. Informally, this can be understood as: `Regular
+expressions cannot count.', in particular, the current level of
+nesting cannot be maintained throughout block openings and
+closings. To achieve this, we need to rely on the actions, where
+function calls are available. The technique consists in modifying the
+rule \textsf{in\_comment} in such a manner that the actions become
+functions whose argument is the current depth of nesting.
+\begin{tabbing}
+\Xrule \= \ident{token} \equal \Xparse\\
+\> \ \ \ \ldots\\
+\> \vbar{} \str{/*} \{ \ident{in\_comment} \ident{lexbuf} \underline{\num{1}} \}\\
+\Xand \= \ident{in\_comment} \equal \Xparse\\
+\> \ \ \ \str{*/} \= \{ \underline{\Xfun \ident{depth} \(\rightarrow\)} \=
+\underline{\Xif \ident{depth} \equal \num{1} \Xthen} \ident{token} \ident{lexbuf}\\
+\> \> \> \underline{\Xelse \ident{in\_comment} \ident{lexbuf}
+\lpar\ident{depth}\texttt{-}\num{1}\rpar{}} \}\\
+\> \underline{\vbar{} \str{/*}} \> \underline{\{ \Xfun \ident{depth}
+  \(\rightarrow\) \ident{in\_comment} \ident{lexbuf}
+  \lpar\ident{depth}\texttt{+}\num{1}\rpar{} \}}\\ 
+\> \vbar{} \ident{eof} \> \{ \ident{raise} \cst{Open\_comment} \}\\
+\> \vbar{} {\LARGE \_} \> \{ \ident{in\_comment} \ident{lexbuf} \}
+\end{tabbing}
+Note that \Xfun \ident{depth} \(\rightarrow\) \ident{raise}
+\cst{Open\_comment} would be less efficient, and the call
+\ident{in\_comment} \ident{lexbuf} is equivalent to \Xfun
+\ident{depth} \(\rightarrow\) \ident{in\_comment} \ident{lexbuf}
+\ident{depth}.
+
+\paragraph{Finite automata}
+
+Lexer generators like \ocamllex work by combining the regular
+expressions of the specification, and translating them into a program
+expressed in the target language. In order to do so, these have to be
+translated first into a formalism of same level of expressivity, but
+more intuitive: finite automata. Then, the automaton resulting from
+combining several automata is compiled into source code. As we
+indicated at the opening of this chapter, we will not discuss automata
+theory here, as only basic notions are necessary four our present
+purpose, and the Annex presents the topic independently of any
+programming language. Therefore, suffice it to give some examples
+about the recognition of some lexemes specific to the matter at hand
+here.
+\begin{itemize}
+
+   \item a keyword:
+     \begin{center}
+       \includegraphics[bb=48 710 198 730]{mots_cles}
+     \end{center}
+
+  \item an integer
+    \begin{center}
+      \includegraphics[bb=47 709 216 738]{entiers}
+    \end{center}
+
+  \item either a keyword or an integer:
+    \begin{center}
+      \includegraphics[bb=47 687 216 730]{mots_cles_ou_entiers}
+    \end{center}
+
+\end{itemize}
+If a final state (doubly\hyp{}circled) is reached from the initial
+state, the lexeme is recognised, like \Tlet and \Tint.
+
+The lexer considers at all times two pieces of information:
+the current state in the specified automaton, and the character at the
+head of the input stream.
+\begin{itemize*}
+
+  \item If there exists a transition for the head character at the
+    current state, then
+    \begin{itemize*}
+
+      \item it is withdrawn from the input stream and discarded;
+ 
+      \item the current state becomes the one pointed to by the
+        transition;
+
+      \item the process resumes by considering the new state and the
+        new character at the head of the input;
+
+    \end{itemize*}
+
+  \item otherwise, if there is no transition (the state is blocking),
+    then
+    \begin{itemize*}
+
+      \item if the current state is final, then the associated lexeme
+        is emitted;
+
+      \item else, an error is signalled (invalid character).
+   
+    \end{itemize*}
+
+\end{itemize*}
+Some ambiguity may occur, like
+\begin{itemize*}
+
+   \item the input string \str{let} being recognised as a variable
+     instead of a keyword,
+
+   \item the input string \str{letrec} being recognised as the
+     following lists of lexemes: \lbra\Tlet; \Tident \str{rec}\rbra{}
+     or \lbra\Tlet; \Trec\rbra{} or \lbra\Tident \str{letrec}\rbra{}
+     etc.
+
+\end{itemize*}
+The general solution consists in establishing rules of priority:
+\begin{itemize}
+
+   \item when several lexemes are possible prefixes of the input, chose
+     the longest;
+
+   \item otherwise, follow the order of definition of the tokens, for
+     example, in the \ocamllex specification given earlier, the rule
+     for \Tlet is written \emph{before} that for \ident{ident}.
+
+\end{itemize}
+This way, the sentence \texttt{let letrec = 3 in 1 + funny} is
+recognised as the list \lbra\Tlet; \Tident \str{letrec}; \Tequal;
+\Tint \num{3}; \Tin; \Tint \num{1}; \Tplus; \Tident \str{funny}\rbra.
+
+To implement this `longest\hyp{}match rule', we need to add a
+structure: an initially empty buffer of characters, and resume the
+previous algorithm. When the current state is final and a transition
+is enabled, instead of discarding the corresponding character, we save
+it in that extra buffer until a blocking state. If that state is
+final, we return the associated lexeme, else we emit the lexeme of the
+last final state encountered, the characters of the buffer are placed
+back into the entrant stream, and we loop back to the initial state.
+\begin{center}
+\begin{minipage}{0.45\linewidth}
+\includegraphics[bb=48 658 198 738]{lexeme_long}
+\end{minipage}
+\hspace*{15mm}
+\begin{minipage}{0.4\linewidth}
+$\begin{aligned}
+  e_1 &= \texttt{['a'-'k' 'n'-'z']}\\
+  e_2 &= \texttt{['a'-'d' 'f'-'z']}\\
+  e_3 &= \texttt{['a'-'s' 'u'-'z']}\\
+  e_4 &= \texttt{['a'-'z]}
+\end{aligned}$
+\end{minipage}
+\end{center}

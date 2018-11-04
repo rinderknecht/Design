@@ -1,0 +1,1834 @@
+\chapter{Binary Search Trees}
+
+Searching for an internal node in a binary tree can be costly because,
+in the worst case, the whole tree must be traversed, for example, in
+preorder or level\hyp{}order. To improve upon this, two situations are
+desirable: the binary tree should be as balanced\index{binary
+  tree!balanced $\sim$} as possible and the choice of visiting
+\begin{wrapfigure}[7]{r}[0pt]{0pt}
+\centering
+\includegraphics{bst_ex}
+\caption{\label{fig:bst_ex}}
+\end{wrapfigure}
+the left or right subtree should be taken only upon examining the
+contents in the root, called \emph{key}\index{key}.
+
+The simplest solution consists in satisfying the latter condition and
+later see how it fits the former. A \emph{binary search tree}
+\citep{Mahmoud_1992}\index{binary search tree} \(\fun{bst}(x, t_1,
+t_2)\)\index{bst@\fun{bst/3}} is a binary tree such that the key~\(x\)
+is greater than the keys in~\(t_1\) and smaller than the keys
+in~\(t_2\). (The external node \(\fun{ext}()\) is a trivial search
+tree.) The comparison function depends on the nature of the keys, but
+has to be \emph{total}, that is, any key can be compared to any other
+key. An example is given in \fig~\vref{fig:bst_ex}. An immediate
+consequence of the definition is that the inorder\index{binary
+  tree!inorder} traversal of a binary search tree yields an
+increasingly sorted stack, for example, \([3,5,11,13,17,29]\) from the
+tree in \fig~\ref{fig:bst_ex}.
+
+This property enables checking simply that a binary tree is a search
+tree: perform an inorder traversal and then check the order of the
+resulting stack. The corresponding function,
+\fun{bst\(_0\)/1}\index{bst0@\fun{bst\(_0\)/1}}, is legible in
+\fig~\vref{fig:bst0},
+\begin{figure}[t]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+\fun{bst}_0(t) & \rightarrow & \fun{ord}(\fun{in}_2(t,\el)).\\
+\\
+\fun{in}_2(\fun{ext}(),s) & \rightarrow & s;\\
+\fun{in}_2(\fun{bst}(x,t_1,t_2),s) & \rightarrow
+  & \fun{in}_2(t_1,\cons{x}{\fun{in}_2(t_2,s)}).\\
+\\
+\fun{ord}(\cons{x,y}{s}) & \rightarrow & \fun{ord}(\cons{y}{s}),
+\;\text{if \(y \succ x\)};\\
+\fun{ord}(\cons{x,y}{s}) & \rightarrow & \fun{false}();\\
+\fun{ord}(s) & \rightarrow & \fun{true}().
+\end{array}}
+\end{equation*}
+\caption{Na\"{\i}vely checking a binary search tree\label{fig:bst0}}
+\end{figure}
+where \fun{in\(_2\)/2}\index{in2@\fun{in\(_2\)/2}} is just a
+redefinition of \fun{in/2}\index{in@\fun{in/2}} in
+\fig~\vref{fig:in}. Thus, the cost of \(\fun{in}_2(t)\), when
+\(t\)~has size~\(n\), is \(\C{\fun{in}_2}{n} = \C{\fun{in}}{n} = 2n +
+2\). The worst case for \fun{ord/1}\index{ord@\fun{ord/1}} occurs when
+the stack is sorted increasingly, so the maximum cost is
+\(\W{\fun{ord}}{n} = n\), if \(n > 0\). The best case is manifest when
+the first key is greater than the second, so the minimum cost is
+\(\B{\fun{ord}}{n} = 1\). Summing up: \(\B{\fun{bst}_0}{n} = 1 +
+(2n+2) + 1 = 2n + 4\) and \(\W{\fun{bst}_0}{n} = 1 + (2n+2) + n = 3n +
+3\).
+
+A better design consists in not constructing the inorder stack and
+only \emph{keeping the smallest key so far}, assuming the traversal is
+from right to left, and compare it with the current key. But this is a
+problem at the beginning, as we have not visited any node yet. A
+common trick to deal with exceptional values is to use a
+\emph{sentinel}\index{sentinel}, which is a dummy. Here, we would like
+to set the sentinel to \(+\infty\), as any key would be smaller, in
+particular the largest key, which is \emph{unknown}. (Would it be
+known, we could use it as a sentinel.) It is actually easy to model
+this infinite value in our functional language: let us simply use a
+constant data constructor \fun{infty/0}\index{infty@\fun{infty/0}}
+(\emph{infinity}) and make sure that we handle its comparison
+separately from the others. Actually,
+\(\fun{infty}()\)\index{infty@\fun{infty/0}} is compared only once,
+with the largest key, but we will not try to optimise this, lest the
+design is obscured.
+
+The program is displayed in
+\fig~\vref{fig:bst}.\index{bst@\fun{bst/1}}\index{bst1@\fun{bst\(_1\)/2}}
+\begin{figure}[t]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+  \fun{bst}(t) & \rightarrow & \fun{norm}(\fun{bst}_1(t,\fun{infty}())).\\
+  \\
+  \fun{bst}_1(\fun{ext}(),m) & \rightarrow & m;\\
+  \fun{bst}_1(\fun{bst}(x,t_1,t_2),m) & \rightarrow & 
+  \fun{cmp}(x,t_1,\fun{bst}_1(t_2,m)).\\
+\\
+\fun{cmp}(x,t_1,\fun{infty}()) & \rightarrow & \fun{bst}_1(t_1,x);\\
+\fun{cmp}(x,t_1,m) & \rightarrow &
+  \fun{bst}_1(t_1,x), \,\text{if \(m \succ x\)};\\
+\fun{cmp}(x,t_1,m) & \rightarrow & \fun{false}().\\
+\\
+\fun{norm}(\fun{false}()) & \rightarrow & \fun{false}();\\
+\fun{norm}(m) & \rightarrow & \fun{true}().
+\end{array}}
+\end{equation*}
+\caption{Checking a binary search tree\label{fig:bst}}
+\end{figure}
+The parameter~\(m\) stands for the \emph{minimum} key so far. The sole
+purpose of \fun{norm/1}\index{norm@\fun{norm/1}} is to get rid of the
+smallest key~\(m\) in the tree and instead terminate with
+\(\fun{true}()\), but, if the tree is not empty, we could as well end
+with \(\fun{true}(m)\), or even \(\fun{false}(x)\), if more
+information were deemed useful.\index{true@\fun{true/1}}
+
+In the worst case, the original tree is a binary search tree, hence it
+has to be traversed in its entirety. If there are \(n\)~internal
+nodes, the maximum cost is \(\W{\fun{bst}}{n} = 1 + 2n + (n+1) + 1 =
+3n + 3\)\index{bst@$\W{\fun{bst}}{n}$} because each internal node
+triggers one call to \fun{bst\(_1\)/2}\index{bst1@\fun{bst\(_1\)/2}} and, in
+turn, one call to \fun{cmp/3}\index{cmp@\fun{cmp/3}}; also, all the
+\(n+1\) external nodes are visited. Consequently, \(\W{\fun{bst}_0}{n}
+= \W{\fun{bst}}{n}\),\index{bst0@$\W{\fun{bst}_0}{n}$} if \(n > 0\),
+which is not an improvement. Nevertheless, here, we do not build a
+stack with all the keys, which is a definite gain in terms of memory
+allocation.
+
+Memory is not the only advantage, though, as the minimum cost of
+\fun{bst/1}\index{bst@\fun{bst/1}} is lower than for
+\fun{bst\(_0\)/1}.\index{bst0@\fun{bst\(_0\)/1}} Indeed, the best case
+for both occurs when the tree is not a binary search tree, but this is
+discovered the sooner in \fun{bst/1} at the second comparison, because
+the first one always succeeds by design (\(+\infty \succ
+x\)). Obviously, for the second comparison to occur as soon as
+possible, we need the first comparison to happen as soon as possible
+too. Two configurations work:
+\begin{align*}
+\fun{bst}(\fun{bst}(x,t_1,\fun{bst}(y,\fun{ext}(),\fun{ext}())))
+& \xrightarrow{\smash{8}} \fun{false}(),\\
+\fun{bst}(\fun{bst}(y,\fun{bst}(x,t_1,\fun{ext}()),\fun{ext}()))
+& \xrightarrow{\smash{8}} \fun{false}(),
+\end{align*}
+where \(x \succcurlyeq y\). (The second tree is the left rotation of
+the first. We have seen \vpageref{par:rotation} that inorder
+traversals are invariant through rotations.) The minimum cost in both
+cases is \(\B{\fun{bst}}{n} = 8\),\index{bst@$\B{\fun{bst}}{n}$} to be
+contrasted with the linear cost \(\B{\fun{bst}_0}{n} = 2n +
+4\)\index{bst0@$\B{\fun{bst}_0}{n}$} due to the inevitable complete
+inorder traversal.
+
+\section{Search}
+
+We now must find out whether searching for a key is faster than with
+an ordinary binary tree, which was our initial motivation. Given the
+search tree \(\fun{bst}(x,t_1,t_2)\), if the key~\(y\) we are
+searching for is such that \(y \succ x\), then we search recursively
+for it in~\(t_2\); otherwise, if \(x \succ y\), we look in~\(t_1\);
+finally, if \(y = x\), we just found it at the root of the given
+tree. The definition of \fun{mem/2} (\emph{membership}) is shown in
+\fig~\vref{fig:mem}.
+\begin{figure}[b]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+\fun{mem}(y,\fun{ext}()) & \rightarrow & \fun{false}();\\
+\fun{mem}(x,\fun{bst}(x,t_1,t_2)) & \rightarrow & \fun{true}();\\
+\fun{mem}(y,\fun{bst}(x,t_1,t_2)) & \rightarrow & 
+  \fun{mem}(y,t_1), \; \text{if \(x \succ y\)};\\
+\fun{mem}(y,\fun{bst}(x,t_1,t_2)) & \rightarrow &
+  \fun{mem}(y,t_2).
+\end{array}}
+\end{equation*}
+\caption{Searching in a binary search tree\label{fig:mem}}
+\end{figure}
+The crucial point is that we may not need to visit all the nodes. More
+precisely, if all nodes are visited, then the tree is
+degenerate\index{binary tree!degenerate $\sim$}, to wit, it is
+isomorphic to a stack, like the trees in \fig~\vref{fig:tree_stack}
+and \fig~\vref{fig:zigzag}. Clearly, the minimum cost of a successful
+search occurs when the key is at the root, so
+\(\B{\fun{mem}}{n{\scriptscriptstyle (+)}} =
+1\),\index{mem@$\B{\fun{mem}}{n{\scriptscriptstyle (+)}}$} and the
+minimum cost of an unsuccessful search happens when the root has an
+external node as a child and \fun{mem/2} visits it:
+\(\B{\fun{mem}}{n{\scriptscriptstyle (-)}} =
+2\).\index{mem@$\B{\fun{mem}}{n{\scriptscriptstyle (-)}}$} The maximum
+cost of a successful search occurs when the tree is degenerate and the
+key we are looking for is at the only leaf\index{binary tree!leaf}, so
+\(\W{\fun{mem}}{n{\scriptscriptstyle (+)}} =
+n\),\index{mem@$\W{\fun{mem}}{n{\scriptscriptstyle (+)}}$} and the
+maximum cost of an unsuccessful search happens when visiting one of
+the children of the leaf of a degenerate\index{binary tree!degenerate
+  $\sim$} tree: \(\W{\fun{mem}}{n{\scriptscriptstyle (-)}} =
+n+1\).\index{mem@$\W{\fun{mem}}{n{\scriptscriptstyle (-)}}$}
+Therefore,
+\begin{equation*}
+\B{\fun{mem}}{n} = 1\quad\text{and}\quad \W{\fun{mem}}{n} = n + 1.
+\index{mem@$\B{\fun{mem}}{n}$}\index{mem@$\W{\fun{mem}}{n}$}
+\end{equation*}
+These extremal costs are the same as for a linear search\index{linear
+  search} by \fun{ls/2}\index{ls@\fun{ls/2}}:
+\begin{equation*}
+\fun{ls}(x,\el)          \rightarrow  \fun{false}();\quad
+\fun{ls}(x,\cons{x}{s})  \rightarrow  \fun{true}();\quad
+\fun{ls}(x,\cons{y}{s})  \rightarrow  \fun{ls}(x,s).
+\end{equation*}
+The cost of a successful linear search is \(\C{\fun{ls}}{n,k} = k\),
+if the sought key is at position~\(k\), where the first key is at
+position~\(1\). Therefore, the average cost of a successful linear
+search, assuming that each distinct key is equally likely to be sought
+is \(\M{\fun{ls}}{n} = \frac{1}{n}\sum_{k=1}^{n}\C{\fun{ls}}{n,k} =
+\tfrac{1}{2}(n+1)\).\index{linear search}\index{ls@$\M{\fun{ls}}{n}$}
+This raises the question of the average cost of
+\fun{mem/2}.\index{mem@\fun{mem/2}}
+
+\mypar{Average cost}
+
+It is clear from the definition that a search path starts at the root
+and either ends at an internal node in case of success, or at an
+external node in case of failure; moreover, each node on these paths
+corresponds to one function call. Therefore, the average cost of
+\fun{mem/2}\index{mem@\fun{mem/2}} is directly related to the average
+internal\index{binary search tree!average internal path length} and
+external\index{binary search tree!average external path length} path
+lengths. To clearly see how, let us consider a binary search tree of
+size~\(n\) containing distinct keys. The total cost of searching all
+of these keys is \(n+I_n\), where \(I_n\)~is the internal path length
+(we add~\(n\) to~\(I_n\) because we count the nodes on the paths, not
+the edges, as one internal node is associated with one function
+call). In other words, a random key chosen amongst those in a given
+tree of size~\(n\) is found by \fun{mem/2} with an average cost of
+\(1+I_n/n\). Dually, the total cost of reaching all the external nodes
+of a given binary search tree is \((n+1)+E_n\), where \(E_n\)~is the
+external path length (there are \(n+1\) external nodes in a tree
+with \(n\)~internal nodes; see theorem~\ref{thm:int_ext}
+\vpageref{thm:int_ext}). In other words, the average cost of a failed
+search by \fun{mem/2}\index{mem@\fun{mem/2}} is \(1 + E_n/(n+1)\).
+
+At this point, we should realise that we are dealing with a double
+randomness, or, equivalently, an average of averages. Indeed, the
+previous discussion assumed the search tree was given, but the key was
+random. The general case is when both are chosen randomly, that is,
+when the previous results are averaged over all possible trees of the
+same size~\(n\). Let \(\M{\fun{mem}}{n{\scriptscriptstyle (+)}}\)
+\index{mem@$\M{\fun{mem}}{n{\scriptscriptstyle (+)}}$} be the average
+cost of the successful search of a random key in a random tree of
+size~\(n\) (any of the \(n\)~keys being sought with same probability);
+moreover, let \(\M{\fun{mem}}{n{\scriptscriptstyle
+    (-)}}\)\index{mem@$\M{\fun{mem}}{n{\scriptscriptstyle
+    (-)}}$} be the average cost of the unsuccessful search of a random
+key in a random tree (any of the \(n+1\) intervals whose end points
+are the \(n\)~keys being equally likely to be searched). Then
+\begin{equation}
+  \M{\fun{mem}}{n{\scriptscriptstyle (+)}}
+  = 1 + \frac{1}{n}\Expected{I_n}
+\quad\text{and}\quad
+\M{\fun{mem}}{n{\scriptscriptstyle (-)}}
+  = 1 + \frac{1}{n+1}\Expected{E_n},
+\label{eq:Mmems}
+\end{equation}
+where \(\Expected{I_n}\) and \(\Expected{E_n}\) are, respectively, the
+average (or \emph{expected}) internal\index{binary search tree!average
+  internal path
+  length} path length and the average external\index{binary search
+  tree!average external path length} path length. Reusing
+equation~\eqref{eq:EI}, page~\pageref{eq:EI} (\(E_n = I_n + 2n\)), we
+deduce \(\Expected{E_n} = \Expected{I_n} + 2n\) and we can now relate
+the average costs of searching by eliminating the average path
+lengths:
+\begin{equation}
+\M{\fun{mem}}{n{\scriptscriptstyle (+)}} = \left(1 + \frac{1}{n}\right)
+\M{\fun{mem}}{n{\scriptscriptstyle (-)}} - \frac{1}{n} - 2.
+\label{eq:Mmem}
+\end{equation}
+Importantly, this equation holds for all binary search trees,
+\emph{independently of how they are built}. In the next section, we
+shall envisage two methods for making search trees and we will be able
+to determine \(\M{\fun{mem}}{n{\scriptscriptstyle (+)}}\)
+\index{mem@$\M{\fun{mem}}{n{\scriptscriptstyle (+)}}$} and
+\(\M{\fun{mem}}{n{\scriptscriptstyle (-)}}\)
+\index{mem@$\M{\fun{mem}}{n{\scriptscriptstyle (-)}}$} with the help
+of equation~\eqref{eq:Mmem}.
+
+But before that, we could perhaps notice that in \fig~\vref{fig:mem}
+we did not follow the order of the comparisons as we wrote it down.
+In the case of a successful search, the comparison \(y = x\) holds
+exactly once, at the very end; therefore, checking it before the
+others, as we did in the second rule in \fig~\vref{fig:mem}, means
+that it fails for every key on the search path, except for the
+last. If we measure the cost as the number of function calls, we would
+not care, but, if we are interested in minimising the number of
+comparisons involved in a search, it is best to move that rule
+\emph{after} the other inequality tests, as in \fig~\vref{fig:mem0}.
+\begin{figure}[b]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+\fun{mem}_0(y,\fun{bst}(x,t_1,t_2)) & \rightarrow & 
+  \fun{mem}_0(y,t_1), \; \text{if \(x \succ y\)};\\
+\fun{mem}_0(y,\fun{bst}(x,t_1,t_2)) & \rightarrow &
+  \fun{mem}_0(y,t_2),\; \text{if \(y \succ x\)};\\
+\fun{mem}_0(y,\fun{ext}()) & \rightarrow & \fun{false}();\\
+\fun{mem}_0(y,t) & \rightarrow & \fun{true}().
+\end{array}}
+\end{equation*}
+\caption{Searching with fewer 2-way comparisons\label{fig:mem0}}
+\end{figure}
+(We assume that an equality is checked as fast as an inequality.) With
+\fun{mem\(_0\)/2}\index{mem0@\fun{mem\(_0\)/2}}, the number of
+comparisons for each search path is different because of the asymmetry
+between left and right: visiting~\(t_1\) yields one comparison (\(x
+\succ y\)), whilst \(t_2\)~begets two comparisons (\(x \nsucc y\) and
+\(y \succ x\)). Moreover, we also moved the pattern for the external
+node after the rules with comparisons, because each search path
+contains exactly one external node at the end, so it is likely more
+efficient to check it last. By the way, all textbooks we are aware of
+suppose that exactly one atomic comparison with three possible
+outcomes (\emph{3-way comparison}) occurs, despite the programs they
+provide clearly employing the \emph{2-way comparisons} \((=)\) and
+\((\succ)\). This widespread blind spot renders the theoretical
+analysis based on the number of comparisons less pertinent, because
+most high\hyp{}level programming languages simply do not feature
+native 3-way comparisons.
+
+\mypar{Andersson's variant}
+
+\cite{Andersson_1991} proposed a variant for searching which fully
+acknowledges the use of 2-way comparisons and reduces their number to
+a minimum, at the expense of more function calls. The design consists
+in threading a candidate key while descending in the tree and always
+ending a search at an external node: if the candidate then equals the
+sought key, the search is successful, otherwise it is not. Therefore,
+the cost in terms of function calls of an unsuccessful search is the
+same as with \fun{mem/2}\index{mem@\fun{mem/2}} or
+\fun{mem\(_0\)/2}\index{mem0@\fun{mem\(_0\)/2}}, and the ending
+external node is the same, but the cost for a successful search is
+higher.  Nevertheless, the advantage is that \emph{equality is not
+  tested on the way down}, only when the external node is reached, so
+only one comparison per node is required. The program is shown in
+\fig~\vref{fig:mem1}.
+\begin{figure}[b]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+\fun{mem}_1(y,\fun{bst}(x,t_1,t_2)) & \rightarrow &
+  \fun{mem}_2(y,\fun{bst}(x,t_1,t_2),x);\\
+\fun{mem}_1(y,\fun{ext}()) & \rightarrow & \fun{false}().\\
+\\
+\fun{mem}_2(y,\fun{bst}(x,t_1,t_2),c) & \rightarrow &
+  \fun{mem}_2(y,t_1,c),\; \text{if \(x \succ y\)};\\
+\fun{mem}_2(y,\fun{bst}(x,t_1,t_2),c) & \rightarrow &
+  \fun{mem}_2(y,t_2,x);\\
+\fun{mem}_2(y,\fun{ext}(),y) & \rightarrow & \fun{true}();\\
+\fun{mem}_2(y,\fun{ext}(),c) & \rightarrow & \fun{false}().
+\end{array}}
+\end{equation*}
+\caption{Andersson's search (key candidate)\label{fig:mem1}}
+\end{figure}
+The candidate is the third argument to
+\fun{mem\(_2\)/2}\index{mem2@\fun{mem\(_2\)/2}} and its first instance
+is the root of the tree itself, as seen in the first rule of
+\fun{mem\(_1\)/2}\index{mem1@\fun{mem\(_1\)/2}}. The only conceptual
+difference with \fun{mem\(_0\)/2}\index{mem0@\fun{mem\(_0\)/2}} is how
+a successful search is acknowledged: if, somewhere along the search
+path, \(x=y\), then \(x\)~becomes the candidate and it will be
+threaded down to an external node where \(x=x\) is checked.
+
+The worst case happens when the tree is degenerate\index{binary
+  tree!degenerate $\sim$} and \fun{mem\(_1\)/2} performs \(n+1\) 2-way
+comparisons, which we write as \(\OW{\fun{mem}_1}{n} = n +
+1\),\index{mem1@$\OW{\fun{mem}_1}{n}$} after the notations we used in
+the analysis of merge sort\index{merge sort}, back in
+chapter~\ref{chap:merge_sort} \vpageref{chap:merge_sort}.
+
+In the case of \fun{mem\(_0\)/2}, the recursive call to the right
+subtree incurs twice as much comparisons as in the left subtree, thus
+the worst case is a right\hyp{}leaning degenerate tree, like in
+\fig~\vref{fig:min_pre0}, and all internal nodes are visited:
+\(\OW{\fun{mem}_0}{n} = 2n\).\index{mem0@$\OW{\fun{mem}_0}{n}$}
+
+In the case of \fun{mem/2}, the number of comparisons is symmetric
+because equality is tested first, so the worst case is a degenerate
+tree in which an unsuccessful search leads to the visit of all
+internal nodes and one external node: \(\OW{\fun{mem}}{n} = 2n +
+1\).\index{mem@$\OW{\fun{mem}}{n}$} Asymptotically, we have
+\begin{equation*}
+\OW{\fun{mem}}{n} \sim \OW{\fun{mem}_0}{n} 
+\sim 2 \cdot \OW{\fun{mem}_1}{n}.
+\end{equation*}
+
+In the case of Andersson's search, there is no difference between the
+cost, in terms of function calls, of a successful search and an
+unsuccessful one, so, for \(n > 0\), we have
+\begin{equation}
+\M{\fun{mem}_3}{n} = 1 + \M{\fun{mem}_2}{n}\quad\text{and}\quad
+\M{\fun{mem}_2}{n} = \M{\fun{mem}}{n{\scriptscriptstyle (-)}}.
+\label{eq:Andersson_average}
+\index{mem3@$\M{\fun{mem}_3}{n}$}\index{mem2@$\M{\fun{mem}_2}{n}$}
+\end{equation}
+Choosing between \fun{mem\(_0\)/2} and \fun{mem\(_1\)/2} depends on
+the compiler or interpreter of the programming language chosen for the
+implementation. If a 2-way comparison is slower than an indirection
+(following a pointer, or, at the assembly level, jumping
+unconditionally), it is probably best to opt for Andersson's
+variant. But the final judgement requires a benchmark.
+
+As a last note, we may simplify Andersson's program by getting rid of
+the initial emptiness test in \fun{mem\(_1\)/2}.\index{mem1@\fun{mem\(_1\)/2}} What we need to do is
+simply have a candidate be the subtree whose root is the candidate in
+the original program. See \fig~\vref{fig:mem3}
+\begin{figure}[b]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+  \fun{mem}_3(y,t) & \rightarrow & \fun{mem}_4(y,t,t).\\
+  \\
+  \fun{mem}_4(y,\fun{bst}(x,t_1,t_2),t) & \rightarrow &
+  \fun{mem}_4(y,t_1,t),\; \text{if \(x \succ y\)};\\
+\fun{mem}_4(y,\fun{bst}(x,t_1,t_2),t) & \rightarrow &
+  \fun{mem}_4(y,t_2,\fun{bst}(x,t_1,t_2));\\
+\fun{mem}_4(y,\fun{ext}(),\fun{bst}(y,t_1,t_2)) & \rightarrow & \fun{true}();\\
+\fun{mem}_4(y,\fun{ext}(),t) & \rightarrow & \fun{false}().
+\end{array}}
+\end{equation*}
+\caption{Andersson's search (tree candidate)\label{fig:mem3}}
+\end{figure}
+where we have \(\OW{\fun{mem}_3}{n} = \OW{\fun{mem}_1}{n} = n + 1\).
+This version may be preferred only if the programming language used
+for the implementation features \emph{aliases}\index{memory!aliasing}
+in patterns or, equivalently, if the compiler can detect that the term
+\(\fun{bst}(x,t_1,t_2)\) can be shared instead of being duplicated in
+the second rule of \fun{mem\(_4\)/3} (here, we assume that sharing is
+implicit and maximum within a rule).\index{mem4@\fun{mem\(_4\)/3}} For
+additional information on Andersson's variant, read
+\cite{Spuler_1992}.
+
+
+\section{Insertion}
+\label{sec:bst:insertion}
+
+\mypar{Leaf insertion}\index{binary search tree!leaf insertion|(}
+
+Since all unsuccessful searches end at an external node, it is
+extremely tempting to start the insertion of a unique key by a
+(failing) search and then grow a leaf with the new key at the external
+node we reached. \Fig~\vref{fig:insl} displays the program for
+\fun{insl/2}\index{insl@\fun{insl/2}} (\emph{insert a leaf}). Note
+that it allows duplicates in the binary search tree, which hinders the
+cost analysis \citep{Burge_1976,ArchibaldClement_2006,Pasanen_2010}.
+\Fig~\vref{fig:insl0} shows a variant which maintains the unicity of
+the keys, based on the definition of
+\fun{mem\(_0\)/2}\index{mem0@\fun{mem\(_0\)/2}} in
+\fig~\vref{fig:mem0}. Alternatively, we can reuse Andersson's lookup,
+as shown in \fig~\vref{fig:insl1}.\index{insl1@\fun{insl/1}}
+
+\bigskip
+
+\begin{figure}[h]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+\fun{insl}(y,\fun{bst}(x,t_1,t_2)) & \xrightarrow{\smash{\tau}} &
+  \fun{bst}(x,\fun{insl}(y,t_1),t_2), \; \text{if \(x \succ y\)};\\
+\fun{insl}(y,\fun{bst}(x,t_1,t_2)) & \xrightarrow{\smash{\upsilon}} &
+  \fun{bst}(x,t_1,\fun{insl}(y,t_2));\\
+\fun{insl}(y,\fun{ext}()) & \xrightarrow{\smash{\phi}} & \fun{bst}(y,\fun{ext}(),\fun{ext}()).
+\end{array}}
+\end{equation*}
+\caption{Leaf insertion with possible duplicates\label{fig:insl}}
+\end{figure}
+
+\bigskip
+
+\begin{figure}[h]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+\fun{insl}_0(y,\fun{bst}(x,t_1,t_2)) & \rightarrow &
+  \fun{bst}(x,\fun{insl}_0(y,t_1),t_2), \; \text{if \(x \succ y\)};\\
+\fun{insl}_0(y,\fun{bst}(x,t_1,t_2)) & \rightarrow &
+  \fun{bst}(x,t_1,\fun{insl}_0(y,t_2)) , \; \text{if \(y \succ x\)};\\
+\fun{insl}_0(y,\fun{ext}()) & \rightarrow &
+\fun{bst}(y,\fun{ext}(),\fun{ext}());\\
+\fun{insl}_0(y,t) & \rightarrow & t.
+\end{array}}
+\end{equation*}
+\caption{Leaf insertion without duplicates\label{fig:insl0}}
+\end{figure}
+
+\bigskip
+
+\begin{figure}[h]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+\fun{insl}_1(y,t) & \rightarrow & \fun{insl}_2(y,t,t).\\
+\\
+\fun{insl}_2(y,\fun{bst}(x,t_1,t_2),t) & \rightarrow &
+  \fun{bst}(x,\fun{insl}_2(y,t_1,t),t_2), \; \text{if \(x \succ y\)};\\
+\fun{insl}_2(y,\fun{bst}(x,t_1,t_2),t) & \rightarrow &
+  \fun{bst}(x,t_1,\fun{insl}_2(y,t_2,\fun{bst}(x,t_1,t_2)));\\
+\fun{insl}_2(y,\fun{ext}(),\fun{bst}(y,t_1,t_2)) & \rightarrow & \fun{ext}();\\
+\fun{insl}_2(y,\fun{ext}(),t) & \rightarrow & \fun{bst}(y,\fun{ext}(),\fun{ext}()).
+\end{array}}
+\end{equation*}
+\caption{Andersson's insertion\label{fig:insl1}}
+\end{figure}
+
+\mypar{Average cost}
+
+In order to carry out the average case analysis of leaf insertion, we
+must assume that all inserted keys are distinct; equivalently, we
+consider all the search trees resulting from the insertion into
+originally empty trees of all the keys of each permutation of
+\((1,2,\dots,n)\). Because the number of permutations is greater than
+the number of binary trees of same size, to wit, \(n! > C_n\) if \(n >
+2\) (see equation~\eqref{eq:Cn} \vpageref{eq:Cn}), we expect some tree
+shapes to correspond to many permutations. As we will see in the
+section about the average height, degenerate and wildly unbalanced
+trees are rare in average \citep{Fill_1996}, making binary search
+trees a good random data structure as long as only leaf insertions are
+performed. Because we assume the unicity of the inserted keys, we
+shall only consider \fun{insl/2} in the following. (Andersson's
+insertion is only worth using if duplicate keys are possible inputs
+that must be detected, leaving the search tree invariant.)
+
+Let us define a function \fun{mkl/1}\index{mkl@\fun{mkl/1}}
+\index{mkl@\fun{mkl/2}} (\emph{make leaves}) in \fig~\vref{fig:mkl}
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+  \fun{mkl}(s) & \xrightarrow{\smash{\xi}} & \fun{mkl}(s,\fun{ext}()).
+& \fun{mkl}(\el,t) & \xrightarrow{\smash{\psi}} & t;\\
+& & & \fun{mkl}(\cons{x}{s},t) & \xrightarrow{\smash{\omega}} & \fun{mkl}(s,\fun{insl}(x,t)).
+\end{array}}
+\end{equation*}
+\caption{Making a binary search tree with leaf insertions
+\label{fig:mkl}}
+\end{figure}
+which builds a binary search tree by inserting as leaves all the keys
+in a given stack. Note that we could also define a function
+\fun{mklR/1}\index{mklR@\fun{mklR/1}} (\emph{make leaves in reverse order}) such that
+\(\fun{mklR}(s) \equiv \fun{mkl}(\fun{rev}(s))\) in a compact manner:
+\begin{equation}
+%\abovedisplayskip=4pt
+%\belowdisplayskip=4pt
+  \fun{mklR}(\el) \rightarrow \fun{ext}();
+  \quad
+  \fun{mklR}(\cons{x}{s}) \rightarrow \fun{insl}(x,\fun{mklR}(s)).
+\label{eq:mklR}
+\end{equation}
+The cost of \(\fun{insl}(x,t)\) depends on~\(x\) and the shape
+of~\(t\), but, because all shapes are obtained by \(\fun{mkl}(s)
+\twoheadrightarrow t\) for a given length of~\(s\), and all external
+nodes of~\(t\) are equally likely to grow a leaf containing~\(x\), the
+average cost \(\M{\fun{insl}}{k}\)\index{insl@$\M{\fun{insl}}{k}$} of
+\(\fun{insl}(x,t)\) only depends on the size~\(k\) of the trees:
+\begin{equation}
+\abovedisplayskip=2pt
+\abovedisplayshortskip=2pt
+\belowdisplayskip=4pt
+\M{\fun{mkl}}{n} = 2 + \sum_{k=0}^{n-1}\M{\fun{insl}}{k}.
+\label{eq:Mmkl0}
+\end{equation}
+One salient feature of leaf insertion is that internal nodes do not
+move, hence the internal\index{binary search tree!internal path
+  length} path length of the nodes is invariant and the cost of
+searching all keys in a tree of size~\(n\) is the cost of inserting
+them in the first place. We already noticed that the former cost is,
+in average, \(n + \Expected{I_n}\); the latter cost is
+\(\sum_{k=0}^{n-1}\M{\fun{insl}}{k}\). From equation~\eqref{eq:Mmkl0}
+then comes
+\begin{equation}
+%\abovedisplayskip=2pt
+%\belowdisplayskip=4pt
+n + \Expected{I_n} = \M{\fun{mkl}}{n} - 2
+\label{eq:n_EIn}
+\end{equation}
+(The subtraction of~\(2\) is to account for rules~\(\smash{\xi}\)
+and~\(\smash{\psi}\), which perform no insertion.) The cost of a leaf
+insertion is that of an unsuccessful search:
+\begin{equation}
+%\abovedisplayskip=4pt
+%\belowdisplayskip=4pt
+\M{\fun{insl}}{k} = \M{\fun{mem}}{k{\scriptscriptstyle (-)}}.
+\label{eq:n_plus_EIn}
+\end{equation}
+Recalling equation~\eqref{eq:Mmems} \vpageref{eq:Mmems},
+equations~\eqref{eq:Mmkl0}, \eqref{eq:n_EIn} and~\eqref{eq:n_plus_EIn}:
+\begin{equation*}
+\abovedisplayskip=2pt
+\belowdisplayskip=0pt
+\M{\fun{mem}}{n{\scriptscriptstyle(+)}}
+= 1 + \frac{1}{n}\Expected{I_n}
+= \frac{1}{n}(\M{\fun{mkl}}{n} - 2)
+= \frac{1}{n}\sum_{k=0}^{n-1}\M{\fun{insl}}{k}
+= \frac{1}{n}\sum_{k=0}^{n-1}\M{\fun{mem}}{k{\scriptscriptstyle (-)}}.
+\end{equation*}
+Finally, using equation~\eqref{eq:Mmem} \vpageref{eq:Mmem}, we deduce
+\begin{equation*}
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\frac{1}{n}\sum_{k=0}^{n-1}\M{\fun{mem}}{k{\scriptscriptstyle (-)}}
+=
+\left(1 + \frac{1}{n}\right)
+\M{\fun{mem}}{n{\scriptscriptstyle (-)}} - \frac{1}{n} - 2.
+\end{equation*}
+Equivalently,
+\begin{equation*}
+\abovedisplayskip=-7pt
+\abovedisplayshortskip=-7pt
+2n + 1 + \sum_{k=0}^{n-1}\M{\fun{mem}}{k{\scriptscriptstyle (-)}}
+= (n+1) \M{\fun{mem}}{n{\scriptscriptstyle (-)}}.
+\end{equation*}
+This recurrence is easy to solve if we subtract its instance when
+\(n-1\):
+\begin{equation*}
+\abovedisplayskip=6pt
+\belowdisplayskip=6pt
+2 + \M{\fun{mem}}{n-1{\scriptscriptstyle(-)}} = 
+(n+1) \M{\fun{mem}}{n{\scriptscriptstyle (-)}}
+- n \M{\fun{mem}}{n-1{\scriptscriptstyle (-)}}.
+\end{equation*}
+Noting that \(\M{\fun{mem}}{0{\scriptscriptstyle (-)}} = 1\), the
+equation becomes
+\begin{equation*}
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\M{\fun{mem}}{0{\scriptscriptstyle (-)}} = 1,\quad
+\M{\fun{mem}}{n{\scriptscriptstyle (-)}}
+= \M{\fun{mem}}{n-1{\scriptscriptstyle (-)}} + \frac{2}{n+1},
+\end{equation*}
+thus
+\begin{equation}
+\abovedisplayskip=-6pt
+\abovedisplayshortskip=-6pt
+\M{\fun{mem}}{n{\scriptscriptstyle (-)}} =
+1 + 2 \sum_{k=2}^{n+1}\frac{1}{k} = 2H_{n+1} - 1,
+\index{mem@$\M{\fun{mem}}{n{\scriptscriptstyle (-)}}$}
+\label{eq:Mmem_fail}
+\end{equation}
+where \(H_n := \sum_{k=1}^{n}1/k\)~is the \(n\)th harmonic
+number\index{harmonic number}. Replacing
+\(\M{\fun{mem}}{n{\scriptscriptstyle (-)}}\) back into
+equation~\eqref{eq:Mmem} and using \(H_{n+1} = H_n + 1/(n+1)\) yields
+\begin{equation}
+\M{\fun{mem}}{n{\scriptscriptstyle (+)}} =
+2\left(1+\frac{1}{n}\right)H_n - 3.
+\index{mem@$\M{\fun{mem}}{n{\scriptscriptstyle (+)}}$}
+\label{eq:Mmem_ok}
+\end{equation}
+From inequations~\eqref{ineq:Hn} \vpageref{ineq:Hn} and
+equations~\eqref{eq:Mmem_fail} and~\eqref{eq:Mmem_ok}:
+\begin{equation*}
+\M{\fun{insl}}{n}
+\sim \M{\fun{mem}}{n{\scriptscriptstyle (-)}}
+\sim \M{\fun{mem}}{n{\scriptscriptstyle (+)}} \sim 2 \ln n.
+\end{equation*}
+We obtain more information about the relative asymptotic behaviours of
+\(\M{\fun{mem}}{n{\scriptscriptstyle(-)}}\) and
+\(\M{\fun{mem}}{n{\scriptscriptstyle(+)}}\) by looking at their
+difference instead of their ratio:
+\begin{equation*}
+\M{\fun{mem}}{n{\scriptscriptstyle (-)}} -
+\M{\fun{mem}}{n{\scriptscriptstyle (+)}} = 
+\frac{2}{n}(n + 1 - H_{n+1}) \sim 2
+\quad\text{and}\quad
+1 \leqslant \M{\fun{mem}}{n{\scriptscriptstyle (-)}} -
+\M{\fun{mem}}{n{\scriptscriptstyle (+)}} < 2.
+\end{equation*}
+The average difference between an unsuccessful search and a successful
+one tends slowly to~\(2\) for large values of~\(n\), which may not be
+intuitive. We can use this result to compare the average difference of
+the costs of a successful search with \fun{mem/2} and
+\fun{mem\(_3\)/2} (Andersson). Recalling
+equation~\eqref{eq:Andersson_average} \vpageref{eq:Andersson_average},
+we draw \(1 + \M{\fun{mem}}{n{\scriptscriptstyle (-)}} =
+\M{\fun{mem}_3}{n{\scriptscriptstyle (+)}}\). The previous result now
+yields
+\begin{equation*}
+  \M{\fun{mem}_3}{n{\scriptscriptstyle (+)}} -
+  \M{\fun{mem}}{n{\scriptscriptstyle (+)}} \sim 3.
+\index{mem3@$\M{\fun{mem}_3}{n{\scriptscriptstyle (+)}}$}
+\end{equation*}
+Therefore, the extra cost of Andersson's variant in case of a
+successful search is asymptotically~\(3\), in average.
+
+Furthermore, replacing \(\M{\fun{mem}}{n{\scriptscriptstyle
+    (-)}}\) and \(\M{\fun{mem}}{n{\scriptscriptstyle (+)}}\) into
+equations~\eqref{eq:Mmems} leads to
+\begin{equation}
+\Expected{I_n} = 2(n+1)H_n - 4n
+\quad\text{and}\quad
+\Expected{E_n} = 2(n+1)H_n - 2n.
+\label{eq:IEn}
+\end{equation}
+Thus \(\Expected{I_n} \sim \Expected{E_n} \sim 2n\ln n\). Note how
+easier it is to find~\(\Expected{I_n}\) for binary search trees,
+compared to simple binary trees.
+
+If we are interested in slightly more theoretical results, we may like
+to know the average number of comparisons involved in a search and an
+insertion. A glance back at \fig~\vref{fig:mem} uncovers that two
+2-way comparisons are done when going down and one 2-way comparison
+(equality) is checked when finding the key, otherwise none:
+\begin{equation}
+\OM{\fun{mem}}{n{\scriptscriptstyle(+)}}
+  = 1 + \frac{2}{n}\Expected{I_n}
+\quad\text{and}\quad
+\OM{\fun{mem}}{n{\scriptscriptstyle(-)}}
+  = \frac{2}{n+1}\Expected{E_n}.
+\label{eq:Mmem_cmp1}
+\end{equation}
+Reusing equations~\eqref{eq:IEn}, we conclude that
+\begin{equation}
+\OM{\fun{mem}}{n{\scriptscriptstyle(+)}}
+  = 4\left(1+\frac{1}{n}\right)H_n - 7
+\quad\text{and}\quad
+\OM{\fun{mem}}{n{\scriptscriptstyle(-)}}
+  = 4H_n + \frac{4}{n+1} - 4.
+\index{mem@$\OM{\fun{mem}}{n{\scriptscriptstyle(-)}}$}
+\index{mem@$\OM{\fun{mem}}{n{\scriptscriptstyle(+)}}$}
+\label{eq:Mmem_cmp2}
+\end{equation}
+Clearly, we have \(\OM{\fun{mem}}{n{\scriptscriptstyle(+)}} \sim
+\OM{\fun{mem}}{n{\scriptscriptstyle(-)}} \sim 4\ln n\). Furthermore,
+\begin{equation*}
+\OM{\fun{mem}}{n{\scriptscriptstyle (-)}} -
+\OM{\fun{mem}}{n{\scriptscriptstyle (+)}} = 
+\frac{4}{n+1} - \frac{4}{n}H_n + 3 \sim 3
+\quad\text{and}\quad
+1 \leqslant \OM{\fun{mem}}{n{\scriptscriptstyle (-)}} -
+\OM{\fun{mem}}{n{\scriptscriptstyle (+)}} < 3.
+\end{equation*}
+
+The average costs for Andersson's search and insertions are easy to
+deduce as well, from equation~\eqref{eq:Andersson_average}
+\vpageref{eq:Andersson_average} and~\eqref{eq:Mmem_fail} on
+page~\pageref{eq:Mmem_fail}: \(\M{\fun{mem}_3}{n} = 2H_{n+1} \sim 2
+\ln n\).\index{mem3@$\M{\fun{mem}_3}{n}$} A glimpse back at
+\fig~\vref{fig:mem3} brings to the fore that one 2-way comparison (\(x
+\succ y\)) is performed when descending in the tree and one more when
+stopping at an external node, whether the search is successful or not:
+\begin{equation*}
+  \OM{\fun{mem}_3}{n} = \frac{1}{n+1}\Expected{E_n} =
+  2H_n + \frac{2}{n+1} - 2 \sim 2\ln n.
+\end{equation*}
+We can now finally compare the average number of comparisons between
+\fun{mem/2} and \fun{mem\(_3\)/2} (Andersson):
+\begin{align*}
+  \OM{\fun{mem}}{n{\scriptscriptstyle(+)}} - \OM{\fun{mem}_3}{n}
+&= 2\left(1 + \frac{2}{n}\right)H_n - \frac{2}{n+1} - 5 \sim 2\ln n,\\
+  \OM{\fun{mem}}{n{\scriptscriptstyle(-)}} - \OM{\fun{mem}_3}{n}
+&= 2H_n + \frac{2}{n+1} - 2 \sim 2\ln n.
+\end{align*}
+As far as leaf insertion itself is concerned,
+\fun{insl/2}\index{insl@\fun{insl/2}} behaves as
+\fun{mem\(_3\)/2}\index{mem3@\fun{mem\(_3\)/2}}, except that no
+comparison occurs at the external nodes. Also, from
+equations~\eqref{eq:n_plus_EIn} and~\eqref{eq:Mmem_fail}, we finish
+the average case analysis of \(\fun{insl/2}\):
+\begin{equation*}
+  \OM{\fun{insl}}{n} =
+  \OM{\fun{mem}_3}{n} - 1 = 2H_n + \frac{2}{n+1} -
+  3\quad\text{and}\quad \M{\fun{insl}}{n} = 2H_{n+1} - 1.
+\index{insl@$\OM{\fun{insl}}{n}$}
+\index{mem3@$\OM{\fun{mem}_3}{n}$}
+\end{equation*}
+Finally, from equation~\eqref{eq:n_EIn} and~\eqref{eq:IEn}, we deduce
+\begin{equation}
+\M{\fun{mkl}}{n} = n + \Expected{I_n} + 2 = 2(n+1)H_n - n + 2
+\sim 2n\ln n.
+\index{mkl@$\M{\fun{mkl}}{n}$}
+\label{eq:Mmkl}
+\end{equation}
+
+\mypar{Amortised cost}
+
+The worst case for leaf insertion occurs when the search tree is
+degenerate\index{binary tree!degenerate $\sim$} and the key to be
+inserted becomes the deepest leaf. If the tree has size~\(n\), then
+\(n+1\) calls are performed, as seen in \fig~\vref{fig:insl}, so
+\(\W{\fun{insl}}{n} = n + 1\)\index{insl@$\W{\fun{insl}}{n}$} and
+\(\OW{\fun{insl}}{n} = n\).\index{insl@$\OW{\fun{insl}}{n}$} In the
+case of Andersson's insertion in \fig~\vref{fig:insl1}, the worst case
+is identical but there is a supplementary call to set the candidate
+key, so \(\W{\fun{insl}_1}{n} = n +
+2\).\index{insl1@$\W{\fun{insl}_1}{n}$} Moreover, the number of
+comparisons is symmetric and equals~\(1\) per internal node, so
+\(\OW{\fun{insl}_1}{n} = n\)\index{insl1@$\OW{\fun{insl}_1}{n}$} and
+any degenerate tree is the worst configuration.
+
+The best case for leaf insertion with \(\fun{insl/2}\) and
+\(\fun{insl\(_1\)/2}\) happens when the key has to be inserted as the
+left or right child of the root, to wit, the root is the minimum or
+maximum key in inorder, so \(\B{\fun{insl}}{n} =
+2\)\index{insl@$\B{\fun{insl}}{n}$} and \(\B{\fun{insl}_1}{n} =
+3\).\index{insl@$\B{\fun{insl}_1}{n}$} As far as comparisons are
+concerned: \(\OB{\fun{insl}}{n} = 1\)\index{insl@$\OB{\fun{insl}}{n}$}
+and \(\OB{\fun{insl}_1}{n} = 2\).\index{insl1@$\OB{\fun{insl}_1}{n}$}
+
+While turning our attention to the extremal costs of
+\fun{mkl/1}\index{mkl@\fun{mkl/1}} and
+\fun{mkr/1}\index{mkr@\fun{mkr/1}}, we need to realise that we cannot
+simply sum minimum or maximum costs of \fun{insl/2} because, as
+mentioned earlier, the call \(\fun{insl}(x,t)\) depends on~\(x\) and
+the shape of~\(t\). For instance, after three keys have been inserted
+into an empty tree, the root has no more empty children, so the best
+case we determined previously is not pertinent anymore.
+
+Let \(\OB{\fun{mkl}}{n}\)\index{mkl@$\OB{\fun{mkl}}{n}$} be the
+minimum number of comparisons needed to construct a binary search tree
+of size~\(n\) using leaf insertions. If we want to minimise the cost
+at each insertion, then the path length for each new node must be as
+small as possible and this is achieved if the tree continuously grows
+as a perfect \index{binary tree!perfect $\sim$} or almost
+perfect\index{binary
+  tree!almost perfect $\sim$} tree. The former is a tree whose
+external nodes all belong to the same level, a configuration we have
+seen \vpageref{par:perfection} (the tree fits tightly inside an
+isosceles triangle); the latter is a tree whose external nodes lie on
+two consecutive levels and we have seen this kind of tree in the
+paragraph devoted to comparison trees and the minimean of sorting
+\vpageref{par:opt_sort:minimean}.
+
+Let us assume first that the tree is perfect, with size~\(n\) and
+height~\(h\).\index{binary tree!height} The height is the length,
+counted in number of edges, of the longest path from the root to an
+external node. The total path length for a level~\(k\) made only of
+internal nodes is~\(k2^k\). Therefore, summing all levels yields
+\begin{equation}
+\OB{\fun{mkl}}{n} = \sum_{k=1}^{h-1}k2^k = (h-2)2^h + 2,
+\label{eq:OBmkl_tmp1}
+\end{equation}
+by reusing equation~\eqref{eq:Sj} \vpageref{eq:Sj}. Moreover, summing
+the number of internal nodes by levels: \(n = \sum_{k=0}^{h-1}2^k =
+2^{h} - 1\), hence \(h = \lg(n+1)\), which we can replace in
+equation~\eqref{eq:OBmkl_tmp1} to obtain
+\begin{equation*}
+\OB{\fun{mkl}}{n} = (n+1)\lg(n+1) - 2n.
+\end{equation*}
+We proved \(1 + \floor{\lg n} = \ceiling{\lg(n+1)}\) when establishing
+the maximum number of comparisons of top\hyp{}down merge sort in
+equation~\eqref{eq:top} \vpageref{eq:top}, so we can proceed
+conclusively:
+\begin{equation}
+\OB{\fun{mkl}}{n} = (n+1)\floor{\lg n} - n + 1.
+\index{mkl@$\OB{\fun{mkl}}{n}$}
+\label{eq:OBmkl_perfect}
+\end{equation}
+
+Let us assume now that the tree is almost perfect, with the
+penultimate level \(h-1\) containing \(q \neq 0\)~internal nodes, so
+\begin{equation}
+\OB{\fun{mkl}}{n} = \sum_{k=1}^{h-2}k2^k + (h-1)q
+= (h-3)2^{h-1} + 2 + (h-1)q.
+\label{eq:OBmkl_tmp2}
+\end{equation}
+Moreover, the total number~\(n\) of internal nodes, when summed level
+by level, satisfies \(n = \sum_{k=0}^{h-2}2^k + q = 2^{h-1} - 1 + q\),
+hence \(q = n - 2^{h-1} + 1\). By definition, we have \(0 < q
+\leqslant 2^{h-1}\), hence \(0 < n - 2^{h-1} + 1 \leqslant 2^{h-1}\),
+which yields \(h - 1 < \lg(n+1) \leqslant h\), then \(h =
+\ceiling{\lg(n+1)} = \floor{\lg n} + 1\), whence \(q = n -
+2^{\floor{\lg n}} + 1\). We can now substitute \(h\)~and~\(q\) by
+their newly found values in terms of~\(n\) back into
+equation~\eqref{eq:OBmkl_tmp2}:
+\begin{equation}
+\OB{\fun{mkl}}{n} = (n+1)\floor{\lg n} - 2^{\floor{\lg n}} + 2.
+\label{eq:OBmkl_almost_perfect}
+\end{equation}
+Comparing equations~\eqref{eq:OBmkl_perfect}
+and~\eqref{eq:OBmkl_almost_perfect}, we see that the number of
+comparisons is minimised when the tree is perfect, so \(n = 2^p -
+1\). The asymptotic approximation of \(\OB{\fun{mkl}}{n}\) is not
+difficult to find, as long as we avoid the pitfall \(2^{\floor{\lg n}}
+\sim n\). Indeed, consider the function \(x(p) := 2^p - 1\) ranging
+over the positive integers. First, let us notice that, for all
+\(p>0\),
+\begin{equation*}
+2^{p-1} \leqslant 2^p - 1 < 2^p \Rightarrow p-1 \leqslant \lg(2^p-1) <
+p \Rightarrow \floor{\lg(2^p-1)} = p-1.
+\end{equation*}
+Therefore, \(2^{\floor{\lg(x(p))}} = 2^{p-1} = (x(p)+1)/2 \sim x(p)/2
+\nsim x(p)\), which proves that \(2^{\floor{\lg(n)}} \nsim n\) when
+\(n=2^p-1 \rightarrow \infty\). Instead, in the case of
+equation~\eqref{eq:OBmkl_perfect}, let us use the standard
+inequalities \(x - 1 < \floor{x} \leqslant x\):
+\begin{equation*}
+(n+1)\lg n - 2n < \OB{\fun{mkl}}{n} \leqslant (n+1)\lg n - n + 1.
+\end{equation*}
+In the case of equation~\eqref{eq:OBmkl_almost_perfect}, let us use
+the definition of the fractional part\index{fractional part} \(\{x\}
+:= x - \floor{x}\). Obviously, \(0 \leqslant \{x\} < 1\). Then
+\begin{equation*}
+\OB{\fun{mkl}}{n} = (n+1)\lg n - n \cdot \theta(\{\lg n\})
+                    + 2 - \{\lg n\},
+\end{equation*}
+where \(\theta(x) := 1 + 2^{-x}\). Let us minimise and maximise the
+linear term: we have \(\min_{0 \leqslant x <
+  1}\theta(x) = \theta(1) = 3/2\) and \(\max_{0 \leqslant x <
+  1}\theta(x) = \theta(0) = 2\). Keeping in mind that \(x=\{\lg n\}\),
+we have
+\begin{equation*}
+(n+1)\lg n - 2n + 2 < \OB{\fun{mkl}}{n} < (n+1)\lg n - \tfrac{3}{2}n + 1.
+\end{equation*}
+In any case, it is now clearly established that \(\OB{\fun{mkl}}{n}
+\sim n\lg n\).\index{mkl@$\OB{\fun{mkl}}{n}$}
+
+Let \(\OW{\fun{mkl}}{n}\)\index{mkl@$\OW{\fun{mkl}}{n}$} be the
+maximum number of comparisons to build a binary search tree of
+size~\(n\) by leaf insertions. If we maximise each insertion, we need
+to grow a degenerate tree and insert at one external node of maximal
+path length: \(\OW{\fun{mkl}}{n} = \sum_{k=1}^{n-1}k =
+\tfrac{1}{2}n(n-1) \sim \tfrac{1}{2}n^2\).\index{binary search
+  tree!leaf insertion|)}
+
+\mypar{Root insertion}
+\index{binary search tree!root insertion|(}
+
+If recently inserted keys are looked up, the cost is relatively high
+because these keys are leaves or close to a leaf. In this scenario,
+instead of inserting a key as a leaf, it is better to insert it as a
+root \citep{Stephenson_1980}. The idea is to perform a leaf insertion
+and, on the way back to the root (that is to say, after the recursive
+calls are evaluated, one after the other), we perform rotations to
+bring the inserted node up to the root. More precisely, if the node
+was inserted in a left subtree, then a right rotation brings it one
+level up, otherwise a left rotation has the same effect. The
+composition of these rotations brings the leaf to the root. Right
+rotation, \fun{rotr/1}\index{rotr@\fun{rotr/1}} (\emph{rotate right})
+and left rotation, \fun{rotl/1}\index{rotl@\fun{rotl/1}} (\emph{rotate
+  left}),\index{binary tree!rotation} were discussed in
+section~\ref{sec:traversals} \vpageref{par:rotation} and are defined
+in \fig~\vref{fig:rotations}.
+\begin{figure}[b]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+\fun{rotr}(\fun{bst}(y,\fun{bst}(x,t_1,t_2),t_3))
+& \xrightarrow{\smash{\epsilon}} & \fun{bst}(x,t_1,\fun{bst}(y,t_2,t_3)).\\
+\fun{rotl}(\fun{bst}(x,t_1,\fun{bst}(y,t_2,t_3)))
+& \xrightarrow{\smash{\zeta}} & \fun{bst}(y,\fun{bst}(x,t_1,t_2),t_3).
+\end{array}}
+\end{equation*}
+\caption{Right (\(\smash{\epsilon}\)) and left (\(\smash{\zeta}\)) rotations\label{fig:rotations}}
+\end{figure}
+Obviously, they commute and are inverses of each other:
+\begin{equation*}
+\abovedisplayskip=5pt
+\belowdisplayskip=5pt
+\fun{rotl}(\fun{rotr}(t)) \equiv \fun{rotr}(\fun{rotl}(t)) \equiv t.
+\end{equation*}
+Moreover, and less trivially, they preserve inorder traversals:
+\begin{equation*}
+  \abovedisplayskip=5pt
+  \belowdisplayskip=5pt
+  \fun{in}_3(\fun{rotl}(t)) \equiv \fun{in}_3(\fun{rotr}(t)) \equiv
+  \fun{in}_3(t),
+\end{equation*}
+where \fun{in\(_3\)/1}\index{in3@\fun{in\(_3\)/1}} computes the
+inorder traversal of a tree: \(\fun{in}_3(t) \rightarrow
+\fun{in}_2(t,\el)\), with \fun{in\(_2\)/2}\index{in2@\fun{in\(_2\)/2}}
+being defined in \fig~\vref{fig:bst0}. This theorem is inherently
+connected to
+\(\pred{Rot}{x,y,t_1,t_2,t_3}\)\index{Rot@\predName{Rot}},
+\vpageref{def:Rot}, and it is easy to prove, without recourse to
+induction. First, we could remark that if \(\fun{in}_3(t) \equiv
+\fun{in}_3(\fun{rotl}(t))\), then, replacing \(t\) by
+\(\fun{rotr}(t)\) yields the equivalence \(\fun{in}_3(\fun{rotr}(t))
+\equiv \fun{in}_3(\fun{rotl}(\fun{rotr}(t))) \equiv \fun{in}_3(t)\),
+so we only need to prove \(\fun{in}_3(\fun{rotl}(t)) \equiv
+\fun{in}_3(t)\).  Since the left\hyp{}hand side is larger, we should
+try to rewrite it into the right\hyp{}hand side. Because a left
+rotation requires the tree to have the shape
+\(t=\fun{bst}(x,t_1,\fun{bst}(y,t_2,t_3))\), we have the rewrites of
+\fig~\vref{fig:in_rotr}.
+\begin{figure}
+  \begin{equation*}
+    \boxed{
+      \begin{array}{@{}r@{\;}l@{\;}l@{}}
+  \fun{in}_3(\fun{rotl}(t))
+  & \rightarrow & \fun{in}_2(\fun{rotl}(t),\el)\\
+  & = & \fun{in}_2(\fun{rotl}(\fun{bst}(x,t_1,\fun{bst}(y,t_2,t_3))),\el)\\
+  & \xrightarrow{\smash{\epsilon}} &
+  \fun{in}_2(\fun{bst}(y,\fun{bst}(x,t_1,t_2),t_3),\el)\\
+  & \rightarrow &
+  \fun{in}_2(\fun{bst}(x,t_1,t_2),\cons{y}{\fun{in}_2(t_3,\el)})\\
+  & \Rrightarrow &
+ \fun{in}_2(t_1,\cons{x}{\fun{in}_2(t_2,\cons{y}{\fun{in}_2(t_3,\el)})})\\
+  & \leftarrow &
+  \fun{in}_2(t_1,\cons{x}{\fun{in}_2(\fun{bst}(y,t_2,t_3),\el)})\\
+  & \leftarrow &
+  \fun{in}_2(\fun{bst}(x,t_1,\fun{bst}(y,t_2,t_3)),\el)\\
+  & = &
+  \fun{in}_2(t,\el)\\
+  & \leftarrow &
+  \fun{in}_3(t).\hfill\Box
+\end{array}
+}
+\end{equation*}
+\caption{Proof of \(\fun{in}_3(\fun{rotl}(t)) \equiv
+  \fun{in}_3(t)\)\label{fig:in_rotr}}
+\end{figure}
+If we rotate subtrees, as we did, for example, in \fig~\vref{fig:rot},
+the same theorem implies that the inorder traversal of the whole tree
+is invariant.
+
+A corollary is that rotations keep invariant the property of being a
+binary search tree (\fig~\vref{fig:bst}):
+\begin{equation*}
+\abovedisplayskip=5pt
+\belowdisplayskip=5pt
+\fun{bst}(\fun{rotl}(t)) \equiv \fun{bst}(\fun{rotr}(t)) \equiv \fun{bst}(t).
+\end{equation*}
+Indeed, assuming that \fun{bst/1} is the specification of
+\fun{bst\(_0\)/1} in \fig~\vref{fig:bst0}, and that the latter is
+correct, that is, \(\fun{bst}(t) \equiv \fun{bst}_0(t)\), it is quite
+easy to prove our theorem, with the help of the previous theorem
+\(\fun{in}_3(\fun{rotl}(t)) \equiv \fun{in}_3(t)\), which is
+equivalent to \(\fun{in}_2(\fun{rotl}(t),\el) \equiv
+\fun{in}_2(t,\el)\), and noticing that it is sufficient to prove
+\(\fun{bst}_0(\fun{rotl}(t)) \equiv \fun{bst}_0(t)\). We conclude:
+\begin{equation*}
+\fun{bst}_0(\fun{rotl}(t))
+\Rrightarrow \fun{ord}(\fun{in}_2(\fun{rotl}(t),\el))
+\equiv \fun{ord}(\fun{in}_2(t,\el))
+\leftarrow \fun{bst}_0(t).
+\end{equation*}
+
+Let us consider now an example of root insertion in
+\fig~\vref{fig:insr_ex}, where the tree of \fig~\vref{fig:bst_ex} is
+augmented with~\(7\).
+\begin{figure}[b]
+\centering
+\includegraphics[bb=71 641 406 724]{insr_ex}%[bb=71 645 406 718]
+\caption{Root insertion of \(7\) into \fig~\vref{fig:bst_ex}
+\label{fig:insr_ex}}
+\end{figure}
+Remark that the transitive closure \;\((\twoheadrightarrow)\) captures
+the preliminary leaf insertion, \((\xrightarrow{\smash{\epsilon}})\)
+is a right rotation and \((\xrightarrow{\smash{\zeta}})\) is a left
+rotation. It is now a simple matter to modify the definition of
+\fun{insl/2} so it becomes root insertion as \fun{insr/2}, in
+\fig~\vref{fig:insr}.
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+\fun{insr}(y,\fun{bst}(x,t_1,t_2)) & \xrightarrow{\smash{\eta}} &
+  \fun{rotr}(\fun{bst}(x,\fun{insr}(y,t_1),t_2)),
+  \; \text{if \(x \succ y\)};\\
+\fun{insr}(y,\fun{bst}(x,t_1,t_2)) & \xrightarrow{\smash{\theta}} &
+  \fun{rotl}(\fun{bst}(x,t_1,\fun{insr}(y,t_2)));\\
+\fun{insr}(y,\fun{ext}()) & \xrightarrow{\smash{\iota}} & \fun{bst}(y,\fun{ext}(),\fun{ext}()).
+\end{array}}
+\end{equation*}
+\caption{Root insertion with possible duplicates\label{fig:insr}}
+\end{figure}
+Note that we can avoid creating the temporary internal nodes
+\(\fun{bst}(x,\dots,t_2)\) and \(\fun{bst}(x,t_1,\dots)\) by modifying
+\fun{rotl/1} and \fun{rotr/1} so that they take three arguments
+(\fun{rotl\(_0\)/3} and \fun{rotr\(_0\)/3}), as shown along the new
+version \fun{insr\(_0\)/2} in \fig~\ref{fig:insr0}.
+\begin{figure}[b]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+\fun{insr}_0(y,\fun{bst}(x,t_1,t_2)) & \rightarrow &
+  \fun{rotr}_0(x,\fun{insr}_0(y,t_1),t_2),
+  \; \text{if \(x \succ y\)};\\
+\fun{insr}_0(y,\fun{bst}(x,t_1,t_2)) & \rightarrow &
+  \fun{rotl}_0(x,t_1,\fun{insr}_0(y,t_2));\\
+\fun{insr}_0(y,\fun{ext}()) & \rightarrow &
+\fun{bst}(y,\fun{ext}(),\fun{ext}()).\\
+\\
+\fun{rotr}_0(y,\fun{bst}(x,t_1,t_2),t_3)
+& \rightarrow & \fun{bst}(x,t_1,\fun{bst}(y,t_2,t_3)).\\
+\fun{rotl}_0(x,t_1,\fun{bst}(y,t_2,t_3))
+& \rightarrow & \fun{bst}(y,\fun{bst}(x,t_1,t_2),t_3).
+\end{array}}
+\end{equation*}
+\caption{Root insertion with possible duplicates (bis)\label{fig:insr0}}
+\end{figure}
+
+A comparison between leaf and root insertions reveals interesting
+facts. For instance, because leaf insertion does not displace any
+node, making the same tree from two permutations of the keys bears the
+same cost, for example, \((1,3,2,4)\) and \((1,3,4,2)\). On the other
+hand, as noted by \cite{GeldenhuysVanderMerwe_2009}, making the same
+search tree using different root insertions may yield different costs,
+like \((1,2,4,3)\) and \((1,4,2,3)\). They also prove that all the
+trees of a given size can either be created by leaf or root insertions
+because
+\begin{equation}
+\pred{RootLeaf}{s} \colon \fun{mkr}(s) \equiv \fun{mkl}(\fun{rev}(s)),
+\label{thm:RootLeaf}
+\index{RootLeaf@\predName{RootLeaf}}
+\end{equation}
+where \fun{mkr/1}\index{mkr@\fun{mkr/1}} \index{mkr@\fun{mkr/2}}
+(\emph{make roots}) is easily defined in \fig~\vref{fig:mkr}.
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\fun{mkr}(s) & \xrightarrow{\smash{\kappa}} &
+\fun{mkr}(s,\fun{ext}()).
+& \fun{mkr}(\el,t) & \xrightarrow{\smash{\lambda}} & t;\\
+&&&\fun{mkr}(\cons{x}{s},t) & \xrightarrow{\smash{\mu}} & \fun{mkr}(s,\fun{insr}(x,t)).
+\end{array}}
+\end{equation*}
+\caption{Making a binary search tree with root insertions
+\label{fig:mkr}}
+\end{figure}
+Notice that this is equivalent to claim \(\fun{mkr}(s) \equiv
+\fun{mklR}(s)\), where \fun{mklR/1} is defined in
+equation~\eqref{eq:mklR} \vpageref{eq:mklR}. It is worth proving
+\(\pred{RootLeaf}{s}\) here because, contrary to
+\cite{GeldenhuysVanderMerwe_2009}, we want to use structural induction
+to exactly follow the syntax of the function definitions, instead of
+induction on sizes, an adventitious concept, and we want to avoid
+using ellipses when describing the data. Furthermore, our logical
+framework is not separated from our actual function definitions (the
+abstract program): the rewrites themselves, that is, the computational
+steps, give birth to a logical interpretation as classes of equivalent
+terms.
+
+We start by remarking that \(\pred{RootLeaf}{s}\) is equivalent to
+\begin{equation*}
+\pred{RootLeaf\(_0\)}{s} \colon \fun{mkr}(s) \equiv
+  \fun{mkl}(\fun{rev}_0(s)),
+\index{RootLeaf0@\predName{RootLeaf\(_0\)}}
+\end{equation*}
+where
+\fun{rev\(_0\)/1} is defined at the start of
+section~\vref{sec:reversal}, where we prove \(\pred{EqRev}{s} \colon
+\fun{rev}_0(s) \equiv \fun{rev}(s)\).\index{EqRev@\predName{EqRev}} It
+is often a good idea to use \fun{rev\(_0\)/1} in inductive proofs
+because of rule~\(\smash{\delta}\) defining
+\(\fun{rev}_0(\cons{x}{s})\) directly in terms of \(\fun{rev}_0(s)\).
+Let us recall the relevant definitions:
+\begin{equation*}
+  \begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+  \fun{cat}(\el,t)\index{cat@\fun{cat/2}}
+& \xrightarrow{\smash{\alpha}} & t;
+& \fun{rev}_0(\el)
+& \xrightarrow{\smash{\gamma}} & \el;\\
+  \fun{cat}(\cons{x}{s},t)
+& \xrightarrow{\smash{\beta}} & \cons{x}{\fun{cat}(s,t)}.
+& \fun{rev}_0(\cons{x}{s})
+& \xrightarrow{\smash{\delta}} & \fun{cat}(\fun{rev}_0(s),[x]).
+\end{array}
+\end{equation*}
+Of course, \fun{rev\(_0\)/1}\index{rev0@\fun{rev\(_0\)/1}} is
+worthless as a program because of its quadratic cost, which cannot
+compete with the linear cost of \fun{rev/1}\index{rev@\fun{rev/1}},
+but, as far as theorem proving is concerned, it is a valuable
+specification and lemma \(\pred{EqRev}{s}\) allows us to transfer any
+equivalence depending upon \fun{rev\(_0\)/1} into an equivalence
+employing \fun{rev/1}.
+
+Let us proceed by induction on the structure of the
+stack~\(s\). First, we need to prove directly (without induction)
+\(\pred{RootLeaf\(_0\)}{\el}\). We have
+\begin{equation*}
+\fun{mkr}(\el) \!\xrightarrow{\smash{\kappa}}\! \fun{mkr}(\el,\fun{ext}())
+\!\xrightarrow{\smash{\lambda}}\! \fun{ext}()
+\!\xleftarrow{\smash{\psi}}\! \fun{mkl}(\el,\fun{ext}())
+\!\xleftarrow{\smash{\xi}}\! \fun{mkl}(\el)
+\!\xleftarrow{\smash{\gamma}}\! \fun{mkl}(\fun{rev}_0(\el)\!).
+\end{equation*}
+Second, we set the inductive hypothesis to be
+\(\pred{RootLeaf\(_0\)}{s}\) and we proceed to prove
+\(\pred{RootLeaf\(_0\)}{\cons{x}{s}}\), for any~\(x\). Since the
+right\hyp{}hand side is larger, we start rewriting it and whenever we
+feel astray, we rewrite the other side, aiming at their
+convergence. On the way, there will be steps, in the form of
+equivalences, which constitute lemmas (subgoals) that will need
+demonstration later.
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
+\fun{mkl}(\fun{rev}_0(\cons{x}{s}))
+& \xrightarrow{\smash{\delta}} &
+  \fun{mkl}(\fun{cat}(\fun{rev}_0(s),[x]))\\
+& \Rra{\xi} &
+  \fun{mkl}(\fun{cat}(\fun{rev}_0(s),[x]),\fun{ext}())\\
+& \equiv_0 & \fun{mkl}([x],\fun{mkl}(\fun{rev}_0(s),\fun{ext}()))
+& (\text{Lemma})\\
+& \Rra{\omega} &
+  \fun{mkl}(\el,\fun{insl}(x,\fun{mkl}(\fun{rev}_0(s),\fun{ext}())))\\
+& \Rra{\psi} &
+  \fun{insl}(x,\fun{mkl}(\fun{rev}_0(s),\fun{ext}()))\\
+& \Lla{\xi} &
+  \fun{insl}(x,\fun{mkl}(\fun{rev}_0(s)))\\
+& \equiv & \fun{insl}(x,\fun{mkr}(s)) & (\pred{RootLeaf\(_0\)}{s}\!)\\
+& \xrightarrow{\smash{\xi}} &
+  \fun{insl}(x,\fun{mkr}(s,\fun{ext}()))\\
+& \equiv_1 & \fun{mkr}(s,\fun{insl}(x,\fun{ext}()))
+& (\text{Lemma})\\
+& \xrightarrow{\smash{\phi}} & 
+  \fun{mkr}(s,\fun{bst}(x,\fun{ext}(),\fun{ext}()))\\
+& \xleftarrow{\smash{\iota}} &
+  \fun{mkr}(s,\fun{insr}(x,\fun{ext}()))\\
+& \xleftarrow{\smash{\mu}} & \fun{mkr}(\cons{x}{s},\fun{ext}())\\
+& \xleftarrow{\smash{\kappa}} & \fun{mkr}(\cons{x}{s}).
+& \hfill\Box
+\end{array}
+\end{equation*}
+
+Now, we have to prove the two lemmas that we identified with our proof
+sketch. The first one, in the instance of \((\equiv_0)\), looks like a
+corollary of\index{MklCat@\predName{MklCat}} \(\pred{MklCat}{u,v,t}
+\colon \fun{mkl}(\fun{cat}(u,v),t) \equiv_0
+\fun{mkl}(v,\fun{mkl}(u,t))\). The first action to be undertaken when
+facing a new proposition is to try to disprove it by some pertinent or
+tricky choice of variables. In this case, though, the truth of this
+lemma can be intuitively ascertained without effort, which gives us
+more confidence for working out a formal proof, instead of dispensing
+with one. It is enough to reason by induction on the structure of the
+stack~\(u\). First, we verify \(\pred{MklCat}{\el,v,t}\):
+\begin{equation*}
+\fun{mkl}(\fun{cat}(\el,v),t)
+  \xrightarrow{\smash{\alpha}} \fun{mkl}(v,t)
+  \xleftarrow{\smash{\psi}} \fun{mkl}(v,\fun{mkl}(\el,t)).
+\end{equation*}
+Second, we assume \(\pred{MklCat}{u,v,t}\), for all~\(v\) and~\(t\),
+which is thus the inductive hypothesis, and we prove
+\(\pred{MklCat}{\cons{x}{u},v,t}\):
+\begin{equation*}
+  \begin{array}{@{}r@{\;}l@{\;}l@{\quad}r@{}}
+      \fun{mkl}(\fun{cat}(\cons{x}{u},v),t)
+& \xrightarrow{\smash{\beta}} &
+  \fun{mkl}(\cons{x}{\fun{cat}(u,v)},t)\\
+& \Rra{\omega} &
+  \fun{mkl}(\fun{cat}(u,v),\fun{insl}(x,t))\\
+& \equiv_0 & \fun{mkl}(v,\fun{mkl}(u,\fun{insl}(x,t)))
+         & \!\!(\pred{MklCat}{u,v,\fun{inst}(x,t)}\!)\\
+& \xleftarrow{\smash{\omega}} &
+  \fun{mkl}(v,\fun{mkl}(\cons{x}{u},t)). & \hfill\Box
+\end{array}
+\end{equation*}
+
+Let us formally define the second lemma whose instance we identified
+as \((\equiv_1)\) in the proof of \(\pred{RootLeaf\(_0\)}{s}\). Let
+\begin{equation*}
+  \pred{MkrInsr}{x,s,t} \colon
+  \fun{insl}(x,\fun{mkr}(s,t)) \equiv_1 \fun{mkr}(s,\fun{insl}(x,t)).
+\end{equation*}
+This proposition, despite its pleasurable symbolic symmetry, is not
+trivial and may require some examples to be better grasped. It means
+that a leaf insertion can be performed before or after a series of
+root insertions, yielding in both cases the same tree. We approach the
+proof by induction on the structure of the stack~\(s\) only. (The
+other parameters are unlikely to be inductively relevant because
+\(x\)~is a key, so we can assume nothing about its internal structure,
+if any, and~\(t\) is the second parameter of both
+\fun{mkr/2}\index{mkr@\fun{mkr/2}} and
+\fun{insl/2}\index{insl@\fun{insl/2}}, so we do not know anything
+about its shape nor contents.) We start, as usual, with a verification
+(A verification, by definition, does not involve the use of any
+inductive argument.) of the basis\index{MkInsr@\predName{MkInsr}}
+\(\pred{MkInsr}{x,\el,t}\):
+\begin{equation*}
+  \fun{insl}(x,\fun{mkr}(\el,t))
+\xrightarrow{\smash{\lambda}} \fun{insl}(x,t)
+\Lla{\lambda} \fun{mkr}(\el,\fun{insl}(x,t)).
+\end{equation*}
+We now assume \(\pred{MkrInsr}{x,s,t}\) for all~\(x\) and~\(t\), and
+we try to prove \(\pred{MkrInsr}{x,\cons{y}{s},t}\), for all
+keys~\(y\), by rewriting both sides of the equivalence and aiming at
+the same term:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\;\;\,}r@{}}
+  \fun{insl}(x,\fun{mkr}(\cons{y}{s},t))
+& \xrightarrow{\smash{\mu}} &
+  \fun{insl}(x,\fun{mkr}(s,\fun{insr}(y,t)))\\
+& \equiv_1 & \fun{mkr}(s,\fun{insl}(x,\fun{insr}(y,t)))
+           & (\pred{MkrInsr}{x,s,\fun{insr}(y,t)}\!)\\
+& \equiv_2 & \fun{mkr}(s,\fun{insr}(y,\fun{insl}(x,t)))
+           & (\text{Lemma})\\
+& \Lla{\mu} & 
+  \fun{mkr}(\cons{y}{s},\fun{insl}(x,t)).
+& \hfill\Box
+\end{array}
+\end{equation*}
+Note that we have found that we need a lemma in the guise of its
+instance \((\equiv_2)\), which states that a root insertion commutes
+with a leaf insertion. This is not obvious and probably needs to be
+seen on some examples to be believed. The process of inductive
+demonstration itself has brought us to the important concept on which
+our initial proposition hinges. Let the lemma in question be formally
+defined as follows:
+\begin{equation*}
+\pred{Ins}{x,y,t} \colon \fun{insl}(x,\fun{insr}(y,t))
+\equiv_2 \fun{insr}(y,\fun{insl}(x,t)).
+\index{Ins@\predName{Ins}}
+\end{equation*}
+We will use induction on the structure of the tree~\(t\), because the
+other variables are keys, hence are atomic. The verification of
+\(\pred{Ins}{x,y,\fun{ext}()}\), the basis, happens to be rather
+lengthy, compared to earlier related proofs:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\quad}r@{}}
+  \fun{insl}(x,\fun{insr}(y,\fun{ext}()))
+& \xrightarrow{\smash{\iota}} &
+  \fun{insl}(x,\fun{bst}(y,\fun{ext}(),\fun{ext}())) & \otimes
+\end{array}
+\end{equation*}
+The symbol \(\otimes\) is a tag from which different rewrites are
+possible, depending on some condition, and we will need to resume from
+that mark. Here, two cases present themselves to us: either \(x \succ
+y\) or \(y \succ x\). We have
+\begin{itemize}
+
+  \item If \(x \succ y\), then
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\quad}r@{}}
+\otimes
+& \xrightarrow{\smash{\upsilon}} & 
+  \fun{bst}(y,\fun{ext}(),\fun{insl}(x,\fun{ext}()))
+& (x \succ y)\\
+& \xrightarrow{\smash{\phi}} &
+  \fun{bst}(y,\fun{ext}(),\fun{bst}(x,\fun{ext}(),\fun{ext}()))\\
+& \xleftarrow{\smash{\epsilon}} &
+\fun{rotr}(\fun{bst}(x,\fun{bst}(y,\fun{ext}(),\fun{ext}()),\fun{ext}()))\\
+& \xleftarrow{\smash{\iota}} &
+  \fun{rotr}(\fun{bst}(x,\fun{insr}(y,\fun{ext}()),\fun{ext}()))\\
+& \xleftarrow{\smash{\eta}} &
+  \fun{insr}(y,\fun{bst}(x,\fun{ext}(),\fun{ext}()))
+& (x \succ y)\\
+& \xleftarrow{\smash{\phi}} &
+  \fun{insr}(y,\fun{insl}(x,\fun{ext}())).
+\end{array}
+\end{equation*}
+
+  \item If \(y \succ x\), then
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
+\otimes & \xrightarrow{\smash{\tau}} &
+  \fun{bst}(y,\fun{insl}(x,\fun{ext}()),\fun{ext}())
+& (y \succ x)\\
+& \xrightarrow{\smash{\phi}} &
+  \fun{bst}(y,\fun{bst}(x,\fun{ext}(),\fun{ext}()),\fun{ext}())\\
+& \xleftarrow{\smash{\xi}} &
+\fun{rotl}(\fun{bst}(x,\fun{ext}(),\fun{bst}(y,\fun{ext}(),\fun{ext}())))\\
+& \xleftarrow{\smash{\iota}} &
+  \fun{rotl}(\fun{bst}(x,\fun{ext}(),\fun{insr}(y,\fun{ext}())))\\
+& \xleftarrow{\smash{\theta}} &
+  \fun{insr}(y,\fun{bst}(x,\fun{ext}(),\fun{ext}()))
+& (y \succ x)\\
+& \xleftarrow{\smash{\phi}} &
+  \fun{insr}(y,\fun{insl}(x,\fun{ext}())).
+\end{array}
+\end{equation*}
+\end{itemize}
+
+Now, let us assume \(\pred{Ins}{x,y,t_1}\) and \(\pred{Ins}{x,y,t_2}\)
+and proceed to prove \(\pred{Ins}{x,y,t}\), with
+\(t=\fun{bst}(a,t_1,t_2)\), for all keys~\(a\). We start arbitrarily
+with the right\hyp{}hand side as follows:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\quad}r@{}}
+  \fun{insr}(y,\fun{insl}(x,t))
+& = & \fun{insr}(y,\fun{insl}(x,\fun{bst}(a,t_1,t_2))) & \otimes
+\end{array}
+\end{equation*}
+Two cases arise: either \(a \succ x\) or \(x \succ a\).
+\begin{itemize}
+
+\item If \(a \succ x\), then \(\otimes \xrightarrow{\smash{\tau}}
+  \fun{insr}(y,\fun{bst}(a,\fun{insl}(x,t_1),t_2)) \; \otimes\). Two
+  subcases reveal themselves: either \(a \succ y\) or \(y \succ a\).
+  \begin{itemize}
+
+    \item If \(a \succ y\), then 
+      \begin{equation*}
+      \begin{array}{@{}r@{\;}l@{\;}l@{\hspace{-8mm}}r@{}}
+        \otimes & \Rra{\eta} &
+        \fun{rotr}(\fun{bst}(a,\fun{insr}(y,\fun{insl}(x,t_1)),t_2))
+        & (a \succ y)\\
+        & \equiv_2 & \fun{rotr}(\fun{bst}(a,\fun{insl}(x,  
+        \fun{insr}(y,t_1)),t_2)) & (\pred{Ins}{x,y,t_1})\\
+        & \Lla{\tau} & \fun{rotr}(\fun{insl}(x,
+        \fun{bst}(a,\fun{insr}(y,t_1),t_2)))\\
+        & \equiv & \fun{rotr}(\fun{insl}(x,
+        \fun{rotl}(\fun{rotr}(\fun{bst}(a,\fun{insr}(y,t_1),t_2)))))\\
+        & \xleftarrow{\smash{\eta}} &
+        \fun{rotr}(\fun{insl}(x,\fun{rotl}(\fun{insr}(y, 
+        \fun{bst}(a,t_1,t_2)))))\\
+        & = & \fun{rotr}(\fun{insl}(x,\fun{rotl}(\fun{insr}(y,t))))
+        & (t=\fun{bst}(a,t_1,t_2))\\
+        & \equiv_3 & \fun{rotr}(\fun{rotl}(\fun{insl}(x, 
+        \fun{insr}(y,t)))) & (\text{Lemma})\\
+        & \equiv & \fun{insl}(x,\fun{insr}(y,t)).
+        & (\fun{rotr}(\fun{rotl}(z)) \equiv z)
+      \end{array}
+      \end{equation*}
+      What makes this case of the proof work is that \(a \succ x\) and
+      \(a \succ y\) allow us to move the calls to the rotations down
+      into the term so that they are composed on the subtree~\(t_1\),
+      enabling the application of the inductive hypothesis
+      \(\pred{Ins}{x,y,t_1}\). Then we bring back up the commuted
+      calls, using the fact that composing a left and right rotation,
+      and vice\hyp{}versa, is the identity. Note how, in the process,
+      we found a new lemma we need to prove later in the instance of
+      \((\equiv_3)\). The interpretation of this subgoal is that left
+      rotation and leaf insertion commute, shedding more light on the
+      matter.
+
+    \item If \(y \succ a\), then
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\hspace{-8mm}}r@{}}
+  \otimes & \xrightarrow{\smash{\theta}} &
+  \fun{rotl}(\fun{bst}(a,\fun{insl}(x,t_1),\fun{insr}(y,t_2)))
+  & (y \succ a)\\
+  & \Lla{\tau} &
+  \fun{rotl}(\fun{insl}(x,\fun{bst}(a,t_1,\fun{insr}(y,t_2))))\\
+  & \equiv &
+  \fun{rotl}(\fun{insl}(x,\fun{rotr}(\fun{rotl}(\fun{bst}(a,t_1,    
+  \fun{insr}(y,t_2))))))\\
+  & \xleftarrow{\smash{\theta}} &
+  \fun{rotl}(\fun{insl}(x,\fun{rotr}(\fun{insr}(y, 
+  \fun{bst}(a,t_1,t_2)))))\\
+  & = & \fun{rotl}(\fun{insl}(x,\fun{rotr}(\fun{insr}(y,t))))
+  & (t=\fun{bst}(a,t_1,t_2))\\
+  & \equiv_4 & \fun{rotl}(\fun{rotr}(\fun{insl}(x,\fun{insr}(y,t))))
+  & (\text{Lemma})\\
+  & \equiv & \fun{insl}(x,\fun{insr}(y,t)).
+  & (\fun{rotl}(\fun{rotr}(z)) \equiv z)
+\end{array}
+\end{equation*}
+Here, there was no need for the inductive hypothesis, because \(a
+\succ x\) and \(y \succ a\) imply \(y \succ x\), hence the leaf and
+root insertions are not composed and apply to two different subtrees,
+\(t_1\) and~\(t_2\). All we have to do then is to get them up in the
+same order we got them down (as in a queue). We discovered another
+subgoal that needs proving later, in the instance of \((\equiv_4)\),
+and which is the dual of \((\equiv_3)\) because it states that right
+rotation and leaf insertion commute. Together, they mean that
+rotations commute with leaf insertion.
+  \end{itemize}
+
+\item If \(x \succ a\), then \(\otimes \xrightarrow{\smash{\upsilon}}
+  \fun{insr}(y, \fun{bst}(a, t_1, \fun{insl}(y,t_2))) \;
+  \otimes\). Two subcases become apparent: either \(a \succ y\) or \(y
+  \succ a\).
+  \begin{itemize}
+
+    \item If \(a \succ y\), then
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\hspace{-9mm}}r@{}}
+  \otimes & \Rra{\eta} & \fun{rotr}(\fun{bst}(a,
+  \fun{bst}(a,\fun{insr}(y,t_1),\fun{insl}(x,t_2))))
+  & (a \succ y)\\
+  & \Lla{\upsilon} &
+  \fun{rotr}(\fun{insl}(x,\fun{bst}(a,\fun{insr}(y,t_1),t_2)))\\
+  & \equiv & \fun{rotr}(\fun{insl}(x, 
+  \fun{rotl}(\fun{rotr}(\fun{bst}(a,\fun{insr}(y,t_1),t_2)))))\\
+  & \xleftarrow{\smash{\eta}} &
+  \fun{rotr}(\fun{insl}(x,\fun{rotl}(\fun{insr}(y, 
+  \fun{bst}(a,t_1,t_2)))))\\
+  & = & \fun{rotr}(\fun{insl}(x,\fun{rotl}(\fun{insr}(y,t))))
+  & (t=\fun{bst}(a,t_1,t_2))\\
+  & \equiv_3 &
+  \fun{rotr}(\fun{rotl}(\fun{insl}(x,\fun{insr}(y,t))))\\
+  & \equiv & \fun{insl}(x,\fun{insr}(y,t)).
+  & (\fun{rotr}(\fun{rotl}(z)) \equiv z)
+\end{array}
+\end{equation*}
+This subcase is similar to the previous one in the sense that the
+insertions apply to different subtrees, thus there is no need for the
+inductive hypothesis. The difference is that, here, \((\equiv_3)\) is
+required in stead of \((\equiv_4)\).
+
+  \item If \(y \succ a\), then
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
+  \otimes & \Rra{\theta} & 
+  \fun{rotl}(\fun{bst}(a,t_1,\fun{insr}(y,\fun{insl}(x,t_2))))\\
+  & \equiv_2 & \fun{rotl}(\fun{bst}(a,t_1,\fun{insl}(x,
+  \fun{insr}(y,t_2)))) & (\pred{Ins}{x,y,t_2})\\
+  & \Lla{\upsilon} &
+  \fun{rotl}(\fun{insl}(x,\fun{bst}(a,t_1,\fun{insr}(y,t_2))))\\
+  & \equiv_3 & \fun{insl}(x,\fun{rotl}(\fun{bst}(a,t_1,
+  \fun{insr}(y,t_2))))\\
+  & \xleftarrow{\smash{\theta}} & \fun{insl}(x,\fun{insr}(y,
+  \fun{bst}(a,t_1,t_2)))\\
+  & = & \fun{insl}(x,\fun{insr}(y,t)). & (t=\fun{bst}(a,t_1,t_2))
+\end{array}
+\end{equation*}
+This is the last subcase. It is similar to the first one, because the
+insertions are composed, albeit on~\(t_2\) instead of~\(t_1\),
+therefore calling for the inductive hypothesis to be applied. Then,
+insertions are brought up in the same order they were moved down,
+\emph{e.g.,} \fun{insl/2} was pushed down before \fun{insr/2} and is
+lifted up before \fun{insr/2}.\hfill\(\Box\)
+  \end{itemize}
+
+\end{itemize}
+
+We now have to prove two remaining lemmas, dual of each other and
+meaning together that rotations commute with leaf insertions. Let us
+consider the first:
+\begin{equation*}
+\fun{insl}(x,\fun{rotl}(t)) \equiv_3 \fun{rotl}(\fun{insl}(x,t)).
+\end{equation*}
+Implicitly, this proposition makes sense only if \(t=\fun{bst}(a, t_1,
+\fun{bst}(b,t_2,t_3))\) is a binary search tree, which implies \(b
+\succ a\). The proof is technical in nature, which means that it
+requires many cases and does not bring new insights, which the lack of
+induction underlies. We start as follows:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{}}
+  \fun{insl}(x,\fun{rotl}(t))
+& = & \fun{insl}(x,\fun{rotl}(\fun{bst}(a, t_1,
+\fun{bst}(b,t_2,t_3))))\\
+& \xrightarrow{\smash{\zeta}} &
+\fun{insl}(x,\fun{bst}(b,\fun{bst}(a,t_1,t_2),t_3)) \quad \otimes
+\end{array}
+\end{equation*}
+Two cases arise: either \(b \succ x\) or \(x \succ b\).
+\begin{itemize}
+
+  \item If \(b \succ x\), then \(\otimes \xrightarrow{\smash{\tau}}
+  \fun{bst}(b,\fun{insl}(x,\fun{bst}(a,t_1,t_2)),t_3) \; \otimes\).
+  Two subcases surface: either \(a \succ x\) or \(x \succ a\).
+ 
+  \(\begin{array}{@{}r@{\;}l@{\;}l@{}}
+      \text{\;-- If \(a \succ x\), then \(\otimes\)} &       
+      \xrightarrow{\smash{\tau}} &
+      \fun{bst}(b,\fun{bst}(a,\fun{insl}(x,t_1),t_2),t_3)\\
+      & \Lla{\zeta} &
+      \fun{rotl}(\fun{bst}(a,\fun{insl}(x,t_1),
+      \fun{bst}(b,t_2,t_3)))\\
+      & \xleftarrow{\smash{\tau}} &
+      \fun{rotl}(\fun{insl}(x,\fun{bst}(a,t_1,
+      \fun{bst}(b,t_2,t_3))))\\
+      & = & \fun{rotl}(\fun{insl}(x,t)).
+    \end{array}\)
+
+    \(\begin{array}{@{}r@{\;}l@{\;}l@{}}
+      \text{\;-- If \(x \succ a\), then \(\otimes\)} &
+      \xrightarrow{\smash{\upsilon}} &
+      \fun{bst}(b,\fun{bst}(a,t_1,\fun{insl}(x,t_2)),t_3)\\
+      & \Lla{\zeta} & 
+      \fun{rotl}(\fun{bst}(a,t_1,\fun{bst}(b,\fun{insl}(x,t_2),t_3)))\\
+      & \xleftarrow{\smash{\tau}} &
+      \fun{rotl}(\fun{bst}(a,t_1,\fun{insl}(x,\fun{bst}(b,t_2,t_3))))\\
+      & \xleftarrow{\smash{\upsilon}} &
+      \fun{rotl}(\fun{insl}(x,\fun{bst}(a,t_1,\fun{bst}(b,t_2,t_3))))\\
+      & = & \fun{rotl}(\fun{insl}(x,t)).
+      \end{array}\)
+
+  \item If \(x \succ b\), then the assumption \(b \succ a\) implies
+    \(x \succ a\). We have
+  \begin{equation*}
+  \begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
+    \otimes & \xrightarrow{\smash{\upsilon}} &
+    \fun{bst}(b,\fun{bst}(a,t_1,t_2),\fun{insl}(x,t_3))\\
+    & \Lla{\zeta} &
+    \fun{rotl}(\fun{bst}(a,t_1,\fun{bst}(b,t_2,\fun{insl}(x,t_3))))\\
+    & \xleftarrow{\smash{\upsilon}} &
+    \fun{rotl}(\fun{bst}(a,t_1,\fun{insl}(x,\fun{bst}(b,t_2,t_3))))
+    & (x \succ b)\\
+    & \xleftarrow{\smash{\upsilon}} &
+    \fun{rotl}(\fun{insl}(x,\fun{bst}(a,t_1,\fun{bst}(b,t_2,t_3))))
+    & (x \succ a)\\
+    & = & \fun{rotl}(\fun{insl}(x,t)). & \hfill\Box
+  \end{array}
+  \end{equation*}
+
+\end{itemize}
+
+The last remaining lemma is \(\fun{insl}(x,\fun{rotr}(t)) \equiv_4
+\fun{rotr}(\fun{insl}(x,t))\). In fact, it is a simple algebraic
+matter to show that it is equivalent to \(\fun{insl}(x,\fun{rotl}(t))
+\equiv_3 \fun{rotl}(\fun{insl}(x,t))\). Indeed, we have the following
+equivalent equations:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{}}
+\fun{insl}(x,\fun{rotl}(t)) & \equiv_3 & \fun{rotl}(\fun{insl}(x,t))\\
+\fun{insl}(x,\fun{rotl}(\fun{rotr}(t))) & \equiv &
+\fun{rotl}(\fun{insl}(x,\fun{rotr}(t)))\\
+\fun{insl}(x,t) & \equiv & \fun{rotl}(\fun{insl}(x,\fun{rotr}(t)))\\
+\fun{rotr}(\fun{insl}(x,t)) & \equiv &
+\fun{rotr}(\fun{rotl}(\fun{insl}(x,\fun{rotr}(t))))\\
+\fun{rotr}(\fun{insl}(x,t)) & \equiv_4 &
+\fun{insl}(x,\fun{rotr}(t)).\hfill\Box
+\end{array}
+\end{equation*}
+
+
+\mypar{Average cost}
+
+The average number of comparisons of root insertion is the same as
+with leaf insertion, because rotations do not involve any comparison:
+\begin{equation*}
+\OM{\fun{insr}}{n} = \OM{\fun{insr}_0}{n} = \OM{\fun{insl}}{n}
+= 2H_n + \frac{2}{n+1} - 3 \sim 2\ln n.
+\index{insr@$\OM{\fun{insr}}{n}$}
+\index{insr0@$\OM{\fun{insr}_0}{n}$}
+\end{equation*}
+Rotations double the cost of a step down in the tree, though, and we
+have, recalling equations~\eqref{eq:Mmem_cmp1}
+and~\eqref{eq:Mmem_cmp2} \vpageref{eq:Mmem_cmp2},
+\begin{equation*}
+\M{\fun{insr}}{n} = 1 + \frac{2}{n+1}\Expected{E_n} = 1 +
+\OM{\fun{mem}}{n{\scriptscriptstyle(-)}} = 4H_n + \frac{4}{n+1} - 3
+\sim 4\ln n.
+\index{insr@$\M{\fun{insr}}{n}$}
+\end{equation*}
+As a consequence of theorem~\eqref{thm:RootLeaf}
+\vpageref{thm:RootLeaf}, all permutations of a given size yield the
+same set of binary search trees under \fun{mkl/1} and
+\fun{mkr/1}. Therefore, inserting another key will incur the same
+average number of comparisons by \fun{insl/1} and \fun{insr/1} since
+\(\OM{\fun{insr}}{n} = \OM{\fun{insr}_0}{n} = \OM{\fun{insl}}{n}\). By
+induction on the size, we conclude that the average number of
+comparisons for \fun{mkl/1} and \fun{mkr/1} is the same:
+\begin{equation*}
+\OM{\fun{mkr}}{n} = \OM{\fun{mkl}}{n} = \Expected{I_n}
+= 2(n+1)H_n - 4n.
+\index{mkr@$\OM{\fun{mkr}}{n}$}
+\end{equation*}
+Considering that the only difference between \fun{insl/1} and
+\fun{insr/1} is the additional cost of one rotation per edge down, we
+quickly realise, by recalling equations~\eqref{eq:Mmkl}
+and~\eqref{eq:IEn}, that
+\begin{equation*}
+\M{\fun{mkr}}{n} = \M{\fun{mkl}}{n} + \Expected{I_n}
+= n + 2 \cdot \Expected{I_n} + 2 = 4(n+1)H_n - 7n + 2.
+\index{mkr@$\M{\fun{mkr}}{n}$}
+\end{equation*}
+
+\mypar{Amortised cost}
+\index{cost!amortised $\sim$|(}
+
+Since the first phase of root insertion is a leaf insertion, the
+previous analyses of the extremal costs of \fun{insl/2} and
+\fun{insl\(_1\)/2} apply as well to \fun{insr/2}. Let us consider now
+the amortised costs of \fun{insr/2}, namely, the extremal costs of
+\fun{mkr/1}.
+
+Let \(\OB{\fun{mkr}}{n}\)\index{mkr@$\OB{\fun{mkr}}{n}$} the minimum
+number of comparisons to build a binary search tree of size~\(n\)
+using root insertions. We saw that the best case with leaf insertion
+(\fun{insl/2}) happens when the key is inserted as a child of the
+root. While this cannot lead to the best amortised cost (\fun{mkl/1}),
+it yields the best amortised cost when using root insertions
+(\fun{mkr/1}) because the newly inserted key becomes the root with
+exactly one rotation (a left rotation if it was the right child, and a
+right rotation if it was the left child of the root), leaving the spot
+empty again for another efficient insertion (\fun{insr/2}). In the
+end, the search tree is degenerate, in fact, there are exactly two
+minimum\hyp{}cost trees, whose shapes are those of
+\fig~\vref{fig:tree_stack}. Interestingly, these trees correspond to
+maximum\hyp{}cost trees built using leaf insertions. The first key is
+not compared, so we have \(\OB{\fun{mkr}}{n} = n - 1 \sim
+\OB{\fun{mkl}}{n}/\lg n\).
+
+Perhaps surprisingly, it turns out that finding the maximum number of
+comparisons \(\OW{\fun{mkr}}{n}\)\index{mkr@$\OW{\fun{mkr}}{n}$} 
+to make a search tree of size~\(n\) with \fun{mkr/1}, that is to say,  
+the maximum amortised number of comparisons of \fun{insr/2}, happens
+to be substantially more challenging than making out its average or
+minimum cost. \cite{GeldenhuysVanderMerwe_2009} show that
+\begin{equation*}
+\OW{\fun{mkr}}{n} = \tfrac{1}{4}n^2 + n - 2 - c,
+\end{equation*}
+where \(c = 0\) for \(n\)~even, and \(c=\myfrac{1}/{4}\) for
+\(n\)~odd. This implies
+\begin{equation*}
+\OW{\fun{mkr}}{n} = \tfrac{1}{2}\OW{\fun{mkl}}{n} + \tfrac{5}{4}n - 2 -
+c \sim \tfrac{1}{2}\OW{\fun{mkl}}{n}.
+\end{equation*}
+\index{cost!amortised $\sim$|)}
+
+
+\paragraph{Exercises}
+
+\begin{enumerate}
+
+  \item Prove \(\fun{bst}_0(t) \equiv \fun{bst}(t)\). See definitions of
+  \fun{bst\(_0\)/1}\index{bst0@\fun{bst\(_0\)/1}} and
+  \fun{bst/1}\index{bst@\fun{bst/1}}, respectively, in
+  \fig~\vref{fig:bst0} and \fig~\vref{fig:bst}.
+
+  \item Prove \(\fun{mem}(y,t) \equiv \fun{mem}_3(y,t)\), that is to
+  say, the correctness of Andersson's search. See definitions of
+  \fun{mem/2}\index{mem@\fun{mem/2}} and
+  \fun{mem\(_3\)/2}\index{mem3@\fun{mem\(_3\)/2}}, respectively, in
+  \fig~\vref{fig:mem} and \fig~\vref{fig:mem3}.
+
+  \item Prove \(\fun{insr}(x,t) \equiv \fun{bst}(x,t_1,t_2)\).
+  \index{insr@\fun{insr/2}} In
+    other words, root insertion is really doing what it says it does.
+
+  \item Prove \(\fun{mklR}(s) \equiv \fun{mkl}(\fun{rev}(s))\).
+    \index{mklR@\fun{mklR/1}} \index{mkl@\fun{mkl/1}}
+    \index{rev@\fun{rev/1}}
+
+  \item Prove \(\fun{bst}(t) \equiv \fun{true}() \Rightarrow
+    \fun{mkl}(\fun{pre}(t)) \equiv t\). See definition of \fun{pre/1}
+    \index{pre@\fun{pre/1}} in \fig~\vref{fig:pre}. Is the converse
+    true as well?
+
+\end{enumerate}
+\index{binary search tree!root insertion|)}
+
+\section{Deletion}
+\index{binary search tree!deletion|(}
+
+The removal of a key in a binary search tree is a bit tricky, in
+contrast with leaf insertion. Of course, `removal' is a convenient
+figure of speech in the context of functional programming, where data
+structures are persistent, hence removal means that we have to rebuild
+a new search tree without the key in question. As with insertion, we
+could simply start with a search for the key: if absent, there is
+nothing else to be done, otherwise we replace the key with its
+immediate successor or predecessor in inorder, that is, the minimum of
+the right subtree or the maximum of the left subtree. 
+
+The definitions for these two phases are found in \fig~\vref{fig:del}.
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+  \fun{del}(y,\fun{bst}(x,t_1,t_2)) & \rightarrow &
+  \fun{bst}(x,\fun{del}(y,t_1),t_2),\; \text{if \(x \succ y\)};\\
+\fun{del}(y,\fun{bst}(x,t_1,t_2)) & \rightarrow &
+  \fun{bst}(x,t_1,\fun{del}(y,t_2)),\; \text{if \(y \succ x\)};\\
+\fun{del}(y,\fun{bst}(x,t_1,t_2)) & \rightarrow & 
+   \fun{aux}_0(x,t_1,\fun{min}(t_2));\\
+\fun{del}(y,\fun{ext}()) & \rightarrow & \fun{ext}().\\
+\\
+\fun{min}(\fun{bst}(x,\fun{ext}(),t_2)) & \rightarrow & \pair{x}{t_2};\\
+\fun{min}(\fun{bst}(x,t_1,t_2)) & \rightarrow & 
+  \fun{aux}_1(x,\fun{min}(t_1),t_2).\\
+\\
+\fun{aux}_1(x,\pair{m}{t'_1},t_2) & \rightarrow & 
+  \pair{m}{\fun{bst}(x,t'_1,t_2)}.\\
+\\
+\fun{aux}_0(x,t_1,\pair{m}{t'_2}) & \rightarrow & \fun{bst}(m,t_1,t'_2).
+\end{array}}
+\end{equation*}
+\caption{Deletion of a key in a binary search tree\label{fig:del}}
+\end{figure}
+We have \(\fun{min}(t_2) \twoheadrightarrow
+\pair{m}{t'_2}\),\index{min@\fun{min/1}} where \(m\)~is the minimum
+key of the tree~\(t_2\) and \(t'_2\)~is the reconstruction of~\(t_2\)
+without~\(m\); in other words, the leftmost internal node of~\(t_2\)
+contains the key~\(m\) and that node has been replaced by an external
+node. The call to \fun{aux\(_0\)/3} simply substitutes the key~\(x\)
+to be deleted by its immediate successor~\(m\). The purpose of the
+auxiliary function \fun{aux\(_1\)/3} is to rebuild the tree in which
+the minimum has been removed. Note that the pattern of the third rule
+is not \(\fun{del}(y, \fun{bst}(y,t_1,t_2))\),\index{del@\fun{del/2}}
+because we already know that \(x=y\) and we want to avoid a useless
+equality test.
+
+Of course, we could also have taken the maximum of the left subtree
+and this arbitrary asymmetry actually leads deletions followed by at
+least two insertions to trees which are less balanced, in average,
+than if they had been constructed directly only with insertions. This
+phenomenon is difficult to understand and examples are needed to see
+it at work
+\citep{Eppinger_1983,CulbersonMunro_1989,CulbersonEvans_1994,Knuth_1998a,Heyer_2009}.
+
+Another kind of asymmetry is that deletion is much more complicated to
+program than insertion. This fact has lead some researchers to propose
+a common framework for insertion and deletion
+\citep{Andersson_1991,Hinze_2002}. In particular, when Andersson's
+search with a tree candidate is modified into deletion, the program is
+quite short if the programming language is imperative.
+
+Another approach to deletion consists in marking the targeted nodes as
+deleted without actually removing them. They are still needed for
+future comparisons but they are not to be considered part of the
+collection of keys implemented by the search tree. As such they are
+alike zombies, neither alive nor dead, or we could talk of lazy
+deletion. More seriously, this requires two kinds of internal nodes,
+\fun{bst/3} and \fun{del/3}.\index{del@\fun{del/3}} This alternative
+design is shown in \fig~\vref{fig:del0}.
+\begin{figure}[b]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}l@{\;}l}
+  \fun{del}_0(y,\fun{bst}(x,t_1,t_2)) & \rightarrow &
+  \fun{bst}(x,\fun{del}_0(y,t_1),t_2),\; \text{if \(x \succ y\)};\\
+\fun{del}_0(y,\fun{bst}(x,t_1,t_2)) & \rightarrow &
+  \fun{bst}(x,t_1,\fun{del}_0(y,t_2)),\; \text{if \(y \succ x\)};\\
+\fun{del}_0(y,\fun{bst}(x,t_1,t_2)) & \rightarrow & 
+  \fun{del}(x,t_1,t_2);\\
+\fun{del}_0(y,\fun{del}(x,t_1,t_2)) & \rightarrow &
+  \fun{del}(x,\fun{del}_0(y,t_1),t_2),\; \text{if \(x \succ y\)};\\
+\fun{del}_0(y,\fun{del}(x,t_1,t_2)) & \rightarrow &
+  \fun{del}(x,t_1,\fun{del}_0(y,t_2)),\; \text{if \(y \succ x\)};\\
+\fun{del}_0(y,t) & \rightarrow & t.\\
+\end{array}}
+\end{equation*}
+\caption{Lazy deletion of a key in a binary search tree\label{fig:del0}}
+\end{figure}
+Note that the insertion of a key which happens to have been lazily
+deleted does not need to be performed at an external node: the
+constructor \fun{del/3} would simply be changed into \fun{bst/3}, the
+mark of normal internal nodes.
+
+\paragraph{Exercise}
+
+Define the usual insertions on this new kind of search tree.
+
+\index{binary search tree!deletion|)}
+
+%\section{Merging}
+%% Brown & Tarjan Merging
+
+\section{Average parameters}
+
+The average height~\(h_n\) of a binary search tree of size~\(n\) has
+been intensively studied \citep{Devroye_1986, Devroye_1987,
+  Mahmoud_1992, KnesslSpankowski_2002}, but the methods, mostly of
+analytic nature, are beyond the scope of this book. \cite{Reed_2003}
+proved that
+\begin{equation*}
+h_n = \alpha \ln n - \frac{3\alpha}{2\alpha - 2} \ln\ln n + \mathcal{O}(1),
+\end{equation*}
+where \(\alpha\)~is the unique solution on \([2,+\infty[\) to the
+equation \(\alpha\ln(2e/\alpha) = 1\), an approximation being \(\alpha
+\simeq 4.31107\), and \(\mathcal{O}(1)\) is an unknown function whose
+absolute value is bounded from above by an unknown
+constant. Particularly noteworthy is a rough logarithmic upper bound
+by \cite{Aslam_2001}, expressed in a probabilistic model and
+republished by \cite{CLRS_2009} in section~12.4.
+
+\cite{ChauvinDrmotaJabbour-Hattab_2001} studied the average width of
+binary search trees.
+

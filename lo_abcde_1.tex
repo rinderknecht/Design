@@ -1,0 +1,61 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath,amssymb}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\Tf[framesize=6pt]
+%\;
+\pstree[nodesepA=1pt,nodesepB=0pt,levelsep=17pt,treesep=14pt]{\TR{\fun{d}}}{
+  \Tf[framesize=6pt]
+  \Tf[framesize=6pt]
+}
+\pstree[nodesepA=1pt,nodesepB=0pt,levelsep=17pt,treesep=14pt]{\TR{\fun{e}}}{
+  \Tf[framesize=6pt]
+  \Tf[framesize=6pt]
+}
+%\;
+\Tf[framesize=6pt]
+\;\;\raisebox{-3pt}{\(\rightarrow\)}\;\;
+\Tf[framesize=6pt]
+%\;
+\pstree[nodesepA=1pt,nodesepB=0pt,levelsep=17pt,treesep=14pt]{\TR{\fun{d}}}{
+  \Tf[framesize=6pt]
+  \Tf[framesize=6pt]
+}
+\pstree[nodesep=0pt,levelsep=17pt,treesep=14pt]{\TCircle{\fun{e}}}{
+  \Tf[framesize=6pt]
+  \Tf[framesize=6pt]
+}
+\raisebox{-3pt}{\(\rightarrow\)}\;\;
+\Tf[framesize=6pt]
+\;
+\Tf[framesize=6pt]
+\;
+\Tf[framesize=6pt]
+%\;
+\pstree[nodesep=0pt,levelsep=17pt,treesep=14pt]{\TCircle{\fun{d}}}{
+  \Tf[framesize=6pt]
+  \Tf[framesize=6pt]
+}
+\raisebox{-3pt}{\(\rightarrow\)}\;\;
+\Tf[framesize=6pt]
+\;
+\Tf[framesize=6pt]
+\;
+\Tf[framesize=6pt]
+\;
+\Tf[framesize=6pt]
+\;
+\Tf[framesize=6pt]
+\;\;\raisebox{-3pt}{\(\twoheadrightarrow\)}\;
+\TR{\(\emq\)}
+\endTeXtoEPS
+
+\end{document}

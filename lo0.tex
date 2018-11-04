@@ -1,0 +1,27 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath,amssymb}
+\usepackage{mathpartir}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\begin{mathpar}
+\boxed{
+\inferrule{}{\fun{bf}_0(t) \rightarrow \fun{bf}_1([t])}.
+\quad
+\inferrule{}{\fun{bf}_1(\el) \rightarrow \el};
+\quad
+\inferrule
+  {\fun{def}(f) \twoheadrightarrow \pair{r}{f'}}
+  {\fun{bf}_1(f) \twoheadrightarrow \fun{cat}(r,\fun{bf}_1(f'))}.
+}
+\end{mathpar}
+\endTeXtoEPS
+
+\end{document}
