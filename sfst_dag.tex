@@ -1,0 +1,53 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\fun{sfst}}}{
+  \TR{\texttt{[]}}
+  \TR{\(x\)}
+}
+\raisebox{-3pt}{\(\xrightarrow{\theta}\)}\;\;
+\pstree[levelsep=17pt,treesep=14pt]{\TR{\rnode[cb]{el}{\texttt{[]}}}}{}
+\qquad
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\fun{sfst}}}{
+  \pstree{\TR{\texttt{|}}}{
+    \TR{\(x\)}
+    \TR{\rnode[r]{beta_s}{\(s\)}}
+  }
+  \TR{\rnode[br]{Qb}{\(x\)}}
+}
+\raisebox{-3pt}{\(\xrightarrow{\iota}\)}\;\;
+\pstree[levelsep=17pt,treesep=14pt]{\TR{\rnode[cb]{beta}{\(\circ\)}}}{}
+\qquad
+\pstree[nodesep=2pt,levelsep=15pt,treesep=14pt]{\TR{\fun{sfst}}}{
+  \pstree{\TR{\texttt{|}}}{
+    \TR{\rnode[br]{gamma_y}{\(y\)}}
+    \TR{\rnode[br]{gamma_s}{\(s\)}}
+  }
+  \TR{\rnode[br]{gamma_x}{\(x\)}}
+}
+\raisebox{-3pt}{\(\xrightarrow{\kappa}\)}\hspace*{-5pt}
+\pstree[nodesep=2pt,levelsep=15pt,treesep=14pt]%
+  {\TR{\rnode[bl]{gamma_cons}{\texttt{|}}}}{
+  \Tn
+  \Tn
+  \pstree{\TR{\rnode[bl]{gamma_ref_s}{\rnode[br]{gamma_ref_x}{\TR{\fun{sfst}}}}}}{
+    \Tn
+  }
+}
+%
+\nccurve[angleA=-90,angleB=0,nodesepB=1pt,nodesepA=-1pt]{->}{beta}{beta_s}
+\nccurve[angleA=-125,angleB=-55,nodesepA=2pt,nodesepB=1pt,ncurvB=1]{->}{gamma_cons}{gamma_y}
+\nccurve[angleA=-120,angleB=-45,nodesepA=5pt]{->}{gamma_ref_s}{gamma_s}
+\nccurve[angleA=-60,angleB=-50,nodesepA=5pt,nodesepB=1pt,ncurvA=1]{->}{gamma_ref_x}{gamma_x}
+\endTeXtoEPS
+
+\end{document}

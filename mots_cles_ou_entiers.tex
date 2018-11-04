@@ -1,0 +1,34 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{vaucanson-g}
+\usepackage{pst-eps}
+
+\input{ocaml_syntax}
+
+%\ShowGrid
+ 
+\begin{document}
+
+\TeXtoEPS
+\VCDraw{%
+\begin{VCPicture}{(0,0)(4,1)}
+% States
+\State[1]{(0,0)}{A}
+\State[2]{(2,1)}{B}
+\State[3]{(4,1)}{C}
+\FinalState[4]{(6,1)}{D}\nput{0}{D}{\cst{LET}}
+\Initial{A}
+\FinalState[5]{(4,0)}{E}\nput{-90}{E}{\cst{INT}}
+% Edges
+\EdgeL{A}{B}{\texttt{'l'}}
+\EdgeL{B}{C}{\texttt{'e'}}
+\EdgeL{C}{D}{\texttt{'t'}}
+\EdgeR{A}{E}{\texttt{['0'-'9']}}
+\LoopE[.5]{E}{\texttt{['0'-'9']}}
+\end{VCPicture}
+}
+\endTeXtoEPS
+
+\end{document}

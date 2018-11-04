@@ -1,0 +1,6 @@
+<!ELEMENT book (author,title,contents)>
+<!ELEMENT author (#PCDATA)>
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT contents (chapter+)>
+<!ELEMENT chapter EMPTY>
+<!ATTLIST chapter title CDATA #REQUIRED>

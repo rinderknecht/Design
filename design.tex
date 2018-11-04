@@ -1,0 +1,209 @@
+%% -*- mode: latex; mode: flyspell; ispell-local-dictionary: "british" -*-
+
+\documentclass[a4paper,11pt,twoside,final]{book}
+
+% Page geometry for College Publications
+%
+\usepackage[bindingoffset=0cm,a4paper,centering,textheight=200mm,textwidth=120mm,includefoot,includehead,dvips]{geometry}
+
+%% Pretty but the partial differential sign is missing:
+%%
+%% \usepackage[cmintegrals,cmbraces]{newtxmath}
+%% \usepackage{ebgaramond-maths}
+
+%% For math font:
+%%
+%% \DeclareFontFamily{OT1}{pzc}{}
+%% \DeclareFontShape{OT1}{pzc}{m}{it}%
+%% {<-> s * [1.15] pzcmi7t}{}
+%% \DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+%%\usepackage[scaled=1.15]{urwchancal}
+%%
+%% How to have text font?
+%%
+%% For text font (only):
+%%
+%% \usepackage{chancery}
+%% \usepackage[T1]{fontenc}
+
+% Language and fonts
+%
+\usepackage[british]{babel}       % British English
+\usepackage[T1]{fontenc}          % Required for hyphenation and \DJ
+\usepackage[utf8]{inputenc}       % UTF-8 encoding
+\usepackage{hyphenat}             % \hyp{} is a breakable dash
+\usepackage{url}                  % To typeset URLs
+\usepackage{mdwlist}              % Tight vertical spacing of list items
+\usepackage[scaled=0.8]{beramono} % Nice bold/italic teletype font
+\usepackage{microtype}            % Microtypographic enhancements
+%\usepackage{draftwatermark}
+%\SetWatermarkScale{4}
+\usepackage{framed}
+
+% Hyperlinks
+%
+% Note: figure references do not seem to work.
+% Note: Set "USE_PS := yes" in Makefile.cfg
+%
+%\usepackage[ps2pdf,breaklinks]{hyperref}
+%\hypersetup{colorlinks=true,urlcolor=blue,citecolor=blue,linkcolor=blue}
+
+\frenchspacing  % Follow French conventions after a period
+\hfuzz 2pt      % Do not report overhang less than 2pt
+
+% Tricky hyphenations
+%
+\hyphenation{de-queue de-queue-ing de-queue-ings}
+\hyphenation{en-queue en-queue-ing en-queue-ings}
+\hyphenation{now-adays}
+\hyphenation{sub-tree sub-trees sub-term sub-terms sub-tra-ce sub-tra-ces sub-struc-tu-re sub-struc-tu-res sub-ca-se sub-ca-ses sub-stack sub-stacks sub-seq-uen-ce sub-seq-uen-ces sub-word sub-words}
+\hyphenation{bit-wise bit-string}
+\hyphenation{de-struc-tu-re de-struc-tu-res de-struc-tu-red de-struc-tu-ring}
+\hyphenation{pre-proc-ess pre-proc-esses pre-proc-ess-ed pre-proc-ess-ing}
+\hyphenation{meta-prog-ram meta-prog-ram-ming}
+\hyphenation{pre-order post-order in-order}
+\hyphenation{mer-ger mer-gers mer-ges}
+\hyphenation{name-space name-spaces}
+
+% Bibliographic style
+%
+\usepackage[comma]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{etoolbox}
+\apptocmd{\thebibliography}{\raggedright}{}{} % No Underfull \hbox
+
+% Index
+%
+\usepackage{makeidx}                         % Support for \makeindex
+\usepackage[justific=RaggedRight]{idxlayout} % Ragged right
+                                             % justification of index entries
+\makeindex
+
+% Figures/Graphics
+%
+\usepackage{graphicx}   % Inclusion
+\usepackage{float}      % Before package `wrapfig'
+\usepackage[justification=raggedleft]{caption}
+\usepackage{subfig}     % Subfigures
+\captionsetup[subfloat]{justification=raggedleft}
+\usepackage{wrapfig}    % Wrapping text around figures
+
+% Maths & Logic
+%
+\usepackage{amsmath,amssymb,amsthm,stmaryrd}
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{prop}{Proposition}
+\usepackage{mathpartir}
+
+% Verbatim and tty
+%
+\usepackage{verbatim} % Inputting in verbatim environment
+\usepackage{alltt}    % Extended verbatim environment
+
+% Tables
+%
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabulary}
+\usepackage{hhline}
+
+% Miscellanea
+%
+\usepackage{xspace}    % Automatic insertion of a space after a macro
+\usepackage{varioref}  % Qualifying references with page numbers
+\usepackage{booktabs}
+\usepackage{clrscode}
+
+% New commands
+%
+\input{commands}
+\input{ocaml_syntax}
+\input{ocaml_macros}
+\input{comp_macros}
+\input{token}
+\input{grammar}
+\input{dfa_macros}
+\input{xmllint}
+\input{saxon}
+\input{erlc}
+
+% Title and author
+%
+\title{\Huge Design and Analysis of Purely Functional Programs}
+\author{\Large Christian Rinderknecht}
+\date{}
+
+% ---------------------------------------------------------------------
+%
+\begin{document}
+
+\maketitle
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+\frontmatter
+\setcounter{page}{5}
+\tableofcontents
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+\newpage
+\thispagestyle{empty}
+\input{foreword}
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+\mainmatter
+
+\allowdisplaybreaks
+
+\include{introduction}
+\include{linear}
+\include{arborescent}
+\include{implementation}
+\include{annex}
+
+\backmatter
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+\clearpage
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliography{design}
+\nocite*{}
+
+\clearpage
+\addcontentsline{toc}{chapter}{Index}
+\printindex
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+\end{document}

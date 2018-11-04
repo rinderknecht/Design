@@ -1,0 +1,74 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\fun{e}}}{
+  \pstree{\TR{\fun{a}}}{
+    \Tn
+    \pstree{\TR{\fun{c}}}{
+      \TR{\fun{b}}
+      \TR{\fun{d}}
+    }
+  }
+  \pstree{\TR{\fun{g}}}{
+    \TR{\fun{f}}
+    \TR{\fun{h}}
+  }
+}
+\raisebox{-3pt}{\(\rightarrow\)}
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\fun{a}}}{
+  \Tn
+  \pstree{\TR{\fun{e}}}{
+    \pstree{\TR{\fun{c}}}{
+      \TR{\fun{b}}
+      \TR{\fun{d}}
+    }
+    \pstree{\TR{\fun{g}}}{
+      \TR{\fun{f}}
+      \TR{\fun{h}}
+    }
+  }
+}
+\raisebox{-3pt}{\(\rightarrow\)}
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\fun{a}}}{
+  \Tn
+  \pstree{\TR{\fun{c}}}{
+    \TR{\fun{b}}
+    \pstree{\TR{\fun{e}}}{
+      \TR{\fun{d}}
+      \pstree{\TR{\fun{g}}}{
+        \TR{\fun{f}}
+        \TR{\fun{h}}
+      }
+    }
+  }
+}
+\raisebox{-3pt}{\(\rightarrow\)}
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\fun{a}}}{
+  \Tn
+  \pstree{\TR{\fun{b}}}{
+    \Tn
+    \pstree{\TR{\fun{c}}}{
+      \Tn
+      \pstree{\TR{\fun{e}}}{
+        \TR{\fun{d}}
+        \pstree{\TR{\fun{g}}}{
+          \TR{\fun{f}}
+          \TR{\fun{h}}
+        }
+      }
+    }
+  }
+}
+\raisebox{-3pt}{\text{etc.}}
+\endTeXtoEPS
+
+\end{document}

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE numbers SYSTEM "numbers_bis.dtd">
+<numbers>
+  <num val="8"/>
+  <num val="1"/>
+  <num val="two"/>
+  <num val="two"/>
+  <num val="two"/>
+  <num val="2"/>
+  <num val="one"/>
+  <num val="2"/>
+  <num val="4"/>
+  <num val="4"/>
+</numbers>

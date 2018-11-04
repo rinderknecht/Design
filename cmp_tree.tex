@@ -1,0 +1,32 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+%\psset{showbbox=true}
+\pstree[nodesep=2pt,levelsep=24pt,treesep=7pt]{\TR{\(a_1\)?\(a_2\)}}{
+  \psset{tpos=0.2,levelsep=24pt}
+  \pstree{\TR{\(a_2\)?\(a_3\)}\tlput{\(_{<}\)}}{
+    \psset{tpos=0.3}
+    \TR{\((a_1,a_2,a_3)\)} \tlput{\(_{<}\!\!\)}
+    \pstree{\TR{\(a_1\)?\(a_3\)}\trput{\(\!\!_{>}\)}}{
+      \TR{\((a_1,a_3,a_2)\)}\tlput{\(_{<}\!\!\)}
+      \TR{\((a_3,a_1,a_2)\)}\trput{\(\!\!_{>}\)}
+    }
+  }
+  \pstree{\TR{\(a_2\)?\(a_3\)}\trput{\(_{>}\)}}{
+    \psset{tpos=0.3}
+    \pstree{\TR{\(a_1\)?\(a_3\)}\tlput{\(_{<}\!\!\)}}{
+      \TR{\((a_2,a_1,a_3)\)}\tlput{\(_{<}\!\!\)}
+      \TR{\((a_2,a_3,a_1)\)}\trput{\(\!\!_{>}\)}
+    }
+    \TR{\((a_3,a_2,a_1)\)}\trput{\(\!\!_{>}\)}
+  }
+}
+\endTeXtoEPS
+
+\end{document}

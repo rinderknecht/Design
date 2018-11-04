@@ -1,0 +1,29 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pst-tree,pst-eps}
+\usepackage[scaled=0.8]{beramono}
+
+\newcommand\erlcode[1]{\texttt{#1}}
+\newcommand\erlnode[1]{\TR{\erlcode{#1}}}
+\newcommand\erlcirc[1]{\Tcircle[linestyle=solid]{\erlcode{#1}}}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\erlnode{F}}{
+  \TR{\(X_1\)}
+  \pstree[linewidth=0.8pt,linestyle=solid]{\erlnode{F}}{
+    \TR{\(X_2\)}
+    \psset{linewidth=1.5pt,linestyle=dotted}
+    \pstree[linewidth=0.8pt,linestyle=solid]{\erlnode{F}}{
+      \TR{\(X_{n}\)}
+      \erlnode{A}
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}

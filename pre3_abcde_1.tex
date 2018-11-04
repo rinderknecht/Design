@@ -1,0 +1,51 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\raisebox{-3pt}{\(\xrightarrow{\gamma}\)}
+\pstree[nodesep=0pt,levelsep=17pt,treesep=14pt]{\TCircle{\fun{e}}}{
+  \Tf[framesize=6pt]
+  \Tf[framesize=6pt]
+}
+\pstree[nodesep=1pt,levelsep=17pt,treesep=14pt]{\TR{\fun{b}}}{
+  \pstree[nodesepB=0pt]{\TR{\fun{d}}}{
+    \Tf[framesize=6pt]
+    \Tf[framesize=6pt]
+  }
+  \psset{nodesepB=0pt}
+  \Tf[framesize=6pt]
+}
+\;\raisebox{-3pt}{\(\xrightarrow{\delta}\)}
+\;\;
+\Tf[framesize=6pt]
+\;\;
+\Tf[framesize=6pt]
+\pstree[nodesep=1pt,levelsep=17pt,treesep=14pt]{\TR{\fun{b}}}{
+  \pstree[nodesepB=0pt]{\TR{\fun{d}}}{
+    \Tf[framesize=6pt]
+    \Tf[framesize=6pt]
+  }
+  \psset{nodesepB=0pt}
+  \Tf[framesize=6pt]
+}
+\;\;
+\raisebox{-3pt}{\(\xrightarrow{\gamma^2}\)}
+\pstree[nodesepA=0pt,nodesepB=1pt,levelsep=17pt,treesep=14pt]{\TCircle{\fun{b}}}{
+  \pstree[nodesepA=1pt,nodesepB=0pt]{\TR{\fun{d}}}{
+    \Tf[framesize=6pt]
+    \Tf[framesize=6pt]
+  }
+  \psset{nodesepB=0pt}
+  \Tf[framesize=6pt]
+}
+\endTeXtoEPS
+
+\end{document}

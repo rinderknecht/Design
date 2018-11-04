@@ -1,0 +1,51 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[scaled=0.8]{beramono}
+\usepackage{pstricks,pst-tree,pst-eps}
+
+\newcommand\pcdata[1]{\Tr{\psframebox{\rule{0pt}{7pt}\texttt{#1}}}}
+\newcommand\element[1]{\Tr{#1}}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=1cm,nodesep=2pt,treesep=7pt,framearc=.4]{\element{email}}{
+  \pstree{\element{from}}{
+    \psset{nodesepB=0pt}
+    \pcdata{Me}
+  }
+  \pstree{\element{subject}}{
+    \psset{nodesepB=0pt}
+    \pcdata{Homeworks}
+  }
+  \pstree{\element{to}}{
+    \psset{nodesepB=0pt}
+    \pcdata{You}
+  }
+  \pstree{\element{to}}{
+    \psset{nodesepB=0pt}
+    \pcdata{Me}
+  }
+  \pstree{\element{body}}{
+    \psset{nodesepB=0pt}
+    \pcdata{\textvisiblespace\textvisiblespace{}A}
+    \pstree[nodesep=2pt]{\element{definition}}{
+    \psset{nodesepB=0pt}
+      \pcdata{deadline}
+    }
+    \psset{nodesepB=0pt}
+    \pcdata{is[...]}
+    \pstree[nodesep=2pt]{\element{emphasis}}{
+      \psset{nodesepB=0pt}
+      \pcdata{homework}
+    }
+    \psset{nodesepB=0pt}
+    \pcdata{.}
+  }
+}
+\endTeXtoEPS
+
+\end{document}

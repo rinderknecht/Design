@@ -1,0 +1,23 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\input{ocaml_syntax}
+
+\begin{document}
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=18pt]{\TR{\texttt{*}}}{
+   \pstree{\TR{\texttt{+}}}{
+      \TR{\num{1}}
+      \TR{\num{2}}
+   }
+   \pstree{\TR{\texttt{/}}}{
+     \TR{\num{5}}
+     \TR{\num{1}}
+   }
+}
+\endTeXtoEPS
+
+\end{document}

@@ -1,0 +1,26 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{pstricks,pst-tree,pst-eps}
+
+\newcommand{\mknode}[1]{\TR{\texttt{#1}}}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=22pt,nodesep=2pt]{\mknode{:=}}{
+  \mknode{position}
+  \pstree{\mknode{+}}{
+    \mknode{initial}
+    \pstree{\mknode{*}}{
+      \mknode{rate}
+      \pstree{\TR{\textbf{\textsf{int\_to\_float}}}}{
+        \mknode{60}
+      }
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}

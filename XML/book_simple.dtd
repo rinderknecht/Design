@@ -1,0 +1,7 @@
+<!ELEMENT book (author, section+)>
+<!ATTLIST book title CDATA #REQUIRED>
+<!ELEMENT author EMPTY>
+<!ATTLIST author first NMTOKEN #REQUIRED
+                 last  NMTOKEN #REQUIRED>
+<!ELEMENT section (section*)>
+<!ATTLIST section title CDATA #REQUIRED>

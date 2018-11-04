@@ -1,0 +1,43 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}         % Needed
+\usepackage{pst-eps}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage[scaled=0.8]{beramono} % Option [scaled=0.8] necessary for \flip
+
+\newcommand\flip[1]{\texttt{\textbf{#1}}}
+
+\begin{document}
+
+\TeXtoEPS
+\(
+\begin{array}{@{}rc@{\;}c@{\;}c@{\;}c@{\;}c@{\;}r@{}}
+\toprule
+ n & \multicolumn{5}{c}{\text{Bits of \(n\)}} & \text{Flips}\\
+\midrule
+ 0 & 0 & 0 & 0 & 0 & \flip{0} &  0\\
+ 1 & 0 & 0 & 0 & \flip{0} & \flip{1} &  1\\
+ 2 & 0 & 0 & 0 & 1 & \flip{0} &  3\\
+ 3 & 0 & 0 & \flip{0} & \flip{1} & \flip{1} &  4\\
+ 4 & 0 & 0 & 1 & 0 & \flip{0} &  7\\
+ 5 & 0 & 0 & 1 & \flip{0} & \flip{1} &  8\\
+ 6 & 0 & 0 & 1 & 1 & \flip{0} & 10\\
+ 7 & 0 & \flip{0} & \flip{1} & \flip{1} & \flip{1} & 11\\
+ 8 & 0 & 1 & 0 & 0 & \flip{0} & 15\\
+ 9 & 0 & 1 & 0 & \flip{0} & \flip{1} & 16\\
+10 & 0 & 1 & 0 & 1 & \flip{0} & 18\\
+11 & 0 & 1 & \flip{0} & \flip{1} & \flip{1} & 19\\
+12 & 0 & 1 & 1 & 0 & \flip{0} & 22\\
+13 & 0 & 1 & 1 & \flip{0} & \flip{1} & 23\\
+14 & 0 & 1 & 1 & 1 & \flip{0} & 25\\
+15 & \flip{0} & \flip{1} & \flip{1} & \flip{1} & \flip{1} & 26\\
+16 & 1 & 0 & 0 & 0 & \flip{0} & 31\\
+\bottomrule
+\end{array}
+\)
+\endTeXtoEPS
+
+\end{document}

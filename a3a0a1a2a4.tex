@@ -1,0 +1,21 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pst-node,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\begin{pspicture}[showgrid=false](0,-1)(4,1)
+\(\rnode{x3}{x_3} \prec \rnode{x0}{x_0} \prec \rnode{x1}{x_1} \prec
+\rnode{x2}{x_2} \prec \rnode{x4}{x_4}\)
+\ncbar[nodesep=3pt,angle=-90,arm=0.25]{->}{x0}{x1}
+\ncbar[nodesep=3pt,angle=90,arm=0.25]{->}{x1}{x2}
+\ncbar[nodesep=3pt,angle=-90,arm=0.5]{->}{x2}{x3}
+\ncbar[nodesep=3pt,angle=90,arm=0.5]{->}{x3}{x4}
+\end{pspicture}
+\endTeXtoEPS
+
+\end{document}

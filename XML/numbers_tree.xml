@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE numbers SYSTEM "numbers_tree.dtd">
+<numbers>
+  <num val="18"/>
+  <num val="1">
+    <num val="1"/>
+    <num val="2"/>
+  </num>
+  <num val="3">
+    <num val="4">
+      <num val="1"/>
+      <num val="1"/>
+    </num>
+  </num>
+  <num val="5">
+    <num val="23"/>
+    <num val="3"/>
+    <num val="2">
+      <num val="7">
+        <num val="4"/>
+        <num val="4"/>
+      </num>
+    </num>
+  </num>
+</numbers>

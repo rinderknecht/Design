@@ -1,0 +1,589 @@
+\section{Persistence}
+\label{sec:persistence}
+
+\emph{Persistence}\index{persistence} is a distinctive feature of
+purely functional languages, meaning that values are
+constants. Functions update a data structure by creating a new version
+of it, instead of modifying it in place and thereby erasing its
+history. We saw in section~\vref{sec:functional} that subtrees common
+to both sides of the same rule are shared. Such a sharing is sound
+because of persistence: there is no logical way to tell apart a copied
+subtree from the original.
+
+\paragraph{Maximum sharing}
+\index{sharing}
+
+An obvious source of sharing is the occurrence of a variable in the
+pattern of a rule and its right\hyp{}hand side, as seen in
+\fig~\vref{fig:cat_dag} for instance. But this does not always lead to
+maximum sharing as the definition of
+\fun{red/1}\index{red@\fun{red/1}} (\emph{reduce}) in
+\fig~\ref{fig:red} shows. This function copies a stack without its
+consecutively repeated items. For example, we might have \(\fun{red}([4,1,2,2,2,1,1]) \twoheadrightarrow [4,1,2,1]\).
+% Wrapping figure better declared before a paragraph
+%
+\setlength{\intextsep}{0pt}
+\begin{wrapfigure}[6]{r}[0pt]{0pt}
+% [6] vertical lines
+% {r} mandatory right placement (better because of a list)
+\centering
+\includegraphics[bb=71 672 203 726]{red}
+\caption{Reducing\label{fig:red}}
+\end{wrapfigure}
+A
+directed acyclic graph of the second rule is depicted in
+\fig~\vref{fig:red_dag1}.
+\begin{figure}
+\centering
+\subfloat[Sharing variables\label{fig:red_dag1}]{%
+  \includegraphics[bb=70 645 158 723]{red_dag1}
+}
+\qquad\qquad
+\subfloat[Sharing subtrees\label{fig:red_dag2}]{%
+  \includegraphics[bb=70 645 158 723]{red_dag2}
+}
+\caption{Directed acyclic graphs (DAG) of the second rule of
+  \fun{red/1}}
+\end{figure}
+In this picture, sharing is based on commonly occurring variables, but
+we can see that \(\cons{x}{s}\) is not completely shared. Consider the
+same rule in \fig~\vref{fig:red_dag2} with maximum sharing, where a
+whole subtree is shared.
+\setlength{\intextsep}{12pt}
+
+When discussing memory management, \emph{we assume that sharing is
+  maximum for each rule}, so, for instance, \fig~\vref{fig:red_dag2}
+would be the default. But this property is not enough to insure that
+sharing is maximum between the arguments of a function call and its
+value. For example,
+\begin{equation*}
+\fun{cp}(\el) \rightarrow \el;\qquad
+\fun{cp}(\cons{x}{s}) \rightarrow \cons{x}{\fun{cp}(s)}.
+\end{equation*}
+makes a copy of its argument, but the value of \(\fun{cp}(s)\) only
+shares its items with~\(s\), despite \(\fun{cp}(s) \equiv s\).
+
+\paragraph{Revision control}
+
+A simple idea to implement data structures enabling backtracking
+consists in keeping all successive
+versions\index{persistence!version-based}. A stack can be used to keep
+such a record, called \emph{history}\index{persistence!history}, and
+backtracking is reduced to linear search\index{linear search}. For
+example, we may be interested in recording a series of stacks, each
+one obtained from its predecessor by a push or a pop, like the history
+\([[4,2,1],[2,1],[3,2,1],[2,1],[1],\el]\), where the initial stack was
+empty; next, \(1\)~was pushed, followed by~\(2\) and~\(3\); then
+\(3\)~was popped and \(4\)~pushed instead. This way, the \emph{last
+  version} is the top of history, like \([4,2,1]\) in our
+example. Furthermore, we want two successive versions to share as much
+structure as possible. (We speak of `version' instead of `state',
+because the latter applies when values are not persistent.)  These
+requirements are at the heart of \emph{revision control} software,
+used by programmers to keep track of the evolution of their source
+code.
+
+As a simple case study, we shall continue with our example of
+recording the different versions of a stack, while keeping in mind
+that the technique described further applies to any data structure. We
+need to write two functions, \fun{push/2}\index{push@\fun{push/2}}
+(different from the one defined in section~\ref{sec:cutting}) and
+\fun{pop/1}\index{pop@\fun{pop/1}}, which, instead of processing one
+stack, deal with a history of stacks. Consider the following
+definitions:
+\begin{equation}
+\begin{array}{@{}r@{\;}c@{\;}l@{\quad}r@{\;}c@{\;}l@{}}
+\fun{push}(x,\el) & \rightarrow & [[x],\el];
+& \fun{pop}(\cons{\cons{x}{s}}{h}) & \rightarrow &
+                                     \cons{s,\cons{x}{s}}{h}.\\
+\fun{push}(x,\cons{s}{h}) & \rightarrow &
+\cons{\cons{x}{s},s}{h}. & 
+\fun{top}(\cons{\cons{x}{s}}{h}) & \rightarrow & x.
+\end{array}
+\label{eq:push_pop_persistence}
+\end{equation}
+The corresponding directed acyclic graphs are found in
+\fig~\vref{fig:push_pop_dag}.
+\begin{figure}
+\centering
+\includegraphics[bb=70 639 294 723]{push_pop_dag}
+\caption{DAGs of \fun{push/2} and \fun{pop/1} with maximum sharing
+\label{fig:push_pop_dag}}
+\end{figure}
+History \([[4,2,1],[2,1],[3,2,1],[2,1],[1],\el]\) is displayed in
+\fig~\ref{fig:history}
+\begin{figure}[!b]
+\centering
+\includegraphics[bb=70 575 247 723]{history}
+\caption{History \([[4,2,1],[2,1],[3,2,1],[2,1],[1],\el]\)
+\label{fig:history}}
+\end{figure}
+as a directed acyclic graph as well. It is obtained as the evaluation
+of
+\begin{equation}
+%\abovedisplayskip=4pt
+%\belowdisplayskip=4pt
+\fun{push}(4, \fun{pop}(\fun{push}(3, \fun{push}(2,
+\fun{push}(1, \el))))).
+\label{ex:history}
+\end{equation}
+
+Let \(\fun{ver}(k,h)\) \index{ver@\fun{ver/2}} evaluate in the~\(k\)th
+previous version in the history~\(h\), so \(\fun{ver}(0,h)\) is the
+last version. As expected, \fun{ver/2} is just a linear search with a
+countdown:
+\begin{equation*}
+%\abovedisplayskip=4pt
+%\belowdisplayskip=4pt
+\fun{ver}(0,\cons{s}{h}) \rightarrow s;\qquad
+\fun{ver}(k,\cons{s}{h}) \rightarrow \fun{ver}(k-1,h).
+\end{equation*}
+Our encoding of history allows the last version to be easily modified,
+but not older ones. When a data structure allows every version in its
+history to be modified, it is said \emph{fully
+  persistent}\index{persistence!full $\sim$}; if only the last version
+can be replaced, it is said \emph{partially persistent}
+\citep{MehlhornTsakalidis_1990}.\index{persistence!partial $\sim$}
+
+\paragraph{Backtracking updates}
+\index{persistence!backtracking}
+
+In order to achieve full persistence, we should keep a history of
+updates\index{persistence!update-based},
+\(\ufun{push}(x)\)\index{push@\fun{push/1}} and
+\(\ufun{pop}()\)\index{pop@\fun{pop/0}}, instead of successive,
+maximally overlapping versions. In the following, the underlining
+avoids confusion with the functions
+\fun{push/2}\index{push@\fun{push/2}} and
+\fun{pop/1}\index{pop@\fun{pop/1}}. Instead of
+equation~\eqref{ex:history}, we have now the history
+\begin{equation}
+[\ufun{push}(4), \ufun{pop}(), \ufun{push}(3), \ufun{push}(2),
+\ufun{push}(1)].
+\label{ex:history1}
+\end{equation}
+But not all series of \(\ufun{push}(x)\) and \(\ufun{pop}()\) are
+valid, as \([\ufun{pop}(), \ufun{pop}(), \ufun{push}(x)]\) and
+\([\ufun{pop}()]\). In order to characterise valid histories, let us
+consider a graphical representation of updates in
+\fig~\vref{fig:push_pop1}.
+\begin{figure}
+\centering
+\subfloat[$\protect\fun{push}(x)$]{%
+  \includegraphics[bb=71 662 130 721,scale=0.8]{push}}
+\qquad
+\subfloat[$\protect\fun{pop}()$]{%
+  \includegraphics[bb=71 662 130 721,scale=0.8]{pop}}
+\caption{Stack updates\label{fig:push_pop1}}
+\end{figure}
+This is the same model we used in section~\ref{sec:queueing} where we
+studied queueing (see in particular \fig~\vref{fig:enq_deq}), except
+that we choose here a leftwards orientation to mirror the notation for
+stacks, whose tops are laid out on the left of the page. Consider for
+instance the history in \fig~\vref{fig:history1}.
+\begin{figure}[b]
+\centering
+\includegraphics[bb=69 577 300 726,scale=0.9]{history1}
+\caption{$[\ufun{pop}(), \ufun{pop}(), \ufun{push}(4),\ufun{push}(3),
+      \ufun{pop}(), \ufun{push}(2), \ufun{push}(1)]$
+\label{fig:history1}}
+\end{figure}
+It is clear that \emph{a valid history is a line which never
+  crosses the absissa axis.}
+
+Programming \fun{top/1}\index{top@\fun{top/1}} with a history of
+updates is more difficult because we must find the top item of the
+last version without constructing it. The idea is to walk back the
+historical line and determine the last push leading to a version whose
+length is equal to that of the last version. In
+\fig~\ref{fig:history1}, the last version is~(\(\bullet\)). If we draw
+a horizontal line from it rightwards, the first push ending on the
+line is \(\ufun{push}(1)\), so the top of the last version
+is~\(1\).
+
+This thought experiment is depicted in \fig~\ref{fig:topmost}.
+\begin{figure}
+\centering
+\includegraphics[bb=69 577 300 726,scale=0.9]{topmost}
+\caption{Finding the top of the last version
+\label{fig:topmost}}
+\end{figure}
+Notice that we do not need to determine the length of the last
+version: the difference of length with the current version, while
+walking back, is enough.
+
+Let \fun{top\(_0\)/1}\index{top0@\fun{top\(_0\)/1}} and
+\fun{pop\(_0\)/1}\index{pop0@\fun{pop\(_0\)/1}} be the equivalent of
+\fun{top/1} and \fun{pop/1} operating on updates instead of versions.
+Their definitions are found in \fig~\vref{fig:pop_top}.
+\begin{figure}[h]
+\begin{equation*}
+\boxed{%
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\fun{pop}_0(h)   & \rightarrow          & \cons{\ufun{pop}()}{h}. &
+\fun{top}_0(0,\cons{\ufun{push}(x)}{h}) & \rightarrow             & x;\\
+\fun{top}_0(h)   & \rightarrow          & \fun{top}_0(0,h).       &
+\fun{top}_0(k,\cons{\ufun{push}(x)}{h}) & \rightarrow             & \fun{top}_0(k-1,h);\\
+                 & & &
+\fun{top}_0(k,\cons{\ufun{pop}()}{h})   & \rightarrow            & \fun{top}_0(k+1,h).
+\end{array}}
+\end{equation*}
+\caption{The top and the rest of an history of updates
+\label{fig:pop_top}}
+\end{figure}
+An ancillary function \fun{top\(_0\)/2}\index{top0@\fun{top\(_0\)/2}}
+keeps track of the difference between the lengths of the last and
+current versions. We have found the item when the difference is~\(0\)
+and the current update is a push.
+
+As previously, we want the call
+\(\fun{ver}_0(k,h)\)\index{ver0@\fun{ver\(_0\)/2}} to evaluate in
+the~\(k\)th previous version in~\(h\). Here, we need to walk back
+\(k\)~updates in the past,
+\begin{equation*}
+\fun{ver}_0(0,h)           \rightarrow \fun{lst}_0(h);\qquad
+\fun{ver}_0(k,\cons{s}{h}) \rightarrow \fun{ver}_0(k-1,h).
+\end{equation*}
+and build the last version from the rest of the history with
+\fun{lst\(_0\)/1}\index{lst0@\fun{lst\(_0\)/1}}:
+\begin{mathpar}
+\inferrule*{}{\fun{lst}_0(\el) \rightarrow \el};
+\quad
+\inferrule*{}{\fun{lst}_0(\cons{\ufun{push}(x)}{h})
+              \rightarrow \cons{x}{\fun{lst}_0(h)}};
+\quad
+\inferrule
+  {\fun{lst}_0(h)                      \twoheadrightarrow \cons{x}{s}}
+  {\fun{lst}_0(\cons{\ufun{pop}()}{h}) \twoheadrightarrow s}.
+\end{mathpar}
+Let \(\C{\fun{ver}_0}{k,n}\)~be the cost of the call
+\(\fun{ver}_0(k,h)\) and \(\C{\fun{lst}_0}{n}\)~the cost
+of~\(\fun{lst}_0(h)\), where \(n\)~is the length of~\(h\):
+\(\C{\fun{lst}_0}{i} = i + 1\) and \(\C{\fun{ver}_0}{k,n} = (k+1) +
+\C{\fun{lst}_0}{n-k} = n + 2\).
+
+What is the total amount of memory
+allocated?\index{sharing}\index{memory|see{sharing}} More precisely,
+we want to know the number of pushes performed. The only rule of
+\fun{lst\(_0\)/1} featuring a push in its right\hyp{}hand side is the
+second one, so the number of cons\hyp{}nodes is the number of push
+updates. But this is a waste in certain cases, for example, when the
+version built is empty, like the history
+\([\ufun{pop}(),\ufun{push}(6)]\). The optimal situation is to
+allocate only as much as the computed version actually contains.
+
+% Wrapping figure better declared before a paragraph
+%
+\setlength{\intextsep}{0pt}
+\begin{wrapfigure}[]{r}[0pt]{0pt}
+% {r} mandatory right placement
+\centering
+\includegraphics[bb=71 644 257 721]{lst1}
+\caption{Last version \label{fig:lst1}}
+\end{wrapfigure}
+\hspace*{-5.6pt} We can achieve this memory optimality with
+\fun{lst\(_1\)/1} in \fig~\ref{fig:lst1} by retaining features of both
+\fun{top\(_0\)/1}\index{top0@\fun{top\(_0\)/1}} and \fun{lst\(_0\)/1}.
+We have\index{lst1@$\C{\fun{lst}_1}{n}$} \(\C{\fun{lst}_1}{n} =
+\C{\fun{lst}_0}{n} = n + 1\), and the number of
+cons\hyp{}nodes\index{sharing|(} created is now the length of the last
+version itself. This is another instance of an output\hyp{}dependent
+cost\index{cost!output-dependent $\sim$}, like
+\fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}} in
+section~\vref{sec:flattening}. There is still room for improvement if
+the historical line meets the absissa axis, as there is no need to
+visit the updates \emph{before} a pop resulting into an empty version;
+for instance, in \fig~\vref{fig:back2zero},
+\begin{figure}[b]
+\centering
+\includegraphics[bb=69 606 300 726,scale=0.9]{back2zero}
+\caption{Last version $[3]$ found in four steps\label{fig:back2zero}}
+\end{figure}
+it is useless to go past \(\ufun{push}(3)\)\index{push@\fun{push/1}}
+to find the last version to be~\([3]\). But, in order to detect
+whether the historical line meets the abscissa axis, we need to
+augment the history~\(h\) with the length~\(n\) of the last version,
+that is, work with \(\pair{n}{h}\), and modify
+\fun{push/2}\index{push@\fun{push/2}}
+and~\fun{pop/1}\index{pop@\fun{pop/1}} accordingly:
+\begin{equation*}
+\fun{push}_2(x,\pair{n}{h}) \! \rightarrow \!
+\pair{n\!+\!1}{\cons{\ufun{push}(x)}{h}}.\quad
+\fun{pop}_2(\pair{n}{h}) \! \rightarrow \!
+\pair{n\!-\!1}{\cons{\ufun{pop}()}{h}}.
+\end{equation*}
+We have to rewrite~\fun{ver/2}\index{ver2@\fun{ver\(_2\)/2}} so it keeps
+track of the length of the last version:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{}}
+\fun{ver}_2(0,\pair{n}{h}) & \rightarrow & \fun{lst}_1(0,h);\\
+\fun{ver}_2(k,\pair{n}{\cons{\ufun{pop}()}{h}})
+                      & \rightarrow & \fun{ver}_2(k-1,\pair{n+1}{h});\\
+\fun{ver}_2(k,\pair{n}{\cons{\ufun{push}(x)}{h}})
+                      & \rightarrow & \fun{ver}_2(k-1,\pair{n-1}{h}).
+\end{array}
+\end{equation*}
+We can reduce the memory\index{sharing|)} footprint by separating the
+length~\(n\) of the last version from the current history~\(h\), so no
+pairs are allocated, and we can stop when the current version
+is~\(\el\), as planned, in \fig~\ref{fig:ver_no_pair}.
+\begin{figure}
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{ver}_3(k,\pair{n}{h}) & \rightarrow & \fun{ver}_3(k,n,h).\\
+\fun{ver}_3(0,n,h) & \rightarrow & \fun{lst}_3(0,n,h);\\
+\fun{ver}_3(k,n,\cons{\ufun{pop}()}{h})
+                      & \rightarrow & \fun{ver}_3(k-1,n+1,h);\\
+\fun{ver}_3(k,n,\cons{\ufun{push}(x)}{h})
+                      & \rightarrow & \fun{ver}_3(k-1,n-1,h).\\
+\fun{lst}_3(\pair{n}{h}) & \rightarrow & \fun{lst}_3(0,n,h).\\
+\fun{lst}_3(k,0,h) & \rightarrow & \el;\\
+\fun{lst}_3(0,n,\cons{\ufun{push}(x)}{h}) & \rightarrow
+                      & \cons{x}{\fun{lst}_3(0,n-1,h)};\\
+\fun{lst}_3(k,n,\cons{\ufun{push}(x)}{h}) & \rightarrow
+                      & \fun{lst}_3(k-1,n-1,h);\\
+\fun{lst}_3(k,n,\cons{\ufun{pop}()}{h}) & \rightarrow
+                      & \fun{lst}_3(k+1,n+1,h).
+\end{array}}
+\end{equation*}
+\caption{Querying a version without pairs\label{fig:ver_no_pair}}
+\end{figure}
+
+One may wonder why bother pairing~\(n\) and~\(h\) just to separate
+them again, defeating the purpose of data abstraction. This example
+demonstrates that abstraction is desirable for callers, but called
+functions may break it due to pattern matching. We may also realise
+that the choice of a stack for storing updates is not the best in
+terms of memory usage. Instead, we can directly chain updates with an
+additional argument denoting the previous update, so, for instance,
+instead of equation~\eqref{ex:history1}:
+\begin{equation*}
+\pair{3}{\ufun{push}(4, \ufun{pop}(\ufun{push}(3, \ufun{push}(2, \ufun{push}(1,\el)))))}.
+\end{equation*}
+This new encoding\index{stack!encoding with tuples} closely mirrors
+the call~\eqref{ex:history} on page~\pageref{ex:history} and saves
+\(n\)~cons\hyp{}nodes in a history of length~\(n\). See
+\fig~\ref{fig:ver}.
+\begin{equation*}
+\fun{push}_4(x,\pair{n}{h}) \rightarrow
+\pair{n\!+\!1}{\ufun{push}(x,h)}.\quad
+\fun{pop}_4(\pair{n}{h}) \rightarrow \pair{n\!-\!1}{\ufun{pop}(h)}.
+\end{equation*}
+\begin{figure}[t]
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{ver}_4(k,\pair{n}{h}) & \rightarrow & \fun{ver}_4(k,n,h).\\
+\fun{ver}_4(0,n,h) & \rightarrow & \fun{lst}_4(0,n,h);\\
+\fun{ver}_4(k,n,\ufun{pop}(h))
+                      & \rightarrow & \fun{ver}_4(k-1,n+1,h);\\
+\fun{ver}_4(k,n,\ufun{push}(x,h))
+                      & \rightarrow & \fun{ver}_4(k-1,n-1,h).\\
+\fun{lst}_4(\pair{n}{h}) & \rightarrow & \fun{lst}_4(0,n,h).\\
+\fun{lst}_4(k,0,h) & \rightarrow & \el;\\
+\fun{lst}_4(0,n,\ufun{push}(x,h)) & \rightarrow
+                      & \cons{x}{\fun{lst}_4(0,n-1,h)};\\
+\fun{lst}_4(k,n,\ufun{push}(x,h)) & \rightarrow
+                      & \fun{lst}_4(k-1,n-1,h);\\
+\fun{lst}_4(k,n,\ufun{pop}(h)) & \rightarrow 
+                      & \fun{lst}_4(k+1,n+1,h).
+\end{array}}
+\end{equation*}
+\caption{Querying a version without a stack\label{fig:ver}}
+\end{figure}
+
+There is now a minimum and maximum cost. The worst case is when the
+bottommost item of the last version is the first item pushed in the
+history, so \fun{lst\(_4\)/3}\index{lst4@\fun{lst\(_4\)/3}} has to
+recur until the origin of time. In other words, the historical line
+never reaches the abscissa axis after the first push. We have same
+cost as before: \(\W{\fun{lst}_4}{n} = n +
+1\). \index{lst4@$\W{\fun{lst}_4}{n}$} The best case happens when the
+last version is empty. In this case, \(\B{\fun{lst}_4}{n} =
+1\)\index{lst4@$\B{\fun{lst}_4}{n}$}, and this is an occurrence of the
+kind of improvement we sought.
+
+%\mypar{Average cost}
+
+\paragraph{Full persistence}
+\index{persistence!full $\sim$}
+
+The update\hyp{}based approach to history is fully persistent by
+enabling the modification of the past as follows: traverse history
+until the required moment, pop up the update at that point, push
+another one and simply put back the previously traversed updates,
+which must have been kept in some accumulator. But changing the past
+must not create a history with a non\hyp{}constructible version in it,
+to wit, the historical line must not cross the absissa axis after the
+modification. If the change consists in replacing a pop by a push,
+there is no need to worry, as this will raise by~\(2\) the end point
+of the line. It is the converse change that requires special
+attention, as this will lower by~\(2\) the end point. The \(\pm
+2\)~offset comes from the vertical difference between the end points
+of a push and a pop update of same origin, as can be easily seen in
+\fig~\vref{fig:push_pop1}. As a consequence, in
+\fig~\ref{fig:history1}, the last version has length~\(1\), which
+implies that it is impossible to replace a push by a pop, anywhere in
+the past.
+
+Let us consider the history in \fig~\vref{fig:history2}.
+\begin{figure}
+\centering
+\includegraphics[bb=69 578 272 726,scale=0.9]{history2}%[]
+\caption{$\ufun{pop}(\ufun{push}(4,\ufun{push}(3,
+          \ufun{pop}(\ufun{push}(2,\ufun{push}(1,\el))))))$
+\label{fig:history2}}
+\end{figure}
+Let \(\fun{chg}(k,u,\pair{n}{h})\)\index{chg@\fun{chg/3}} be the
+changed history, where \(k\)~is the index of the update we want to
+change, indexing the last one at~\(0\); \(u\)~is the new update we
+want to set; \(n\)~is the length of the last version of
+history~\(h\). The call
+\begin{equation*}
+\fun{chg}(3,\ufun{push}(5),
+  \pair{2}{\ufun{pop}(\ufun{push}(4,\ufun{push}(3,
+           \ufun{pop}(\ufun{push}(2,\fun{push}(1,\el))))))})
+\end{equation*}
+results in
+\(\pair{4}{\ufun{pop}(\ufun{push}(4,\ufun{push}(3,\ufun{push}(5,
+  \ufun{push}(2,\ufun{push}(1,\el))))))}\). \!\!This call succeeds
+because in \fig~\ref{fig:pop2push}
+\begin{figure}
+\centering
+\subfloat[A pop becomes a push\label{fig:pop2push}]{
+  \includegraphics[bb=69 521 270 726,scale=0.8]{pop2push}}
+\quad
+\subfloat[A push becomes a pop\label{fig:push2pop}]{
+  \includegraphics[bb=69 577 270 726,scale=0.8]{push2pop}}
+\caption{Changing updates}
+\end{figure}
+the new historical line does not cross the absissa axis. We can see in
+\fig~\ref{fig:push2pop} the result of the call
+\begin{equation*}
+\fun{chg}(2,\ufun{pop}(),
+            \pair{2}{\ufun{pop}(\ufun{push}(4,\ufun{push}(3,
+                     \ufun{pop}(\ufun{push}(2,\ufun{push}(1,\el))))))}).
+\end{equation*}
+All these examples help in guessing the characteristic property for a
+replacement to be valid:
+\begin{itemize}
+
+  \item the replacements of a pop by a push, a pop by a pop, a push by
+    a push are always valid;
+
+  \item the replacement of a push by a pop as update~\(k>0\) is valid
+    if and only if the historical line between updates
+    \(0\)~and~\(k-1\) remains above or reaches without crossing the
+    horizontal line of ordinate~\(2\).
+
+\end{itemize}
+We can divide the algorithm in two phases. First, the update to be
+replaced must be found, but, the difference with \fun{ver\(_4\)/3} is
+that we may need to know if the historical line before reaching the
+update lies above the horizontal line of ordinate~\(2\). This is easy
+to check if we maintain across recursive calls the lowest ordinate
+reached by the line. The second phase substitute the update and checks
+if the resulting history is valid.
+
+Let us implement the first phase. First, we project \(n\)~and~\(h\)
+out of \(\pair{n}{h}\) in order to save some memory, and the lowest
+ordinate is~\(n\), which we pass as an additional argument to another
+function \fun{chg/5}\index{chg@\fun{chg/5}|(}:
+\begin{equation*}
+\fun{chg}(k,u,\pair{n}{h}) \rightarrow \fun{chg}(k,u,n,h,n).
+\end{equation*}
+Function~\fun{chg/5} traverses~\(h\) while decrementing~\(k\), until
+\(k=0\), which means that the update to be changed has been found. At
+the same time, the length of the current version is computed (third
+argument) and compared to the previous lowest ordinate (the fifth
+argument), which is updated according to the outcome. We may try the
+following canvas:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{}}
+\fun{chg}(0,u,n,h,m) & \rightarrow & \fbcode{CCCCCCC}\,;\\
+\fun{chg}(k,u,n,\ufun{pop}(h),m) & \rightarrow
+                                 & \fun{chg}(k-1,u,n+1,h,m);\\
+\fun{chg}(k,u,n,\ufun{push}(x,h),m) & \rightarrow 
+                   & \fun{chg}(k-1,u,n-1,h,m),\qquad \text{if \(m < n\)};\\
+\fun{chg}(k,u,n,\ufun{push}(x,h),m) & \rightarrow
+                                    & \fun{chg}(k-1,u,n-1,h,n-1).
+\end{array}
+\end{equation*}
+\index{chg@\fun{chg/5}|)} The problem is that we forget the history
+down to the update we are looking for. There are two methods to record
+it: either we use an accumulator\index{functional
+  language!accumulator} and stick with a definition in tail
+form\index{functional language!tail form} (small\hyp{}step
+design\index{design!small-step $\sim$}), or we put back a visited
+update after returning from a recursive call (big\hyp{}step
+design\index{design!big-step $\sim$}). The latter is faster, as there
+is no need to reverse the accumulator when we are done; the former
+allows us to share the history up to the update when it leaves history
+structurally invariant, at the cost of an extra parameter being the
+original history. This same dilemma was encountered when we compared
+\fun{sfst/2}\index{sfst@\fun{sfst/2}} and
+\fun{sfst\(_0\)/2}\index{sfst0@\fun{sfst\(_0\)/2}} in
+section~\ref{sec:skipping} on page~\pageref{sec:skipping}. Let us opt
+for a big\hyp{}step design in \fig~\ref{fig:chg}.
+\begin{figure}[b]
+\centering
+\framebox[\columnwidth]{\vbox{%
+\begin{gather*}
+\inferrule*{}{\fun{chg}(0,u,n,h,m) \rightarrow \fun{rep}(u,h,m)}
+\;\;
+\inferrule
+  {\fun{chg}(k-1,u,n+1,h,m) \twoheadrightarrow \pair{n'}{h'}}
+  {\fun{chg}(k,u,n,\ufun{pop}(h),m) \twoheadrightarrow 
+                                    \pair{n'}{\ufun{pop}(h')}}
+\\
+\inferrule
+  {\fun{chg}(k-1,u,n-1,h,m) \twoheadrightarrow \pair{n'}{h'}\\
+   m < n}
+  {\fun{chg}(k,u,n,\ufun{push}(x,h),m) \twoheadrightarrow
+                              \pair{n'}{\ufun{push}(x,h')}}
+\\
+\inferrule
+  {\fun{chg}(k-1,u,n-1,h,n-1) \twoheadrightarrow \pair{n'}{h'}}
+  {\fun{chg}(k,u,n,\ufun{push}(x,h),m) \twoheadrightarrow 
+                               \pair{n'}{\ufun{push}(x,h')}}
+\end{gather*}
+}}
+\caption{Changing a past version (big-step design)\label{fig:chg}}
+\end{figure}
+Notice how the length~\(n'\) of the new history is simply passed down
+the inference rules. It can simply be made out:
+\begin{itemize*}
+
+  \item replacing a pop by a pop or a push by a push leaves the
+    original length invariant;
+
+  \item replacing a pop by a push increases the original length
+    by~\(2\);
+
+  \item replacing a push by a pop, assuming this is valid, decreases
+    the original length by~\(2\).
+
+\end{itemize*}
+This task is up to the new
+function~\fun{rep/3}\index{rep@\fun{rep/3}|(} (\emph{replace}), which
+implements the second phase. The design is to return a pair made of
+the differential in length~\(d\) and the new history~\(h'\):
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{}}
+\fun{rep}(\ufun{pop}(),\ufun{pop}(h),m)
+     & \rightarrow & \pair{0}{\ufun{pop}(h)};\\
+\fun{rep}(\ufun{push}(x),\ufun{push}(y,h),m)
+     & \rightarrow & \pair{0}{\ufun{push}(x,h)};\\
+\fun{rep}(\ufun{push}(x),\ufun{pop}(h),m)
+     & \rightarrow & \pair{2}{\ufun{push}(x,h)};\\
+\fun{rep}(\ufun{pop}(),\ufun{push}(y,h),m)
+     & \rightarrow & \pair{-2}{\ufun{pop}(h)}.
+\end{array}
+\end{equation*}
+\index{rep@\fun{rep/3}|)} This definition implies that we need to
+redefine~\fun{chg/3}\index{chg@\fun{chg/3}} as follows:
+\begin{mathpar}
+\inferrule{\fun{chg}(k,u,n,h,n) \twoheadrightarrow \pair{d}{h'}}
+          {\fun{chg}(k,u,\pair{n}{h}) \twoheadrightarrow \pair{n+d}{h'}}.
+\end{mathpar}

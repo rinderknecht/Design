@@ -1,0 +1,69 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\input{ocaml_syntax}
+\input{ocaml_macros}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=20pt]
+  {\mknode{\TR[name=outer-let]{\cst{Let}}}
+          {}
+          {\raisebox{4pt}{\Rnode{alpha}{$\alpha$}}}
+  }
+  {\mknode{\TR{\str{x}}}
+          {}
+          {\raisebox{1pt}{\Rnode{beta}{$\beta$}}}
+   \pstree
+     {\mknode{\TR{\cst{Const}}}
+             {}
+             {\raisebox{3pt}{\Rnode{gamma}{$\gamma$}}}
+     }
+     {\TR[name=outer-var]{\num{1}}
+     }
+   \pstree
+     {\mknode{\TR{\cst{BinOp}}}
+             {}
+             {\raisebox{2pt}{\Rnode{delta}{$\delta$}}}
+     }
+     {\TR{\cst{Add}}
+      \pstree
+        {\mknode{\TR[name=inner-let]{\cst{Let}}}
+                {}
+                {\raisebox{3pt}{\Rnode{eta}{$\eta$}}}
+        }
+        {\mknode{\TR{\str{x}}}
+                {}
+                {\raisebox{3pt}{\Rnode{zeta}{$\zeta$}}}
+         \pstree
+           {\mknode{\TR{\cst{Const}}}
+                   {}
+                   {\raisebox{2pt}{\Rnode{nu}{$\nu$}}}
+           }
+           {\TR{\num{2}}
+           }
+         \pstree
+           {\mknode{\TR[name=inner-var]{\cst{Var}}}
+                   {}
+                   {\raisebox{3pt}{\Rnode{zeta}{$\zeta$}}}
+           }
+           {\TR{\str{x}}
+           }
+        }
+      \pstree
+        {\mknode{\TR[name=outer-var]{\cst{Var}}}
+                {}
+                {\raisebox{2pt}{\Rnode{beta}{$\beta$}}}
+        }
+        {\TR{\str{x}}
+        }
+     }
+  }
+\ncarc[linestyle=dotted,nodesepA=1pt,nodesepB=1pt,arcangle=-40]{->}{inner-var}{inner-let}
+\ncarc[linestyle=dotted,nodesepA=1pt,nodesepB=1pt,arcangle=-40]{->}{outer-var}{outer-let}
+\endTeXtoEPS
+
+\end{document}

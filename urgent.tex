@@ -1,0 +1,39 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{pstricks,pst-tree,pst-eps}
+\usepackage{color}
+
+\newcommand{\myred}[1]{\textcolor[named]{BrickRed}{#1}}
+\newcommand\pcdata[1]{\Tr{\psframebox{\rule{0pt}{7pt}\texttt{#1}}}}
+\newcommand\element[1]{\Tr{#1}}
+\newcommand\attr[1]{\Tr{\textbf{@}#1}}
+\newcommand\attrdata[1]{\Tr{\texttt{#1}}}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=1cm,nodesep=2pt,framearc=.4]{\element{email}}{
+  \pstree{\attr{priority}}{
+    \attrdata{urgent}
+  }
+  \pstree{\element{from}}{
+    \psset{nodesepB=0pt}
+    \pcdata{Me}
+  }
+  \pstree{\element{subject}}{
+    \psset{nodesepB=0pt}
+    \pcdata{Homeworks}
+  }
+  \pstree{\element{to}}{
+    \psset{nodesepB=0pt}
+    \pcdata{You}
+  }
+  \pstree{\element{body}}{
+    \pstribox{\rule{0pt}{8pt}[...]}
+  }
+}
+\endTeXtoEPS
+
+\end{document}

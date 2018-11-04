@@ -1,0 +1,3109 @@
+\chapter{Binary Trees}
+\label{binary tree}
+
+In this chapter, we focus on the binary tree as a data structure in
+itself, redefining it on the way and introducing related classical
+algorithms and measures.
+
+\Fig~\vref{fig:bt_shape} displays a binary tree as an example.
+\begin{figure}
+\centering
+\includegraphics{bt_shape}
+\caption{A binary tree\label{fig:bt_shape}}
+\end{figure}
+Nodes are of two kinds: internal\index{binary tree!internal node|(}
+(\(\circ\) and \(\bullet\)) or external\index{binary tree!external
+  node|(} (\(\scriptstyle \Box\)). The characteristic feature of a
+binary tree is that internal nodes are downwardly connected to two
+nodes, called \emph{children}\index{tree!node!child}, whilst external
+nodes have no such links. The root\index{tree!node!root} is the
+topmost internal node, represented with a circle and a diameter.
+\emph{Leaves}\index{binary tree!leaf} are internal nodes whose
+children are two external nodes; they are depicted as black discs.
+
+% Wrapping figure better declared before a paragraph
+%
+\begin{wrapfigure}[8]{r}[0pt]{0pt}
+% [8] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\includegraphics[bb=71 648 177 723]{leaf_tree}
+\caption{A leaf tree\label{fig:leaf_tree}}
+\end{wrapfigure}
+Internal nodes are usually associated with some kind of information,
+whilst external nodes are not, like the one shown in
+\fig~\vref{fig:bt_ex1}:
+\begin{figure}[b]
+\centering
+\subfloat[Extended binary tree\label{fig:bt_ex1}]{
+\includegraphics{bt_ex1}}
+\qquad
+\subfloat[Pruned binary tree\label{fig:bt_ex2}]{
+\includegraphics[bb=67 645 169 721]{bt_ex2}}
+\caption{Two representations of a binary tree\label{fig:bt_ex}}
+\end{figure}
+this is the default representation we use in the present
+book. Sometimes, in order to draw more attention to the internal
+nodes, the external nodes may be omitted, as in
+\fig~\vref{fig:bt_ex2}. Moreover, only the leaves might then carry
+information, in which case the tree is a \emph{leaf tree}\index{binary
+  tree!leaf tree}, as in \fig~\vref{fig:leaf_tree}. Another variant
+sees all nodes carrying some piece of data, as was the case with
+comparison trees (refer for example to \fig~\vref{fig:cmp_tree}, where
+external nodes contain permutations and internal nodes hold
+comparisons of keys).
+
+As seen in the study of sorting algorithms optimal in average,
+\vpageref{par:minimax}, an \emph{external path}\index{tree!external
+  path} is a path from the root to an external
+node\index{tree!node!external $\sim$} and the
+\emph{height}\index{tree!height} of a tree is the length of the
+maximum external paths. For example, the height of the binary tree in
+\fig~\vref{fig:bt_shape} is~\(5\) and there are two external paths of
+maximum length. A path from the root to an internal node is an
+\emph{internal path}\index{tree!internal path}. The \emph{internal
+  path length of a tree}\index{tree!internal path length} is the sum
+of the lengths of all its internal paths. We already have met the
+\emph{external path length of a tree}\index{tree!external path
+  length}, \vpageref{external_path_length}, which is the sum of the
+lengths of all its external paths. (The length of a path is the number
+of its edges.)
+
+\paragraph{Warning}
+
+Some authors use a different nomenclature for the definition of the
+leaves and height. It is also common to stumble upon the concept of
+\emph{depth}\index{binary tree!depth} of a tree, which can be mistaken
+for its height, the former counting the number of nodes on a maximum
+path.
+\begin{thm}%[Internal and external nodes]
+\label{thm:int_ext}
+\textsl{A binary tree with \(n\)~internal nodes has \(n+1\)~external
+  nodes.}
+\end{thm}
+\begin{proof}
+Let \(e\)~be the number of external nodes to be determined. We can
+count the edges in two complementary ways. Top\hyp{}down, we see that
+each internal node has exactly two children, so \(l=2n\), where
+\(l\)~is the number of edges. Bottom\hyp{}up, we see that each node
+has exactly one parent, except the root, which as none. Therefore,
+\(l=(n+e)-1\). Identifying the two values of~\(l\) yields \(e=n+1\).
+\end{proof}
+
+\paragraph{Data structure}
+
+There are many ways to represent a binary tree as a data
+structure. First, we can remark that, just as a stack can be empty or
+not, there are two kinds of nodes, internal or external, and the empty
+tree can be identified to an external node. Therefore, we only need
+two data constructors, say \fun{ext/0}\index{ext@\fun{ext/0}} for
+external nodes, and \fun{int/3}\index{int@\fun{int/3}} for internal
+nodes. The latter applies to three arguments because two children are
+expected, as well as some information. The order of these arguments
+may differ. Because we may see an internal node to stand,
+horizontally, between its subtrees \(t_1\)~and~\(t_2\), we may prefer
+to write \(\fun{int}(t_1,x,t_2)\). (Semitic readers might wish to swap
+\(t_1\)~and~\(t_2\).) Alternatively, we may consider that an internal
+node lies, vertically, before its subtrees, in which case we might
+prefer to write \(\fun{int}(x,t_1,t_2)\). The latter makes typing or
+handwriting small trees easier, in particular for
+testing\index{testing} purposes. For example, the binary tree of
+\fig~\vref{fig:bt_ex1} formally corresponds to \(\fun{int}(8, t_1,
+\fun{int}(3, \fun{ext}(), \fun{ext}(2, \fun{ext}(), \fun{ext}())))\),
+where \(t_1=\fun{int}(1, \fun{ext}(3, \fun{ext}(), \fun{int}(5,
+\fun{ext}(), \fun{ext}())), \fun{ext}(9, \fun{ext}(),
+\fun{ext}()))\). We will use henceforth the convention
+\(\fun{int}(x,t_1,t_2)\), sometimes called \emph{prefix
+  notation}.\index{binary tree!prefix notation}\index{binary
+  tree!internal node|)}\index{binary tree!external node|)}
+
+The \emph{size}\index{binary tree!size} of a binary tree is the number
+of its internal nodes. It is the most common measure used on trees
+when expressing costs of functions. As a warm\hyp{}up exercise, let us
+write a program computing the size of a given binary tree:
+\begin{equation}
+\fun{size}(\fun{ext}()) \rightarrow 0;\quad
+\fun{size}(\fun{int}(x,t_1,t_2))
+  \rightarrow 1 + \fun{size}(t_1) + \fun{size}(t_2).
+\index{size@\fun{size/1}}
+\label{eq:size}
+\end{equation}
+Notice the similarity with computing the length of a stack:
+\begin{equation*}
+\fun{len}(\fun{nil}()) \rightarrow 0;\quad
+\fun{len}(\fun{cons}(x,s)) \rightarrow 1 + \fun{len}(s).
+\index{len@\fun{len/1}}
+\index{nil@\fun{nil/0}}
+\index{cons@\fun{cons/2}}
+\end{equation*}
+The difference lies in that two recursive calls are needed to visit
+all the nodes of a binary tree, instead of one for a stack. This
+bidimensional topology gives rise to many kinds of visits, called
+\emph{walks} or \emph{traversals}.
+
+\section{Traversals}
+\index{tree!traversal}
+\index{tree!walk|see{traversal}}
+\label{sec:traversals}
+
+In this section, we present the classic traversals of binary trees,
+which are distinguished by the order in which the data stored in the
+internal nodes is pushed onto a stack originally empty.
+
+\mypar{Preorder}
+\index{binary tree!preorder|(}
+\label{preorder}
+
+A \emph{preorder}\index{binary tree!preorder} traversal of a
+non\hyp{}empty binary tree consists in having in a stack the root
+(recursively, it is the current internal node), followed by the nodes
+in preorder of the left subtree and, finally, the nodes in preorder of
+the right subtree. (For the sake of brevity, we will identify the
+contents of the nodes with the nodes themselves, when there is no
+ambiguity.) For example, the (contents of the) nodes in preorder of
+the tree in \fig~\vref{fig:bt_ex1} are \([8,1,3,5,9,3,2]\). Because
+this method first visits the children of a node before its
+sibling\index{tree!node!sibling} (two internal nodes are siblings if
+they have the same parent), it is a
+\emph{depth\hyp{}first}\index{binary tree!depth-first traversal}
+traversal. A simple program is
+\begin{equation}
+\fun{pre}_0(\fun{ext}()) \xrightarrow{\smash{\gamma}} \el;
+\;\;
+\fun{pre}_0(\fun{int}(x,t_1,t_2)) \xrightarrow{\smash{\delta}}
+ \cons{x}{\fun{cat}(\fun{pre}_0(t_1),\fun{pre}_0(t_2))}.
+\label{eq:pre0}
+\index{pre0@\fun{pre\(_0\)/1}}
+\end{equation}
+We used the catenation\index{stack!catenation} on stacks provided by
+\fun{cat/2}\index{cat@\fun{cat/2}}, defined in~\eqref{def:cat}
+\vpageref{def:cat}, to order the values of the subtrees. We know that
+the cost of \fun{cat/2} is linear in the size of its first argument:
+\(\C{\fun{cat}}{p} := \Call{\fun{cat}(s,t)} = p+1\), where \(p\)~is
+the length of~\(s\). Let
+\(\C{\fun{pre}_0}{n}\)\index{pre0@$\C{\fun{pre}_0}{n}$} be the cost of
+\(\fun{pre}_0(t)\), where \(n\)~is the number of internal nodes
+of~\(t\). From the definition of \fun{pre\(_0\)/1}, we deduce
+\begin{equation*}
+\C{\fun{pre}_0}{0} = 1;\quad
+\C{\fun{pre}_0}{n+1} = 
+  1 + \C{\fun{pre}_0}{p} + \C{\fun{pre}_0}{n-p} + \C{\fun{cat}}{p},
+\index{pre0@$\C{\fun{pre}_0}{n}$}
+\end{equation*}
+where \(p\)~is the size of~\(t_1\). So \(\C{\fun{pre}_0}{n+1} =
+\C{\fun{pre}_0}{p} + \C{\fun{pre}_0}{n-p} + p + 2\). This recurrence
+belongs to a class called \emph{divide and conquer}
+\index{design!big-step $\sim$} \index{divide and conquer|see{design,
+    big-step $\sim$}} because it springs from strategies which
+consists in splitting the input (here, of size \(n+1\)), recursively
+applying the relevant solving strategy to the smaller parts (here, of
+sizes~\(p\) and \(n-p\)) and finally combining the solutions of the
+parts into a solution of the partition. The extra cost incurred by
+combining smaller solutions (here, \(p+2\)) is called the
+\emph{toll}\index{toll} and the closed form and asymptotic behaviour
+of the solution to the recurrence crucially depends upon its kind.
+
+In another context (see page~\pageref{big-step}), we,
+idiosyncratically, called this strategy \emph{big\hyp{}step design}
+\index{design!big-step $\sim$} because we wanted a convenient way to
+contrast it with another sort of modelling which we called
+\emph{small\hyp{}step design}.\index{design!small-step $\sim$} As a
+consequence, we already have seen instances of `divide and conquer,'
+for example, in the case of merge sort\index{merge sort} in
+chapter~\vref{chap:merge_sort}, which often epitomises the concept
+itself.
+
+The maximum cost
+\(\W{\fun{pre}_0}{k}\)\index{pre0@$\W{\fun{pre}_0}{n}$} satisfies the
+extremal recurrence
+\begin{equation}
+\W{\fun{pre}_0}{0} = 1;\quad
+\W{\fun{pre}_0}{k+1} = 
+  2 + \max_{0 \leqslant p \leqslant k}\{\W{\fun{pre}_0}{p} 
+                                  + \W{\fun{pre}_0}{k-p} + p\}.
+\index{pre0@$\W{\fun{pre}_0}{n}$}
+\label{eq:pre0_max}
+\end{equation}
+Instead of attacking frontally these equations, we can guess a
+possible solution and check it. Here, we could try to consistently
+choose \(p=k\), prompted by the idea that maximising the toll at each
+node of the tree will perhaps lead to a total maximum (\emph{eager
+  solving}). Thus, we envisage
+\begin{equation}
+\W{\fun{pre}_0}{0} = 1;\quad
+\W{\fun{pre}_0}{k+1} = \W{\fun{pre}_0}{k} + k + 3.
+\label{eq:max_pre0_rec}
+\end{equation}
+Summing both sides from \(k=0\) to \(k=n-1\) and simplifying yields
+\begin{equation*}
+\W{\fun{pre}_0}{n} = \tfrac{1}{2}(n^2 + 5n + 2) \sim \tfrac{1}{2}n^2.
+\end{equation*}
+At this point, we check whether this closed form satisfies
+equation~\eqref{eq:pre0_max}. We have \(2(\W{\fun{pre}_0}{p} +
+\W{\fun{pre}_0}{n-p} + p + 2) = 2p^2 + 2(1-n)p + n^2 + 5n + 8\). This
+is the equation of a parabola whose minimum occurs at \(p = (n-1)/2\)
+and maximum at \(p = n\), over the interval \([0,n]\). The maximum,
+whose value is \(n^2 + 7n + 8\), equals \(2 \cdot
+\W{\fun{pre}_0}{n+1}\), so the closed form satisfies the extremal
+recurrence.
+
+What does a binary tree maximising the cost of
+\fun{pre\(_0\)/1}\index{pre0@\fun{pre\(_0\)/1}} look like? The toll
+\(k+3\) in~\eqref{eq:max_pre0_rec} is a consequence of taking the
+maximum cost of \fun{cat/2}\index{cat@\fun{cat/2}} at each node, which
+means that all the internal nodes being catenated come from the left
+subtrees, the left subtree of the left subtree etc. so these nodes are
+catenated again and again while going up (that is, returning from the
+recursive calls), leading to a quadratic cost. The shape of such a
+tree is shown in \fig~\vref{fig:max_pre0}.
+\begin{figure}[b]
+\centering
+\subfloat[Maximum\label{fig:max_pre0}]{
+  \includegraphics{max_pre0}}
+\qquad
+\subfloat[Minimum\label{fig:min_pre0}]{
+  \includegraphics{min_pre0}}
+\caption{Extremal trees for \(\C{\fun{pre}_0}{n}\)
+\label{fig:tree_stack}}
+\end{figure}
+
+Dually, the minimum cost
+\(\B{\fun{pre}_0}{k}\)\index{pre0@$\B{\fun{pre}_0}{n}$} satisfies the
+extremal recurrence
+\begin{equation*}
+\B{\fun{pre}_0}{0} = 1;\quad
+\B{\fun{pre}_0}{k+1} = 
+  2 + \min_{0 \leqslant p \leqslant k}\{\B{\fun{pre}_0}{p} 
+                                  + \B{\fun{pre}_0}{k-p} + p\}.
+\end{equation*}
+Along the same line as before, but on the opposite direction, we may
+try to minimise the toll by choosing \(p=0\), which means that all
+external nodes, but one, are left subtrees. Consequently, we have
+\begin{equation}
+\B{\fun{pre}_0}{0} = 1;\quad
+\B{\fun{pre}_0}{k+1} = \B{\fun{pre}_0}{k} + 3.
+\label{eq:min_pre0_rec}
+\end{equation}
+Summing both sides from \(k=0\) to \(k=n-1\) and simplifying yields
+\begin{equation*}
+\B{\fun{pre}_0}{n} = 3n + 1 \sim 3n.
+\end{equation*}
+It is easy to check that this is indeed a solution
+to~\eqref{eq:min_pre0_rec}. The shape of the corresponding tree is
+shown in \fig~\vref{fig:min_pre0}. Note that both extremal trees are
+isomorphic to a stack (that is, the abstract syntax
+tree\index{tree!abstract syntax $\sim$} of a stack) and, as such, are
+instances of \emph{degenerate trees}\index{binary tree!degenerate
+  $\sim$}. Also, the maximum cost of
+\fun{pre\(_0\)/1}\index{pre0@\fun{pre\(_0\)/1}} is quadratic, which
+calls for some improvement.
+
+Another big\hyp{}step design\index{design!big-step $\sim$} we may come
+up with consists in not using \fun{cat/2}\index{cat@\fun{cat/2}} and
+calling instead
+\fun{flat/1}\index{stack!flattening}\index{flat@\fun{flat/1}}, defined
+in \fig~\vref{fig:flat}, \emph{once at the end}. \Fig~\vref{fig:pre1}
+shows that new version of the preorder traversal, named
+\fun{pre\(_1\)/1}\index{pre1@\fun{pre\(_1\)/1}}.
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{pre}_1(t) & \rightarrow & \fun{flat}(\fun{pre}_2(t)).\\
+\\
+\fun{pre}_2(\fun{ext}()) & \rightarrow & \el;\\
+\fun{pre}_2(\fun{int}(x,t_1,t_2)) & \rightarrow &
+  \cons{x,\fun{pre}_2(t_1)}{\fun{pre}_2(t_2)}.
+\end{array}}
+\end{equation*}
+\caption{Preorder traversal using \fun{flat/1}\label{fig:pre1}}
+\end{figure}
+The cost of \(\fun{pre}_2(t)\)\index{pre2@\fun{pre\(_2\)/1}} is now
+reduced to \(2n+1\) (see theorem~\ref{thm:int_ext}
+\vpageref{thm:int_ext}). On page~\pageref{cost:flat}, the cost of
+\(\fun{flat}(s)\)\index{flat@\fun{flat/1}} was \(1 + n + \Omega +
+\Gamma + L\), where \(n\)~is the length of
+\(\fun{flat}(s)\)\index{flat@\fun{flat/1}}, \(\Omega\)~is the number
+of empty stacks in~\(s\), \(\Gamma\)~is the number of non\hyp{}empty
+stacks and \(L\)~is the sum of the lengths of the embedded stacks. The
+value of~\(\Omega\) is \(n+1\) because this is the number of external
+nodes. The value of~\(\Gamma\) is \(n-1\), because each internal node
+yields a non\hyp{}empty stack by the second rule of
+\fun{pre\(_2\)/1}\index{pre2@\fun{pre\(_2\)/1}} and the root is
+excluded because we only count embedded stacks. The value of~\(L\) is
+\(3(n-1)\) because those stacks have length~\(3\) by the same rule. In
+the end, \(\Call{\fun{flat}(s)} = 6n - 2\), where \(\fun{pre}_2(t)
+\twoheadrightarrow s\) and \(n\)~is the size of~\(t\). Finally, we
+must account for the rule defining
+\fun{pre\(_1\)/1}\index{pre1@\fun{pre\(_1\)/1}} and assess afresh the
+cost incurred by the empty tree:
+\begin{equation*}
+\C{\fun{pre}_1}{0} = 3;\index{pre1@$\C{\fun{pre}_1}{n}$}
+\quad
+\C{\fun{pre}_1}{n} = 1 + (2n+1) + (6n - 2) = 8n,\; 
+\text{when \(n > 0\).}
+\end{equation*}
+
+Despite a significant improvement in the cost and the lack of extreme
+cases, we should try a small\hyp{}step design\index{design!small-step
+  $\sim$} before giving up. The underlying principle in this kind of
+approach is to do as little as possible in each rule. Looking back at
+\fun{pre\(_0\)/1}\index{pre0@\fun{pre\(_0\)/1}}, it is clear that the
+root is correctly placed, but, without resorting to
+\(\fun{pre}_3(t_1)\)\index{pre3@\fun{pre\(_3\)/1}} and
+\(\fun{pre}_3(t_2)\) in the following canvas, what can be done
+further?
+\begin{equation*}
+\fun{pre}_3(\fun{ext}()) \rightarrow \el;
+\quad
+\fun{pre}_3(\fun{int}(x,t_1,t_2)) \rightarrow 
+  \cons{x}{\fbcode{CCCCCCC}\,}.
+\end{equation*}
+The way forth is to think in terms of forests\index{tree!forest},
+instead of single trees, because a forest is a stack of trees and, as
+such, can also be used to accumulate trees\index{functional
+  language!accumulator}. This is a common technique when processing
+trees. See \fig~\vref{fig:pre3}.
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{pre}_3(t) & \xrightarrow{\smash{\alpha}} & \fun{pre}_4([t]).\\
+\\
+\fun{pre}_4(\el) & \xrightarrow{\smash{\beta}} & \el;\\
+\fun{pre}_4(\cons{\fun{ext}()}{f})
+  & \xrightarrow{\smash{\gamma}} & \fun{pre}_4(f);\\
+\fun{pre}_4(\cons{\fun{int}(x,t_1,t_2)}{f})
+  & \xrightarrow{\smash{\delta}} &
+  \cons{x}{\fun{pre}_4(\cons{t_1,t_2}{f})}.
+\end{array}}
+\end{equation*}
+\caption{Efficient preorder traversal with a forest\label{fig:pre3}}
+\end{figure}
+Empty trees in the forest are skipped in rule~\clause{\gamma}. In
+rule~\clause{\delta}, the subtrees \(t_1\) and~\(t_2\) are now simply
+pushed back onto the forest~\(f\), for later processing. This way,
+there is no need to compute
+\(\fun{pre}_4(t_1)\)\index{pre4@\fun{pre\(_4\)/1}} or
+\(\fun{pre}_4(t_2)\) immediately. This method is slightly different
+from using an accumulator which contains, at every moment, a partial
+result or a reversed partial result. Here, no parameter is added but,
+instead, a stack replaces the original parameter, and it does not
+contain partial results, but pieces of the original tree from which to
+pick internal nodes easily (the root of the first tree) in the
+expected order. An example is given in \fig~\vref{fig:pre3_abcde},
+\begin{figure}[!b]
+\centering
+\includegraphics[bb=71 650 374 710]{pre3_abcde_0} %[... ... ... 723]
+\includegraphics[bb=71 668 306 721]{pre3_abcde_1}
+\includegraphics{pre3_abcde_2}
+\caption{A preorder traversal with \fun{pre\(_4\)/1}
+\label{fig:pre3_abcde}}
+\end{figure}
+where the forest is the argument of \fun{pre\(_4\)/1} and the circle
+nodes are the current value of~\(x\) in rule~\(\delta\) of
+\fig~\ref{fig:pre3}.
+
+\par\vskip\baselineskip
+
+\noindent The cost of
+\(\fun{pre}_3(t)\)\index{pre3@\fun{pre\(_3\)/1}}, where the size
+of~\(t\) is~\(n\), is simple:
+\begin{itemize*}
+
+  \item rule \clause{\alpha} is used once;
+
+  \item rule \clause{\beta} is used once;
+
+  \item rule \clause{\gamma} is used once for each external node, that
+    is, \(n+1\) times;% (see theorem~\ref{thm:int_ext}   \vpageref{thm:int_ext});
+
+  \item rule \clause{\delta} is used once for each internal node, so
+    \(n\)~times, by definition.
+
+\end{itemize*}
+In total, \(\C{\fun{pre}_3}{n} = 2n + 3 \sim
+2n\)\index{pre3@$\C{\fun{pre}}{n}$}, which is a notable
+improvement. The keen reader may remark that we could further reduce
+the cost by not visiting the external nodes, as shown in
+\fig~\ref{fig:pre5}.
+\begin{figure}[t]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{pre}_5(t) & \rightarrow & \fun{pre}_6([t]).\\
+\\
+\fun{pre}_6(\el) & \rightarrow & \el;\\
+\fun{pre}_6(\cons{\fun{ext}()}{f})
+  & \rightarrow & \fun{pre}_6(f);\\
+\fun{pre}_6(\cons{\fun{int}(x,\fun{ext}(),\fun{ext}())}{f})
+  & \rightarrow & \cons{x}{\fun{pre}_6(f)};\\
+\fun{pre}_6(\cons{\fun{int}(x,\fun{ext}(),t_2)}{f})
+  & \rightarrow & \cons{x}{\fun{pre}_6(\cons{t_2}{f})};\\
+\fun{pre}_6(\cons{\fun{int}(x, t_1, \fun{ext}())}{f})
+  & \rightarrow & \cons{x}{\fun{pre}_6(\cons{t_1}{f})};\\
+\fun{pre}_6(\cons{\fun{int}(x,t_1,t_2)}{f})
+  & \rightarrow & \cons{x}{\fun{pre}_6(\cons{t_1,t_2}{f})}.
+\end{array}}
+\end{equation*}
+\caption{Lengthy definition of a preorder traversal\label{fig:pre5}}
+\end{figure}
+We then have
+\begin{equation*}
+\C{\fun{pre}_5}{n} = \C{\fun{pre}_3}{n} - (n+1) = n +
+2.
+\end{equation*}
+\index{pre6@\fun{pre\(_6\)/1}}\index{pre5@\fun{pre\(_5\)/1}}\index{pre5@$\C{\fun{pre}_5}{n}$}
+Despite the gain, the optimised program is significantly longer and
+the right\hyp{}hand sides of the new rules are partial
+evaluations\index{functional language!evaluation!partial $\sim$} of
+rule~\clause{\delta}. The measure of the input we use for calculating
+the costs does not include the abstract time needed to select the rule
+to apply but it is likely, though, that the more patterns, the higher
+this hidden penalty. In this book, we prefer to visit the external
+nodes unless there is a logical reason not to do so, if only for the
+sake of conciseness.
+
+The total number of cons\hyp{}nodes\index{cons-node} created by the
+rules~\(\alpha\) and~\(\delta\) is the total number of nodes,
+\(2n+1\), but if we want to know how many there can be at any time, we
+need to consider how the shape of the original tree influences the
+rules~\(\gamma\) and~\(\delta\). In the best case,
+\(t_1\)~in~\(\delta\) is \(\fun{ext}()\) and will be eliminated next
+by rule~\clause{\gamma} without additional creation of nodes. In the
+worst case, \(t_1\)~maximises the number of internal nodes on its left
+branch. Therefore, these two configurations correspond to the extremal
+cases for the cost of \fun{pre\(_0\)/1}\index{pre0@\fun{pre\(_0\)/1}}
+in \fig~\vref{fig:tree_stack}. In the worst case, all the \(2n+1\)
+nodes of the tree will be in the stack at one point, whilst, in the
+best case, only two will be. The question of the average stack size
+will be considered later in this text in relation with the average
+height.
+
+The distinction between big\hyp{}step design\index{design!big-step
+  $\sim$} (or `divide and conquer'\index{divide and conquer}) and
+small\hyp{}step design\index{design!small-step $\sim$} is not always a
+clear cut and is mainly intended to be a didactical means. In
+particular, we should not assume that there are only two possible
+kinds of design for every given task. To bring further clarity to the
+subject, let us use an heterogeneous approach to design another
+version, \fun{pre/1}\index{pre@\fun{pre/1}}, which computes
+efficiently the preorder traversal of a given binary tree. Looking
+back at \fun{pre\(_0\)/1}\index{pre0@\fun{pre\(_0\)/1}}, we can
+identify the source of the inefficiency in the fact that, in the worst
+case,
+\begin{equation*}
+\fun{pre}_0(t) \twoheadrightarrow 
+\cons{x_1}{\fun{cat}(\cons{x_2}{\fun{cat}(\dots
+    \fun{cat}(\cons{x_n}{\fun{cat}(\el, \el)},\el) \dots)})}
+\index{cat@\fun{cat/2}}
+\end{equation*}
+where \(t = \fun{int}(x_1,\fun{int}(x_2,\dots, \fun{int}(x_n,
+\fun{ext}(), \fun{ext}()), \dots, \fun{ext}()),\fun{ext}())\) is the
+tree in \fig~\vref{fig:max_pre0}. We met this kind of partial rewrite
+in formula~\eqref{eq:rev0}\index{rev0@\fun{rev\(_0\)/1}}
+\vpageref{eq:rev0} and~\eqref{inv_isrt}
+\vpageref{inv_isrt}\index{isrt@\fun{isrt/1}}\index{ins@\fun{ins/2}},
+and we found that it leads to a quadratic cost.  Whilst the use of
+\fun{cat/2}\index{cat@\fun{cat/2}} in itself is not the issue, but
+rather the accumulation of calls to \fun{cat/2}\index{cat@\fun{cat/2}}
+as their first argument, let us nevertheless seek out a definition not
+relying on catenation at all. This means that we want to build the
+preorder stack by using exclusively pushes. Therefore, we must add an
+auxiliary parameter, originally set to the empty stack, on which the
+contents of the nodes are pushed in the proper order: \(\fun{pre}(t)
+\rightarrow \fun{pre}(t,\el)\).\index{pre@\fun{pre/2}} Now, we should
+wonder what the interpretation of this accumulator\index{functional
+  language!accumulator} is when considering the pattern
+\(\fun{pre}(t,s)\). Let us have a look at the internal node
+\(t=\fun{int}(x,t_1,t_2)\) in \fig~\vref{fig:pre_tree}.
+\begin{figure}
+\centering
+\subfloat[Preorder with \fun{pre/1}\label{fig:pre_tree}]{
+  \includegraphics[bb=71 672 166 721]{pre_tree}}
+\subfloat[Inorder with \fun{in/1}\label{fig:in_tree}]{
+  \includegraphics[bb=71 672 183 721]{in_tree}}
+\subfloat[Postorder with \fun{post/1}\label{fig:post_tree}]{
+  \includegraphics[bb=71 672 183 721]{post_tree}}
+\caption{Efficient classic traversals\label{fig:classic_walks}}
+\end{figure}
+The arrows evince the traversal in the tree and connect different
+stages of the preorder stack: a downwards arrow points to the argument
+of a recursive call on the corresponding child; an upward arrow points
+to the result of the call on the parent. For instance, the
+subtree~\(t_2\) corresponds to the recursive call
+\(\fun{pre}(t_2,s)\)\index{pre@\fun{pre/2}} whose value is
+named~\(s_1\). Likewise, we have \(\fun{pre}(t_1,s_1)
+\twoheadrightarrow s_2\), which is therefore equivalent to
+\(\fun{pre}(t_1,\fun{pre}(t_2,s)) \twoheadrightarrow s_2\). Finally,
+the root is associated with the evaluation \(\fun{pre}(t,s)
+\twoheadrightarrow \cons{x}{s_2}\), that is, \(\fun{pre}(t,s) \equiv
+\cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,s))}\).\index{pre@\fun{pre/2}}
+The rule for external nodes is not shown and simply consists in
+letting the stack invariant. We can finally write the functional
+program in \fig~\vref{fig:pre}.
+\begin{figure}[b]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{pre}(t) & \xrightarrow{\smash{\theta}} & \fun{pre}(t,\el).\\
+\\
+\fun{pre}(\fun{ext}(),s) & \xrightarrow{\smash{\iota}} & s;\\
+\fun{pre}(\fun{int}(x,t_1,t_2),s)
+  & \xrightarrow{\smash{\kappa}} 
+  & \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,s))}.
+\end{array}}
+\end{equation*}
+\caption{Cost and memory efficient preorder\label{fig:pre}}
+\end{figure}
+We now understand that, given \(\fun{pre}(t,s)\), the nodes in the
+stack~\(s\) are the nodes that follow, in preorder, the nodes in the
+subtree~\(t\). The cost is extremely simple:
+\begin{equation}
+\C{\fun{pre}}{n} = 1 + (n+1) + n = 2n+2.\label{eq:pre}
+\index{pre@$\C{\fun{pre}}{n}$}
+\end{equation}
+(Keep in mind that there are \(n+1\) external nodes when there are
+\(n\) internal nodes.)
+
+This variant is to be preferred over
+\fun{pre\(_3\)/1}\index{pre3@\fun{pre\(_3\)/1}} because its
+memory\index{memory} usage is lower: rule~\clause{\delta} in
+\fig~\vref{fig:pre3} pushes \(t_1\) and~\(t_2\), thus allocates two
+cons\hyp{}nodes\index{cons-node} per internal node, totalling \(2n\)
+supplementary nodes. By contrast, \fun{pre/1}\index{pre@\fun{pre/1}}
+creates none, but allocates \(n\)~call\hyp{}nodes
+\fun{pre}\index{pre@\fun{pre/2}} (one per internal node), so the
+advantage stands, albeit moot. Note that
+\fun{pre\(_3\)/1}\index{pre3@\fun{pre\(_3\)/1}} is in tail
+form\index{functional language!tail form}, but not \fun{pre/2}.
+
+\paragraph{Preorder numbering}
+
+\Fig~\vref{fig:preorder}
+\begin{figure}
+\centering
+\subfloat[Preorder\label{fig:preorder}]{\includegraphics{preorder}}
+\;
+\subfloat[Postorder\label{fig:postorder}]{\includegraphics{postorder}}
+\;
+\subfloat[Inorder\label{fig:inorder}]{\includegraphics{inorder}}
+\;
+\subfloat[Level order\label{fig:lorder}]{\includegraphics{lorder}}
+\caption{Classic numberings of a pruned binary tree
+\label{fig:orders}}
+\end{figure}
+shows a binary tree whose internal nodes have been replaced by their
+rank in preorder, with the smallest number, \(0\), at the root. In
+particular, the preorder traversal of that tree yields
+\([0,1,2,3,4,5,6]\). Producing such a tree from some initial tree is a
+\emph{preorder numbering}\index{binary tree!preorder numbering}. A
+complete example is shown in \fig~\vref{fig:bt_ex3},
+\begin{figure}[b]
+\centering
+\includegraphics{bt_ex3}
+\caption{Preorder numbers as exponents\label{fig:bt_ex3}}
+\end{figure}
+where the preorder numbers are exponents to the internal nodes. Note
+how these numbers increase along downwards paths.
+
+Their generation can be tackled in two phases: first, we need to
+understand how to produce the right number for a given node; second,
+we need to use these numbers to build a tree. The scheme for the
+former is shown on internal nodes in \fig~\vref{fig:prenum1}.
+\begin{figure}[t]
+\centering
+\subfloat[Numbers only\label{fig:prenum1}]{%
+\includegraphics[bb=71 668 170 721]{prenum1}}
+\qquad
+\subfloat[Numbers and tree\label{fig:prenum0}]{%
+\includegraphics[bb=71 668 217 721]{prenum0}}
+\caption{Preorder numbering in two phases\label{fig:prenum}}
+\end{figure}
+A number on the left side of a node indexes it, for example node~\(x\)
+is indexed with~\(i\): these numbers descend in the tree. A number on
+the right side of a node is the smallest number not used in the
+numbering of the subtrees attached to that node: these numbers ascend
+and may be used for the numbering of another subtree. For instance,
+\(j\)~is the smallest integer not numbering the nodes of the subtree
+\(t_1\). External nodes do not change their incoming number and are
+not depicted.
+
+The second and final design phase consists in the construction of the
+tree made of these numbers and it is pictured in
+\fig~\vref{fig:prenum0}. Conceptually, it is the completion of the
+first phase in the sense that upwards arrows, which denote values of
+recursive calls on subtrees, now point at pairs whose first component
+is the number we found earlier and the second component is a numbered
+tree. As usual with recursive definitions, we assume that the
+recursive calls on substructures are correct (that is, they yield the
+expected values) and we infer the value of the call on the whole
+structure at hand, here \(\pair{k}{\fun{int}(i,t'_1,t'_2)}\).
+
+The function
+\fun{npre/1}\index{npre@\fun{npre/1}} (\emph{number in preorder}) in
+\fig~\vref{fig:npre}
+\begin{figure}[t]
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\centering
+\framebox[0.75\columnwidth]{\vbox{%
+\begin{gather*}
+\inferrule
+  {\fun{npre}(0,t) \twoheadrightarrow \pair{i}{t'}}
+  {\fun{npre}(t) \twoheadrightarrow t'}\,.
+\qquad
+\fun{npre}(i,\fun{ext}()) \rightarrow \pair{i}{\fun{ext}()};
+\\
+\inferrule
+  {\fun{npre}(i+1,t_1) \twoheadrightarrow \pair{j}{t'_1}
+   \and
+   \fun{npre}(j,t_2) \twoheadrightarrow \pair{k}{t'_2}}
+  {\fun{npre}(i,\fun{int}(x,t_1,t_2)) \twoheadrightarrow
+   \pair{k}{\fun{int}(i,t'_1,t'_2)}}\,.
+\end{gather*}
+}}
+\caption{Preorder numbering\label{fig:npre}}
+\end{figure}
+implements this algorithm. We use an auxiliary function
+\fun{npre/2}\index{npre@\fun{npre/2}} such that \(\fun{npre}(i,t)
+\twoheadrightarrow \pair{j}{t'}\), where \(t'\)~is the preorder
+numbering of~\(t\), with root~\(i\), and \(j\)~is the smallest integer
+not found in~\(t'\) (in other words, \(j-i\) is the size of~\(t\)
+and~\(t'\)). This function is the one illustrated in
+\fig~\vref{fig:prenum0}.
+
+By the way, we should perhaps recall that inference
+systems\index{induction!inference system}, first seen
+\vpageref{par:infsys}, can be eliminated by the introduction of
+auxiliary functions (one for each premise). In this instance, we could
+equivalently write\index{snd@\fun{snd/1}} the program in
+\fig~\vref{fig:npre_bis}.
+\begin{figure}
+\begin{equation*}
+%\belowdisplayskip=0pt
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{npre}(t) & \rightarrow & \fun{snd}(\fun{npre}(0,t)).\\
+\\
+\fun{snd}(\pair{x}{y}) & \rightarrow & y.\\
+\\
+\fun{npre}(i,\fun{ext}()) & \rightarrow & \pair{i}{\fun{ext}()};\\
+\fun{npre}(i,\fun{int}(x,t_1,t_2)) & \rightarrow &
+\fun{t}_1(\fun{npre}(i+1,t_1),i,t_2).\\
+\\
+\fun{t}_1(\pair{j}{t'_1},i,t_2) & \rightarrow &
+\fun{t}_2(\fun{npre}(j,t_2),i,t'_1).\\
+\\
+\fun{t}_2(\pair{k}{t'_2},i,t'_1) & \rightarrow & \pair{k}{\fun{int}(i,t'_1,t'_2)}.
+\end{array}
+}
+\end{equation*}
+\caption{Version of \fun{npre/1} without inference rules\label{fig:npre_bis}}
+\end{figure} 
+\index{binary tree!preorder|)}
+
+\paragraph{Termination}
+\index{termination!preorder traversal|(}
+\index{binary tree!preorder!termination|(}
+
+It is easy to prove the termination of
+\fun{pre/2}\index{pre@\fun{pre/2}} because the technique used for
+proving the termination of Ackermann's function on
+page~\pageref{par:ackermann} is pertinent in the current context as
+well. We define a lexicographic order\index{induction!lexicographic
+  order} on the calls to \fun{pre/2}\index{pre@\fun{pre/2}}
+(dependency pairs\index{termination!dependency pair}) as follows:
+\begin{equation}
+\fun{pre}(t,s) \succ \fun{pre}(t',s') :\Leftrightarrow \text{\(t
+  \succ_{B} t'\) or (\(t = t'\) and \(s \succ_{S} s'\))},
+\label{eq:BS_order}
+\end{equation}
+where \(B\)~is the set of all binary trees, \(S\)~is the set of all
+stacks, \(t \succ_{B} t'\) means that the tree~\(t'\) is an immediate
+subtree\index{tree!subtree!immediate $\sim$} of~\(t\), and \(s
+\succ_{S} s'\) means that the stack \(s'\)~is an immediate
+substack\index{induction!immediate substack order} of~\(s\)
+(page~\pageref{par:well-founded}).  From the definition in
+\fig~\vref{fig:pre}, we see that rule~\(\theta\) maintains termination
+if \fun{pre/2}\index{pre@\fun{pre/2}} terminates; rule~\(\iota\)
+terminates; finally, rule~\(\kappa\) rewrites a call into smaller
+calls: \(\fun{pre}(\fun{int}(x,t_1,t_2),s) \succ \fun{pre}(t_2,s)\)
+and \(\fun{pre}(\fun{int}(x,t_1,t_2),s) \succ \fun{pre}(t_1,u)\), for
+all~\(u\), in particular if \(\fun{pre}(t_2,s) \twoheadrightarrow
+u\). As a consequence, \fun{pre/1}\index{pre@\fun{pre/1}} terminates
+on all inputs.\index{binary
+  tree!preorder!termination|)}\index{termination!preorder
+  traversal|)}\hfill\(\Box\)
+
+\paragraph{Equivalence}
+
+To see how structural induction can be used to prove properties on
+binary trees, we will consider a simple statement we made earlier,
+formally expressed as \(\pred{Pre}{t} \colon \fun{pre}_0(t) \equiv
+\fun{pre}(t)\).\index{Pre@\predName{Pre}}\index{pre0@\fun{pre\(_0\)/1}}\index{pre@\fun{pre/1}}
+We need to prove
+\begin{itemize}
+
+  \item the basis \(\pred{Pre}{\fun{ext}()}\);
+
+  \item the inductive step \(\forall t_1.\pred{Pre}{t_1} \Rightarrow
+    \forall t_2.\pred{Pre}{t_2} \Rightarrow \! \forall
+    x.\pred{Pre}{\fun{int}(x,t_1,t_2)}\).
+
+\end{itemize}
+The basis is easy because \(\fun{pre}_0(\fun{ext}())
+\xrightarrow{\smash{\gamma}} \el \xleftarrow{\smash{\iota}}
+\fun{pre}(\fun{ext}(),\el) \xleftarrow{\smash{\theta}}
+\fun{pre}(\fun{ext}())\). See definition of \fun{pre\(_0\)/1} at
+equation~\eqref{eq:pre0} \vpageref{eq:pre0}. It is useful here to
+recall the definition of \fun{cat/2}\index{cat@\fun{cat/2}}:
+\begin{equation*}
+\fun{cat}(\el,t) \xrightarrow{\smash{\alpha}} t;
+\qquad
+\fun{cat}(\cons{x}{s},t) \xrightarrow{\smash{\beta}}
+\cons{x}{\fun{cat}(s,t)}.
+\end{equation*}
+In order to discover how to use the two induction hypotheses
+\(\pred{Pre}{t_1}\) and \(\pred{Pre}{t_2}\)\index{Pre@\predName{Pre}},
+let us start from one side of the equivalence we wish to establish,
+for example, the left\hyp{}hand side, and rewrite it until we reach
+the other side or get stuck. Let \(t := \fun{int}(x,t_1,t_2)\), then
+\begin{equation*}
+\begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
+\fun{pre}_0(t)
+& = & \fun{pre}_0(\fun{int}(x,t_1,t_2))\\
+& \xrightarrow{\smash{\delta}}
+& \cons{x}{\fun{cat}(\fun{pre}_0(t_1), \fun{pre}_0(t_2))}\\
+& \equiv & \cons{x}{\fun{cat}(\fun{pre}(t_1), \fun{pre}_0(t_2))}
+& (\pred{Pre}{t_1})\\
+& \equiv & \cons{x}{\fun{cat}(\fun{pre}(t_1), \fun{pre}(t_2))}
+& (\pred{Pre}{t_2})\\
+& \xrightarrow{\smash{\theta}}
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2))}\\
+& \xrightarrow{\smash{\theta}}
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2,\el))}.
+\end{array}
+\end{equation*}
+At this point, we start rewriting the other side, until we get stuck
+as well: \(\fun{pre}(t) = \fun{pre}(\fun{int}(x,t_1,t_2))
+\xrightarrow{\smash{\theta}} \fun{pre}(\fun{int}(x,t_1,t_2),\el)
+\xrightarrow{\smash{\kappa}}
+\cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))}\)\index{pre@\fun{pre/1}}\index{pre@\fun{pre/2}}. Comparing
+the two stuck expressions\index{rewrite system!stuck expression}
+suggests a subgoal to reach.
+
+Let \(\pred{CatPre}{t,s} \colon \fun{cat}(\fun{pre}(t,\el),s) \equiv
+\fun{pre}(t,s)\)\index{CatPre@\predName{CatPre}}\index{cat@\fun{cat/2}}\index{pre@\fun{pre/2}}. When
+a predicate depends upon two parameters, we have different options to
+ponder: either we need lexicographic induction, or simple induction on
+one of the variables. It is best to use a lexicographic
+ordering\index{induction!lexicographic order} on pairs and, if we
+realise afterwards that only one component was needed, we can rewrite
+the proof with a simple induction on that component. Let us then
+define
+\begin{equation*}
+(t,s) \succ_{B \times S} (t',s') :\Leftrightarrow \text{\(t \succ_{B}
+    t'\) or (\(t = t'\) and \(s \succ_{S} s'\))}.
+\end{equation*}
+This is conceptually the same order as the one on the calls to
+\fun{pre/1}\index{pre@\fun{pre/1}}, in
+definition~\eqref{eq:BS_order}. If we find out later that immediate
+subterm relations are too restrictive, we would choose here general
+subterm relations, which means, in the case of binary trees, that a
+tree is a subtree of another. The minimum element for the
+lexicographic order we just defined is \((\fun{ext}(),\el)\). The
+well\hyp{}founded induction principle then requires that we establish
+\begin{itemize*}
+
+  \item the basis \(\pred{CatPre}{\fun{ext}(),\el}\);
+
+  \item \(\forall t,s. (\forall t',s'.(t,s) \succ_{B \times S} (t',s')
+    \Rightarrow \pred{CatPre}{t',s'}) \Rightarrow
+    \pred{CatPre}{t,s}\).
+
+\end{itemize*}
+The basis is easy: \(\fun{cat}(\fun{pre}(\fun{ext}(),\el),\el)
+\xrightarrow{\smash{\iota}} \fun{cat}(\el,\el)
+\xrightarrow{\smash{\alpha}} \el \xleftarrow{\smash{\iota}}
+\fun{pre}(\fun{ext}(),\el)\).\index{cat@\fun{cat/2}} We then assume
+\(\forall t',s'.(t,s) \succ_{B \times S} (t',s') \Rightarrow
+\pred{CatPre}{t',s'}\), which is the induction hypothesis, and proceed
+to rewrite the left\hyp{}hand side after letting \(t :=
+\fun{int}(x,t_1,t_2)\). The result is shown in \fig~\vref{fig:CatPre},
+\index{CatPre@\predName{CatPre}}
+\begin{figure}[t]
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}c@{\;}l}
+  \fun{cat}(\fun{pre}(t,\el),s)
+& =
+& \fun{cat}(\fun{pre}(\fun{int}(x,t_1,t_2),\el),s)\\
+& \xrightarrow{\smash{\kappa}}
+& \fun{cat}(\cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))},s)\\
+& \xrightarrow{\smash{\beta}} 
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\fun{pre}(t_2,\el)),s)}\\
+& \equiv_0
+& \cons{x}{\fun{cat}(\fun{cat}(\fun{pre}(t_1,\el),\fun{pre}(t_2,\el)),s)}\\
+& \equiv_1
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el),\fun{cat}(\fun{pre}(t_2,\el),s))}\\
+& \equiv_2
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el),\fun{pre}(t_2,s))}\\
+& \equiv_3
+& \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,s))}\\
+& \xleftarrow{\smash{\kappa}}
+& \fun{pre}(\fun{int}(x,t_1,t_2),s)\\
+& =
+& \fun{pre}(t,s).\hfill\Box
+\end{array}}
+\end{equation*}
+\caption{Proof of \(\pred{CatPre}{t} \colon
+  \fun{cat}(\fun{pre}(t,\el),s) \equiv
+  \fun{pre}(t,s)\)\label{fig:CatPre}}
+\end{figure}
+where
+\begin{itemize*}
+
+  \item (\(\equiv_0\)) is the instance
+  \(\pred{CatPre}{t_1,\fun{pre}(t_2,\el)}\) of the induction
+  hypothesis because \((t,s) \succ_{B \times S} (t_1,s')\), for all
+  stacks~\(s'\), in particular when \(\fun{pre}(t_2,\el)
+  \twoheadrightarrow s'\);\index{pre@\fun{pre/2}}
+
+  \item (\(\equiv_1\)) is an application of the lemma on the
+  associativity of stack catenation\index{stack!catenation}
+  (page~\pageref{proof:assoc_cat}), namely
+  \index{pre@\fun{pre/2}}\index{CatAssoc@\predName{CatAssoc}}
+  \(\pred{CatAssoc}{\fun{pre}(t_1,\el),\fun{pre}(t_2,\el),s}\);
+
+  \item (\(\equiv_2\)) is the instance
+  \(\pred{CatPre}{t_2,s}\)\index{CatPre@\predName{CatPre}} of the
+  induction hypothesis because \((t,s) \succ_{B \times S} (t_2,s)\);
+
+  \item (\(\equiv_3\)) is the instance \(\pred{CatPre}{t_1,
+    \fun{pre}(t_2,s)}\) of the induction hypothesis because \((t,s)
+    \succ_{B \times S} (t_1,s')\), for all stacks~\(s'\), in
+    particular when \(s' = \fun{pre}(t_2,s)\).\index{pre@\fun{pre/2}}
+\end{itemize*}
+We can resume conclusively in \fig~\vref{fig:pre0_pre}.\hfill\(\Box\)
+\begin{figure}
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}c@{\;}l@{\qquad}r}
+\fun{pre}_0(t)
+& = & \fun{pre}_0(\fun{int}(x,t_1,t_2))\\
+& \xrightarrow{\smash{\delta}}
+& \cons{x}{\fun{cat}(\fun{pre}_0(t_1), \fun{pre}_0(t_2))}\\
+& \equiv & \cons{x}{\fun{cat}(\fun{pre}(t_1), \fun{pre}_0(t_2))}
+& (\pred{Pre}{t_1})\\
+& \equiv & \cons{x}{\fun{cat}(\fun{pre}(t_1), \fun{pre}(t_2))}
+& (\pred{Pre}{t_2})\\
+& \xrightarrow{\smash{\theta}}
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2))}\\
+& \xrightarrow{\smash{\theta}}
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2,\el))}\\
+& \equiv 
+& \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))}
+& (\pred{CatPre}{t_1,\fun{pre}(t_2,\el)})\\
+& \xleftarrow{\smash{\kappa}}
+& \fun{pre}(\fun{int}(x,t_1,t_2),\el)\\
+& \xleftarrow{\smash{\theta}} 
+& \fun{pre}(\fun{int}(x,t_1,t_2))\\
+& = & \fun{pre}(t). & \hfill\Box
+\end{array}}
+\end{equation*}
+\caption{Proof of \(\pred{Pre}{t} \colon \fun{pre}_0(t) \equiv
+  \fun{pre}(t)\) \label{fig:pre0_pre}}
+\end{figure}
+
+\paragraph{Flattening revisited}
+\index{stack!flattening|(}
+
+In section~\vref{sec:flattening}, we defined two functions for
+flattening\index{stack!flattening} stacks (see \fig~\ref{fig:flat0} on
+page~\pageref{fig:flat0} and \fig~\ref{fig:flat} on
+page~\pageref{fig:flat}). With the understanding of preorder
+traversals, it may occur to us that the flattening of a stack is
+equivalent to the preorder traversal of a binary leaf
+tree\index{binary tree!leaf tree} (see \fig~\vref{fig:leaf_tree} for
+an example) which ignores empty stacks. The key is to see a stack,
+possibly containing other stacks, as a leaf tree, as shown for example
+in \fig~\vref{fig:stacks}, where the internal nodes (\texttt{|}) are
+cons\hyp{}nodes.
+\begin{figure}
+\centering
+\includegraphics[bb=71 643 186 721]{stacks}
+\caption{Embedded stacks as a leaf tree\label{fig:stacks}}
+\end{figure}
+
+The first step consists in defining inductively the set of the binary
+leaf trees as the smallest set~\(L\) generated by the deductive
+(downwards) reading of the inference system
+\begin{mathpar}
+\inferrule*{}{\fun{leaf}(x) \in L}
+\qquad
+\inferrule{t_1 \in L \and t_2 \in L}{\fun{fork}(t_1,t_2) \in L}.
+\end{mathpar}
+In other words, a leaf containing the piece of data~\(x\) is noted
+\(\fun{leaf}(x)\)\index{leaf@\fun{leaf/1}} and the other internal
+nodes are \emph{forks}\index{binary tree!fork}, written
+\(\fun{fork}(t_1,t_2)\)\index{fork@\fun{fork/2}}, with \(t_1\)
+and~\(t_2\) being binary leaf trees themselves. The second step
+requires a modification of \fun{pre/1}, defined in
+\fig~\vref{fig:pre}, so it processes binary leaf trees. The new
+function, \fun{lpre/1}\index{lpre@\fun{lpre/1}}, is shown in
+\fig~\vref{fig:lpre}.
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{lpre}(t) & \rightarrow & \fun{lpre}(t,\el).\\
+\\
+\fun{lpre}(\fun{leaf}(x),s) & \rightarrow & \cons{x}{s};\\
+\fun{lpre}(\fun{fork}(t_1,t_2),s)
+  & \rightarrow & \fun{lpre}(t_1,\fun{lpre}(t_2,s)).
+\end{array}}
+\end{equation*}
+\caption{Preorder on binary leaf trees\label{fig:lpre}}
+\end{figure}
+The final step is the translation of \fun{lpre/1} and \fun{lpre/2}
+into \fun{flat\(_2\)/1} and \fun{flat\(_2\)/2}, respectively, in
+\fig~\vref{fig:flat2}.
+The key is to see that
+\(\fun{fork}(t_1,t_2)\)\index{fork@\fun{fork/2}} becomes
+\(\cons{t_1}{t_2}\), and \(\fun{leaf}(x)\), when \(x\)~is not an empty
+stack, becomes~\(x\) as the \emph{last} pattern. The case
+\(\fun{leaf}(\el)\)\index{leaf@\fun{leaf/1}} becomes~\(\el\) as the
+first pattern.
+
+The cost of \fun{pre/1}\index{pre@\fun{pre/1}} was found to be
+\(\C{\fun{pre}}{n} = 2n+2\)\index{pre@$\C{\fun{pre}}{n}$} in
+equation~\eqref{eq:pre} on page~\pageref{eq:pre}, where \(n\)~was the
+number of internal nodes. Here, \(n\)~is the length of
+\(\fun{flat}_2(t)\)\index{flat2@\fun{flat\(_0\)/1}}, namely, the number
+of non\hyp{}stack leaves in the leaf tree. With this definition, the
+number of cons\hyp{}nodes is \(n + \Omega + \Gamma\), where
+\(\Omega\)~is the number of embedded empty stacks and \(\Gamma\)~is
+the number of embedded non\hyp{}empty stacks, so \(S := 1 + \Omega +
+\Gamma\) is the total number of stacks. Consequently,
+\(\C{\fun{flat}_2}{n} = 2(n + S)\).\index{flat2@$\C{\fun{flat}_2}{n}$}
+For example,
+\begin{equation*}
+\fun{flat}_2([1,[\el,[2,3]],[[4]],5]) \xrightarrow{22} [1,2,3,4,5],
+\end{equation*}
+because \(n=5\) and \(S=6\). (The latter is the number of opening
+square brackets.) When \(S=1\), that is, the stack is flat, then
+\(\C{\fun{pre}}{n} = \C{\fun{flat}_2}{n}\), otherwise
+\(\C{\fun{pre}}{n} < \C{\fun{flat}_2}{n}\).
+
+\bigskip
+
+\begin{figure}[h]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{flat}_2(t) & \rightarrow & \fun{flat}_2(t,\el).\\
+\\
+\fun{flat}_2(\el,s) & \rightarrow & s;\\
+\fun{flat}_2(\cons{t_1}{t_2},s)
+  & \rightarrow & \fun{flat}_2(t_1,\fun{flat}_2(t_2,s));\\
+\fun{flat}_2(x,s) & \rightarrow & \cons{x}{s}.
+\end{array}}
+\end{equation*}
+\caption{Flattening like \fun{lpre/1}\label{fig:flat2}}
+\end{figure}
+\index{stack!flattening|)}
+
+\mypar{Inorder}
+\index{binary tree!inorder|(}
+\label{inorder}
+
+The \emph{inorder} (or \emph{symmetric}) traversal of a non\hyp{}empty
+binary tree consists in having in a stack the nodes of the left
+subtree in inorder, followed by the root and then the nodes of the
+right subtree in inorder. For example, the nodes in inorder of the
+tree in \fig~\vref{fig:bt_ex1} are \([3,5,1,9,8,3,2]\). Clearly, it is
+a depth\hyp{}first traversal\index{binary tree!depth-first traversal},
+like a preorder, because children are visited before siblings.
+According to our findings about \fun{pre/1}\index{pre@\fun{pre/1}} in
+\fig~\vref{fig:pre}, we understand that we should structure our
+program to follow the strategy depicted in \fig~\vref{fig:in_tree},
+where the only difference with \fig~\ref{fig:pre_tree} is the moment
+when the root~\(x\) is pushed on the accumulator\index{functional
+  language!accumulator}: between the inorder traversals of the
+subtrees \(t_1\)~and~\(t_2\). The implicit rewrites in
+\fig~\ref{fig:in_tree} are \(\fun{in}(t_2,s) \twoheadrightarrow
+s_1\),\index{in@\fun{in/2}} then \(\fun{in}(t_1,\cons{x}{s_1})
+\twoheadrightarrow s_2\) and \(\fun{in}(t,s) \twoheadrightarrow s_2\),
+where \(t=\fun{int}(x,t_1,t_2)\). By eliminating the intermediary
+variables \(s_1\)~and~\(s_2\) we obtain the equivalence
+\(\fun{in}(t_1,\cons{x}{\fun{in}(t_2,s)}) \equiv \fun{in}(t,s)\). The
+case of the external node is the same as for preorder. This reasoning
+yields the function defined in \fig~\vref{fig:in},
+\begin{figure}[b]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{in}(t) & \xrightarrow{\xi} & \fun{in}(t,\el).\\
+\\
+\fun{in}(\fun{ext}(),s) & \xrightarrow{\smash{\pi}} & s;\\
+\fun{in}(\fun{int}(x,t_1,t_2),s)
+  & \xrightarrow{\smash{\rho}} 
+  & \fun{in}(t_1,\cons{x}{\fun{in}(t_2,s)}).
+\end{array}}
+\end{equation*}
+\caption{Inorder traversal\label{fig:in}}
+\end{figure}
+whose cost is the same as for preorder: \(\C{\fun{in}}{n} =
+\C{\fun{pre}}{n} = 2n + 2\).\index{in@$\C{\fun{in}}{n}$}
+
+\Fig~\vref{fig:inorder} gives the example of a binary tree which is
+the result of an \emph{inorder numbering}\index{binary tree!inorder
+  numbering}. The inorder traversal of that tree yields
+\([0,1,2,3,4,5,6]\). Inorder numberings have an interesting property:
+given any internal node, all the nodes in its left subtree have
+smaller numbers, and all nodes in its right subtree have greater
+numbers. Let \fun{nin/1}\index{nin@\fun{nin/1}}\index{nin@\fun{nin/2}}
+be a function computing the inorder numbering of a given tree in
+\fig~\vref{fig:nin},
+\begin{figure}
+\centering
+\framebox[0.75\columnwidth]{\vbox{%
+\begin{gather*}
+\inferrule
+  {\fun{nin}(0,t) \twoheadrightarrow \pair{i}{t'}}
+  {\fun{nin}(t) \twoheadrightarrow t'}\,.
+\qquad
+\fun{nin}(i,\fun{ext}()) \rightarrow \pair{i}{\fun{ext}()};
+\\
+\inferrule
+  {\fun{nin}(i,t_1) \twoheadrightarrow \pair{j}{t'_1}
+   \and
+   \fun{nin}(j+1,t_2) \twoheadrightarrow \pair{k}{t'_2}}
+  {\fun{nin}(i,\fun{int}(x,t_1,t_2)) \twoheadrightarrow
+   \pair{k}{\fun{int}(j,t'_1,t'_2)}}\,.
+\end{gather*}
+}}
+\caption{Inorder numbering\label{fig:nin}}
+\end{figure}
+where~\(j\), at the root, is the smallest number greater than any
+number in~\(t_1\).
+
+\paragraph{Flattening revisited}
+\label{par:rotation}
+
+The design of
+\fun{flat/1}\index{stack!flattening}\index{flat@\fun{flat/1}} in
+\fig~\vref{fig:flat} may suggest a new approach to inorder
+traversals. By composing right rotations\index{binary tree!rotation|(}
+as defined in \figs~\vrefrange{fig:lift1}{fig:lift2} (the converse is,
+of course, a \emph{left rotation}), the node to be visited first in
+inorder can be brought to be the root of a tree whose left subtree is
+empty. Recursively, the right subtree is then processed, in a
+top\hyp{}down fashion. This algorithm is sound because \emph{inorder
+  traversals are invariant through rotations}, which is formally
+expressed as follows.
+\begin{equation*}
+\pred{Rot}{x,y,t_1,t_2,t_3} \colon
+\fun{in}(\fun{int}(y,\fun{int}(x,t_1,t_2),t_3))
+\equiv
+\fun{in}(\fun{int}(x,t_1,\fun{int}(y,t_2,t_3))).\index{in@\fun{in/1}}
+\label{def:Rot}
+\end{equation*}
+In \fig~\vref{fig:rot},
+\begin{figure}[b]
+\centering
+\includegraphics[bb=71 627 374 715]{rot}
+\caption{Composing right\hyp{}rotations, top\hyp{}down\label{fig:rot}}
+\end{figure}
+we show how a binary tree becomes a right\hyp{}leaning,
+degenerate\index{binary tree!degenerate $\sim$} tree, isomorphic to a
+stack, by repeatedly applying right rotations, top\hyp{}down.  Dually,
+we could compose left rotations and obtain a left\hyp{}leaning,
+degenerate tree, whose inorder traversal is also equal to the inorder
+traversal of the original tree. The function
+\fun{in\(_1\)/1}\index{in1@\fun{in\(_1\)/1}} based on right rotations
+is given in \fig~\vref{fig:in1}.
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{in}_1(\fun{ext}()) & \xrightarrow{\smash{\alpha}} & \el;\\
+\fun{in}_1(\fun{int}(y,\fun{int}(x,t_1,t_2),t_3))
+  & \xrightarrow{\smash{\beta}} & \fun{in}_1(\fun{int}(x,t_1,\fun{int}(y,t_2,t_3)));\\
+\fun{in}_1(\fun{int}(y,\fun{ext}(),t_3))
+  & \xrightarrow{\smash{\gamma}} & \cons{y}{\fun{in}_1(t_3)}.
+\end{array}}
+\end{equation*}
+\caption{Inorder traversal by right rotations\label{fig:in1}}
+\end{figure}
+Note how, in rule~\(\gamma\), we push the root~\(y\) in the result as
+soon as we can, which would not be possible had we used left rotations
+instead, and thus we do \emph{not} build the whole rotated tree, as in
+\fig~\vref{fig:rot}.
+
+The cost \(\C{\fun{in}_1}{n}\)\index{in1@$\C{\fun{in}_1}{n}$} depends
+on the topology of the tree at hand. Firstly, let us note that
+rule~\(\alpha\) is used only once, on the rightmost external
+node. Secondly, if the tree to be traversed is already a
+right\hyp{}leaning degenerate \index{binary tree!degenerate $\sim$}
+tree, rule~\(\beta\) is not used and rule~\(\gamma\) is used
+\(n\)~times. Clearly, this is the best case and \(\B{\fun{in}_1}{n} =
+n + 1\).\index{in1@$\B{\fun{in}_1}{n}$} Thirdly, we should remark that
+a right rotation brings exactly one more node (named~\(x\) in
+\(\pred{Rot}{x,y,t_1,t_2,t_3}\))\index{Rot@\predName{Rot}} into the
+\emph{rightmost branch}\index{tree!branch}, that is, the series of
+nodes starting with the root and reached using repeatedly right edges
+(for instance, in the initial tree in \fig~\vref{fig:rot}, the
+rightmost branch\index{tree!branch} is \([\fun{e}, \fun{g},
+\fun{h}]\)). Therefore, if we want to maximise the use of
+rule~\(\beta\), we must have an initial tree whose right subtree is
+empty, so the left subtree contains \(n-1\) nodes (the root belongs,
+by definition, to the rightmost branch): this yields
+\(\W{\fun{in}_1}{n} = (n-1) + (n+1) =
+2n\).\index{in1@$\W{\fun{in}_1}{n}$}\index{binary tree!rotation|)}
+
+\paragraph{Exercise}
+
+Prove \(\forall x,y,t_1,t_2,t_3.\pred{Rot}{x,y,t_1,t_2,t_3}\).
+\index{Rot@\predName{Rot}}
+
+\paragraph{Mirroring}
+
+Let us define a function \fun{mir/1}\index{mir@\fun{mir/1}}
+(\emph{mirror}) such that \(\fun{mir}(t)\) is the symmetric of the
+binary tree~\(t\) with respect to an exterior vertical line. An
+example is given in \fig~\vref{fig:mirror}.
+\begin{figure}[b]
+\centering
+\subfloat[\(t\)]{\includegraphics[bb=77 660 163 723]{bt_ex2}}
+\qquad
+\subfloat[\(\protect\fun{mir}(t)\)]{\includegraphics[bb=74 660 160 723]{bt_ex4}}
+\caption{Mirroring a binary tree\label{fig:mirror}}
+\end{figure}
+It is easy to define this function:
+\begin{equation*}
+\fun{mir}(\fun{ext}()) \xrightarrow{\smash{\sigma}} \fun{ext}();
+\quad
+\fun{mir}(\fun{int}(x,t_1,t_2)) \xrightarrow{\smash{\tau}}
+\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)).
+\end{equation*}
+From the previous example, it is quite simple to postulate the
+property
+\begin{equation*}
+\pred{InMir}{t} \colon \fun{in}(\fun{mir}(t)) \equiv
+\fun{rev}(\fun{in}(t)),\index{InMir@\predName{InMir}}
+\end{equation*}
+where \fun{rev/1}\index{rev@\fun{rev/1}}
+reverses\index{stack!reversal} its stack argument (see
+definition~\eqref{def:rev} \vpageref{def:rev}). This property is useful
+because the left\hyp{}hand side of the equivalence is more costly than
+the right\hyp{}hand side: \(\Call{\fun{in}(\fun{mir}(t))} =
+\C{\fun{mir}}{n} + \C{\fun{in}}{n} = (2n+1) + (2n+2) = 4n + 3\), to be
+compared with \(\Call{\fun{rev}(\fun{in}(t))} = \C{\fun{in}}{n} +
+\C{\fun{rev}}{n} = (2n+2) + (n+2) = 3n +
+4\).\index{mir@$\C{\fun{mir}}{n}$}
+
+\medskip
+
+\noindent Structural induction on the immediate subtrees requires that
+we establish
+\begin{itemize}
+  
+  \item the basis
+  \(\pred{InMir}{\fun{ext}()}\);\index{InMir@\predName{InMir}|(}
+
+  \item the step \(\forall t_1.\pred{InMir}{t_1} \Rightarrow \forall
+    t_2.\pred{InMir}{t_2} \Rightarrow \forall
+    x.\pred{InMir}{\fun{int}(x,t_1,t_2)}.\)
+
+\end{itemize}
+The former results from \(\fun{in}(\fun{mir}(\fun{ext}()))
+\xrightarrow{\smash{\sigma}} \fun{in}(\fun{ext}())
+\xrightarrow{\smash{\xi}} \fun{in}(\fun{ext}(),\el)
+\xrightarrow{\smash{\pi}} \el \xleftarrow{\smash{\zeta}}
+\fun{rcat}(\el,\el) \xleftarrow{\smash{\epsilon}} \fun{rev}(\el)
+\xleftarrow{\smash{\pi}} \fun{rev}(\fun{in}(\fun{ext}(),\el))
+\xleftarrow{\smash{\xi}}
+\fun{rev}(\fun{in}(\fun{ext}()))\).\index{rcat@\fun{rcat/2}}\index{rev@\fun{rev/1}}
+Let us assume \(\pred{InMir}{t_1}\) and \(\pred{InMir}{t_2}\) and let
+\(t := \fun{int}(x,t_1,t_2)\), for any~\(x\). We rewrite the
+left\hyp{}hand side of the equivalence to be proved until we reach the
+right\hyp{}hand side or we get stuck:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
+\fun{in}(\fun{mir}(t)) & = &
+\fun{in}(\fun{mir}(\fun{int}(x,t_1,t_2)))\\
+& \xrightarrow{\smash{\tau}} 
+& \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)))\\
+& \xrightarrow{\smash{\xi}}
+& \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),\el)\\
+& \Rra{\rho}
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),\el)})\\
+& \Lla{\xi}
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1))})\\
+& \equiv 
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rev}(\fun{in}(t_1))})
+& (\pred{InMir}{t_1})\\
+& \xrightarrow{\smash{\xi}}
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rev}(\fun{in}(t_1,\el))})\\
+& \Rra{\epsilon}
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),\el)}).
+\end{array}
+\end{equation*}
+We cannot use the induction hypothesis \(\pred{InMir}{t_2}\) to get
+rid of \(\fun{mir}(t_2)\). Close examination of the terms suggests to
+\emph{weaken} the property and overload \predName{InMir} with a new
+definition:
+\begin{equation*}
+\pred{InMir}{t,s} \colon \fun{in}(\fun{mir}(t),s) \equiv
+\fun{rcat}(\fun{in}(t,\el),s).
+\end{equation*}
+We have \(\pred{InMir}{t,\el} \Leftrightarrow \pred{InMir}{t}\). Now,
+we rewrite as follows:
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
+\fun{in}(\fun{mir}(t),s)
+& = 
+& \fun{in}(\fun{mir}(\fun{int}(x,t_1,t_2)),s)\\
+& \xrightarrow{\smash{\tau}} 
+& \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),s)\\
+& \Rra{\rho}
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),s)})\\
+& \equiv 
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),s)})
+& (\pred{InMir}{t_1,s})\\
+& \equiv_0
+& \fun{rcat}(\fun{in}(t_2,\el),\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),s)})\\
+& \Lla{\eta}
+& \fun{rcat}(\cons{x}{\fun{in}(t_2,\el)},
+\fun{rcat}(\fun{in}(t_1,\el),s)),
+\end{array}
+\end{equation*}
+where (\(\equiv_0\)) is
+\(\pred{InMir}{t_2,\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),s)}}\).\index{rcat@\fun{rcat/2}}\index{InMir@\predName{InMir}|)}
+The right\hyp{}hand side now:
+\begin{equation*}
+%\begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
+\fun{rcat}(\fun{in}(t,\el),s)
+\! = \!
+ \fun{rcat}(\fun{in}(\fun{int}(x,t_1,t_2),\el),s)
+\! \xrightarrow{\smash{\rho}}\!
+ \fun{rcat}(\fun{in}(t_1,\cons{x}{\fun{in}(t_2,\el)}),s).
+%\end{array}
+\end{equation*}
+The two stuck expressions share the subterm
+\(\cons{x}{\fun{in}(t_2,\el)}\)\index{in@\fun{in/2}}. The main
+difference is that the former expression contains two calls to
+\fun{rcat/2}\index{rcat@\fun{rcat/2}|(}, instead of one in the
+latter. Can we find a way to have only one call in the former too?  We
+need to find an expression equivalent to
+\(\fun{rcat}(s,\fun{rcat}(t,u))\), whose shape is \(\fun{rcat}(v,w)\),
+where \(v\) and~\(w\) contain no call to \fun{rcat/2}. Some examples
+quickly suggest\index{Rcat@\predName{Rcat}}
+\begin{equation*}
+  \pred{Rcat}{s,t,u} \colon \fun{rcat}(s,\fun{rcat}(t,u)) \equiv \fun{rcat}(\fun{cat}(t,s),u).
+\end{equation*}
+We actually do not need induction to prove this theorem if we recall
+what we already proved:
+\begin{itemize*}
+
+  \item \(\pred{CatRev}{s,t} \colon \fun{cat}(\fun{rev}_0(t),
+    \fun{rev}_0(s)) \equiv \fun{rev}_0(\fun{cat}(s,t))\);
+
+  \item \(\pred{EqRev}{s} \colon \fun{rev}_0(s) \equiv \fun{rev}(s)\);
+
+  \item \(\pred{CatAssoc}{s,t,u} \colon \fun{cat}(s,\fun{cat}(t,u))
+    \equiv \fun{cat}(\fun{cat}(s,t),u)\);
+
+  \item \(\pred{RevCat}{s,t} \colon \fun{rcat}(s,t) \equiv
+    \fun{cat}(\fun{rev}(s),t)\).
+
+\end{itemize*}
+Then, we have the equivalences
+\begin{equation*}
+\begin{array}{@{}r@{\,}c@{\,}l@{\,}r@{}}
+\fun{rcat}(s,\fun{rcat}(t,u))
+& \equiv & \fun{rcat}(s,\fun{cat}(\fun{rev}(t),u))
+& (\pred{RevCat}{t,u}\!)\\
+& \equiv & \fun{rcat}(s,\fun{cat}(\fun{rev}_0(t),u))
+& (\pred{EqRev}{t}\!)\\
+& \equiv & \fun{cat}(\fun{rev}(s),\fun{cat}(\fun{rev}_0(t),u))
+& (\pred{RevCat}{s,\fun{cat}(\fun{rev}_0(t),u)}\!)\\
+& \equiv & \fun{cat}(\fun{rev}_0(s),\fun{cat}(\fun{rev}_0(t),u)\!)
+& (\pred{EqRev}{s}\!)\\
+& \equiv & \fun{cat}(\fun{cat}(\fun{rev}_0(s),\fun{rev}_0(t)\!),u)\!\!
+& (\!\pred{CatAssoc}{\fun{rev}(s),\fun{rev}(t),u}\!)\\
+& \equiv & \fun{cat}(\fun{rev}_0(\fun{cat}(t,s)),u)
+& (\pred{CatRev}{s,t}\!)\\
+& \equiv & \fun{cat}(\fun{rev}(\fun{cat}(t,s)),u)
+& (\pred{EqRev}{\fun{cat}(t,s)}\!)\\
+& \equiv & \fun{rcat}(\fun{cat}(t,s),u)
+& (\pred{RevCat}{\fun{cat}(t,s),u}\!)
+\end{array}
+\end{equation*}
+Let us resume rewriting the first stuck expression:
+\begin{equation*}
+\begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
+\fun{in}(\fun{mir}(t),s)
+& \equiv_0
+& \fun{rcat}(\cons{x}{\fun{in}(t_2,\el)},
+  \fun{rcat}(\fun{in}(t_1,\el),s))\\
+& \equiv_1
+& \fun{rcat}(\fun{cat}(\fun{in}(t_1,\el),
+  \cons{x}{\fun{in}(t_2,\el)}), s),\index{rcat@\fun{rcat/2}|)}
+\end{array}
+\end{equation*}
+where (\(\equiv_0\)) is a short\hyp{}hand for the previous derivation
+and (\(\equiv_1\)) is the instance
+\(\pred{Rcat}{\cons{x}{\fun{in}(t_2,\el)}, \fun{in}(t_1,\el),
+  s}\). Another comparison of the stuck expressions reveals that we
+need to prove \(\fun{cat}(\fun{in}(t,\el),s) \equiv
+\fun{in}(t,s)\). This equivalence is likely to be true, as it is
+similar to \(\pred{CatPre}{t,s}\).\index{CatPre@\predName{CatPre}}
+Assuming this lemma, we achieve the proof.\hfill\(\Box\)
+
+\paragraph{Exercises}
+\begin{enumerate*}
+
+  \item Prove the missing lemma \(\pred{CatIn}{t,s} \colon
+  \fun{cat}(\fun{in}(t,\el),s) \equiv
+  \fun{in}(t,s)\).\index{CatIn@\predName{CatIn}}\index{cat@\fun{cat/2}}
+
+  \item Define a function which builds a binary tree from its preorder
+    and inorder traversals, assuming that its internal nodes are all
+    distinct. Make sure its cost is linear in the number of internal
+    nodes. Compare your solution with that of \cite{MuBird_2003}.
+
+\end{enumerate*}
+\index{binary tree!inorder|)}
+
+\mypar{Postorder}
+\index{binary tree!postorder|(}
+
+A \emph{postorder}\index{binary tree!postorder} traversal of a
+non\hyp{}empty binary tree consists in storing in a stack the nodes of
+the right subtree in postorder, followed by the nodes of the left
+subtree in postorder, and, in turn, by the root. For example, the
+nodes in postorder of the tree in \fig~\vref{fig:bt_ex1} are
+\([5,3,9,1,2,3,8]\). Clearly, it is a depth\hyp{}first
+traversal\index{binary tree!depth-first traversal}, like a preorder,
+but, unlike a preorder, it saves the root last in the resulting
+stack. This approach is summarised for internal nodes in
+\fig~\vref{fig:post_tree}. The difference with
+\fun{pre/1}\index{pre@\fun{pre/1}} and \fun{in/1}\index{in@\fun{in/1}}
+lies in the moment when the root is pushed in the accumulator. The
+function definition is given in \fig~\vref{fig:post}.
+\begin{figure}
+%\abovedisplayskip=0pt
+%\belowdisplayskip=0pt
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{post}(t) & \xrightarrow{\lambda} & \fun{post}(t,\el).\\
+\\
+\fun{post}(\fun{ext}(),s) & \xrightarrow{\smash{\mu}} & s;\\
+\fun{post}(\fun{int}(x,t_1,t_2),s)
+  & \xrightarrow{\smash{\nu}} 
+  & \fun{post}(t_1,\fun{post}(t_2,\cons{x}{s})).
+\end{array}}
+\end{equation*}
+\caption{Postorder traversal\label{fig:post}}
+\end{figure}
+The meaning of the stack~\(s\) in the call
+\(\fun{post}(t,s)\)\index{post@\fun{post/2}}\index{post@\fun{post/1}}
+is the same as in \(\fun{pre}(t,s)\), modulo ordering: \(s\)~is made
+of the contents, in postorder, of the nodes that follow, in postorder,
+the nodes of the subtree~\(t\). The cost is familiar as well:
+\(\C{\fun{post}}{n} = \C{\fun{in}}{n} = \C{\fun{pre}}{n} = 2n +
+2\).\index{post@$\C{\fun{post}}{n}$}
+
+An example of \emph{postorder numbering}\index{binary tree!postorder
+  numbering} is shown in \fig~\vref{fig:postorder}, so the postorder
+traversal of that tree yields \([0,1,2,3,4,5,6]\). Notice how the
+numbers increase along upwards paths. \Fig~\vref{fig:npost}\index{npost@\fun{npost/1}}\index{npost@\fun{npost/2}}
+\begin{figure}
+%\abovedisplayskip=0pt
+%\belowdisplayskip=0pt
+\centering
+\framebox[0.75\columnwidth]{\vbox{%
+\begin{gather*}
+\inferrule
+  {\fun{npost}(0,t) \twoheadrightarrow \pair{i}{t'}}
+  {\fun{npost}(t) \rightarrow t'}\,.
+\qquad
+\fun{npost}(i,\fun{ext}()) \rightarrow \pair{i}{\fun{ext}()};
+\\
+\inferrule
+  {\fun{npost}(i,t_1) \twoheadrightarrow \pair{j}{t'_1}
+   \and
+   \fun{npost}(j,t_2) \twoheadrightarrow \pair{k}{t'_2}}
+  {\fun{npost}(i,\fun{int}(x,t_1,t_2)) \rightarrow
+   \pair{k+1}{\fun{int}(k,t'_1,t'_2)}}\,.
+\end{gather*}
+}}
+\caption{Postorder numbering\label{fig:npost}}
+\end{figure}
+shows the program to number a binary tree in postorder. The root is
+numbered with the number coming up from the right subtree, following
+the pattern of a postorder traversal.
+
+\paragraph{A proof}\label{proof:PreMir}
+
+Let \(\pred{PreMir}{t} \colon \fun{pre}(\fun{mir}(t)) \equiv
+\fun{rev}(\fun{post}(t))\).\index{PreMir@\predName{PreMir}|(} Previous
+experience with proving \(\pred{InMir}{t}\) leads us to weaken
+(generalise) the property in order to facilitate the proof:
+\(\pred{PreMir}{t,s} \colon \fun{pre}(\fun{mir}(t),s) \equiv
+\fun{rcat}(\fun{post}(t,\el),s)\).\index{rcat@\fun{rcat/2}} Clearly,
+\(\pred{PreMir}{t,\el} \Leftrightarrow \pred{PreMir}{t}\). Let us then
+define
+\begin{equation*}
+  (t,s) \succ_{B \times S} (t',s') :\Leftrightarrow \text{\(t \succ_{B}
+    t'\) or (\(t = t'\) and \(s \succ_{S} s'\))}.
+\end{equation*}
+This is conceptually the same order as the one on the calls to
+\fun{pre/1}\index{pre@\fun{pre/1}}, in definition~\eqref{eq:BS_order}
+\vpageref{eq:BS_order}. The minimum element for this lexicographic
+order is \((\fun{ext}(),\el)\). Well\hyp{}founded induction then
+requires that we prove
+\begin{itemize}
+
+  \item the basis \(\pred{PreMir}{\fun{ext}(),\el}\);
+
+  \item \(\forall t,s. (\forall t',s'.(t,s) \succ_{B \times S} (t',s')
+    \Rightarrow \pred{PreMir}{t',s'}) \Rightarrow
+    \pred{PreMir}{t,s}\).
+
+\end{itemize}
+The basis:\index{mir@\fun{mir/1}|(}
+\(\fun{pre}(\fun{mir}(\fun{ext}()),\el) \xrightarrow{\smash{\sigma}}
+\fun{pre}(\fun{ext}(),\el) \xrightarrow{\smash{\iota}} \el
+\xleftarrow{\smash{\zeta}} \fun{rcat}(\el,\el)
+\xleftarrow{\smash{\mu}}
+\fun{rcat}(\fun{post}(\fun{ext}(),\el),\el)\). Let \(t :=
+\fun{int}(x,t_1,t_2)\). In \fig~\vref{fig:premir}, we have the
+rewrites of the left\hyp{}hand side,
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
+\fun{pre}(\fun{mir}(t),s)
+& = & \fun{pre}(\fun{mir}(\fun{int}(x,t_1,t_2)),s)\\
+& \xrightarrow{\smash{\tau}} 
+& \fun{pre}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),s)\\
+& \Rra{\kappa}
+& \cons{x}{\fun{pre}(\fun{mir}(t_2),\fun{pre}(\fun{mir}(t_1),s))}\\
+& \equiv_0
+& \cons{x}{\fun{pre}(\fun{mir}(t_2),
+           \fun{rcat}(\fun{post}(t_1,\el),s))}\\
+& \equiv_1
+& \cons{x}{\fun{rcat}(\fun{post}(t_2,\el),
+           \fun{rcat}(\fun{post}(t_1,\el),s))}\\
+& \equiv_2
+& \cons{x}{\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el),
+                                 \fun{post}(t_2,\el)),
+                      s)}\\
+& \Lla{\zeta}
+& \fun{rcat}(\el,\cons{x}{\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el),
+                                       \fun{post}(t_2,\el)),
+                            s)})\\
+& \Lla{\eta}
+& \fun{rcat}([x],\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el),
+                                       \fun{post}(t_2,\el)),
+                            s))\\
+& \equiv_3
+& \fun{rcat}(\fun{cat}(\fun{cat}(\fun{post}(t_1,\el),
+                                  \fun{post}(t_2,\el)),
+                       [x]),
+             s)\\
+& \equiv_4
+& \fun{rcat}(\fun{cat}(\fun{post}(t_1,\el),
+                       \fun{cat}(\fun{post}(t_2,\el),
+                                 [x])),
+             s)\\
+& \equiv_5
+& \fun{rcat}(\fun{cat}(\fun{post}(t_1,\el),
+                       \fun{post}(t_2,[x])),
+             s)\\
+& \equiv_6
+& \fun{rcat}(\fun{post}(t_1,\fun{post}(t_2,[x])),s)\\
+& \xleftarrow{\smash{\nu}}
+& \fun{rcat}(\fun{post}(\fun{int}(x,t_1,t_2),\el),s)\\
+& =
+& \fun{rcat}(\fun{post}(t,\el),s).\hfill\Box
+\end{array}
+}
+\end{equation*}
+\caption{Proof of \(\fun{pre}(\fun{mir}(t),s) \equiv \fun{rcat}(\fun{post}(t,\el),s)\)\label{fig:premir}}
+\end{figure}
+where 
+\begin{itemize*}
+
+  \item (\(\equiv_0\)) is \(\pred{PreMir}{t_1,s}\), an instance of the
+  induction hypothesis;\index{PreMir@\predName{PreMir}}
+
+  \item (\(\equiv_1\)) is
+  \(\pred{PreMir}{t_2,\fun{rcat}(\fun{post}(t_1,\el),s)}\), as
+  inductive hypothesis; \index{PreMir@\predName{PreMir}}
+
+  \item (\(\equiv_2\)) is
+    \(\pred{Rcat}{\fun{post}(t_2,\el),\fun{post}(t_1,\el),s}\);
+    \index{Rcat@\predName{Rcat}}
+
+  \item (\(\equiv_3\)) is
+    \(\pred{Rcat}{[x],\fun{cat}(\fun{post}(t_1,\el),
+      \fun{post}(t_2,\el)),s}\);
+    \index{Rcat@\predName{Rcat}}
+
+  \item (\(\equiv_4\)) is \(\pred{CatAssoc}{\fun{post}(t_1,\el),
+    \fun{post}(t_2,\el),[x]}\);\index{CatAssoc@\predName{CatAssoc}}
+
+  \item (\(\equiv_5\)) is
+  \(\pred{CatPost}{t_2,[x]}\)\index{CatPost@\predName{CatPost}} if
+  \(\pred{CatPost}{t,s} \colon \fun{cat}(\fun{post}(t),s) \equiv
+  \fun{post}(t,s)\);\index{cat@\fun{cat/2}}
+
+  \item (\(\equiv_6\)) is \(\pred{CatPost}{t_1,\fun{post}(t_2,[x])}\).
+  \index{post@\fun{post/2}}\index{CatPost@\predName{CatPost}}
+
+\end{itemize*}
+Then \index{mir@\fun{mir/1}|)} \(\pred{CatPost}{t,s} \Rightarrow
+\pred{PreMir}{t,s} \Rightarrow \fun{pre}(\fun{mir}(t)) \equiv
+\fun{rev}(\fun{post}(t))\).\hfill\(\Box\)
+
+\paragraph{Duality}
+\label{thm:duality}
+
+The dual theorem\index{PostMir@\predName{PostMir}} \(\pred{PostMir}{t}
+\colon \fun{post}(\fun{mir}(t)) \equiv
+\fun{rev}(\fun{pre}(t))\)\index{mir@\fun{mir/1}}
+\index{pre@\fun{pre/1}} \index{post@\fun{post/1}}
+\index{rev@\fun{rev/1}} can be proved in at least two ways: either we
+design a new proof in the spirit of the proof of \(\pred{PreMir}{t}\),
+or we take advantage of the fact that the theorem is an equivalence
+and we produce equivalent but simpler theorems. Let us do the latter
+and start by considering \(\pred{PreMir}{\fun{mir}(t)}\)
+\index{PreMir@\predName{PreMir}|)} and proceed by finding equivalent
+expressions on both sides of the equivalence, until we reach
+\(\pred{PostMir}{t}\):
+\begin{equation*}
+\begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
+          \fun{pre}(\fun{mir}(\fun{mir}(t)))
+& \equiv 
+& \fun{rev}(\fun{post}(\fun{mir}(t)))
+& (\pred{PreMir}{\fun{mir}(t)})\\
+  \fun{pre}(t)
+& \equiv
+& \fun{rev}(\fun{post}(\fun{mir}(t)))
+& (\pred{InvMir}{t})\\
+  \fun{rev}(\fun{pre}(t))
+& \equiv
+& \fun{rev}(\fun{rev}(\fun{post}(\fun{mir}(t))))\\
+  \fun{rev}(\fun{pre}(t))
+& \equiv
+& \fun{post}(\fun{mir}(t))
+& (\pred{InvRev}{\fun{post}(\fun{mir}(t))}),
+\end{array}
+\end{equation*}
+where\index{InvMir@\predName{InvMir}} \(\pred{InvMir}{t} \colon
+\fun{mir}(\fun{mir}(t)) \equiv t\) and\index{InvRev@\predName{InvRev}}
+\(\pred{InvRev}{s} :\Leftrightarrow \pred{Inv}{s} \wedge
+\pred{EqRev}{s}\).\hfill\(\Box\)
+
+\paragraph{Exercises}
+\begin{enumerate*}
+
+  \item Prove the lemma\index{CatPost@\predName{CatPost}}
+  \(\pred{CatPost}{t,s} \colon \fun{cat}(\fun{post}(t,\el),s) \equiv
+  \fun{post}(t,s)\).
+
+  \item Use \fun{rev\(_0\)/1} instead of \fun{rev/1} in
+  \(\pred{InMir}{t}\) and \(\pred{PreMir}{t}\). Are the proofs easier?
+
+  \item Prove the missing lemma\index{InvMir@\predName{InvMir}}
+  \(\pred{InvMir}{t} \colon \fun{mir}(\fun{mir}(t)) \equiv
+  t\).\label{ex:mir_mir}
+
+  \item Can you build a binary tree from its postorder and inorder
+    traversals, assuming that its internal nodes are all distinct?
+
+\end{enumerate*}
+\index{binary tree!postorder|)}
+
+\mypar{Level order}
+\index{binary tree!level order|(}
+
+The \emph{level}~\(l\)\index{tree!level} in a tree is a stack of nodes
+in preorder\index{binary tree!preorder} whose internal path lengths
+are~\(l\).\index{tree!internal path length} In particular, the root is
+the only node at level~\(0\). In the tree of \fig~\vref{fig:bt_ex1},
+\([3,9,2]\) is level~\(2\). To understand the preorder condition, we
+need to consider the preorder numbering of the tree, shown in
+\fig~\vref{fig:bt_ex3} with preorder numbers as left exponents to the
+contents. This way, there is no more ambiguity when referring to
+nodes. For instance, \([3,9,2]\) was in fact ambiguous because there
+are two nodes whose associated data is~\(3\). We meant that
+\([{}^{2}{3}, {}^{4}{9}, {}^{6}{2}]\) is the level~\(2\) because these
+nodes all have internal path lengths~\(2\) \emph{and} have increasing
+preorders (\(2,4,6\)).
+
+A \emph{level-order}\index{binary tree!level order} traversal consists
+in making a stack with the nodes of all the levels by increasing path
+lengths. For instance, the level order of the tree in
+\fig~\vref{fig:bt_ex1} is \([8,1,3,3,9,2,5]\). Because this method
+visits the sibling of a node before its children, it is said
+\emph{breadth\hyp{}first}\index{binary tree!breadth-first traversal}.
+
+In \fig~\vref{fig:lorder} is shown the \emph{level\hyp{}order
+  numbering} of the tree in \fig~\vref{fig:bt_ex3}, more often called
+\emph{breadth numbering}.  \index{binary tree!breadth numbering} (Mind
+the common misspellings `bread numbering' and `breath numbering.')
+Notice how the numbers increase along downwards path between nodes, as
+in a preorder numbering.
+
+We may now realise that the notion of level in a tree is not
+straightforward. The reason is simple: the nodes in a level are not
+siblings\index{tree!node!sibling}, except in level~\(1\), so, in
+general, we cannot expect to build a level of a tree
+\(\fun{int}(x,t_1,t_2)\) by means of levels in \(t_1\) and~\(t_2\)
+alone, that is, with a big\hyp{}step design\index{design!big-step
+  $\sim$}. As a consequence, a small\hyp{}step approach is called for,
+standing in contrast, for example, with
+\fun{size/1}\index{size@\fun{size/1}} in~\eqref{eq:size}
+\vpageref{eq:size}.
+
+Let \fun{bf\(_0\)/1}\index{bf0@\fun{bf\(_0\)/1}}
+(\emph{breadth\hyp{}first}) be the function such that
+\(\fun{bf}_0(t)\) is the stack of nodes of~\(t\) in level order. It is
+partially defined in \fig~\vref{fig:lo0}.
+\begin{figure}[t]
+\centering
+\includegraphics[bb=108 682 395 721]{lo0}
+\caption{Level order \fun{bf\(_0\)/1}\label{fig:lo0}}
+\end{figure}
+If we imagine that we cut off the root of a binary tree, we obtain the
+immediate subtrees. If, in turn, we cut down these trees, we obtain
+more subtrees. This suggests that we should better work on general
+forests\index{tree!forest} instead of trees, one or two at a time.
+
+The cutting function is \fun{def/1}\index{def@\fun{def/1}}
+(\emph{deforest}), defined in \fig~\vref{fig:def},
+\begin{figure}
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\centering
+\includegraphics[bb=71 660 324 721]{def}
+\caption{Deforestation\label{fig:def}}
+\end{figure}
+such that \(\fun{def}(f)\), where \(f\)~represents a forest, evaluates
+in a pair \(\pair{r}{f'}\), where \(r\)~are the roots in preorder of
+the trees in~\(f\), and \(f'\)~is the immediate subforest
+of~\(f\). (Beware, the word deforestation is used by scholars of
+functional languages with a different meaning, but it will do for us,
+as we already encountered a function
+\fun{cut/2}\index{cut@\fun{cut/2}}.) Note how, in \fig~\vref{fig:def},
+the inference rule augments the partial level~\(r\) with the
+root~\(x\), and how \(t_2\)~is pushed before~\(t_1\) onto the rest of
+the immediate forest of~\(f\), to be processed later by
+\fun{bf\(_0\)/1}\index{bf0@\fun{bf\(_0\)/1}}. Instead of building the
+stack of levels \([[8], [1,3], [3,9,2], [5]]\), we actually flatten
+step by step simply by calling \fun{cat/2}\index{cat@\fun{cat/2}} in
+rule~\clause{\mu}. If we really want the levels, we would write
+\(\cons{r}{\fun{bf}_1(f')}\)\index{bf1@\fun{bf\(_1\)/1}} instead of
+\(\fun{cat}(r,\fun{bf}_1(f'))\)\index{cat@\fun{cat/2}}, which, by the
+way, reduces the cost.
+
+The underlying concept here is that of the \emph{traversal of a
+  forest}. Except in inorder, all the traversals we have discussed
+naturally carry over to binary forests: the preorder traversal of a
+forest consists in the preorder traversal of the first tree in the
+forest, followed by the preorder traversal of the rest of the
+forest. Same logic for postorder and level order. This uniformity
+stems from the fact that all these traversals are performed
+rightwards, to wit, a left child is visited just before its sibling.
+The notion of height\index{tree!height} of a tree also extends
+naturally to a forest: the height of a forest is the maximum height of
+each individual tree. The reason why this is simple is because height
+is a purely vertical view of a tree, thus independent of the siblings'
+order.
+
+To assess now the cost
+\(\C{\fun{bf}_0}{n,h}\)\index{bf0@$\C{\fun{bf}_0}{n,h}$} of the call
+\(\fun{bf}_0(t)\), where \(n\)~is the size of the binary tree~\(t\)
+and \(h\)~is its height\index{binary tree!height}, it is convenient to
+work with \emph{extended levels}\index{binary tree!extended level}. An
+extended level is a level where external nodes are included (they are
+not implicitly numbered in preorder because external nodes are
+indistinguishable). For example, the extended level~\(2\) of the tree
+in \fig~\vref{fig:bt_ex3} is \([{}^{2}{3}, {}^{4}{9}, \Box,
+{}^{6}{2}]\). If it is needed to draw a contrast with the other kind
+of level, we may call the latter \emph{pruned levels}, which is
+consistent with our terminology in \fig~\ref{fig:bt_ex} on
+page~\pageref{fig:bt_ex}. Note that there is always one more extended
+level than pruned levels, made entirely of external nodes. (We avoided
+writing that these are the highest nodes, as the trouble with the term
+`height'\index{tree!height} is that it really makes sense if the trees
+are laid out with the root at the bottom of the page. That is perhaps
+why some authors prefer the less confusing concept of
+\emph{depth}\index{binary tree!depth}, in use in graph theory. For a
+survey of the different manners of drawing trees, see
+\cite{Knuth_1997} in its section~2.3.) In other words, \(l_h=0\),
+where \(l_i\)~is the number of internal nodes on the extended
+level~\(i\).
+\begin{itemize*}
+
+  \item Rule~\clause{\iota} is used once;
+
+  \item rule~\clause{\kappa} is used once;
+
+  \item rules~\clause{\lambda} and~\clause{\mu} are used once for each
+    extended level of the original tree; these amount to \(2(h+1)\)
+    calls;
+
+  \item the cost of \(\fun{cat}(r,\fun{loc}_1(f'))\) is the length of
+    the level~\(r\), plus one, thus the cumulative cost of catenation
+    is \(\sum_{i=0}^{h}\C{\fun{cat}}{l_i} = n + h + 1\);
+
+  \item rule~\clause{\epsilon} is used once per extended level, that
+    is, \(h+1\) times;
+
+  \item rule~\clause{\zeta} is used once per external node, that is,
+    \(n+1\) times;
+
+  \item rules \clause{\eta} and~\clause{\theta} are used once per
+    internal node, that is \(2n\)~times.
+
+\end{itemize*}
+Gathering these enumerations, we find that
+\begin{equation*}
+\C{\fun{bf}_0}{n,h} = 4n + 4h + 7. \index{bf0@$\C{\fun{bf}_0}{n,h}$}
+\end{equation*}
+By definition, the minimum cost is \(\B{\fun{bf}_0}{n} =
+\min_h\C{\fun{bf}_0}{n,h}\). The height\index{binary tree!height} is
+minimum when the binary tree is \emph{perfect}\index{binary
+  tree!perfect $\sim$}, that is, when all levels are full (see
+\fig~\vref{fig:comp_tree}). In this case, \(l_i=2^i\), for \(0
+\leqslant i \leqslant h-1\), and, by extension, there are
+\(2^h\)~external nodes. Theorem~\vref{thm:int_ext} yields the equation
+\(n+1 = 2^h\), so \(h=\lg(n+1)\), and \(\B{\fun{bf}_0}{n} = 4n +
+4\lg(n+1) + 7 \sim 4n\). \index{bf0@$\B{\fun{bf}_0}{n}$}
+
+% Wrapping figure better declared before a paragraph
+%
+\begin{wrapfigure}[7]{r}[0pt]{0pt}
+% [7] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\includegraphics[bb=62 653 115 721]{zigzag}
+\caption{\label{fig:zigzag}}
+\end{wrapfigure}
+The maximum cost is obtained by maximising the height\index{binary
+  tree!height}, while keeping the size constant. This happens for
+degenerate \index{binary tree!degenerate $\sim$} trees, as the ones
+shown in \fig~\vref{fig:tree_stack} and \fig~\vref{fig:zigzag}. Here,
+\(h=n\) and the cost is \(\W{\fun{bf}_0}{n} = 8n + 7 \sim
+8n\). \index{bf0@$\W{\fun{bf}_0}{n}$}
+
+By contrast, we found programs that perform preorder, postorder and
+inorder traversals in \(2n+2\) function calls. It is possible to
+reduce the cost by using a different design, based on
+\fun{pre\(_3\)/1}\index{pre3@\fun{pre\(_3\)/1}} in
+\fig~\vref{fig:pre3}. The difference is that, instead of using a stack
+to store subtrees to be traversed later, we use a queue\index{queue},
+a linear data structure introduced in
+section~\ref{sec:queueing}. Consider in \fig~\vref{fig:lo_abcde} the
+algorithm at work on the same example found in
+\fig~\vref{fig:pre3_abcde}.
+\begin{figure}[b]
+\centering
+\includegraphics[bb=70 655 385 723]{lo_abcde_0}
+\bigskip
+\includegraphics[bb=70 690 388 723]{lo_abcde_1}
+\caption{A level-order traversal with a queue\label{fig:lo_abcde}}
+\end{figure}
+Keep in mind that trees are dequeued on the right side of the forest
+and enqueued on the left. (Some authors prefer the other way.) The
+root of the next tree to be dequeued is circled.
+
+In order to compare with
+\fun{pre\(_4\)/1}\index{pre4@\fun{pre\(_4\)/1}} in
+\fig~\vref{fig:pre3}, we write
+\(\enq{x}{q}\)\index{queue}\index{enq@$\enq{x}{q}$} instead of
+\(\fun{enq}(x,q)\)\index{enq@\fun{enq/2}}, and
+\(\deq{x}{q}\)\index{deq@$\deq{x}{q}$} instead of \(\pair{q}{x}\). The
+empty queue is noted~\(\emq\)\index{queue@$\emq$}. More importantly,
+we will allow these expressions in the patterns of
+\fun{bf\(_2\)/1}\index{bf2@\fun{bf\(_2\)/1}}, which performs a
+level\hyp{}order traversal in \fig~\ref{fig:bf1}.
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{bf}_1(t) & \rightarrow & \fun{bf}_2(\enq{t}{\emq}).\\
+\\
+\fun{bf}_2(\emq) & \rightarrow & \el;\\
+\fun{bf}_2(\deq{\fun{ext}()}{q}) & \rightarrow & \fun{bf}_2(q);\\
+\fun{bf}_2(\deq{\fun{int}(x,t_1,t_2)}{q})
+  & \rightarrow & \cons{x}{\fun{bf}_2(\enq{t_2}{\enq{t_1}{q}})}.
+\end{array}}
+\end{equation*}
+\caption{Abstract level-order traversal with a queue\label{fig:bf1}}
+\end{figure}
+The difference in data structure (accumulator) has already been
+mentioned: \fun{pre\(_4\)/1}\index{pre4@\fun{pre\(_4\)/1}} uses a
+stack and \fun{bf\(_2\)/1}\index{bf2@\fun{bf\(_2\)/1}} a queue, but,
+as far as algorithms are concerned, they differ only in the relative
+order in which \(t_1\) and~\(t_2\) are added to the accumulator.
+
+In section~\ref{sec:queueing}, we saw how to implement a queue with
+two stacks as \(\fun{q}(r,f)\):\index{q@\fun{q/2}} the rear
+stack~\(r\), where items are pushed (logically enqueued), and the
+front stack~\(f\), from whence items are popped (logically
+dequeued). Also, we defined enqueueing by
+\fun{enq/2}\index{enq@\fun{enq/2}} in~\eqref{def:enq},
+\vpageref{def:enq}, and dequeueing with
+\fun{deq/1}\index{deq@\fun{deq/1}} in~\eqref{def:deq}. This allows us
+to refine the definition of
+\fun{bf\(_2\)/1}\index{bf2@\fun{bf\(_2\)/1}} into
+\fun{bf\(_3\)/1}\index{bf3@\fun{bf\(_3\)/1}} in \fig~\vref{fig:bf3}.
+\begin{figure}
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\centering
+\framebox[0.9\columnwidth]{\vbox{%
+\begin{gather*}
+\fun{bf}_3(t) \rightarrow \fun{bf}_4(\fun{enq}(t,\fun{q}(\el,\el))).
+\qquad
+\fun{bf}_4(\fun{q}(\el,\el)) \rightarrow \el;\\
+%
+\inferrule
+  {\fun{deq}(q) \twoheadrightarrow \pair{q'}{\fun{ext}()}}
+  {\fun{bf}_4(q) \twoheadrightarrow \fun{bf}_4(q')};
+\quad
+\inferrule
+  {\fun{deq}(q) \twoheadrightarrow \pair{q'}{\fun{int}(x,t_1,t_2)}}
+  {\fun{bf}_4(q) \twoheadrightarrow 
+   \cons{x}{\fun{bf}_4(\fun{enq}(t_2,\fun{enq}(t_1,q')))}}\,.
+\end{gather*}}}
+\caption{Refinement of \fig~\vref{fig:bf1}\label{fig:bf3}}
+\end{figure}
+
+We can specialise the program further, so we save some memory by not
+using the constructor \fun{q/2}\index{q@\fun{q/2}} and remembering
+that its first argument is the rear and the second is the
+front. Moreover, instead of calling \fun{deq/1}\index{deq@\fun{deq/1}}
+and \fun{enq/2}\index{enq@\fun{enq/1}}, we can expand their
+definitions and merge them with the definition at hand. The result is
+shown in \fig~\vref{fig:bf}.
+\begin{figure}[b]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{bf}(t) & \xrightarrow{\smash{\nu}} & \fun{bf}(\el,[t]).\\
+\\
+\fun{bf}(\el,\el) & \xrightarrow{\smash{\xi}} & \el;\\
+\fun{bf}(\cons{t}{r},\el) & \xrightarrow{\smash{\pi}} &
+  \fun{bf}(\el,\fun{rcat}(r,[t]));\\
+\fun{bf}(r,\cons{\fun{ext}()}{f}) 
+  & \xrightarrow{\smash{\rho}} & \fun{bf}(r,f);\\
+\fun{bf}(r,\cons{\fun{int}(x,t_1,t_2)}{f})
+  & \xrightarrow{\smash{\sigma}} 
+  & \cons{x}{\fun{bf}(\cons{t_2,t_1}{r},f)}.
+\end{array}}
+\end{equation*}
+\caption{Refinement of \fig~\vref{fig:bf3}\label{fig:bf}}
+\end{figure}
+Recall that \fun{rcat/2}\index{rcat@\fun{rcat/2}} (\emph{reverse and
+  catenate}) is defined in equation~\eqref{def:rev}
+\vpageref{def:rev}. Note that
+\(\fun{bf}_4(\fun{enq}(t,\fun{q}(\el,\el)))\)\index{bf4@\fun{bf\(_4\)/1}}
+has been optimised in \(\fun{bf}(\el,[t])\)\index{bf@\fun{bf/2}} in
+order to save a stack reversal. The definition of
+\fun{bf/1}\index{bf@\fun{bf/1}} can be considered the most
+\emph{concrete} of the refinements, the more \emph{abstract} program
+being the original definition of
+\fun{bf\(_1\)/1}\index{bf1@\fun{bf\(_1\)/1}}. The former is shorter
+than \fun{bf\(_0\)/1}\index{bf0@\fun{bf\(_0\)/1}}, but the real gain
+is the cost. Let \(n\)~be the size of the binary tree at hand and
+\(h\)~its height\index{binary tree!height}. Rules are applied as
+follows:
+\begin{itemize*}
+
+  \item rule \clause{\nu} is used once;
+
+  \item rule \clause{\xi} is used once;
+
+  \item rule \clause{\pi} is used once per level, except the first one
+    (the root), hence, in total \(h\)~times;
+
+  \item all levels but the first (the root) are reversed by
+    \fun{rev/1}, accounting \(\sum_{i=1}^{h}\C{\fun{rev}}{e_i} =
+    \sum_{i=1}^{h}(e_i+2) = (n-1)+(n+1)+ 2h = 2n +
+    2h\),\index{rev@$\C{\fun{rev}}{n}$} where \(e_i\)~is the number of
+    nodes on the extended level~\(i\);
+
+  \item rule \clause{\rho} is used once per external node, that is,
+    \(n+1\);
+
+  \item rule \clause{\sigma} is used once per internal node, so
+    \(n\)~times.
+
+\end{itemize*} 
+Gathering all these enumerations yields the formula
+\begin{equation*}
+\C{\fun{bf}}{n,h} = 4n + 3h + 3.\index{bf@$\C{\fun{bf}}{n,h}$}
+\end{equation*}
+As with \fun{bf\(_0\)/1}\index{bf0@\fun{bf\(_0\)/1}}, the minimum cost
+happens here when \(h = \lg(n+1)\), so \(\B{\fun{bf}}{n} = 4n +
+3\lg(n+1) + 3 \sim 4n\).\index{bf@$\B{\fun{bf}}{n,h}$} The maximum
+cost occurs when \(h=n\), so \(\W{\fun{bf}}{n} = 7n + 3 \sim 7n\). We
+can now compare \fun{bf\(_0\)/1}\index{bf0@\fun{bf\(_0\)/1}} and
+\fun{bf/1}\index{bf@\fun{bf/1}}: \(\C{\fun{bf}}{n,h} <
+\C{\fun{bf}_0}{n,h}\)\index{bf@$\C{\fun{bf}}{n,h}$}
+\index{bf0@$\C{\fun{bf}_0}{n,h}$} and the difference in cost is most
+observable in their worst cases, which are both degenerate
+trees. Therefore \fun{bf/1} is preferable in any case.
+
+\paragraph{Termination}
+\index{termination!level order|(} \index{binary tree!level
+  order!termination|(} With the aim to prove the termination of
+\fun{bf/2}\index{bf@\fun{bf/2}}, we reuse the lexicographic order on
+pairs of stacks, based on the immediate substack order
+(\(\succ_{S}\))\index{induction!immediate substack order} that proved
+the termination of \fun{mrg/2}\index{mrg@\fun{mrg/2}} on page
+\pageref{merging_termination}:
+\begin{equation*}
+(s,t) \succ_{S^2} (s',t') :\Leftrightarrow \text{\(s \succ_{S} s'\) or
+    (\(s = s'\) and \(t \succ_{S} t'\))}.
+\end{equation*}
+Unfortunately, (\(\succ_{S^2}\)) fails to monotonically order (with
+respect to the rewrite relation) the left\hyp{}hand side and
+right\hyp{}hand side of rule~\(\sigma\), because of
+\((r,\cons{\fun{int}(x,t_1,t_2)}{f}) \nsucc_{S^2}
+(\cons{t_2,t_1}{r},f)\). Another approach consists in defining a
+well\hyp{}founded order on the number of nodes in a pair of forests:
+\begin{equation*}
+(r,f) \succ_{S^2} (r',f') :\Leftrightarrow \fun{dim}(r) +
+  \fun{dim}(f) > \fun{dim}(r') + \fun{dim}(f'),
+\end{equation*}
+with
+\begin{equation*}
+\fun{dim}(\el) \rightarrow \el;\qquad
+\fun{dim}(\cons{t}{f}) \rightarrow \fun{size}(t) + \fun{dim}(f).
+\end{equation*}
+where \fun{size/1}\index{size@\fun{size/1}}\index{binary tree!size} is
+defined in~\eqref{eq:size} \vpageref{eq:size}. This is a kind of
+polynomial measure\index{termination!polynomial measure} on dependency
+pairs\index{termination!dependency pair}, as exemplified with
+\fun{flat/1}\index{flat@\fun{flat/1}} on
+page~\pageref{flattening:termination}. Here, \(\measure{\fun{bf}(s,t)}
+:= \fun{dim}(s) + \fun{dim}(t)\). Unfortunately, this order
+monotonically fails on rule~\(\pi\), because \((r,\el) \nsucc_{S^2}
+(\el,\fun{rev}(r))\).
+
+The conundrum can be lifted if we visualise the complete set of
+traces\index{functional language!evaluation!trace} of
+\fun{bf/2}\index{bf@\fun{bf/2}} in a compact manner. If we assume that
+\fun{rev/1}\index{rev@\fun{rev/1}} is a constructor, the
+right\hyp{}hand sides either contain no call or exactly one recursive
+call. The traces of calls to such definitions are nicely represented
+as finite automata.\index{finite automaton} An example of a
+deterministic finite automaton\index{finite automaton!deterministic
+  $\sim$|(} (DFA) was given in \fig~\vref{fig:abacabac}. Here, a
+transition is a rewrite rule and a state corresponds to an abstraction
+of the input. In the case of \fun{bf/2}, the input is a pair of
+stacks. Let us decide for the moment that we will only take into
+account whether a stack is empty or not, yielding four states. Let
+`\texttt{|}' denote an arbitrary non\hyp{}empty stack. Examining the
+definitions of \fun{bf/1}\index{bf@\fun{bf/1}} and
+\fun{bf/2}\index{bf@\fun{bf/2}} in \fig~\vref{fig:bf}, we see that
+\begin{itemize*}
+
+  \item rule~\(\xi\) applies to the state \((\el,\el)\) only;
+
+  \item rule~\(\pi\) applies to the state \((\mid,\el)\), and leads to
+    a state \((\el,\mid)\);
+
+  \item rule~\(\rho\) applies to the states \((\el,\mid)\) and
+    \((\mid,\mid)\), and leads to any state;
+
+  \item rule~\(\sigma\) applies to the states \((\el,\mid)\) and
+    \((\mid,\mid)\), and leads to the states \((\mid,\el)\) and
+    \((\mid,\mid)\).
+
+\end{itemize*}
+In \fig~\vref{fig:lo_nfa},
+\begin{figure}
+\centering
+\subfloat[Non-deterministic (NFA)\label{fig:lo_nfa}]{
+\includegraphics[bb=71 580 209 721]{lo_nfa}}
+\quad
+\subfloat[Deterministic (DFA)\label{fig:lo_dfa}]{
+\includegraphics[bb=71 580 209 721]{lo_dfa}}
+\caption{Traces of \fun{bf/2} as finite automata}
+\end{figure}
+we gather all this connectivity into a finite automaton. Note that, by
+definition, the initial state has an incoming edge~\(\nu\) without
+source and the final state has an outgoing edge~\(\xi\) without
+destination. A trace is any sequence of transitions from the initial
+state \((\el,\mid)\) to the final state \((\el,\el)\), for example,
+\(\nu\rho^p\sigma^q\pi\rho\xi\), with \(p \geqslant 0\) and \(q
+\geqslant 2\). This automaton is called a \emph{non\hyp{}deterministic
+  finite automaton}\index{finite automaton!non\hyp{}deterministic
+  $\sim$|(} (NFA) because a state may have more than one outgoing
+transition with the same label (consider the initial state and the two
+transitions labelled~\(\sigma\), for example).
+
+It is always possible to construct a \emph{deterministic finite
+  automaton} (DFA) equivalent to a given non\hyp{}deterministic finite
+automaton \citep{VanLeeuwen_1990c,HopcroftMotwaniUllman_2003}. The
+outgoing transitions of each state of the former have a unique
+label. Equivalence means that the sets of traces of each automaton are
+the same. If `\texttt{?}' denotes a stack, empty or not,
+\fig~\vref{fig:lo_dfa} shows an equivalent DFA for the traces of
+\fun{bf/1}\index{bf@\fun{bf/1}} and \fun{bf/2}\index{bf@\fun{bf/2}}.
+
+As we observed earlier, using the well\hyp{}founded order
+\((\succ_{S^2})\) based on the sizes of the stacks, all transitions
+\(x \rightarrow y\) in the DFA satisfy \(x \succ_{S^2} y\),
+except~\(\pi\), for which \(x =_{S^2} y\) holds (the total number of
+nodes is invariant). We can nevertheless conclude that \fun{bf/2}
+terminates because the only way to have non\hyp{}termination would be
+the existence of a \(\pi\)-\emph{circuit}, that is, a series of
+successive transitions from a state to itself all labelled
+with~\(\pi\), along which the number of nodes remains identical. In
+fact, all traces have~\(\pi\) followed by~\(\rho\) or~\(\sigma\).
+
+Yet another spin on this matter would be to prove, by examining all
+rules in isolation and all compositions of two rules, that
+\begin{equation*}
+x \rightarrow y \Rightarrow x \succcurlyeq_{S^2} y
+\quad \text{and} \quad
+x \xrightarrow{\smash{2}} y \Rightarrow x \succ_{S^2} y.
+\end{equation*}
+Consequently, if \(n > 0\), then \(x \xrightarrow{\smash{2n}} y\)
+entails \(x \succ_{S^2} y\), because \((\succ_{S^2})\) is
+transitive. Furthermore, if \(x \xrightarrow{\smash{2n}} y \rightarrow
+z\), then \(x \succ_{S^2} y \succcurlyeq_{S^2} z\), hence \(x
+\succ_{S^2} z\). In the end, \(x \xrightarrow{\smash{n}} y\) implies
+\(x \succ_{S^2} y\), for all \(n > 1\).\index{finite
+  automaton!non\hyp{}deterministic $\sim$|)}\index{finite
+  automaton!deterministic $\sim$|)}\index{binary tree!level
+  order!termination|)}\index{termination!level order|)}\hfill\(\Box\)
+
+\paragraph{Breadth-first numbering}
+\index{binary tree!breadth numbering|(}
+
+As mentioned earlier, \fig~\vref{fig:lorder} shows an example of
+breadth\hyp{}first numbering. This problem has received notable
+attention \citep{JonesGibbons_1993,GibbonsJones_1998,Okasaki_2000}
+because functional programmers usually feel a bit challenged by this
+problem. A good approach consists in modifying the function
+\fun{bf\(_1\)/2}\index{bf1@\fun{bf\(_1\)/2}} in \fig~\vref{fig:bf1} so
+that it builds a tree instead of a stack. We do so by enqueueing
+immediate subtrees, so they are recursively numbered when they are
+dequeued, and by incrementing a counter, initialised with~\(0\), every
+time a non\hyp{}empty tree has been dequeued.
+
+Consider \fun{bfn\(_1\)/1}\index{bfn1@\fun{bfn\(_1\)/1}} and
+\fun{bfn\(_2\)/2}\index{bfn2@\fun{bfn\(_2\)/2}}
+(\emph{breadth\hyp{}first numbering}) in \fig~\vref{fig:bfn1},
+\begin{figure}
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\centering
+\framebox[0.87\columnwidth]{\vbox{%
+\begin{gather*}
+\inferrule
+  {\fun{bfn}_2(0,\enq{t}{\emq}) \twoheadrightarrow \deq{t'}{\emq}}
+  {\fun{bfn}_1(t) \twoheadrightarrow t'}.
+\\
+\fun{bfn}_2(i,\emq) \rightarrow \emq;
+\qquad
+\fun{bfn}_2(i,\deq{\fun{ext}()}{q}) \rightarrow
+  \enq{\fun{ext}()}{\fun{bfn}_2(i,q)};
+\\
+\inferrule
+  {\fun{bfn}_2(i+1,\enq{t_2}{\enq{t_1}{q}}) \twoheadrightarrow 
+   \deq{t'_2}{\deq{t'_1}{q'}}}
+  {\fun{bfn}_2(i,\deq{\fun{int}(x,t_1,t_2)}{q}) \twoheadrightarrow 
+   \enq{\fun{int}(i,t'_1,t'_2)}{q'}}.
+\end{gather*}}}
+\caption{Abstract breadth-first numbering\label{fig:bfn1}}
+\end{figure}
+and compare them with the definitions in \fig~\vref{fig:bf1}. In
+particular, notice how, in contrast with
+\fun{bf\(_1\)/2}\index{bf1@\fun{bf\(_1\)/2}}, external nodes are
+enqueued instead of being discarded, because they are later needed to
+make the numbered tree.
+
+In \fig~\vref{fig:bf2_ex}
+\begin{figure}[!b]
+\centering
+\includegraphics{bf2_abcd_0}
+\includegraphics{bf2_abcd_1}
+\includegraphics{bf2_abcd_2}
+\includegraphics{bf2_abcd_3}
+\includegraphics[bb=70 674 275 721]{bf2_abcd_4}
+\includegraphics[bb=69 691 276 721]{bf2_abcd_5}
+\includegraphics[bb=71 690 276 721]{bf2_abcd_6}
+\caption{Example of breadth-first numbering\label{fig:bf2_ex}}
+\end{figure}
+is shown an example, where the numbers on the left represent the
+values of~\(i\) (the first argument of
+\fun{bf\(_2\)/2}\index{bf2@\fun{bf\(_2\)/2}}), the downward rewrites
+define the successive states of the working queue (the second argument
+of \fun{bf\(_2\)/2}\index{bf2@\fun{bf\(_2\)/2}}), and the upward
+rewrites show the successive states of the resulting queue
+(right\hyp{}hand side of
+\fun{bf\(_2\)/2}\index{bf2@\fun{bf\(_2\)/2}}). Recall that trees are
+enqueued on the left and dequeued on the right (other authors may use
+the opposite convention, as \cite{Okasaki_2000}) and pay attention to
+the fact that, in the vertical rewrites on the left, \(t_1\)~is
+enqueued first whilst, on the right, \(t'_2\)~is dequeued first, which
+appears when contrasting \(\enq{t_2}{\enq{t_1}{q}} =
+\enq{t_2}{(\enq{t_1}{q})}\)\index{enq@$\enq{x}{q}$} and
+\(\deq{t'_2}{\deq{t'_1}{q'}} =
+\deq{t'_2}{(\deq{t'_1}{q'})}\)\index{deq@$\deq{x}{q}$}.
+
+We can refine \fun{bfn\(_1\)/1}\index{bfn1@\fun{bfn\(_1\)/1}} and
+\fun{bfn\(_2\)/2}\index{bfn2@\fun{bfn\(_2\)/2}} by introducing
+explicitly the function calls for enqueueing and dequeueing, as shown
+in \fig~\vref{fig:bfn3},
+\begin{figure}[t]
+\centering
+\includegraphics{bfn3}
+\caption{Refinement of \fig~\vref{fig:bfn1}\label{fig:bfn3}}
+\end{figure}
+which could be contrasted with \fig~\vref{fig:bf3}.
+\index{binary tree!breadth numbering|)}
+\index{binary tree!level order|)}
+
+\paragraph{Exercises}
+\begin{enumerate*}
+
+  \item How would you proceed to prove the correctness of
+  \fun{bfn/1}?\index{bfn@\fun{bfn/1}}
+
+  \item Find the cost \(\C{\fun{bfn}}{n}\) of \(\fun{bfn}(t)\), where
+  \(n\)~is the size
+  of~\(t\).\index{bfn@$\C{\fun{bfn}}{n}$}\index{bfn@\fun{bfn/1}}
+
+\end{enumerate*}
+
+
+
+\section{Classic shapes}
+
+In this section, we briefly review some particular binary trees which
+are useful in assessing the extremal costs of many algorithms.
+
+\paragraph{Perfection}
+\label{par:perfection}
+
+\index{binary tree!perfect $\sim$|(} We already mentioned what a
+\emph{perfect binary tree} is in the context of optimal sorting (see
+\fig~\vref{fig:comp_tree}). One way to define such trees is to say
+that all their external nodes belong to the same level or,
+equivalently, the immediate subtrees of any node have same
+height\index{tree!height}. (The height\index{tree!height} of an
+external node is~\(0\).) In \fig~\vref{fig:per} is shown the
+definition of \fun{per/1}\index{per@\fun{per/1}} (\emph{perfection}).
+If the tree~\(t\) is perfect, we also know its height~\(h\):
+\(\fun{per}(t) \twoheadrightarrow \fun{true}(h)\).
+\begin{figure}
+\centering
+\includegraphics{per}
+\caption{Abstract checking of perfection\label{fig:per}}
+\end{figure}
+Note that the rules are ordered, so the last one may only apply when
+the previous ones have not been matched. A refinement without
+inference rules is shown in \fig~\vref{fig:per0},
+\begin{figure}
+\centering
+\includegraphics[bb=71 604 251 721]{per0}
+\caption{Refinement of \fig~\ref{fig:per}\label{fig:per0}}
+\end{figure}
+where \(\fun{per}_0(t_1)\) is evaluated before
+\(\fun{per}_0(t_2)\)\index{per0@\fun{per\(_0\)/1}} since
+\(\fun{t}(\fun{per}_0(t_1), \fun{per}_0(t_2))\) is inefficient if
+\(\fun{per}_0(t_1) \twoheadrightarrow \fun{false}()\).\index{binary
+  tree!perfect $\sim$|)}
+
+% Wrapping figure better declared before a paragraph
+%
+\begin{wrapfigure}[7]{r}[0pt]{0pt}
+% [7] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\includegraphics{complete}
+\caption{\label{fig:complete}}
+\end{wrapfigure}
+
+\paragraph{Completeness}
+
+A binary tree is \emph{complete}\index{binary tree!complete $\sim$} if
+the children of every internal node are either two external nodes or
+two internal nodes themselves. An example is provided in
+\fig~\vref{fig:complete}. Recursively, a given tree is complete if,
+and only if, its immediate subtrees are complete. This is the same
+rule we used for perfection. In other words, perfection and
+completeness are propagated bottom\hyp{}up. Therefore, we need to
+decide what to say about the external nodes, in particular, the empty
+tree. If we decide that the latter is complete, then
+\(\fun{int}(x,\fun{ext}(),\fun{int}(y,\fun{ext}(),\fun{ext}()))\)
+would, incorrectly, be deemed complete. If not, leaves\index{binary
+  tree!leaf} \(\fun{int}(x,\fun{ext}(),\fun{ext}())\) would,
+incorrectly, be found to be incomplete. Thus, we can choose either
+option and handle the problematic case separately; for example, we may
+choose that external nodes are incomplete trees, but leaves are
+complete trees. The program is shown in \fig~\vref{fig:comp}. The last
+rule applies either if \(t=\fun{ext}()\) or
+\(t=\fun{int}(x,t_1,t_2)\), with \(t_1\) or~\(t_2\) incomplete.
+
+\bigskip
+
+\begin{figure}[H]
+\centering
+\includegraphics{comp}
+\caption{Checking completeness\label{fig:comp}}
+\end{figure}
+
+\paragraph{Balance}
+
+\begin{wrapfigure}[7]{r}[0pt]{0pt}
+\centering
+\includegraphics[bb=71 653 153 721]{bal}
+\caption{\label{fig:bal}}
+\end{wrapfigure}
+The last interesting kind of binary trees is the \emph{balanced
+  trees}.\index{binary tree!balanced $\sim$} There are two sorts of
+criteria to define balance: either height or size
+\citep{NievergeltReingold_1972,HiraiYamamoto_2011}. In the latter
+case, siblings are roots of trees with similar sizes; in the former
+case, they have similar height. The usual criterion being height, we
+will use it in the following. Depending on the algorithm, what
+`similar' means may vary. For example, we may decide that two trees
+whose heights differ at most by~\(1\) have similar heights. See
+\fig~\vref{fig:bal} for an instance. Let us start with a definition of
+the height\index{binary tree!height}\index{height@\fun{height/1}} of a
+binary tree and then modify it to obtain a function checking the
+balance:
+\begin{equation*}
+\fun{height}(\fun{ext}()) \rightarrow 0;
+\;
+\fun{height}(\fun{int}(x,t_1,t_2)) \rightarrow 1 +
+\max\{\fun{height}(t_1), \fun{height}(t_2)\}.
+\end{equation*}
+
+The modification is shown in \fig~\vref{fig:balance}, where the
+inference rule of \fun{bal\(_0\)/1}\index{bal0@\fun{bal\(_0\)/1}} is
+needed to check the condition \(|h_1 - h_2| \leqslant 1\). Note that a
+perfect tree is balanced (\(h_1 = h_2\)).
+
+\bigskip
+
+\begin{figure}[h]
+\centering
+\includegraphics{balance}
+\caption{Checking balance\label{fig:balance}}
+\end{figure}
+
+\section{Tree encodings}
+
+In general, many binary trees yield the same preorder, postorder or
+inorder traversal, so it is not possible to rebuild the original tree
+from one traversal alone. The problem of uniquely representing a
+binary tree by a linear structure is called \emph{tree
+  encoding} \citep{Makinen_1991} and is related to the problem of
+generating all binary trees of a given
+size \citep[7.2.1.6]{Knuth_2011}. One simple approach consists in
+extending a traversal with the external nodes; this way, enough
+information from the binary tree is retained in the encoding, allowing
+us to unambiguously go back to the original tree.
+
+The encoding function
+\fun{epost/1}\index{epost@\fun{epost/1}}\index{epost@\fun{epost/2}}
+(\emph{extended postorder})\index{binary tree!postorder!encoding} in
+\fig~\vref{fig:epost},
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{epost}(t) & \rightarrow & \fun{epost}(t,\el).\\
+\\
+\fun{epost}(\fun{ext}(),s) & \rightarrow
+  & \cons{\fun{ext}()}{s};\\
+\fun{epost}(\fun{int}(x,t_1,t_2),s) & \rightarrow
+  & \fun{epost}(t_1,\fun{epost}(t_2,\cons{x}{s})).
+\end{array}}
+\end{equation*}
+\caption{Postorder encoding\label{fig:epost}}
+\end{figure}
+is a simple modification of \fun{post/1}\index{post@\fun{post/1}} in
+\fig~\vref{fig:post}. For example, the tree in
+\fig~\vref{fig:postorder} yields \([\Box, \Box, \Box, 0, 1, \Box,
+\Box, 2, 3, \Box, \Box, \Box, 4, 5, 6]\), where \(\Box\) stands for
+\(\fun{ext}()\). Since a binary tree with \(n\)~internal nodes has
+\(n+1\) external nodes (see theorem~\ref{thm:int_ext}
+\vpageref{thm:int_ext}), the cost is straightforward to find:
+\(\C{\fun{epost}}{n} = 2n + 2\).\index{epost@$\C{\fun{epost}}{n}$}
+
+We already noticed that the postorder of the nodes increases along
+upwards paths, which corresponds to the order in which a tree is
+built: from the external nodes up to the root. Therefore, all we have
+to do is to identify the growing subtrees by putting the unused
+numbers and subtrees in an auxiliary stack: when the contents of a
+root (anything different from \(\fun{ext}()\)) appears in the original
+stack, we can make an internal node with the two first subtrees in the
+auxiliary stack.
+
+The definition of \fun{post2b/1}\index{post2b@\fun{post2b/1}}
+(\emph{extended postorder to binary tree}) is given in
+\fig~\vref{fig:post2b}.\index{binary tree!postorder!decoding}
+\begin{figure}[b]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{post2b}(s) & \rightarrow & \fun{post2b}(\el,s).\\
+\\
+\fun{post2b}([t],\el) & \rightarrow & t;\\
+\fun{post2b}(f,\cons{\fun{ext}()}{s}) & \rightarrow & \fun{post2b}(\cons{\fun{ext}()}{f},s);\\
+\fun{post2b}(\cons{t_2,t_1}{f},\cons{x}{s}) & \rightarrow & \fun{post2b}(\cons{\fun{int}(x,t_1,t_2)}{f},s).
+\end{array}}
+\end{equation*}
+\caption{Postorder decoding\label{fig:post2b}}
+\end{figure}
+Variable~\(f\) stands for \emph{forest}\index{tree!forest}, which is
+how stacks of trees are usually called in computing science. Note that
+a problem would arise if the original tree contains trees because, in
+that case, an external node contained in an internal node would
+confuse \fun{post2b/1}\index{post2b@\fun{post2b/1}}. The cost is easy
+to assess because a postorder encoding must have length \(2n+1\),
+which is the total number of nodes of a binary with \(n\) internal
+nodes. Therefore, \(\C{\fun{post2b}}{n} = 2n +
+3\).\index{post2b@$\C{\fun{post2b}}{n}$} The expected theorem is, of
+course,
+\begin{equation}
+\fun{post2b}(\fun{epost}(t)) \equiv t.
+\label{thm:post2b_epost}
+\end{equation}
+
+Considering preorder now, the encoding function
+\fun{epre/1}\index{epre@\fun{epre/1}}\index{epre@\fun{epre/2}}
+(\emph{extended preorder}) in \fig~\vref{fig:epre}
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{epre}(t) & \rightarrow & \fun{epre}(t,\el).\\
+\\
+\fun{epre}(\fun{ext}(),s) & \rightarrow
+  & \cons{\fun{ext}()}{s};\\
+\fun{epre}(\fun{int}(x,t_1,t_2),s) & \rightarrow
+  & \cons{x}{\fun{epre}(t_1,\fun{epre}(t_2,s))}.
+\end{array}}
+\end{equation*}
+\caption{Preorder encoding\label{fig:epre}}
+\end{figure}
+is a simple modification of \fun{pre/1}\index{pre@\fun{pre/1}} in
+\fig~\vref{fig:pre}. The cost is as simple as for a postorder
+encoding: \(\C{\fun{epre}}{n} =
+2n+2\).\index{epre@$\C{\fun{epre}}{n}$}
+
+Working out the inverse function, from preorder encodings back to
+binary trees, is a little trickier than for postorder traversals,
+because the preorder numbers increase downwards in the trees, which is
+the opposite direction in which trees grow (programmers have trees
+grow from the leaves to the root). One solution consists in recalling
+the relationship \(\pred{PreMir}{t}\)\index{PreMir@\predName{PreMir}}
+between preorder and postorder we proved earlier
+\vpageref{proof:PreMir}:
+\begin{equation*}
+\abovedisplayskip=7pt
+\belowdisplayskip=7pt
+\fun{pre}(\fun{mir}(t)) \equiv \fun{rev}(\fun{post}(t)).
+\end{equation*}
+We should extend the proof of this theorem so we have
+\begin{equation}
+\abovedisplayskip=7pt
+\belowdisplayskip=7pt
+\fun{epre}(\fun{mir}(t)) \equiv \fun{rev}(\fun{epost}(t)).
+\label{thm:epre_epost}
+\index{rev@\fun{rev/1}}
+\end{equation}
+In section~\ref{sec:reversal}, we proved
+\(\pred{Inv}{s}\)\index{Inv@\predName{Inv}} and
+\(\pred{EqRev}{s}\)\index{EqRev@\predName{EqRev}}, that is to say, the
+involution of
+\fun{rev/1}\index{rev@\fun{rev/1}}\index{stack!reversal!involution}:
+\begin{equation}
+\abovedisplayskip=7pt
+\belowdisplayskip=7pt
+\fun{rev}(\fun{rev}(s)) \equiv t.
+\label{thm:rev_inv}
+\end{equation}
+Property~\eqref{thm:rev_inv} and~\eqref{thm:epre_epost} yield
+\begin{equation*}
+\abovedisplayskip=7pt
+\belowdisplayskip=7pt
+\fun{rev}(\fun{epre}(\fun{mir}(t))) \equiv
+\fun{rev}(\fun{rev}(\fun{epost}(t))) \equiv \fun{epost}(t).
+\end{equation*}
+Applying~\eqref{thm:post2b_epost}, we obtain
+\begin{equation*}
+\abovedisplayskip=7pt
+\belowdisplayskip=7pt
+\fun{post2b}(\fun{rev}(\fun{epre}(\fun{mir}(t)))) \equiv
+\fun{post2b}(\fun{epost}(t)) \equiv t.
+\end{equation*}
+From exercise~\ref{ex:mir_mir} \vpageref{ex:mir_mir}, we have
+\(\fun{mir}(\fun{mir}(t)) \equiv t\), therefore
+\begin{equation*}
+\abovedisplayskip=7pt
+\belowdisplayskip=7pt
+\fun{post2b}(\fun{rev}(\fun{epre}(t))) \equiv \fun{mir}(t)
+\quad\text{hence}\quad
+\fun{mir}(\fun{post2b}(\fun{rev}(\fun{epre}(t)))) \equiv t.
+\end{equation*}
+Because we want the encoding followed by the decoding to be the
+identity, \(\fun{pre2b}(\fun{epre}(t)) \equiv t\), we have
+\(\fun{pre2b}(\fun{epre}(t)) \equiv
+\fun{mir}(\fun{post2b}(\fun{rev}(\fun{epre}(t))))\), that is, setting
+the stack \(s := \fun{epre}(t)\),
+\begin{equation*}
+\abovedisplayskip=7pt
+\belowdisplayskip=7pt
+\fun{pre2b}(s) \equiv \fun{mir}(\fun{post2b}(\fun{rev}(s))),
+\end{equation*}
+We obtain \fun{pre2b/1}\index{pre2b@\fun{pre2b/1}}\index{binary
+  tree!preorder!decoding} by modifying
+\fun{post2b/1}\index{post2b@\fun{post2b/1}} in \fig~\vref{fig:pre2b}.
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{pre2b}(s) & \rightarrow & \fun{pre2b}(\el,\fun{rev}(s)).\\
+\\
+\fun{pre2b}([t],\el) & \rightarrow & t;\\
+\fun{pre2b}(f,\cons{\fun{ext}()}{s}) & \rightarrow & \fun{pre2b}(\cons{\fun{ext}()}{f},s);\\
+\fun{pre2b}(\cons{t_1,t_2}{f},\cons{x}{s}) & \rightarrow &
+\fun{pre2b}(\cons{\fun{int}(x,t_1,t_2)}{f},s).
+\end{array}}
+\end{equation*}
+\caption{Preorder decoding\label{fig:pre2b}}
+\end{figure}
+The difference between \fun{pre2b/2}\index{pre2b@\fun{pre2b/2}} and
+\fun{post2b/2}\index{post2b@\fun{post2b/2}} lies in their last
+pattern, that is, \(\fun{post2b}(\cons{t_2,t_1}{f},\cons{x}{s})\)
+versus \(\fun{pre2b}(\cons{t_1,t_2}{f},\cons{x}{s})\), which
+implements the fusion of \fun{mir/1} and
+\fun{post2b/1}. Unfortunately, the cost of \(\fun{pre2b}(t)\)
+\index{pre2b@\fun{pre2b/1}} is greater than the cost of
+\(\fun{post2b}(t)\) because of the stack reversal \(\fun{rev}(s)\) at
+the start: \(\C{\fun{pre2b}}{n} = 2n + 3 + \C{\fun{rev}}{n} = 3n +
+5\).\index{pre2b@$\C{\fun{pre2b}}{n}$}\index{rev@$\C{\fun{rev}}{n}$}
+
+The design of \fun{pre2b/1}\index{pre2b@\fun{pre2b/1}} is based on
+small steps with an accumulator. A more direct approach would extract
+the left subtree and then the right subtree from the rest of the
+encoding. In other words, the new version
+\(\fun{pre2b}_1(s)\)\index{pre2b1@\fun{pre2b\(_1\)/1}} would return a
+tree build from a prefix of the encoding~\(s\), paired with the rest
+of the encoding. The definition is displayed in
+\fig~\vref{fig:pre2b0}.
+\begin{figure}[b]
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\centering
+\framebox[0.87\columnwidth]{\vbox{%
+\begin{gather*}
+\inferrule
+   {\fun{pre2b}_1(s) \twoheadrightarrow \pair{t}{\el}}
+   {\fun{pre2b}_0(s) \twoheadrightarrow t}.
+\qquad
+\fun{pre2b}_1(\cons{\fun{ext}()}{s}) \rightarrow
+\pair{\fun{ext}()}{s};
+\\
+\inferrule
+  {\fun{pre2b}_1(s) \twoheadrightarrow \pair{t_1}{s_1}
+   \and
+   \fun{pre2b}_1(s_1) \twoheadrightarrow \pair{t_2}{s_2}}
+  {\fun{pre2b}_1(\cons{x}{s}) \twoheadrightarrow \pair{\fun{int}(x,t_1,t_2)}{s_2}}.
+\end{gather*}}}
+\caption{Another preorder decoding\label{fig:pre2b0}}
+\end{figure}
+Notice the absence of any adventitious concept, contrary to
+\fun{pre2b/1}\index{pre2b@\fun{pre2b/1}}, which relies on the
+reversal\index{stack!reversal} of a stack and a theorem about mirror
+trees and postorders. To wit,
+\fun{pre2b\(_0\)/1}\index{pre2b0@\fun{pre2b\(_0\)/1}} is conceptually
+simpler, although its cost is greater than that of
+\fun{pre2b/1}\index{pre2b@\fun{pre2b/1}} because we count the number
+of function calls after the inference rules\index{inference system}
+are translated into the core functional language (so two more calls
+matching \(\pair{t_1}{s_1}\) and \(\pair{t_2}{s_2}\) are implicit).
+
+Tree encodings show that it is possible to compactly represent binary
+trees, as long as we do not care for the contents of the internal
+nodes. For instance, we mentioned that the tree in
+\fig~\vref{fig:postorder} yields the extended postorder\index{binary
+  tree!postorder!encoding} traversal \([\Box, \Box, \Box, 0, 1, \Box,
+\Box, 2, 3, \Box, \Box, \Box, 4, 5, 6]\). If we only want to retain
+the shape of the tree, we could replace the contents of the internal
+nodes by~\(0\) and the external nodes by~\(1\), yielding the encoding
+\([1,1,1,0,0,1,1,0,0,1,1,1,0,0,0]\). A binary tree of size~\(n\) can
+be uniquely represented by a binary number of \(2n+1\) bits. In fact,
+we can discard the first bit because the first two bits are
+always~\(1\), so \(2n\)~bits are actually enough. For an extended
+preorder traversal, we choose to map external nodes to~\(0\) and
+internal nodes to~\(1\), so, the tree in \fig~\vref{fig:preorder}
+yields \([0, 1, 2, \Box, 3, \Box, \Box, 4, \Box, \Box, 5, \Box, 6,
+\Box, \Box]\) and \((111010010010100)_2\). We can also discard the
+rightmost bit, since the last two bits are always~\(0\).
+
+\section{Random traversals}
+
+Some applications require a tree traversal to depend on the
+interaction with a user or another piece of software, that is, the
+tree is supplemented with the notion of a current node so the next
+node to be visited can be chosen amongst any of the children, the
+parent or even the siblings. This interactivity stands in contrast
+with preorder, inorder and postorder, where the visit order is
+predetermined and cannot be changed during the traversal.
+
+Normally, the visit of a functional data structure starts always at
+the same location, for example, in the case of a stack, it is the top
+item and, in the case of a tree, the access point is the
+root. Sometimes, updating a data structure with an on\hyp{}line
+algorithm (see page~\pageref{par:online_vs_offline} and
+section~\ref{sec:online} \vpageref{sec:online}) requires to keep a
+direct access `inside' the data structure, usually where the last
+update was performed, or nearby, in view of a better amortised (see
+page~\pageref{par:amortised_cost}) or average cost (see 2-way
+insertion in section~\ref{sec:2-way} \vpageref{sec:2-way}).
+
+\begin{wrapfigure}[7]{r}[0pt]{0pt}
+\centering
+\includegraphics[bb=64 663 118 721]{binzip}
+\caption{\label{fig:binzip}}
+\end{wrapfigure}
+Let us call the current node the \emph{slider}\index{binary
+  tree!slider}, also called the \emph{focus}. A
+\emph{zipper}\index{binary tree!zipper} on a binary tree is made of a
+subtree, whose root is the slider, and a \emph{path} from it up to the
+root. That path is the reification, in reverse order, of the recursive
+calls that led to the subtree (the \emph{call stack}\index{functional
+  language!call stack}), together with the subtrees left unvisited on
+the way down. Put in more abstract terms, a zipper is made of a linear
+context (a rooted path) and a substructure (at the end of that path),
+whose handle is the focus. In one move, it is possible to visit the
+children in any order, the parent or the sibling. Consider
+\fig~\ref{fig:binzip} where the slider is the node~\fun{d}. The
+substructure is \(s :=
+\fun{int}(\fun{d}(),\fun{int}(\fun{e}(),\fun{ext}(),\fun{ext}()),
+\fun{int}(\fun{f}(),\fun{ext}(),\fun{ext}()))\). To define rooted
+paths for the zipper, we need three data constructors: one denoting
+the empty path, \(\fun{top}()\), one denoting a turn to the left,
+\(\fun{left}(x,t,p)\), where \(x\)~is a node on the path, \(t\)~is the
+right subtree of~\(x\), and~\(p\) is the rest of the path up to the
+root, and one constructor denoting a turn to the right,
+\(\fun{right}(x,t,p)\), where \(t\)~is the left subtree of~\(x\).
+
+Resuming our example above, the zipper is then the pair
+\(\pair{p}{s}\), with the path~\(p\) being \(\fun{right}(\fun{b}(),
+\fun{int}(\fun{c}(), \fun{ext}(), \fun{ext}()),p_1)\), meaning that
+the node \fun{b}~has an unvisited left child~\fun{c} (or,
+equivalently, we turned right when going down), and where \(p_1 :=
+\fun{left}(\fun{a}(), \fun{int}(\fun{g}(), \fun{ext}(), \fun{ext}()),
+\fun{top}())\), meaning that the node~\fun{a} has an unvisited right
+child~\fun{g}, and that it is the root of the whole tree, due to
+\(\fun{top}()\). Note that since \fun{b}~is the first in the path up,
+it is the parent of the slider~\fun{d}.
+
+At the beginning, the original tree~\(t\) is injected into a zipper
+\(\pair{\fun{top}()}{t}\). Then, the operations we want for traversing
+a binary tree on demand are \fun{up/1}\index{up@\fun{up/1}} (go to the
+parent), \fun{left/1}\index{left@\fun{left/1}} (go to the left child),
+\fun{right/1}\index{right@\fun{right/1}} (go to the right child) and
+\fun{sibling/1}\index{sibling@\fun{sibling/1}} (go to the
+sibling). All take a zipper as input and all calls evaluate into a
+zipper. After any of these steps is performed, a new
+zipper\index{binary tree!zipper} is assembled as the value of the
+call. See \fig~\vref{fig:zip_move}
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{up}(\pair{\fun{left}(x,t_2,p)}{t_1}) & \rightarrow &
+  \pair{p}{\fun{int}(x,t_1,t_2)};\\
+\fun{up}(\pair{\fun{right}(x,t_1,p)}{t_2}) & \rightarrow &
+\pair{p}{\fun{int}(x,t_1,t_2)}.\\
+\\
+\fun{left}(\pair{p}{\fun{int}(x,t_1,t_2)}) & \rightarrow & 
+  \pair{\fun{left}(x,t_2,p)}{t_1}.\\
+\\
+\fun{right}(\pair{p}{\fun{int}(x,t_1,t_2)}) & \rightarrow &
+  \pair{\fun{right}(x,t_1,p)}{t_2}.\\
+\\
+\fun{sibling}(\pair{\fun{left}(x,t_2,p)}{t_1}) & \rightarrow &
+  \pair{\fun{right}(x,t_1,p)}{t_2};\\
+\fun{sibling}(\pair{\fun{right}(x,t_1,p)}{t_2}) & \rightarrow &
+  \pair{\fun{left}(x,t_2,p)}{t_1}.
+\end{array}}
+\end{equation*}
+\caption{Basic steps in a binary tree\label{fig:zip_move}}
+\end{figure}
+for the program. Beyond random traversals of a binary tree, this
+technique, which is an instance of \emph{Huet's zipper}
+\citep{Huet_1997,Huet_2003}, also allows local editing. This simply
+translates as the replacement of the current tree by another:
+\begin{equation*}
+\fun{graft}(t',\pair{p}{t}) \rightarrow \pair{p}{t'}.
+\end{equation*}
+If we only want to change the slider, we would use
+\begin{equation*}
+\fun{slider}(x',\pair{p}{\fun{int}(x,t_1,t_2)}) \rightarrow
+\pair{p}{\fun{int}(x',t_1,t_2)}.
+\end{equation*}
+If we want to go up to the root and extract the new tree:
+\begin{equation*}
+\fun{zip}(\pair{\fun{top}()}{t}) \rightarrow t;\quad
+\fun{zip}(z) \rightarrow \fun{zip}(\fun{up}(z)).
+\end{equation*}
+We do not need a zipper\index{binary tree!zipper} to perform a
+preorder, inorder or postorder traversal, because it is primarily
+designed to open down and close up paths from the root of a tree, in
+the manner of a zipper\index{binary tree!zipper} in a
+cloth. Nevertheless, if we retain one aspect of its design, namely,
+the accumulation of unvisited nodes and subtrees, we can define the
+classic traversals in tail form\index{functional language!tail form},
+that is, by means of a definition where the right\hyp{}hand sides
+either are a value or a function call whose arguments are not function
+calls themselves. Such definitions are equivalent to loops in
+imperative languages and may be a target for some compilers
+\citep{Appel_1992}.
+
+We show a preorder traversal following this design in
+\fig~\vref{fig:pre_tail},
+\begin{figure}[t]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{pre}_7(t) & \rightarrow & \fun{pre}_8(\el,\el,t).\\
+\\
+\fun{pre}_8(s,\el,\fun{ext}()) & \rightarrow & s;\\
+\fun{pre}_8(s,\cons{\fun{int}(x,t_1,\fun{ext}())}{f},\fun{ext}()) &
+\rightarrow & \fun{pre}_8(s,\cons{x}{f},t_1);\\
+\fun{pre}_8(s,\cons{x}{f},\fun{ext}()) & \rightarrow &
+\fun{pre}_8(\cons{x}{s},f,\fun{ext}());\\
+\fun{pre}_8(s,f,\fun{int}(x,t_1,t_2)) & \rightarrow &
+\fun{pre}_8(s,\cons{\fun{int}(x,t_1,\fun{ext}())}{f},t_2).
+\end{array}}
+\end{equation*}
+\caption{Preorder in tail form\label{fig:pre_tail}}
+\end{figure}
+where, in \(\fun{pre}_8(s,f,t)\), the stack~\(s\) is expected to
+collect the visited nodes in preorder, the stack~\(f\) (forest) is the
+accumulator of unvisited parts of the original tree and \(t\)~is the
+current subtree to be traversed. The cost is simple:
+\(\C{\fun{pre}_7}{n} = 3n + 2\).
+
+
+\section{Enumeration}
+
+Many publications \cite[\S~2.3.4.4]{Knuth_1997}
+\cite[\S~5.1]{SedgewickFlajolet_1996} show how to find the number of
+binary trees of size~\(n\) using an advanced mathematical tool called
+\emph{generating functions}\index{enumerative combinatorics!generating
+  function} \cite[chap.~7]{GrahamKnuthPatashnik_1994}. Instead, for
+didactical purposes, we opt for a more intuitive technique in
+enumerative combinatorics\index{enumerative combinatorics} which
+consists in constructing a one\hyp{}to\hyp{}one correspondence between
+two finite sets, so the cardinal of one is the cardinal of the
+other. In other words, we are going to relate bijectively, on the one
+hand, binary trees, and, on the other hand, other combinatorial
+objects which are relatively easy to count, for a given size.
+
+We actually know the appropriate objects in the instance of \emph{Dyck
+  paths}\index{Dyck path}, introduced in section~\ref{sec:queueing}
+about queueing\index{queue}. A Dyck path is a broken line in a grid
+from the point \((0,0)\) to \((2n,0)\), made up of the two kinds of
+segments shown in \fig~\vref{fig:rise_fall},
+\begin{figure}
+\centering
+\subfloat[Rise\label{fig:rise}]{%
+  \includegraphics[bb=69 662 132 721,scale=0.75]{enqueue}
+}
+\qquad
+\subfloat[Fall\label{fig:fall}]{%
+  \includegraphics[bb=69 662 132 721,scale=0.75]{dequeue}
+}
+\caption{Basic steps in a grid\label{fig:rise_fall}}
+\end{figure}
+such that it remains above the abscissa axis or reaches it. Consider
+again the example given in \fig~\vref{fig:dyck_path}, without taking
+into account the individual costs associated to each step. Following
+the same convention as in chapter~\ref{chap:factoring}, we would say
+here that a \emph{Dyck word}\index{Dyck word|see{Dyck path}} is a
+finite word over the alphabet made of the letters~\fun{r}
+(rise\index{Dyck path!rise}) and~\fun{f} (fall\index{Dyck path!fall}),
+such that all its prefixes\index{word factoring!prefix} contain more
+letters~\fun{r} than~\fun{f}, or an equal number. This condition is
+equivalent to the geometrical characterisation `above the abscissa
+axis or reaches it.' For instance, \fun{rff} is not a Dyck word
+because the prefix \fun{rff} (actually, the whole word) contains more
+falls than rises, so the associated path ends below the axis. The Dyck
+word corresponding to the Dyck path in \fig~\vref{fig:dyck_path} is
+\fun{rrrfrfrrfffrff}. Conceptually, there is no difference between a
+Dyck path and a Dyck word, we use the former when a geometrical
+framework is more intuitive and the latter when symbolic reasoning and
+programming are expected.
+
+First, let us map injectively binary trees to Dyck words, in other
+words, we want to traverse any tree and produce a Dyck word which is
+not the mapping of another tree. Since, by definition, non\hyp{}empty
+binary trees are made of an internal node connected to two binary
+subtrees, we may wonder how to split a Dyck word into three parts: one
+corresponding to the root of the tree and two corresponding to the
+immediate subtrees. Since any Dyck word starts with a rise and ends
+with a fall, we may ask what is the word in\hyp{}between. In general,
+it is not a Dyck word; for example, chopping off the ends of
+\fun{rfrrff} yields \fun{frrf}. Instead, we seek a decomposition of
+Dyck words into Dyck words. If the Dyck word has exactly one
+\emph{return}, that is, one fall leading to the abscissa axis, then
+cutting out the first rise and that unique return (which must be the
+last fall) yields another Dyck word. For instance, \(\fun{rrfrrfff} =
+\fun{r} \cdot \fun{rfrrff} \cdot \fun{f}\). Such words are called
+\emph{prime}, because any Dyck word can be uniquely decomposed as the
+catenation of such words (whence the reference to prime factorisation
+in elementary number theory): for all non\hyp{}empty Dyck words~\(d\),
+there exists \({n > 0}\) unique prime Dyck words~\(p_i\) such that \(d
+= p_1 \cdot p_2 \cdots p_n\). This naturally yields the \emph{arch
+  decomposition}\index{Dyck path!decomposition!arch $\sim$}, whose
+name stems from an architectural analogy: for all Dyck words~\(d\),
+there exists \({n > 0}\) Dyck words \(d_i\) and returns~\(\fun{f}_i\)
+such that
+\begin{equation*}
+d = (\fun{r} \cdot d_1 \cdot \fun{f}_1) \cdots (\fun{r} \cdot d_n
+\cdot \fun{f}_n).
+\end{equation*}
+See \cite{PanayotopoulosSapounakis_1995, Lothaire_2005,
+  FlajoletSedgewick_2009}. Unfortunately, this analysis is not
+suitable as it stands, because \(n\)~may be greater than~\(2\),
+precluding any analogy with binary trees. The solution is simple
+enough: let us keep the first prime factor \(\fun{r} \cdot d_1 \cdot
+\fun{f}_1\) and \emph{not} factorise the suffix, which is a Dyck
+word. To wit, for all non\hyp{}empty Dyck words~\(d\), there exists
+one return~\(\fun{f}_1\) and two Dyck subwords \(d_1\) and~\(d_2\)
+(possibly empty) such that
+\begin{equation*}
+d = (\fun{r} \cdot d_1 \cdot \fun{f}_1) \cdot d_2.
+\end{equation*}
+This is the \emph{first return decomposition}\index{Dyck
+  path!decomposition!first return $\sim$}, also known as
+\emph{quadratic decomposition}\index{Dyck path!decomposition!quadratic
+  $\sim$} --~also possible is \(d = d_1 \cdot (\fun{r} \cdot d_2 \cdot
+\fun{f}_1)\). For example, the Dyck word \(\fun{rrfrffrrrffrff}\),
+shown in \fig~\ref{fig:dyck_quad}
+\begin{figure}
+\centering
+\includegraphics[bb=86 616 502 725,scale=0.8]{dyck_quad}
+\caption{Quadratic decomposition of a Dyck path
+\label{fig:dyck_quad}}
+\end{figure}
+admits the quadratic decomposition \(\fun{r} \cdot \fun{rfrf} \cdot
+\fun{f} \cdot \fun{rrrffrff}\). This decomposition is unique because
+the prime factorisation is unique.
+
+Given a tree \(\fun{int}(x,t_1,t_2)\), the rise and fall explicitly
+distinguished in the quadratic decomposition are to be conceived as a
+pair which is the mapping of~\(x\), while \(d_1\)~is the mapping
+of~\(t_1\) and \(d_2\)~is the mapping of~\(t_2\). More precisely, the
+value of~\(x\) is not relevant here, only the existence of an internal
+node, and a fork\index{binary tree!fork} in a leaf tree\index{binary
+  tree!leaf tree} would be mapped just as well. Formally,
+if~\(\delta(t)\) is the Dyck word mapped from the binary tree~\(t\),
+then we expect the following equations to hold:
+\begin{equation}
+\delta(\fun{ext}()) = \varepsilon; \quad \delta(\fun{int}(x,t_1,t_2))
+= \fun{r}_{x} \cdot \delta(t_1) \cdot \fun{f} \cdot \delta(t_2).
+\label{eq:delta}
+\end{equation}
+Note that we attached the node contents~\(x\) to the rise, so we do
+not lose information. For example, the tree in \fig~\vref{fig:dyck2bt}
+\begin{figure}
+\centering
+\subfloat[Binary tree\label{fig:dyck2bt}]{%
+\includegraphics[bb=71 655 142 721]{dyck2bt}}
+\qquad\quad
+\subfloat[Dyck path corresponding to preorder encoding $[0,1,\Box,2,\Box,\Box,3,\Box,\Box\char93$\label{fig:bt2dyck}]{%
+\includegraphics[scale=0.9,bb=93 650 330 724]{bt2dyck}}
+\caption{Bijection between a binary tree and a Dyck path}
+\end{figure}
+would formally be \(t := \fun{int}(0, \fun{int}(1, \fun{ext}(),
+\fun{int}(2, \fun{ext}(), \fun{ext}())), \fun{int}(3, \fun{ext}(),
+\fun{ext}())\) and mapped into the Dyck path in
+\fig~\vref{fig:bt2dyck}\index{binary tree!preorder!encoding} as
+follows:
+\begin{align*}
+\delta(t)
+&= \fun{r}_0 \cdot \delta(\fun{int}(1, \fun{ext}(),
+\fun{int}(2, \fun{ext}(), \fun{ext}()))) \cdot \fun{f} \cdot
+\delta(\fun{int}(3, \fun{ext}(), \fun{ext}()))\\ &= \fun{r}_0
+\cdot (\fun{r}_1 \cdot \delta(\fun{ext}()) \cdot \fun{f} \cdot
+\delta(\fun{int}(2, \fun{ext}(), \fun{ext}()))) \cdot
+\fun{f} \cdot \delta(\fun{int}(3, \fun{ext}(), \fun{ext}()))\\
+&= \fun{r}_0 \fun{r}_1 \varepsilon \cdot \fun{f} \cdot (\fun{r}_2
+\cdot \delta(\fun{ext}()) \cdot \fun{f} \cdot \delta(\fun{ext}()))
+\cdot \fun{f} \cdot (\fun{r}_3 \cdot \delta(\fun{ext}()) \cdot \fun{f}
+\cdot \delta(\fun{ext}()))\\
+&= \fun{r}_0 \fun{r}_1 \fun{f} \cdot (\fun{r}_2 \cdot
+\varepsilon \cdot \fun{f} \cdot \varepsilon) \cdot
+\fun{f} \cdot (\fun{r}_3 \cdot \varepsilon \cdot \fun{f} \cdot
+\varepsilon)
+= \fun{r}_0\fun{r}_1\fun{f}\fun{r}_2\fun{f}\fun{f}\fun{r}_3\fun{f}.
+\end{align*}
+Notice that if we replace the rises by their associated contents (in
+subscript) and the falls by~\(\Box\), we obtain \([0, 1, \Box, 2,
+\Box, \Box, 3, \Box]\), which is the preorder encoding\index{binary
+  tree!preorder!encoding} of the tree without its last \(\Box\). We
+could then modify \fun{epre/2}\index{epre@\fun{epre/2}} in
+\fig~\vref{fig:epre} to map a binary tree to a Dyck\index{Dyck path}
+path, but we would have to remove the last item from the resulting
+stack, so it is more efficient to directly implement \(\delta\) as
+function \fun{dpre/1}\index{dpre@\fun{dpre/1}} (\emph{Dyck path as
+  preorder}) in \fig~\vref{fig:dpre}.
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{dpre}(t) & \rightarrow & \fun{dpre}(t,\el).\\
+\\
+\fun{dpre}(\fun{ext}(),s) & \rightarrow & s;\\
+\fun{dpre}(\fun{int}(x,t_1,t_2),s)
+  & \rightarrow
+  & \cons{\fun{r}(x)}{\fun{dpre}(t_1,\cons{\fun{f}()}{\fun{dpre}(t_2,s)})}.
+\end{array}}
+\end{equation*}
+\caption{Mapping in preorder a binary tree to a Dyck path\label{fig:dpre}}
+\end{figure}
+If the size of the binary tree is~\(n\), then \(\C{\fun{dpre}}{n} =
+2n+2\)\index{dpre@$\C{\fun{dpre}}{n}$} and the length of the Dyck path
+is~\(2n\).
+
+This mapping is clearly reversible, as we already solved the problem
+of decoding a tree in preorder in
+\figs~\ref{fig:pre2b}\index{pre2b@\fun{pre2b/1}}
+and~\vref{fig:pre2b0}\index{pre2b0@\fun{pre2b\(_0\)/1}}, and we
+understand now that the reversed mapping is based on the quadratic
+(`first return') decomposition of the path. \index{Dyck
+  path!decomposition!first return $\sim$}
+
+If we are concerned about efficiency, though, we may recall that using
+a postorder encoding\index{binary tree!preorder!encoding} yields a
+more efficient decoding, as we saw in
+\figs~\ref{fig:epost}\index{epost@\fun{epost/1}}
+and~\ref{fig:post2b}\index{post2b@\fun{post2b/1}} on
+page~\pageref{fig:epost}, therefore a faster reverse mapping. To
+create a Dyck\index{Dyck path} path based on a postorder, we map
+external nodes to rises and internal nodes to falls (with associated
+contents), and then remove the first rise. See
+\fig~\vref{fig:dyck_post}
+\begin{figure}
+\centering
+\subfloat[Binary tree]{\includegraphics[bb=71 655 142 721]{dyck2bt}}
+\qquad\quad
+\subfloat[Dyck path corresponding to postorder encoding $[\Box,\Box,\Box,2,1,\Box,\Box,3,0\char93$\label{fig:dyck_post}]{%
+\includegraphics[scale=0.9,bb=93 650 330 724]{dyck_post}}
+\caption{Bijection between a binary tree and a Dyck path}
+\end{figure}
+for the Dyck path obtained from the postorder traversal of the same
+previous tree. Of course, just as we did with the preorder mapping, we
+are not going to make the postorder encoding\index{binary
+  tree!postorder!encoding}, but instead go directly from the binary
+tree to the Dyck\index{Dyck path} path, as shown in
+\fig~\vref{fig:dpost}.\index{dpost@\fun{dpost/1}}\index{dpost@\fun{dpost/2}}
+\begin{figure}[t]
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{dpost}(t) & \rightarrow & \fun{dpost}(t,\el).\\
+\\
+\fun{dpost}(\fun{ext}(),s) & \rightarrow & s;\\
+\fun{dpost}(\fun{int}(x,t_1,t_2),s)
+  & \rightarrow
+  & \fun{dpost}(t_1,\cons{\fun{r}()}{\fun{dpost}(t_2,\cons{\fun{f}(x)}{s})}).
+\end{array}}
+\end{equation*}
+\caption{Mapping in postorder a binary tree to a Dyck path\label{fig:dpost}}
+\end{figure}
+Note that we push \(\fun{r}()\) and \(\fun{f}(x)\) in the same rule,
+so we do not have to remove the first rise at the end. (We use a
+similar optimisation with \fun{dpre/2}\index{dpre@\fun{dpre/2}} in
+\fig~\vref{fig:dpre}.) In structural terms, the inverse of this
+postorder mapping corresponds to a decomposition \(d = d_1 \cdot
+(\fun{r} \cdot d_2 \cdot \fun{f}_1)\), which we mentioned earlier in
+passing as an alternative to the `first return'
+decomposition.\index{Dyck path!decomposition!first return $\sim$}
+
+The mapping from Dyck\index{Dyck path} paths encoded in postorder to
+binary trees is a simple variation on
+\fun{post2b/1}\index{post2b@\fun{post2b/1}} and
+\fun{post2b/2}\index{post2b@\fun{post2b/2}} in \fig~\vref{fig:post2b}:
+simply make the auxiliary stack be \([\fun{ext}()]\) at the
+beginning. The definition is named \fun{d2b/1}\index{d2b@\fun{d2b/1}}
+and shown in \fig~\vref{fig:d2b}.
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{r@{\;}c@{\;}l}
+\fun{d2b}(s) & \rightarrow & \fun{d2b}([\fun{ext}()],s).\\
+\\
+\fun{d2b}([t],\el) & \rightarrow & t;\\
+\fun{d2b}(f,\cons{\fun{r}()}{s}) & \rightarrow & \fun{d2b}(\cons{\fun{ext}()}{f},s);\\
+\fun{d2b}(\cons{t_2,t_1}{f},\cons{\fun{f}(x)}{s}) & \rightarrow & \fun{d2b}(\cons{\fun{int}(x,t_1,t_2)}{f},s).
+\end{array}}
+\end{equation*}
+\caption{Mapping a Dyck path to a binary tree in postorder\label{fig:d2b}}
+\end{figure}
+The cost is \(\C{\fun{d2b}}{n} = 2n +
+2\).\index{d2b@$\C{\fun{d2b}}{n}$}
+
+Whether we choose a preorder or a postorder mapping, as a consequence
+of the established bijections, we know that there are as many binary
+trees of size~\(n\) as Dyck paths of length~\(2n\). We already know,
+from chapter~\ref{chap:Catalan}, and equation~\eqref{eq:Cn}
+\vpageref{eq:Cn}, that there are \(C_n = \frac{1}{n+1}\binom{2n}{n}
+\sim \frac{4^n}{n\sqrt{\pi n}}\) of such paths.
+
+Other encodings of binary trees can be found
+in \cite[2.3.3]{Knuth_1997} and \cite[5.11]{SedgewickFlajolet_1996}.
+
+\mypar{Average path length}
+
+Most of the usual average parameters of binary trees, like
+average internal path length, average height and width, are quite
+difficult to derive and require mathematical tools which are beyond
+the scope of this book.
+
+The \emph{internal path length}~\(I(t)\)\index{binary tree!internal
+  path length} of a binary tree~\(t\) is the sum of the path lengths
+from the root to every internal node. We already saw the concept of
+external path length~\(E(t)\)\index{binary tree!external path length},
+that is, the sum of the path lengths from the root to every internal
+node, in section~\ref{sec:opt_sort} on page~\pageref{sec:opt_sort}
+about optimal sorting, where we showed that the binary tree with
+minimum average external path length has all its external nodes on two
+successive levels. The relation between these two path lengths is
+quite simple because the binary structure yields an equation depending
+only on the size~\(n\):
+\begin{equation}
+E_n = I_n + 2n.\label{eq:EI}
+\end{equation}
+Indeed, let \(\fun{int}(x,t_1,t_2)\) be a tree with \(n\)~internal
+nodes. Then we have
+\begin{equation}
+  I(\fun{ext}()) = 0,\quad
+  I(\fun{int}(x,t_1,t_2)) = I(t_1) + I(t_2) + n - 1,
+\label{eq:I}
+\end{equation}
+because each path in~\(t_1\) and~\(t_2\) is extended with one more
+edge back to the root~\(x\), and there are \(n-1\) such paths by
+definition. On the other hand,
+\begin{equation}
+  E(\fun{ext}()) = 0,\quad
+  E(\fun{int}(x,t_1,t_2)) = E(t_1) + E(t_2) + n + 1,
+\label{eq:E}
+\end{equation}
+because the paths in~\(t_1\) and~\(t_2\) are extended by one more step
+to the root~\(x\) and there are \(n+1\) such paths, from
+theorem~\vref{thm:int_ext}. Subtracting equation~\eqref{eq:I}
+from~\eqref{eq:E} yields
+\begin{align*}
+  E(\fun{ext}()) - I(\fun{ext}()) &= 0,\\
+  E(\fun{int}(x,t_1,t_2)) - I(\fun{int}(x,t_1,t_2))
+  &= (E(t_1) - I(t_1)) + (E(t_2) - I(t_2)) + 2.\!\!
+\end{align*}
+In other words, each internal node adds~\(2\) to the difference
+between the external and internal path lengths from it. Since the
+difference is~\(0\) at the external nodes, we get
+equation~\eqref{eq:EI} for the tree of size~\(n\). Unfortunately,
+almost anything else is quite hard to prove. For instance, the
+\emph{average internal path length}~\(\Expected{I_n}\)\index{binary
+  tree!average internal path length} has been shown to be
+\begin{equation*}
+\Expected{I_n}  = \frac{4^n}{C_n} - 3n - 1 \sim n \sqrt{\pi n}
+\end{equation*}
+by \cite{Knuth_1997}, in exercise~5 of section~2.3.4.5,
+and \cite{SedgewickFlajolet_1996}, in Theorem~5.3 of section~5.6.
+Using equation~\eqref{eq:EI}, we deduce \(\Expected{E_n} =
+\Expected{I_n} + 2n\), implying that the cost for traversing a random
+binary tree of size~\(n\) from the root to a random external node is
+\(\Expected{E_n}/(n+1) \sim \sqrt{\pi n}\). Moreover, the value
+\(\Expected{I_n}/n\) can be understood as the average level of a
+random internal node.
+
+\mypar{Average height}
+
+The average height~\(h_n\)\index{binary tree!average height} of a
+binary tree of size~\(n\) is even more difficult to obtain and was
+studied by
+\cite{FlajoletOdlyzko_1981,BrownShubert_1984,FlajoletOdlyzko_1984,Odlyzko_1984}:
+\begin{equation*}
+h_n \sim 2 \sqrt{\pi n}.
+\end{equation*}
+In the case for Catalan trees, to wit, trees whose internal nodes may
+have any number of children, the analysis of the average height has
+been carried out by \cite{DasarathyYang_1980,DershowitzZaks_1981},
+\cite{Kemp_1984} in section~5.1.1,
+\cite{DershowitzZaks_1990,KnuthdeBruijnRice_2000b} and
+\cite{SedgewickFlajolet_1996}, in
+section~5.9.\index{tree!height!average $\sim$}
+
+\mypar{Average width}
+
+The \emph{width}\index{binary tree!width} of a binary tree is the
+length of its largest extended level\index{binary tree!extended
+  level}. It can be shown that the \emph{average
+  width}~\(w_n\)\index{binary tree!width} of a binary tree of
+size~\(n\) satisfies
+\begin{equation*}
+w_n \sim \sqrt{\pi n} \sim \tfrac{1}{2} h_n.
+\end{equation*}
+In particular, this result implies that the average size of the stack
+needed to perform the preorder traversal with
+\fun{pre\(_4\)/2}\index{pre4@\fun{pre\(_4\)/2}} in
+\fig~\vref{fig:pre3} is twice the average size of the queue needed to
+perform a level\hyp{}order traversal with
+\fun{bf/1}\index{bf@\fun{bf/1}} in \fig~\vref{fig:bf}. This is not
+obvious, as the two stacks used to simulate the queue do not always
+hold a complete level.
+
+For general trees, a bijective correspondence with binary trees and
+the transfer of some average parameters has been nicely presented by
+\cite{DasarathyYang_1980}.
+
+\section*{Exercises}
+
+\begin{enumerate}
+
+  \item Prove \(\fun{post2b}(\fun{epost}(t)) \equiv t\).
+    \index{post2b@\fun{post2b/1}}
+
+  \item Prove \(\fun{pre2b}(\fun{epre}(t)) \equiv t\).
+    \index{pre2b@\fun{pre2b/1}}
+
+  \item Prove \(\fun{epre}(\fun{mir}(t)) \equiv
+    \fun{rev}(\fun{epost}(t))\).\index{epost@\fun{epost/1}}
+    \index{rev@\fun{rev/1}}\index{epre@\fun{epre/1}}
+    \index{mir@\fun{mir/1}}
+
+  \item Define the encoding of a tree based on its inorder traversal.
+    \index{binary tree!inorder!encoding}
+
+\end{enumerate}

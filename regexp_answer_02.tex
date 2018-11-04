@@ -1,0 +1,57 @@
+\paragraph{Answer 2.}
+
+When answering these questions, it is important to keep in mind that
+the language of words made up on the alphabet~\(\Sigma\)
+is~\(\Sigma^{*}\) and that there are, in general, several regular
+expressions describing one language.
+
+\begin{enumerate}
+
+  \item The constraint on the words is that they must be of the shape
+    \(a \ldots a\) where the dots stand for `any combination of \(a\)
+    and \(b\).' In other words, one answer is \(a \lparen a \;
+    \disjM{} \, b\rparen\kleeneM \, a \, \disjM \, a\).
+
+  \item This question is very simple since the language of all words
+    is \(\lparen a \; \disjM{} \, b\rparen\kleeneM\), we have to
+    remove \(\epsilon\), \emph{i.e.,} one simple answer is \(\lparen a \;
+    \disjM{} \, b\rparen\plusM\).
+
+  \item The question implies that the words we are looking for are of
+    the form \(\ldots a \, \_ \, \_\) where the dots stand for `any
+    sequence of \(a\) and \(b\)' and each `\_' stands for a regular
+    expression denoting any letter. Any letter is described
+    by \(\lparen a \, \disjM{} \, b\rparen\); therefore one possible
+    answer is \(\lparen a \, \disjM{} \, b\rparen\kleeneM{}
+    a \, \lparen a \, \disjM{} \, b\rparen \, \lparen a \, \disjM{} \,
+    b\rparen\).
+
+  \item The words we search contain, at any place, exactly three
+    \(a\), so are of the form \(\ldots a \ldots a \ldots a \ldots\),
+    where the dots stand for `any letter except \(a\)', \emph{i.e.,} `any
+    number of \(b\).' In other words: \(b\kleeneM a b\kleeneM a
+    b\kleeneM a b\kleeneM\).
+
+  \item Because the alphabet contains only two letters, the question
+    is equivalent to: 'All words containing the substring
+    ab', \emph{i.e.,} the words are of the form \(\ldots ab \ldots\)
+    where the dots stand for `any sequence of \(a\) and \(b\).' It is
+    then easy to understand that a short answer is \(\lparen
+    a \, \disjM{} \, b\rparen\kleeneM ab \lparen a \, \disjM{} \,
+    b\rparen\kleeneM\).
+
+  \item Because the alphabet is made only of two letters, the answer
+    is easy: we put first all the \(a\) and then all the \(b\):
+    \(a\kleeneM b\kleeneM\).
+
+  \item Since the alphabet contains only two letters, the only way to
+    not repeat a letter is to only have substrings \(ab\) or \(ba\) in
+    the words we look for. In other words: \(abab\ldots ab\) or
+    \(abab\ldots aba\) or \(baba\ldots ba\) or \(baba\ldots bab\). In
+    short: \(\lparen ab \rparen\kleeneM a\opt \, \disjM{} \, \lparen
+    ba \rparen\kleeneM b\opt\) or, even shorter: \(a\opt \lparen ba
+    \rparen\kleeneM b\opt\).
+
+\end{enumerate}
+
+

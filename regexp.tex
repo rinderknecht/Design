@@ -1,0 +1,242 @@
+\section{Regular expressions}
+
+In \Pascal, an identifier is a letter followed by zero or more letters
+or digits, that is, and identifier is a member of the set defined by
+\(L(L \cup D)^{*}\). The notation we introduced so far is comfortable
+for mathematics but not for computers. Let us introduce another
+notation, called \emph{regular expressions}, for describing the same
+languages and define its meaning in terms of the mathematical
+notation. With this notation, we might define \Pascal identifiers as
+\begin{center}
+\term{letter} \lparen\term{letter} \disj \term{digit}\rparen\kleene
+\end{center}
+where the vertical bar means `or', the parentheses group
+subexpressions, the star means `zero or more instances of' the
+previous expression and juxtaposition means concatenation. A regular
+expression~\(r\) is built up out of simpler regular expressions using
+a set of rules, as follows. Let~\(\Sigma\) be an alphabet and \(L(r)\)
+the language denoted by~\(r\). Then
+\begin{enumerate*}
+
+   \item \(\epsilon\) is a regular expression that denotes
+     \(\{\varepsilon\}\);\label{regexp_empty}
+
+   \item if \(a \in \Sigma\), then \(a\)~is a regular expression that
+     denotes~\(\{a\}\). This is ambiguous: \(a\)~can denote a
+     language, a word or a letter --~it depends on the
+     context; \label{regexp_sym}
+
+   \item assume \(r\)~and~\(s\) denote the languages \(L(r)\)~and
+     \(L(s)\); \(a\)~denotes a letter. Then \label{regexp_rec}
+   \begin{enumerate*}
+    
+     \item \(r\) \disj \(s\) is a regular expression
+     denoting \(L(r) \cup L(s)\);
+
+     \item \(r s\) is a regular expression denoting \(L(r) L(s)\);
+
+     \item \(r\)\kleene{} is a regular expression
+     denoting \((L(r))^{*}\);
+
+     \item \lparen\(r\)\rparen{} is a regular expression
+     denoting \(L(r)\);
+
+     \item \(\overline{a}\) is a regular expression denoting
+       \(\Sigma\backslash \{a\}\).
+
+   \end{enumerate*}
+
+\end{enumerate*}
+A language described by a regular expression is a \emph{regular
+  language}. Rules~\ref{regexp_empty} and~\ref{regexp_sym} form the
+base of the definition. Rule~\ref{regexp_rec} provides the inductive
+step. Unnecessary parentheses can be avoided in regular expressions if
+\begin{itemize*}
+
+  \item the unary operator \kleene{} has the highest precedence and
+  is left associative,
+
+  \item concatenation has the second highest precedence and is left
+  associative,
+
+  \item \disj{} has the lowest precedence and is left associative.
+
+\end{itemize*}
+Under those conventions, \lparen\(a\)\rparen{} \disj
+\lparen\lparen\(b\)\rparen\kleene\lparen\(c\)\rparen\rparen{} is
+equivalent to \(a\) \disj \(b\)\kleene\(c\). Both expressions denote
+the language containing either the string \(a\) or zero or more
+\(b\)'s followed by one \(c\): \(\{a, c, bc, bbc, bbbc, \dots\}\). For
+example,
+\begin{itemize*}
+
+  \item the regular expression \(a\) \disj \(b\) denotes the set
+    \(\{a, b\}\);
+
+  \item the regular expression \lparen\(a\) \disj
+    \(b\)\rparen\lparen\(a\) \disj \(b\)\rparen{} denotes \(\{aa, ab,
+    ba, bb\}\), the set of all strings of \(a\)'s and \(b\)'s of
+    length two. Another regular expression for the set is \(aa\) \disj
+    \(ab\) \disj \(ba\) \disj \(bb\);
+
+  \item the regular expression \(a\)\kleene{} denotes the set of all
+    strings of zero or more \(a\)'s, i.e. \(\{\varepsilon, a, aa, aaa,
+    \dots\}\);
+
+  \item the regular expression \lparen\(a\) \disj
+    \(b\)\rparen\kleene{} denotes the set of all strings containing
+    zero of more instances of an \(a\) or \(b\), that is the language
+    of all words made of \(a\)'s and \(b\)'s. Another expression is
+    \lparen\(a\)\kleene\(b\)\kleene\rparen\kleene.
+
+\end{itemize*}
+If two regular expressions \(r\)~and~\(s\) denote the same language,
+we say that \(r\)~and~\(s\) are \emph{equivalent} and write \(r =
+s\). In \fig~\vref{fig:laws},
+\begin{figure}
+\centering
+\begin{tabular}{c|l}
+\toprule
+  \multicolumn{1}{c}{\textsc{Law}}
+& \multicolumn{1}{c}{\textsc{Description}}\\
+\midrule
+  \(r\) \disj \(s\) = \(s\) \disj \(r\)
+& \disj is commutative\\
+\hline
+  \(r\) \disj \lparen\(s\) \disj \(t\)\rparen{}
+  = \lparen\(r\) \disj \(s\)\rparen{} \disj \(t\)
+& \disj is associative\\
+\hline
+  \lparen\(rs\)\rparen \(t\) = \(r\)\lparen\(st\)\rparen
+& concatenation is associative\\
+\hline
+  \(r\)\lparen\(s\) \disj \(t\)\rparen{} = \(rs\) \disj \(rt\)
+& concatenation distributes over \disj\\
+  \lparen\(s\) \disj \(t\)\rparen \(r\) = \(sr\) \disj \(tr\)
+&\\
+\hline
+  \(\epsilon r = r\) 
+& \(\epsilon\) is the identity element\\
+  \(r \epsilon = r\)
+& for the concatenation\\
+\hline
+  \(r\)\kleene\kleene = \(r\)\kleene
+& Kleene closure is idempotent\\
+\hline
+  \(r\)\kleene = \(r\)\plus \disj \(\epsilon\)
+& Kleene closure and positive closure\\
+  \(r\)\plus = \(r r\)\kleene
+& are closely linked\\
+\bottomrule
+\end{tabular}
+\caption{Algebraic laws on regular languages\label{fig:laws}}
+\end{figure}
+we show useful algebraic laws on regular languages.
+
+\subsection*{Regular definitions}
+
+It is convenient to give names to regular expressions and define new
+regular expressions using these names as if they were symbols. If
+\(\Sigma\) is an alphabet, then a \emph{regular definition} is a
+series of definitions of the form
+\begin{align*}
+    d_1 &\rightarrow r_1\\
+    d_2 &\rightarrow r_2\\
+    &\cdots\\
+    d_n &\rightarrow r_n
+\end{align*}
+where each \(d_i\) is a distinct name and each \(r_i\) is a regular
+expression over the alphabet \(\Sigma \cup \{d_1, d_2, \dots,
+d_{i-1}\}\), \emph{i.e.,} the basic symbols and the previously defined
+names. The restriction to \(d_j\) such \(j < i\) allows to construct a
+regular expression over \(\Sigma\) only by repeatedly replacing all
+the names in it. For instance, as we have stated, the set of \Pascal
+identifiers can be defined by the regular definitions
+\begin{align*}
+\term{letter} & \rightarrow \text{\exc{A} \disj \exc{B} \disj
+  \ldots \disj \exc{Z} \disj \exc{a} \disj \exc{b} \disj \ldots \disj
+  \exc{z}} \\
+\term{digit} & \rightarrow \text{\exc{0} \disj \exc{1} \disj \exc{2}
+  \disj \exc{3} \disj \exc{4} \disj \exc{5} \disj \exc{6} \disj
+  \exc{7} \disj \exc{8} \disj \exc{9}}\\
+\term{id} & \rightarrow \text{\term{letter} \lparen\term{letter}
+  \disj \term{digit}\rparen\kleene}
+\intertext{Unsigned numbers in \Pascal are strings like
+\texttt{5280}, \texttt{39.37}, \texttt{6.336E4}
+or \texttt{1.894E-4}.}
+\term{digit} & \rightarrow \text{ \exc{0} \disj \exc{1} \disj \exc{2}
+  \disj \exc{3} \disj \exc{4} \disj \exc{5} \disj \exc{6} \disj
+  \exc{7} \disj \exc{8} \disj \exc{9}}\\
+\term{digits} & \rightarrow \text{\term{digit} \term{digit}\kleene}\\
+\term{optional\_fraction} & \rightarrow \text{\exc{.} \term{digits}
+  \disj} \, \epsilon\\
+\term{optional\_exponent} & \rightarrow \text{\lparen\exc{E} \lparen
+  \exc{+} \disj \exc{-} \disj} \, \epsilon \, \text{\rparen{}
+  \term{digits}\rparen{} \disj} \, \epsilon\\
+\term{num} & \rightarrow \text{\term{digits} \term{optional\_fraction}
+  \term{optional\_exponent}}
+\end{align*}
+Certain constructs occur so frequently in regular expressions that it
+is convenient to introduce notational shorthands for them:
+\begin{itemize}
+
+  \item \emph{Zero or one instance.} The unary operator `\opt{}' means
+    `zero or one instance of.' Formally, by definition, if~\(r\) is a
+    regular expression then \(r\)\opt = \(r\) \disj \(\epsilon\). In
+    other words, \lparen\(r\)\rparen\opt{} denotes the language \(L(r)
+    \cup \{\varepsilon\}\).
+\begin{align*}
+\term{digit} & \rightarrow \text{\exc{0} \disj \exc{1} \disj \exc{2}
+  \disj \exc{3} \disj \exc{4} \disj \exc{5} \disj \exc{6} \disj
+  \exc{7} \disj \exc{8} \disj \exc{9}}\\
+\term{digits} & \rightarrow \text{\term{digit}\plus}\\
+\term{optional\_fraction} & \rightarrow \text{\lparen\exc{.}
+  \term{digits}\rparen\opt}\\
+\term{optional\_exponent} & \rightarrow \text{\lparen\exc{E} \lparen
+  \exc{+} \disj \exc{-}\rparen\opt{} \term{digits}\rparen\opt}\\
+\term{num} & \rightarrow \text{\term{digits} \term{optional\_fraction}
+  \term{optional\_exponent}}
+\end{align*}
+
+ \item It is also possible to write:
+\begin{align*}
+\term{digit} & \rightarrow \text{\exc{0} \disj \exc{1} \disj \exc{2}
+  \disj \exc{3} \disj \exc{4} \disj \exc{5} \disj \exc{6} \disj
+  \exc{7} \disj \exc{8} \disj \exc{9}}\\
+\term{digits} & \rightarrow \text{\term{digit}\plus}\\
+\term{fraction} & \rightarrow \text{\exc{.} \term{digits}}\\
+\term{exponent} & \rightarrow \text{\exc{E} \lparen \exc{+} \disj
+  \exc{-}\rparen\opt{} \term{digits}}\\
+\term{num} & \rightarrow \text{\term{digits} \term{fraction}\opt{}
+  \term{exponent}\opt}
+\end{align*}
+
+\end{itemize}
+If we want to specify the characters `\texttt{?}', `\texttt{*}',
+`\texttt{+}', `\texttt{|}', we write them with a preceding backslash,
+\emph{e.g.,} `\verb+\?+', or between double-quotes, \emph{e.g.,}
+\verb+"?"+. Then, of course, the character double-quote must have a
+backslash: \verb+\"+. It is also sometimes useful to match against end
+of lines and end of files: \verb+\n+ stands for the control character
+`end of line' and \term{\$} is for `end of file'.
+
+\subsection*{Non-regular languages}
+
+Some languages cannot be described by any regular expression. For
+example, the language of balanced parentheses cannot be recognised by
+any regular expression: \lparen\rparen, \lparen\lparen\rparen\rparen,
+\lparen\rparen\lparen\rparen,
+\lparen\lparen\lparen\rparen\rparen\lparen\rparen\rparen{}
+etc. Another example is the C programming language: it is not a
+regular language because it contains embedded blocs between `\verb+{+'
+and `\verb+}+'. Therefore, a lexer cannot recognise valid C programs:
+we need a parser.
+
+\paragraph{Exercises}
+
+\input{regexp_question_01}
+\input{regexp_answer_01}
+\input{regexp_question_02}
+\input{regexp_answer_02}
+\input{regexp_question_03}
+\input{regexp_answer_03}

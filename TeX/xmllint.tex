@@ -1,0 +1,87 @@
+%% This TeX file expects
+%%   (1) macro \xmllint to be the path to the XML validating processor
+%%       `xmllint',
+%%   (2) macro \xmlURL to be a full URL (http://...) to a directory
+%%       containing XML documents,
+%%   (3) macro \xsltURL to be a full URL (http://...) to a directory
+%%       containing XST stylesheets.
+%%   (4) macro \XMLdir to be a file system path to the same
+%%       directory as pointed by \xmlURL,
+%%   (5) macro \XSLTdir to be a file system path to the same
+%%       directory as pointed by \xsltURL.
+
+\RequirePackage{verbatim}
+
+\newcommand\XMLhref[2]{\href{\xmlURL/#1}{#2}}
+\newcommand\XSLThref[2]{\href{\xsltURL/#1}{#2}}
+
+\newcommand\checkXML[2]{%
+  \immediate\write18{\xmllint #1/#2 && touch #2.ok}%
+  \IfFileExists{#2.ok}%
+     {\immediate\write18{rm -f #2.ok}%
+      \typeout{File #1/#2 is well-formed}%
+     }%
+     {\errmessage{xmllint: File #1/#2 is invalid}}%
+}
+
+\newcommand\XMLin[1]{
+  \checkXML{\XMLdir}{#1}
+  \verbatiminput{\XMLdir/#1}
+}
+
+\newcommand\XMLinUnchecked[1]{
+  \verbatiminput{\XMLdir/#1}
+}
+
+\newcommand\smallXMLin[1]{
+  \checkXML{\XMLdir}{#1}
+  {\small\verbatiminput{\XMLdir/#1}}
+}
+
+\newcommand\smallXMLinUnchecked[1]{
+  {\small\verbatiminput{\XMLdir/#1}}
+}
+
+\newcommand\footXMLin[1]{
+  \checkXML{\XMLdir}{#1}
+  {\footnotesize\verbatiminput{\XMLdir/#1}}
+}
+
+\newcommand\footXMLinUnchecked[1]{
+  {\footnotesize\verbatiminput{\XMLdir/#1}}
+}
+
+\newcommand\XSLTin[1]{
+  \checkXML{\XSLTdir}{#1}
+  \verbatiminput{\XSLTdir/#1}
+}
+
+\newcommand\XSLTinUnchecked[1]{
+  \verbatiminput{\XSLTdir/#1}
+}
+
+\newcommand\smallXSLTin[1]{
+  \checkXML{\XSLTdir}{#1}
+  {\small\verbatiminput{\XSLTdir/#1}}
+}
+
+\newcommand\smallXSLTinUnchecked[1]{
+  {\small\verbatiminput{\XSLTdir/#1}}
+}
+
+\newcommand\footXSLTin[1]{
+  \checkXML{\XSLTdir}{#1}
+  {\footnotesize\verbatiminput{\XSLTdir/#1}}
+}
+
+\newcommand\footXSLTinUnchecked[1]{
+  {\footnotesize\verbatiminput{\XSLTdir/#1}}
+}
+
+\newcommand\smallDTDin[1]{
+  {\small\verbatiminput{\XMLdir/#1}}
+}
+
+\newcommand\DTDin[1]{
+  {\verbatiminput{\XMLdir/#1}}
+}

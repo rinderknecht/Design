@@ -1,0 +1,35 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath,amssymb}
+\usepackage{mathpartir}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\framebox[0.85\columnwidth]{\vbox{%
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\begin{gather*}
+\inferrule
+  {}
+  {\fun{comp}(\fun{int}(x,\fun{ext}(),\fun{ext}())) \rightarrow 
+   \fun{true}()};
+\\
+\inferrule
+  {\fun{comp}(t_1) \twoheadrightarrow \fun{true}()
+   \and
+   \fun{comp}(t_2) \twoheadrightarrow \fun{true}()}
+  {\fun{comp}(\fun{int}(x,t_1,t_2)) \twoheadrightarrow \fun{true}()};
+\;\;
+\inferrule
+  {}
+  {\fun{comp}(t) \rightarrow \fun{false}()}.
+\end{gather*}}}
+\endTeXtoEPS
+
+\end{document}

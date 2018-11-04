@@ -1,0 +1,38 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pst-infixplot,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\begin{pspicture}(-0.5,-0.5)(4,3)
+%% Axes
+%
+  \psaxes{->}(0,0)(0,-0.5)(4,3)
+%  \psset{linewidth=0.6pt}
+
+%
+% Abscissa x
+%
+\rput[C](4,-0.25){\(x\)}
+%
+% Ordinate f(x)
+%
+\rput[rC](-0.2,3){\(f(x)\)}
+ 
+% f(x) := 2^(x-1) - x
+%
+\psPlot{0.5}{3.6}{2^x/2 - x}
+
+% Segments and intersections
+%
+\psline[linestyle=dotted](3,0)(3,1)
+\psline[linestyle=dotted](0,1)(3,1)
+\qdisk(3,1){2pt}
+\end{pspicture}
+\endTeXtoEPS
+
+\end{document}

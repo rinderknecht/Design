@@ -1,0 +1,32 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-plot,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\begin{pspicture}[showgrid=false](-1,-0.5)(4,3)
+\psaxes[axesstyle=axes,ticks=none,labels=none]{->}(0,0) (-1,-0.5)(4,3)
+\psgrid[griddots=0,gridwidth=0.1pt,subgriddiv=2,gridlabels=0]
+\uput[0]{0}(-0.55,-0.25){\small \(A\)}
+\psline[linewidth=0.5pt,doubleline=true](-0.75,0.75)(1.25,2.75)
+\psdot[dotsize=4pt,dotstyle=square](0,1.5)
+\uput[0]{0}(-0.45,1.65){\small \(s\)}
+\psline[linewidth=0.5pt,doubleline=true](0.75,-0.25)(3.75,2.75)
+\psdot[dotsize=4pt,dotstyle=square](1,0)
+\uput[0]{0}(0.9,-0.2){\small \(t\)}
+\psline[linewidth=1pt](2.5,-0.1)(2.5,0)
+\uput[0]{0}(2.35,-0.25){\small \(a\)}
+\psline[linewidth=1pt](-0.1,2)(0,2)
+\uput[0]{0}(-0.45,2.2){\small \(b\)}
+\psdot*[dotsize=4pt](2.5,2)
+\uput[0]{0}(2.4,2.2){\small \(\Omega\)}
+
+\psline[linewidth=1.2pt](0,0)(0,1)(0.5,1)(0.5,1.5)(2,1.5)(2,2)(2.5,2)
+\psdot[dotsize=4pt,dotstyle=Bo](0,0)
+\end{pspicture}
+\endTeXtoEPS
+
+\end{document}

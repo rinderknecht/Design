@@ -1,0 +1,299 @@
+\section{Specifying lexers with \Lex}
+ 
+Several tools have been built for constructing lexical analysers from
+special\hyp{}purpose notations based on regular expressions. We shall
+now describe one of these tools, named \Lex, which is widely used in
+software projects developed in~C. Using this tool shows how the
+specification of patterns using regular expressions can be combined
+with actions, \emph{e.g.,} making entries into a symbol table, that a
+lexer may be required to perform. We refer to the tool as the
+\emph{\Lex compiler} and to its input specification as the \emph{\Lex
+  language}. \Lex is generally used in the following manner:
+\begin{center}
+\begin{tabular}{cc|c|cc}
+\cline{3-3}
+  \Lex source 
+& \multirow{2}{*}{\Large \(\longrightarrow\)}
+& \Lex
+& \multirow{2}{*}{\Large \(\longrightarrow\)}
+& \multirow{2}{*}{\texttt{lex.yy.c}}\\
+  \texttt{lex.l}
+& 
+& compiler\\
+  \cline{3-3}
+\\
+  \cline{3-3}
+  \multirow{2}{*}{\texttt{lex.yy.c}}
+& \multirow{2}{*}{\Large \(\longrightarrow\)}
+& C
+& \multirow{2}{*}{\Large \(\longrightarrow\)}
+& \multirow{2}{*}{\texttt{a.out}}\\
+& 
+& compiler\\
+  \cline{3-3}
+\\
+  \cline{3-3}
+  character
+& \multirow{2}{*}{\Large \(\longrightarrow\)}
+& \multirow{2}{*}{\texttt{a.out}}
+& \multirow{2}{*}{\Large \(\longrightarrow\)}
+& token\\
+  stream
+& 
+&
+&
+& stream\\
+  \cline{3-3}
+\end{tabular}
+\end{center}
+
+\subsection*{\Lex specifications}
+ 
+A \Lex specification (or source or program) consists of three parts:
+\begin{verbatim}
+declarations
+%%
+translation rules
+%%
+user code
+\end{verbatim}
+The \emph{declarations section} includes declarations of C~variables,
+constants and regular definitions. The latter are used in the
+translation rules. The \emph{translation rules} of a \Lex program are
+statements of the form
+\begin{equation*}
+\begin{array}{cc}
+p_1 & \verb+{+ \textit{action}_1 \verb+}+\\
+p_2 & \verb+{+ \textit{action}_2 \verb+}+\\
+\cdots & \cdots\\
+p_n & \verb+{+ \textit{action}_n \verb+}+
+\end{array}
+\end{equation*}
+where each \(p_i\) is a regular expression and each
+\(\textit{action}_i\) is a C program fragment describing what action
+the lexer should take when pattern \(p_i\) matches a lexeme. The third
+section holds whatever \emph{user code} (auxiliary procedures) are
+needed by the actions. A lexer created by \Lex interacts with a parser
+in the following way:
+\begin{enumerate*}
+
+  \item the parser calls the lexer;
+
+  \item the lexer starts reading its current input
+  characters; \label{scanning}
+
+  \item when the longest prefix of the input matches a regular
+    expression \(p_i\), the corresponding \(\textit{action}_i\) is
+    executed;
+
+  \item finally, two cases occur whether \(\textit{action}_i\) returns
+    control to the parser or not:
+    \begin{enumerate*}
+
+      \item if so, the lexer returns the recognised token and lexeme;
+
+      \item if not, the lexer forgets about the recognised word and
+      go to step~\ref{scanning}.
+
+    \end{enumerate*}
+
+\end{enumerate*}
+
+\subsection*{Declarations}
+
+Let us consider the following excerpt of an example:
+\begin{verbatim}
+%{ /* definitions of constants 
+      LT, LE, EQ, GT, GE, IF, THEN, ELSE, ID, NUM, RELOP */
+%}
+
+/* regular definitions */
+ws       [ \t\n]+
+letter   [A-Za-z]
+digit    [0-9]
+id       {letter}({letter}|{digit})*
+num      {digit}+(\.{digit}+)?(E[+\-]?{digit}+)?
+\end{verbatim}
+First, we see a section where tokens are declared. If \Lex is used in
+conjunction with a parser (as is the case in a compiler), those tokens
+may be instead declared by the parser. In \Lex, the token declarations
+are surrounded by \verb+%{+ and \verb+%}+, and anything between these
+brackets is copied verbatim in \texttt{lex.yy.c}.
+
+Second, we see a series of regular definitions, each consisting of a
+name and a regular expression denoted by that name. For instance,
+\texttt{delim} stands for the \emph{character class} \verb+[ \t\n]+,
+that is, any of the three characters: blank, tabulation (\verb+\t+) or
+newline (\verb+\n+).
+
+If we want to denote a set of letters or digits, it is often unwieldy
+to enumerate all the elements, like the \term{digit} regular
+expression. So, instead of \exc{4} \disj \exc{1} \disj \exc{2} we
+would shortly write \lb\exc{142}\rb. If the characters are
+consecutively ordered, we can use \emph{intervals}, called in \Lex
+\emph{character classes}. For instance, we write
+\lb\exc{a}\dash\exc{c}\rb{} instead of \exc{a} \disj \exc{b} \disj
+\exc{c}. Or \lb\exc{0}\dash\exc{9}\rb{} instead of \exc{0} \disj
+\exc{1} \disj \exc{2} \disj \exc{3} \disj \exc{4} \disj \exc{5} \disj
+\exc{6} \disj \exc{7} \disj \exc{8} \disj \exc{9}. We can now describe
+identifiers in a very compact way:
+\begin{center}
+\lb\exc{A}\dash\exc{Z}\exc{a}\dash\exc{z}\rb\lb\exc{A}\dash\exc{Z}\exc{a}\dash\exc{z}\exc{0}\dash\exc{9}\rb\kleene
+\end{center}
+It is possible to have `\exc{]}' and `\exc{-}' in a character range:
+  the character `\exc{]}' must be first and `\exc{-}' must be first or
+    last.
+
+The second definition is of white space, denote by the name
+\texttt{ws}. Note that we must write \verb+{delim}+ for \term{delim},
+with braces inside regular expressions in order to distinguish it from
+the pattern made of the five letters \verb+delim+. The definitions of
+\texttt{letter} and \texttt{digit} illustrate the use of character
+classes (interval of (ordered) characters). The definition of
+\texttt{id} shows the use of some \Lex special symbols (or
+\emph{metasymbols}): parentheses and vertical bar.
+
+The definition of \texttt{num} introduces a few more features. There
+is another metasymbol `\verb+?+' with the obvious meaning. We notice
+the use of a backslash to make a character mean itself instead of
+being interpreted as a metasymbol: `\verb+\.+' means `the dot
+character', while `\verb+.+' (metasymbol) means `any character.' This
+works with any metasymbol.
+
+Note finally that we wrote \verb|[+\-]| because, in this context, the
+character `\verb|-|' has the meaning of `range', as in \verb+[0-9]+,
+so we must add a backslash. This action is called \emph{to escape} (a
+character). Another way of escaping a character is to use
+double-quotes around it, like \verb+"."+
+
+\subsection*{Translation rules}
+
+The next section contains the translation rules. 
+\begin{verbatim}
+%%
+{ws}     { /* no action and no return */ }
+if       { return IF; }
+then     { return THEN; }
+else     { return ELSE; }
+{id}     { yylval = lexeme(); return ID; }
+{number} { yylval = lexeme(); return NUM; }
+"<"      { return LT; }
+"<="     { return LE; }
+"="      { return EQ; }
+"<>"     { return NE; }
+">"      { return GT; }
+">="     { return GE; }
+\end{verbatim}
+The translation rules follow the first \verb+%%+. The first rule says
+that if the regular expression denoted by the name \texttt{ws}
+maximally matches the input, we take no action. In particular, we do
+not return to the parser. Therefore, by default, this implies that the
+lexer will start again to recognise a token after skipping white
+spaces. The second rule says that if the letters \texttt{if} are seen,
+return the token \texttt{IF}. In the rule for \verb+{id}+, we see two
+statements in the action. First, the \Lex predefined variable
+\texttt{yylval} is set to the lexeme and the token \texttt{ID} is
+returned to the parser. The variable \texttt{yylval} is shared with
+the parser (it is defined in \texttt{lex.yy.c}) and is used to pass
+attributes about the token.
+
+\subsection*{User code}
+ 
+Contrary to our previous presentation, the procedure \texttt{lexeme}
+takes here no argument. This is because the input buffer is directly
+and globally accessed in \Lex through the pointer \texttt{yytext},
+which corresponds to the first character in the buffer when the
+analysis started for the last time. The length of the lexeme is given
+via the variable \texttt{yyleng}. We do not show the details of the
+auxiliary procedures but the trailing section should look like as
+follows:
+\begin{verbatim}
+%%
+char* lexeme () {
+  /* returns a copy of the matched string
+     between yytext[0] and yytext[yyleng-1] */
+}
+\end{verbatim}
+
+\subsection*{Longest-prefix match}
+ 
+If several regular expressions match the input, \Lex chooses the rule
+which matches the most text. This is why the input \verb+if123+ is
+matched, that is, recognised, as an identifier and not as the keyword
+\verb+if+ and the number \verb+123+. If \Lex finds two or more matches
+of the same length, the rule listed \emph{first} in the \Lex input
+file is chosen. That is why we listed the patterns \verb+if+,
+\verb+then+ and \verb+else+ before \verb+{id}+. For example, the input
+\verb+if+ is matched by \verb+if+ and \verb+{id}+, so the first rule
+is chosen, and since we want the token keyword \term{if}, its regular
+expression is written \emph{before} \verb+{id}+.
+
+It is possible to use \Lex without a parser. For instance, let
+\texttt{count.l} be the following \Lex specification:
+\begin{verbatim}
+%{
+int char_count=1, line_count=1;
+%}
+%%
+.  {char_count++;}
+\n {line_count++; char_count++;}
+%%
+int main () {
+  yylex();  /* Calls the lexer */
+  printf("There were %d characters in %d lines.\n",
+          char_count,line_count);
+  return 0;
+}
+\end{verbatim}
+We have to compile the \Lex specification into C code, then compile
+this C code and link the object code against a special library named
+\verb+l+:
+\begin{verbatim}
+lex -t count.l > count.c
+gcc -c -o count.o count.c
+gcc -o counter count.o -ll
+\end{verbatim}
+We can also use the C compiler \texttt{cc} with the same options
+instead of \texttt{gcc}. The result is a binary \texttt{counter} that
+we can apply on \texttt{count.l} itself:
+\begin{verbatim}
+cat count.l | counter
+There were 210 characters in 12 lines.
+\end{verbatim}
+We can extend the previous specification to count words as well. For
+this, we need to define a regular expression for letters and bind it
+to a name, at the end of the declarations.
+\begin{verbatim}
+%{
+int char_count=1, line_count=1, word_count=0;
+%}
+letter [A-Za-z]
+%%
+{letter}+ { word_count++; char_count += yyleng;
+            printf ("[%s]\n",yytext); }
+.         { char_count++; }
+\n        { line_count++; char_count++; }
+%%
+...
+\end{verbatim}
+We can also use more regular expressions with names.
+\begin{verbatim}
+letter [A-Za-z]
+digit  [0-9]
+alpha  ({letter}|{digit})      /* No space inside! */
+id     {letter}([_]*{alpha})*  /* No space inside! */
+%%
+{id} { word_count++; char_count += yyleng;
+       printf ("word=[%s]\n",yytext); }
+.    { char_count++; }
+\n   { line_count++; char_count++; }
+\end{verbatim}
+By default, if there is no parser and no explicit \texttt{main}
+procedure, \Lex will add one in the produced C code as if it were
+given in the user code section (at the end of the specification) as
+\begin{verbatim}
+int main () {
+ yylex();
+ return 0;
+}
+\end{verbatim}

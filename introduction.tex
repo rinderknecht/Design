@@ -1,0 +1,1016 @@
+\chapter{Introduction}
+\setcounter{page}{1}
+
+This is an overview of the topics developed in the rest of the book.
+
+\section{Rewrite systems}
+
+\paragraph{String-rewriting}
+
+Let us assume that we own a string of white and black beads, like
+\(\circ \bullet \bullet \bullet \circ \circ \bullet\), and the
+game \citep{VanLeeuwen_1990a,Dershowitz_1993} consists in removing two
+adjacent beads and replace them with only one according to some rules,
+for example
+\begin{equation*}
+\bullet \; \circ   \xrightarrow{\smash{\alpha}} \bullet\qquad\qquad
+\circ   \; \bullet \xrightarrow{\smash{\beta}} \bullet\qquad\qquad
+\bullet \; \bullet \xrightarrow{\smash{\gamma}} \circ
+\end{equation*}
+The rules~\(\alpha\), \(\beta\)~and~\(\gamma\) make up a simple
+\emph{string\hyp{}rewriting system}\index{rewrite system}. Rules
+\(\alpha\)~and~\(\beta\) can be conceived as `A black bead absorbs the
+white bead next to it.' The goal of this game is to end up with as few
+beads as possible, so our example may lead to the \emph{rewrites}
+\begin{equation*}
+\circ \bullet \bullet \, \fbox{\(\bullet\; \circ\)} \circ \bullet
+\xrightarrow{\smash{\alpha}} \circ \bullet \bullet \,
+\fbox{\(\bullet\; \circ\)} \; \bullet \xrightarrow{\smash{\alpha}}
+\fbox{\(\circ \; \bullet\)} \; \bullet \bullet \,\bullet
+\xrightarrow{\smash{\beta}} \bullet \bullet \, \fbox{\(\bullet \;
+  \bullet\)} \xrightarrow{\smash{\gamma}} \bullet \, \fbox{\(\bullet
+  \; \circ\)} \xrightarrow{\smash{\alpha}} \fbox{\(\bullet \;
+  \bullet\)} \xrightarrow{\smash{\gamma}} \circ
+\end{equation*}
+where the part of the string to be rewritten next is framed.
+
+Other compositions of the rules lead to the same result~\(\circ\) as
+well. Some others bring all\hyp{}white strings, the simplest being
+\(\circ \, \circ\). Some others lead to~\(\bullet\). Strings that can
+not be further rewritten, or \emph{reduced}, are called \emph{normal
+  forms}\index{rewrite system!normal form}. These observations induce
+us to wonder whether all strings have a normal form; if so, if it is
+unique and, furthermore, if it is either all\hyp{}white or
+black\hyp{}only.
+
+First, let us note that the system is  
+\emph{terminating}\index{termination}, that is, there is no infinite
+chain of rewrites, because the number of beads strictly decreases in
+all the rules, although this is not a necessary condition in general,
+for instance, \(\circ \; \bullet \xrightarrow{\smash{\beta}} \bullet
+\circ \circ\) would preserve termination because the composition
+\(\beta\alpha\alpha\) would be equivalent to the original
+rule~\(\beta\). In particular, this means that any string has a normal
+form. Furthermore, notice how the parity of the number of black beads
+is invariant through each rule and how there is no rewrite rule for
+two adjacent white beads. Therefore, if there are \(2p\) initial black
+beads, then composing rules \(\alpha\)~and~\(\beta\) lead to an
+all\hyp{}black string, like \(\bullet \bullet \bullet \, \bullet\)
+above, which can be reduced by applying rule~\(\gamma\) to contiguous
+pairs of beads into an all\hyp{}white string made of
+\(p\)~beads. Otherwise, the same all\hyp{}black string can be reduced
+by applying alternatively \(\gamma\)~and~\(\beta\) on the left end or
+\(\gamma\)~and~\(\alpha\) on the right end,
+yielding~\(\circ\). Similarly, if there is an initial odd number of
+black beads, we always end up with one black bead. It suffices to
+consider the rewrites \(\circ \circ \xleftarrow{\smash{\gamma}}
+\bullet \bullet \circ \xrightarrow{\smash{\alpha}} \bullet \bullet
+\xrightarrow{\smash{\gamma}} \circ\) to see that normal forms are not
+unique. Systems where normal forms are unique are said
+\emph{confluent}\index{rewrite system!confluence}.
+
+If we add the rule \(\circ\; \circ \xrightarrow{\smash{\delta}}
+\circ\), the result of the game is always one bead, whose colour
+depends on the original parity of the black beads as before, and any
+strategy is successful. To see why, let us consider first that two
+non\hyp{}overlapping parts of a string can be rewritten in parallel,
+so they are not of concern. The interesting cases occur when two
+applications of rules (maybe of the same rule) lead to different
+strings because they overlap. For instance, \(\circ \, \circ
+\xleftarrow{\smash{\gamma}} \bullet \bullet \circ
+\xrightarrow{\smash{\alpha}} \bullet \, \bullet\). The important point
+is that \(\circ \, \circ\) and \(\bullet \, \bullet\) can be rewritten
+into~\(\circ\) at the next step by \(\delta\)~and~\(\gamma\),
+respectively. In general, what matters is that all pairs of strings
+resulting from the application of overlapping rules, called
+\emph{critical pairs}\index{rewrite system!critical pair}, can be
+rewritten to the same string, to wit, they are \emph{joinable}. In our
+example, all interactions occur on substrings made of three beads, so
+we must examine in \fig~\vref{fig:bullets}
+\begin{figure}[b]
+\centering
+\includegraphics{bullets}
+\caption{The critical pairs are all joinable\label{fig:bullets}}
+\end{figure}
+eight cases, which we can order as if counting in binary from
+\(0\)~to~\(7\), (\(\circ\))~being interpreted as~\(0\) and
+(\(\bullet\))~as~\(1\). In all the cases, the divergences are joinable
+in one step at most. In general, it is not necessary for critical
+pairs to be joinable in one rewrite just after the divergence, but,
+more generally, to be joinable. This property is called \emph{local
+  confluence}\index{rewrite system!confluence!local $\sim$}. Together
+with termination it implies that \emph{every} string has exactly one
+normal form (a strong property entailing confluence).
+
+The system we defined is \emph{ground}\index{rewrite system!ground
+  $\sim$}, that is, it involves no variables. These allow a finite
+system to denote an infinite number of ground rules or, simply, to
+reduce the size of rewrite systems, for instance, the previous example
+is equivalent to
+\begin{equation*}
+\bullet \; \circ \xrightarrow{\smash{\alpha}} \bullet
+\qquad\qquad
+\circ \; x \xrightarrow{\smash{\beta+\delta}} x
+\qquad\qquad
+\bullet \; \bullet \xrightarrow{\smash{\gamma}} \circ
+\end{equation*}
+If we accept multiple occurrences of a variable on the left\hyp{}hand
+side of a rule, a so\hyp{}called \emph{non left\hyp{}linear
+  rule}\index{rewrite system!linear $\sim$}, we can further decrease
+the size of the system:
+\begin{equation*}
+x  \; x \xrightarrow{\smash{\gamma+\delta}} \circ\qquad\qquad
+x  \; y \xrightarrow{\smash{\alpha+\beta}} \bullet
+\end{equation*}
+Notice that there is now an implicit order over the rules: the rule
+\(\gamma+\delta\) must be examined first for a \emph{match} with a
+part of the current string, because it is included in the second (set
+\(x=y\) in \(\alpha+\beta\)). In general, the order in which the rules
+are written on the page is their logical order. Moreover, let us
+remark that the system does not specify that \(x\)~must either
+be~\(\circ\) or~\(\bullet\). Generally speaking, this means that the
+\emph{type} of the variables has to be defined elsewhere or inferred
+from the variable uses.
+
+\paragraph{Term-rewriting}
+
+Up to now, only string\hyp{}rewriting systems have been played
+with. More general are the \emph{term\hyp{}rewriting
+  systems} \citep{BaaderNipkow_1998}\index{rewrite system}, where a
+\emph{term}\index{term} is a mathematical object possibly featuring
+tuples, integers and variables. Let us consider the following totally
+ordered system
+\begin{equation}
+(0,m) \rightarrow m;\qquad\qquad
+(n,m) \rightarrow (n-1,n \cdot m);\qquad\qquad
+n     \rightarrow (n,1).
+\label{eq:fact_tf}
+\end{equation}
+where rules are separated by a semi\hyp{}colon and the last one is
+ended by a period. Arithmetic operators \((-)\)~and~\((\cdot)\) are
+defined out of the system and \(m\)~and~\(n\) are variables denoting
+natural numbers. Would the rules not be ordered as they are actually
+laid out, the second rule would match any pair. Instead, it can be
+assumed that \(n \neq 0\) when matching with it. We can easily see
+that all the compositions of rewrites starting with a natural
+number~\(n\) end with the factorial\index{factorial} of~\(n\):
+\begin{equation*}
+n \rightarrow (n,1) \rightarrow \dots \rightarrow (0,n!) \rightarrow
+n!, \quad \text{for \(n \in \mathbb{N}\)}.
+\end{equation*}
+Let us note \((\xrightarrow{\smash{n}})\) the composition of
+\((\rightarrow)\) repeated \(n-1\)~times:
+\begin{equation*}
+  (\xrightarrow{\smash{1}})   := (\rightarrow);\qquad
+  (\xrightarrow{\smash{n+1}}) :=
+     (\rightarrow) \circ (\xrightarrow{\smash{n}}),
+\quad \text{with \(n > 0\)}.
+\end{equation*}
+The \emph{transitive closure}\index{transitive
+  closure} \label{transitive_closure} of \((\rightarrow)\) is defined
+as \((\twoheadrightarrow) := \bigcup_{i >
+  0}{(\xrightarrow{\smash{i}})}\). In the present case, the
+factorial\index{factorial} coincides with the transitive closure of
+\((\rightarrow)\), namely, \(n \twoheadrightarrow n!\). Let
+\((\xrightarrow{\smash{*}})\) be the reflexive\hyp{}transitive closure
+of \((\rightarrow)\), that is, \((\xrightarrow{\smash{*}}) := (=) \cup
+(\twoheadrightarrow)\). 
+
+A confluent system defines a \emph{function} and it is then convenient
+to name it; for example, \(\fun{c}(1, \fun{d}(n))\)~is a term
+constructed with \emph{function names} \fun{c}~and~\fun{d}, as well as
+variable~\(n\). A tuple tagged with a function name, like
+\(\fun{f}(x,y)\), is called a \emph{function call}. The components of
+the tuples are then called \emph{arguments}, for example
+\(\fun{d}(n)\) is the second argument of the call \(\fun{c}(1,
+\fun{d}(n))\). It is possible for a function call to hold no
+arguments, like \(\fun{d}()\). We restrict the left\hyp{}hand sides of
+rules to be function calls.
+
+\section{Trees for depicting terms}\index{term|see{tree}} 
+\label{def:tree}
+
+% Wrapping figure better declared before a paragraph
+%
+\begin{wrapfigure}[9]{r}[0pt]{0pt}
+% [9] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\includegraphics[bb=71 645 192 710]{tree_for_term}% [...720]
+\caption{Shape of a tree\label{fig:tree_for_term}}
+\end{wrapfigure}
+The topological understanding of a function call or a tuple is the
+finite \emph{tree}\index{tree}. A tree is a hierarchical layout of
+information and \fig~\vref{fig:tree_for_term} shows the shape of
+one. The disks are called \emph{nodes}\index{tree!node} and the
+segments which connect two nodes are called
+\emph{edges}\index{tree!edge}. The topmost node (with a diameter) is
+called the \emph{root}\index{tree!node!root} and the bottommost ones
+(\(\bullet\)) are called the \emph{leaves}\index{tree!node!leaf}. All
+nodes except the leaves are seen to downwardly connect to some other
+nodes, called \emph{children}\index{tree!node!child}. Upwardly, each
+node but the root is connected to another node, called its
+\emph{parent}\index{tree!node!parent}. Depending on the context, a
+node can also denote the whole tree of which it is the root. Any node
+except the root is the root of a \emph{proper
+  subtree}\index{tree!subtree!proper $\sim$}. A tree is its own
+subtree. The children of a node~\(x\) are the roots of \emph{immediate
+  subtrees}\index{tree!subtree!immediate $\sim$} with respect to the
+tree rooted at~\(x\). Any two different immediate subtrees are
+disjoint, that is, no node from one connects to a node in the other. A
+group of trees is a \emph{forest}\index{tree!forest}.
+
+% Wrapping figure better declared before a paragraph
+%
+\begin{wrapfigure}[8]{r}[0pt]{0pt}
+% [8] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\includegraphics[bb=71 652 123 710]{tree}% normal is [.. .. .. 715]
+\caption{\label{fig:tree}}
+\end{wrapfigure}
+Trees can be used to depict terms as follows. A function call is a
+tree whose root is the function name and the children are the trees
+denoting the arguments. A tuple can be considered as having an
+invisible function name represented by a node with a period
+(\texttt{.}) in the tree, in which case the components of the tuple
+are its children. For example, the tree in \fig~\vref{fig:tree} has
+root~\fun{f} and leaves~\(0\), \(x\), \(1\) and~\(y\). Note how
+variables \(x\)~and~\(y\) are set in italics to differentiate them
+from function names \fun{x}~and~\fun{y}, set in sans\hyp{}serif. For
+example \(\fun{d}((), \fun{e}([1]))\) can be interpreted as a tree of
+root~\fun{d} and whose first immediate subtree is the representation
+of the empty tuple \(()\) and second immediate subtree corresponds to
+\(\fun{e}([1])\). \Fig~\ref{fig:tree} represents the tree
+corresponding to \(\fun{f}((\fun{g}(0),(x,1)),(),\fun{g}(y))\). Note
+that tuples, except the empty tuple, are not represented in the tree,
+since they encode the structure, which is already visible. The number
+of arguments of a function is called \emph{arity}\index{functional
+  language!arity}. Functions with the same name but different arities
+are permitted; for instance, we could have both \(\fun{c}(\fun{a}())\)
+and \(\fun{c}(\fun{a}(x),0)\). This is called
+\emph{overloading}\index{functional language!overloading}. To
+distinguish the different uses, the arity of the function should be
+indicated after a slash, for example \fun{c/1} and \fun{c/2}.
+
+\section{Purely functional languages}
+\label{sec:functional}
+
+We only want to consider confluent systems because they define
+functions. This property can be trivially enforced by setting an order
+on the rules, as we did in previous examples. Another restriction we
+impose is for normal forms to be \emph{values}\index{functional
+  language!value}, to wit, they do not contain any function call which
+can be further reduced. These two constraints define a \emph{purely
+  functional
+  language} \citep{Hughes_1989,Hinsen_2009}\index{functional
+  language}. Notice that we do not require by construction that a
+system terminates, although that is a desirable property. Not doing so
+enables more expressivity, at the expense of some more caution, as we
+shall soon realise.
+
+We would like to further constrain the computation of function calls
+by imposing that arguments are rewritten before the call is. This
+strategy is named \emph{call\hyp{}by\hyp{}value}\index{functional
+  language!call-by-value}.\label{def:call-by-value} Unfortunately, it
+enables otherwise terminating programs to not terminate. For instance,
+let us consider
+\begin{equation*}
+\fun{f}(x) \xrightarrow{\smash{\alpha}} 0.\qquad 
+\fun{g}() \xrightarrow{\smash{\beta}} \fun{g}().
+\end{equation*}
+We have \(\fun{f}(\fun{g}()) \xrightarrow{\smash{\alpha}} 0\) but
+\(\fun{f}(\fun{g}()) \xrightarrow{\smash{\beta}} \fun{f}(\fun{g}())
+\xrightarrow{\smash{\beta}} \dots\) Despite this inconvenience, we
+shall retain call\hyp{}by\hyp{}value because it facilitates some
+analyses. (As an illustration of a more powerful strategy, the purely
+functional language \Haskell \citep{DoetsVanEijck_2004} features
+\emph{lazy evaluation}.) Also it allows us to restrict the shape of
+the left\hyp{}hand sides, called \emph{patterns}\index{functional
+  language!pattern}, to one, outermost function call. For instance, we
+can then disallow for being useless a rule like
+\begin{equation*}
+\fun{plus}(x,\fun{plus}(y,z)) \rightarrow
+\fun{plus}(\fun{plus}(x,y),z).
+\end{equation*}
+If the system is also terminating, we say that
+\((\twoheadrightarrow)\) defines an \emph{evaluation}\index{functional
+  language!evaluation}, or \emph{interpretation}\index{functional
+  language!interpretation|see{evaluation}}, of the terms. For example,
+the factorial\index{factorial|(}
+\fun{fact/1}\index{fact@\textsf{fact/1}} can be defined by the ordered
+system
+\begin{equation}
+\fun{fact}(0) \rightarrow 1;\qquad
+\fun{fact}(n) \rightarrow n \cdot \fun{fact}(n-1).
+\label{def:fact}
+\end{equation}
+Thus \(\fun{fact}(n) \twoheadrightarrow n!\) and the system details
+how to reduce step by step \(\fun{fact}(n)\) into its value.
+
+Most functional languages allow \emph{higher-order
+  function}\index{functional language!higher-order functions}
+definitions, whereas standard term\hyp{}rewriting systems do not. Such
+an example would be the following higher\hyp{}order functional
+program, where \(n \in \mathbb{N}\):
+\begin{equation*}
+\fun{f}(g,0) \rightarrow 1;
+\qquad
+\fun{f}(g,n) \rightarrow n \cdot g(g,n-1).
+\qquad
+\fun{fact}_1(n) \rightarrow \fun{f}(\fun{f},n).
+\end{equation*}
+Note that these two definitions are not recursive, yet
+\fun{fact\(_1\)/1}\index{fact1@\textsf{fact$_1$/1}} computes the
+factorial\index{factorial}.\index{factorial|)} An adequate theoretical
+framework to understand higher\hyp{}order functions is
+\emph{\(\lambda\)-calculus}\hspace*{-2.1pt}
+\citep{HindleySeldin_2008,VanLeeuwen_1990b}.
+\index{lambda-calculus@$\lambda$-calculus} In fact,
+\(\lambda\)-calculus features prominently in the semantics of
+programming languages, even not functional ones
+\citep{Winskel_1993,Reynolds_1998,Pierce_2002,FriedmanWand_2008,TurbakGifford_2008}. We
+prefer to work with rewrite systems because they offer native pattern
+matching, whilst in
+\(\lambda\)-calculus\index{lambda-calculus@$\lambda$-calculus} we
+would have to encode it as a cascade of conditionals, which have
+themselves to be encoded.
+
+In the following, we show how to express linear data structures in a
+purely functional language and how to run our programs on a computer.
+
+\paragraph{Stacks}
+\label{par:stacks}
+
+Let us consider the abstract program\index{cat@\fun{cat/2}|(}
+\index{cons@\fun{cons/2}|(}\index{nil@\fun{nil/0}|(}
+\begin{equation*}
+\fun{cat}(\fun{nil}(),t)     \xrightarrow{\smash{\alpha}} t;\qquad
+\fun{cat}(\fun{cons}(x,s),t) \xrightarrow{\smash{\beta}}
+                                \fun{cons}(x,\fun{cat}(s,t)).
+\end{equation*}
+It defines the function \fun{cat/2}\index{cat@\fun{cat/2}|)} that
+catenates \index{stack!catenation} two \emph{stacks}. Functions
+\fun{nil/0} and \fun{cons/2} are \emph{data
+  constructors}\index{functional language!data constructor}, that is,
+functions that are \emph{not} defined by the system: their irreducible
+calls model data, so they are values and are allowed in patterns. The
+function call \(\fun{nil}()\) denotes the empty stack and
+\(\fun{cons}(x,s)\) is the stack obtained by putting the item~\(x\) on
+top of the stack~\(s\), an action commonly referred as
+\textsl{pushing~\(x\) on~\(s\)}. A non\hyp{}empty stack can be thought
+of as a finite series of items that can only be accessed sequentially
+from the top, as suggested by the analogy with a stack of material
+objects. Let~\(T\) be the set of all possible terms and \(S \subseteq
+T\) be the set of all stacks. Formally, \(S\)~can by defined by
+\emph{induction}\index{induction!definition by
+  $\sim$}\index{stack!inductive definition}\index{inductive
+  definition|see{induction}} as the smallest set~\(\mathcal{S}\) such
+that
+\begin{itemize}
+
+  \item \(\fun{nil}() \in \mathcal{S}\);\label{def:stack}
+
+  \item if \(x \in T\) and \(s \in \mathcal{S}\), then
+    \(\fun{cons}(x,s) \in \mathcal{S}\).
+
+\end{itemize}
+
+Note that, in rule~\(\beta\), if \(s\)~is not a stack, the recursion
+implies that the function \fun{cat/2} is partial, not because the
+rewrites never end, but because the normal form\index{rewrite
+  system!normal form} is not a value. In operational terms, the
+interpreter fails to rewrite the call for some arguments.
+
+Let us set the abbreviations \(\el :=
+\fun{nil}()\)\index{nil@\fun{nil/0}|)} and \(\cons{x}{s} :=
+\fun{cons}(x,s)\)\index{cons@\fun{cons/2}|)}, after the convention of
+the programming language
+\Prolog \citep{SterlingShapiro_1994,Bratko_2000}. For instance, we may
+write \([1|[2|[3|\el]]]\) in stead of
+\(\fun{cons}(1,\fun{cons}(2,\fun{cons}(3,\fun{nil}())))\).  We can
+further abbreviate the notation \(\cons{x_1}{\cons{x_2}{\dots
+    \cons{x_n}{s}}}\) into \(\cons{x_1,x_2,\dots,x_n}{s}\) and
+\(\cons{x}{\el}\) into \([x]\). For example, \([1|[2|[3|\el]]]\) is
+more compactly written as \([1,2,3]\). Our system for
+\fun{cat/2}\index{cat@\fun{cat/2}} now becomes a bit more legible:
+\begin{equation}
+\fun{cat}(        \el,t) \xrightarrow{\smash{\alpha}} t;\qquad
+\fun{cat}(\cons{x}{s},t) \xrightarrow{\smash{\beta}}
+\cons{x}{\fun{cat}(s,t)}.
+\label{def:cat}\index{stack!catenation!definition}
+\end{equation}
+Finally, let us illustrate it with the following
+evaluation:\index{stack!catenation!example}
+\begin{equation*}
+\fun{cat}([1,2],[3,4])
+\!\xrightarrow{\smash{\beta}}\!
+\cons{1}{\fun{cat}([2],[3,4])}
+\!\xrightarrow{\smash{\beta}}\!
+\cons{1}{\cons{2}{\fun{cat}(\el,[3,4])}}
+\!\xrightarrow{\smash{\alpha}}\!
+[1,2,3,4].
+\end{equation*}
+
+\paragraph{Abstract syntax trees}
+
+Depending on the context, we may use the arborescent depiction of
+terms to bring to the fore certain aspects of a computation. For
+example, it may be interesting to show how parts of the output (the
+right\hyp{}hand side) are actually \emph{shared}\index{sharing} with
+the input (the left\hyp{}hand side), in other words, how much of the
+data remains invariant through a given rule. This concept supposes
+that terms reside in some sort of space and that they can be referred
+to from different other terms. This abstract space serves as a model
+of a computer \emph{memory}\index{memory}. Consider for instance in
+\fig~\vref{fig:cat_dag} the same definition of~\fun{cat/2} as given
+in~\eqref{def:cat}. The arrows on certain edges denote some data
+sharing. When trees are used to visualise terms, they are called
+\emph{abstract syntax trees}\index{tree!abstract syntax $\sim$}. When
+some trees share subtrees, the whole forest is called a \emph{directed
+  acyclic graph}.\index{directed acyclic graph}
+\index{tree|see{directed acyclic graph}}
+\begin{figure}[h]
+\centering
+\includegraphics[bb=73 654 300 720]{cat_dag}
+\caption{Definition of \fun{cat/2} with directed acyclic graphs
+\label{fig:cat_dag}}
+\end{figure}
+
+\section{Analysis of algorithms}
+
+The branch of theoretical computer science devoted to the mathematical
+study of the efficiency of programs has been pioneered by Donald
+Knuth, who named it \emph{analysis of algorithms}
+\citep{SedgewickFlajolet_1996,Knuth_1997}. Given a function
+definition, this approach consists basically in three steps: defining
+a measure on the arguments, which represents their size; defining a
+measure on time, which abstracts the wall\hyp{}clock time; expressing
+the abstract time needed to compute calls to that function in terms of
+the size of its arguments. This function models the efficiency and is
+called the \emph{cost}\index{cost} (the lower the cost, the higher the
+efficiency). For example, when sorting objects, also called
+\emph{keys}\index{key|see{sorting}} in this context, by comparing
+them, the input size is the number of keys and the abstract unit of
+time is often one comparison, so the cost is the mathematical function
+which associates the number of keys and the number of comparisons
+to sort them.
+
+
+\mypar{Exact cost}
+
+Rewrite systems enable a rather natural notion of cost for functional
+programs: it is the number of rewrites to reach the value of a
+function call, assuming that the arguments are values. In other words,
+it is the number of calls needed to compute the value. To gain some
+generality, we need to relate the cost to a measure of the size of the
+input. In the case of stacks, this is the number of items it
+contains. For instance, let us recall the catenation of two stacks in
+definition~\eqref{def:cat}\index{cat@\fun{cat/2}}:
+\begin{equation*}
+\fun{cat}(        \el,t) \xrightarrow{\smash{\alpha}} t;\qquad
+\fun{cat}(\cons{x}{s},t) \xrightarrow{\smash{\beta}}
+\cons{x}{\fun{cat}(s,t)}.
+\end{equation*}
+We observe that \(t\)~is invariant, so the cost depends only on the
+size of the first argument. Let
+\(\C{\fun{cat}}{n}\)\index{cat@$\C{\fun{cat}}{n}$} be the cost of the
+call \(\fun{cat}(s,t)\)\index{cat@\fun{cat/2}}, where \(n\)~is the
+size of~\(s\). Rule~\(\alpha\) leads to the equation
+\(\C{\fun{cat}}{0} \eqn{\smash{\alpha}} 1\) and rule~\(\beta\) to
+\(\C{\fun{cat}}{n+1} \eqn{\smash{\beta}} 1 + \C{\fun{cat}}{n}\),
+yielding together \(\C{\fun{cat}}{n} = n +
+1\).\label{cost:cat}\index{stack!catenation!cost}
+
+
+\mypar{Extremal costs}
+\index{cost!extremal $\sim$}
+
+When considering sorting programs based on comparisons, the cost
+varies depending on the algorithm and it also often depends on the
+original partial ordering of the keys, thus size does not capture all
+aspects needed to assess efficiency. This quite naturally leads to
+consider bounds on the cost: for a given input size, we seek the
+configurations of the input that minimise and maximise the cost,
+respectively called \emph{best case} and \emph{worst case}. For
+example, some sorting algorithms have their worst case when the keys
+are already sorted, others when they are sorted in reverse order, etc.
+
+
+\mypar{Average cost}
+\label{par:mean_sort}
+\index{cost!average $\sim$}
+\index{cost!mean $\sim$|see{cost, average}}
+
+Once we obtain bounds on a cost, the question about the \emph{average}
+or \emph{mean cost} \citep{VitterFlajolet_1990}
+\citep[\S{}1.2.10]{Knuth_1997} arises as well. It is computed by
+taking the arithmetic mean of the costs for all possible inputs of a
+given size. Some care is necessary, as there must be a finite number
+of such inputs. For instance, to assess the mean cost of sorting
+algorithms based on comparisons, it is usual to assume that the input
+is a series of \(n\)~\emph{distinct
+  keys}\index{sorting!key!uniqueness} and that the sum of the costs is
+taken over all its \emph{permutations}\index{permutation}, thus
+divided by~\(n!\), the number of permutations of size~\(n\). The
+uniqueness constraints actually allows the analysis to equivalently,
+and more simply, consider the permutations of \((1,2,\dots,n)\). Some
+sorting algorithms, like \emph{merge sort}
+\cite[\S{}5.2.4]{Knuth_1998} \cite[\S{}2.3]{CLRS_2009} or
+\emph{insertion sort} \cite[\S{}5.2.1]{Knuth_1998}
+\cite[\S{}2.1]{CLRS_2009}, have their average cost
+\emph{asymptotically equivalent} to their maximum cost, that is, for
+increasingly large numbers of keys, the ratio of the two costs become
+arbitrarily close to~\(1\)\index{cost!asymptotic $\sim$}. Some others,
+like \emph{Hoare's sort}, also known as \emph{quicksort}
+\cite[\S{}5.2.2]{Knuth_1998} \cite[\S{}7]{CLRS_2009}, have the growth
+rate of their average cost being of a lower magnitude than the maximum
+cost, on an asymptotic scale \cite[\S{}9]{GrahamKnuthPatashnik_1994}.
+
+\paragraph{On-line vs. off-line}
+\label{par:online_vs_offline}
+
+Sorting algorithms can be distinguished depending on whether they
+operate on the whole series of keys, or key by key. The former are
+said \emph{off\hyp{}line}\index{off-line algorithm}, as keys are not
+sorted while they are coming in, and the latter are called
+\emph{on\hyp{}line}\index{on-line algorithm}, as the sorting process
+can be temporally interleaved with the input process. For example,
+insertion sort is an on\hyp{}line algorithm, whereas Hoare's sort is
+not because it is an instance of the divide\hyp{}and\hyp{}conquer
+strategy that splits the data. This distinction is pertinent in other
+contexts as well, like with algorithms that are intrinsically
+\emph{sequential}, instead of enabling some degree of
+\emph{parallelism}, e.g., a database is updated by a series of atomic
+requests, but requests on non\hyp{}overlapping parts of the data might
+be performed in parallel.
+
+\mypar{Amortised cost}
+\label{par:amortised_cost}
+
+Sometimes an update is costly because it is delayed by an imbalance in
+the data structure that calls for an immediate remediation, but this
+remediation itself may lead to a state such that subsequent operations
+are faster than if the costly update had not happen. Therefore, when
+considering a series of updates, it may be overly pessimistic to
+cumulate the maximum costs of all the operations considered in
+isolation. Instead, \emph{amortised
+  analysis} \citep{Okasaki_1998a} \citep[\S{}17]{CLRS_2009}\index{cost!amortised
+  $\sim$}\index{amortised analysis|see{cost, amortised}} takes into
+account the interactions between updates, so a lower maximum bound on
+the cost is derived. Note that this kind of analysis is inherently
+different from the average case analysis, as its object is the
+composition of different functions instead of independent calls to the
+same function on different inputs. Amortised analysis is a worst case
+analysis of a sequence of updates, not of a single one.
+
+
+\paragraph{Aggregate analysis}
+\label{par:aggregate}
+\index{aggregate cost|see{cost, amortised}}
+\index{enumerative combinatorics}
+
+Let us consider a counter enumerating the integers from~\(0\) to~\(n\)
+in binary by updating an array containing
+bits \cite[\S{}17.1]{CLRS_2009}. In the worst case, an increment leads
+to inverting all the bits. The number~\(m\) of bits of~\(n\) can be
+found by setting \(n := \sum_{i=0}^{m-1}{b_i2^i}\), where the~\(b_i\)
+are the bits and \(b_{m-1}=1\). Then
+\begin{equation}
+2^{m-1} \leqslant n < 2^m \Rightarrow m - 1 \leqslant \lg n
+< m \Rightarrow m = \floor{\lg n} + 1,
+\label{eq:num_of_bits}
+\end{equation}
+where \(\floor{x}\) (\textsl{floor
+  of~\(x\)})\index{floor@$\floor{x}$|see{floor function}}\index{floor
+  function} is the greatest integer less than or equal to~\(x\) and
+\(\lg n\)~is the binary logarithm of~\(n\). The cost of the
+\(n\)~increments is thus bounded from above by \(n\lg n + n \sim n\lg
+n\), as \(n \rightarrow \infty\).
+
+\hspace*{-0.25pt} A little observation reveals that this upper bound
+is overly pessimistic, as carry propagation clears a series of
+rightmost bits to~\(0\), so the next addition will flip only one bit,
+the following two etc. as shown in \fig~\vref{fig:flips}, where bits
+about to be flipped at the next increment are set in boldface type.
+\begin{figure}[t]
+\centering
+\subfloat[Bit flips\label{fig:flips}]{\includegraphics{flips}}
+\qquad
+\subfloat[$F(n) = \sum_{i \geqslant 0}\floor{n/2^i}$, with $n=22$\label{fig:ruler}]%
+{\includegraphics{ruler}}
+\caption{Counting bits vertically and diagonally}
+\end{figure}
+Counting the flips \emph{vertically} reveals that the bit
+corresponding to~\(2^0\), that is, the rightmost bit, flips every
+time. The bit of~\(2^1\) flips once every two increments, so, from
+\(0\)~to~\(n\), it flips \(\floor{n/2^1}\)~times. In general, the bit
+of~\(2^k\) flips \(\floor{n/2^k}\)~times. Therefore, the total number
+of flips~\(F(n)\) in a sequence of \(n\)~increments is
+\begin{equation}
+F(n) := \sum_{k \geqslant 0}{\left\lfloor\frac{n}{2^k}\right\rfloor}.
+\label{eq:F}
+\end{equation}
+The sum is actually always finite, as illustrated by the example in
+\fig~\vref{fig:ruler}. There, we can see \emph{diagonally} that
+\(1\)-bits at position~\(j\) appear in positions~\(j-1\) down
+to~\(0\), so account for \(2^j + 2^{j-1} + \dots + 2^0 = 2^{j+1}-1\).
+In all generality, let \(n := 2^{e_r} + \dots + 2^{e_1} + 2^{e_0} >
+0\), with \(e_r > \dots > e_1 > e_0 \geqslant 0\) and \(r \geqslant
+0\). The naturals \(e_i\)~are the positions of the \(1\)-bits in the
+binary notation of~\(n\). The power \(2^{e_r}\) corresponds to the
+leftmost bit in the binary expansion of~\(n\), so \(e_r+1\)~is equal
+to the number of bits of~\(n\), which is known from
+equation~\eqref{eq:num_of_bits}:
+\begin{equation}
+e_r = \floor{\lg n}.\label{eq:e_r}
+\end{equation}
+We can now give a closed form for \(F(n)\) as follows:
+\begin{equation}
+F(n) = \sum_{i=0}^{r}(2^{e_i+1} - 1) = 2n - \nu_n,
+\label{eq:ruler_nu}
+\end{equation}
+where \(\nu_n := r + 1\)\index{bit sum@$\nu_n$|see{bit sum}} is the
+sum of the bits of~\(n\), or, equivalently, the number of
+\(1\)-bits. It is called many names, like \emph{population count},
+\emph{sideways sum}, \emph{bit sum}\index{bit sum} or \emph{Hamming
+  weight}; for example, in \fig~\vref{fig:ruler}, we can read \(F(22)
+= 41 = 2 \cdot 22 - 3\). Furthermore, we have the following intuitive
+tight bounds for any \(n>0\):
+\begin{equation*}
+1 \leqslant \nu_{n} \leqslant \floor{\lg n} + 1,
+\end{equation*}
+because equality~\eqref{eq:e_r} establishes that \(\floor{\lg n} + 1\)
+is the number of bits of~\(n\). Therefore, \(2n - \floor{\lg n} - 1
+\leqslant F(n) \leqslant 2n\). By l'Hospital rule, \(\lim_{n \to
+  +\infty}{(\lg n/n)} = \lim_{n \to +\infty}(1/n\ln 2) = 0\), where
+\(\ln n\)~is the \emph{natural logarithm}. Therefore,
+\begin{equation*}
+F(n) \sim 2n,\;\, \text{as \(n \rightarrow \infty\)}.
+\end{equation*}
+Two enumerations (counting vertically and diagonally) have shown that
+the exact total number of flips is of a lower magnitude than expected.
+
+This example resorts to a particular kind of amortised analysis called
+\emph{aggregate analysis}, because it relies on enumerative
+combinatorics \citep{Stanley_1999a,Stanley_1999b,Martin_2001} to reach
+its result (it aggregates positive partial amounts, often in different
+manners, to obtain the total cost). A visually appealing variation on
+the previous example consists in determining the average number of
+\(1\)-bits in the binary notation of the integers from~\(0\) to~\(n\)
+\citep{Bush_1940}.
+
+\section{Inductive proofs}
+
+Let us notice that \(\fun{cat}([1], [2,3,4]) \twoheadrightarrow
+[1,2,3,4] \twoheadleftarrow \fun{cat}([1,2],
+[3,4])\)\index{cat@\fun{cat/2}|(}. It is enlightening to create
+\emph{equivalence classes} of terms that are joinable, based
+on~\((\equiv)\) \index{equivalence@$a \equiv b$|see{equivalence of
+    expressions}} \index{equivalence!$\sim$ of expressions} defined
+as: \(a \equiv b\) if there exists a value~\(v\) such that \(a
+\xrightarrow{\smash[t]{*}} v\) and \(b \xrightarrow{\smash{*}}
+v\). For instance, \(\fun{cat}([1,2], [3,4]) \equiv \fun{cat}([1],
+[2,3,4])\). The relation (\(\equiv\)) is indeed an equivalence
+because it is
+\begin{itemize*}
+ 
+  \item \emph{reflexive}: \(a \equiv a\);
+
+  \item \emph{symmetric}: if \(a \equiv b\), then \(b \equiv a\);
+
+  \item \emph{transitive}: if \(a \equiv b\) and \(b \equiv c\), then
+    \(a \equiv c\).
+
+\end{itemize*}
+Of some interest are the following facts. If \(f(x)\) and~\(f(y)\)
+have a value, then \(x \equiv y\) implies \(f(x) \equiv f(y)\). If
+\(x_1 \leftarrow x_2 \twoheadrightarrow x_3 \equiv x_4 \rightarrow x_5
+\twoheadleftarrow x_6\), then \(x_1 \equiv x_2 \equiv x_3 \equiv x_4
+\equiv x_5 \equiv x_6\). In the case \(x \twoheadrightarrow z
+\xrightarrow{\smash{\alpha}} t \twoheadleftarrow y\), we use the
+special notation \(x \Rra{\alpha} y\) to underline the role played by
+rule~\(\alpha\) in the equivalence, instead of simply \(x \equiv
+y\). If we want to prove equivalences with variables ranging over
+infinite sets, like \(\fun{cat}(s,\fun{cat}(t,u)) \equiv
+\fun{cat}(\fun{cat}(s,t),u)\)\index{cat@\fun{cat/2}|)}, we need some
+induction principle.
+
+
+\mypar{Well-founded induction}
+\label{par:well-founded}
+\index{induction!well-founded $\sim$}
+
+We define a \emph{well\hyp{}founded order}
+\citep{Winskel_1993}\index{induction!well-founded order} on a
+set~\(A\) as being a binary relation \((\succ)\) which does not have
+any \emph{infinite descending chains}\index{induction!infinite
+  descending chain}, to wit, no \(a_0 \succ a_1 \succ \dots\) The
+\emph{well\hyp{}founded induction principle} then states that, for any
+predicate~\(\aleph\), \(\forall a \in A.\aleph(a)\) is implied by
+\(\forall a.(\forall b.a \succ b \Rightarrow \aleph(b)) \Rightarrow
+\aleph(a)\). Because there are no infinite descending chains, any
+subset \(B \subseteq A\) contains minimal elements \(M \subseteq B\),
+that is, there is no \(b \in B\) such that \(a \succ b\), if \(a \in
+M\). In this case, proving by well\hyp{}founded induction degenerates
+into proving \(\aleph(a)\) for all \(a \in M\). When \(A=\mathbb{N}\),
+this principle is called \emph{mathematical (complete) induction}
+\citep{Buck_1963}\index{induction!mathematical
+  $\sim$}. \emph{Structural induction}\index{induction!structural
+  $\sim$} is another particular case where \(t \succ s\) holds if, and
+only if, \(s\)~is a proper
+\emph{subterm}\index{term!subterm}\index{term!proper subterm}
+of~\(t\), namely, the abstract syntax tree of~\(s\) is included in the
+tree of~\(t\) and \(s \neq t\). Sometimes, a restricted form is
+enough. For instance, we can define \(\cons{x}{s} \succ
+s\)\index{cons@\fun{cons/2}}, for any term~\(x\) and any stack~\(s \in
+S\). (Both \(x\)~and~\(s\) are \emph{immediate
+  subterms}\index{term!immediate subterm} of
+\(\cons{x}{s}\)\index{cons@\fun{cons/2}}.) There is no infinite
+descending chain since \(\el\)~is the unique minimal element of~\(S\):
+no~\(s\) satisfies \(\el \succ s\); so the basis is \(t=\el\) and
+\(\forall t.(\forall s.t \succ s \Rightarrow \aleph(s)) \Rightarrow
+\aleph(t)\) degenerates into \(\aleph(\el)\).
+
+\paragraph{Associativity}
+\label{proof:assoc_cat}
+
+Let us prove the associativity\index{stack!catenation!associativity}
+\index{induction!example} of \fun{cat/2}\index{cat@\fun{cat/2}}, which
+we express formally by \(\pred{CatAssoc}{s,t,u} \colon
+\fun{cat}(s,\fun{cat}(t,u)) \equiv
+\fun{cat}(\fun{cat}(s,t),u)\)\index{CatAssoc@\predName{CatAssoc}|(},
+where \(s\), \(t\) and~\(u\) are stack values. We apply the
+well\hyp{}founded induction principle to the structure of~\(s\), so we
+must establish
+\begin{itemize*}
+
+  \item the basis \(\forall t,u \in S.\pred{CatAssoc}{\el,t,u}\);
+
+  \item step \(\forall s,t,u \in S.\pred{CatAssoc}{s,t,u}
+    \Rightarrow \forall x \in T.\pred{CatAssoc}{\cons{x}{s},t,u}\).
+
+\end{itemize*}
+The base case is direct: \(\fun{cat}(\el,\fun{cat}(s,t))
+\xrightarrow{\smash{\alpha}} \fun{cat}(s,t)
+\xleftarrow{\smash{\alpha}}
+\fun{cat}(\fun{cat}(\el,t),u)\)\index{cat@\fun{cat/2}}. Let us assume
+now \(\pred{CatAssoc}{s,t,u}\), called the \emph{induction
+  hypothesis}\index{induction!$\sim$ hypothesis}, and let us prove
+\(\pred{CatAssoc}{\cons{x}{s},t,u}\)\index{CatAssoc@\predName{CatAssoc}|)},
+for any term~\(x\). We have
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l@{\qquad}r@{}}
+  \fun{cat}(\cons{x}{s},\fun{cat}(t,u))
+& \Rra{\beta}
+& \cons{x}{\fun{cat}(s,\fun{cat}(t,u))}\\
+& \equiv
+& \cons{x}{\fun{cat}(\fun{cat}(s,t),u)}
+& (\pred{CatAssoc}{s,t,u})\\
+& \Lla{\beta}
+& \fun{cat}(\cons{x}{\fun{cat}(s,t)},u)\\
+& \Lla{\beta}
+& \fun{cat}(\fun{cat}(\cons{x}{s},t),u).\index{cat@\fun{cat/2}}
+\end{array}
+\end{equation*}
+Thus\index{CatAssoc@\predName{CatAssoc}}
+\(\pred{CatAssoc}{\cons{x}{s},t,u}\) holds and \(\forall s,t,u \in
+S.\pred{CatAssoc}{s,t,u}\)\index{CatAssoc@\predName{CatAssoc}}.\hfill\(\Box\)
+
+Writing \(\fun{cat}(\cons{x}{s},\fun{cat}(t,u))
+\xrightarrow{\smash{\beta}} \cons{x}{\fun{cat}(s,\fun{cat}(t,u))}\) is
+incorrect because the semantics of our functional language requires
+that arguments are evaluated before the call is. Nevertheless,
+if~\(s\), \(t\) and~\(u\) are not values, it is sufficient that they
+have one for \(\pred{CatAssoc}{s,t,u}\) to hold as well; for example,
+if \(f(s)\) has a value~\(v\), then \(\pred{CatAssoc}{f(s),t,u}\) is
+true because \(\fun{cat}(f(s),\fun{cat}(t,u)) \twoheadrightarrow
+\fun{cat}(v,\fun{cat}(t,u)) \equiv \fun{cat}(\fun{cat}(v,t),u)
+\twoheadleftarrow \fun{cat}(\fun{cat}(f(s),t),u)\). Therefore,
+termination is an important property we need to check.
+ 
+\mypar{Termination}
+\label{par:ackermann}
+When defining our purely functional language, we allowed programs to
+not terminate. We could actually have imposed some syntactic
+restrictions on recursive definitions in order to guarantee the
+termination of all functions. A well\hyp{}known class of such
+terminating functions makes exclusively use of a bridled form of
+recursion called \emph{primitive recursion}
+\citep{Robinson_1947,Robinson_1948}\index{termination!primitive
+  recursion}. Unfortunately, many useful functions do not fit easily
+in this framework and, as a consequence, most functional languages
+leave to the programmers the responsibility to check the termination
+of their programs. For theoretical reasons, it is not possible to
+provide a general criterion for termination, but many standard rules
+exists that cover many usages. Consider the following example where
+\(m,n \in \mathbb{N}\):
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{}}
+\fun{ack}(0,n)     & \xrightarrow{\smash{\theta}} & n+1;\\
+\fun{ack}(m+1,0)   & \xrightarrow{\smash{\iota}}  & \fun{ack}(m,1);\\
+\fun{ack}(m+1,n+1) & \xrightarrow{\smash{\kappa}} 
+                   & \fun{ack}(m,\fun{ack}(m+1,n)).
+\end{array}
+\end{equation*}
+This is a simplified form of Ackermann's
+function\index{termination!Ackermann's
+  function}\index{ack@\fun{ack/2}|(}, an early example of a total
+computable function which is not primitive recursive. It makes use of
+double recursion and two parameters to grow values as towers of
+exponents, for example, \(\fun{ack}(4,3) \twoheadrightarrow
+2^{2^{65536}} - 3\). It is not obviously terminating, because if the
+first argument does decrease, the second largely increases. Let us
+define a well\hyp{}founded ordering on pairs, called
+\emph{lexicographic order}\index{induction!lexicographic order}. Let
+\((\succ_A)\) and \((\succ_B)\) be well\hyp{}founded orders on the
+sets \(A\) and~\(B\). Then \((\succ_{A \times B})\) defined as follows
+on \(A \times B\) is well\hyp{}founded:
+\begin{equation}
+(a_0,b_0) \succ_{A \times B} (a_1,b_1) :\Leftrightarrow \text{\(a_0
+    \succ_A a_1\) or (\(a_0 = a_1\) and \(b_0 \succ_B b_1\)).}
+\label{def:lexico}
+\end{equation}
+If \(A=B=\mathbb{N}\) then \((\succ_A) = (\succ_B) = (>)\). To prove
+that \(\fun{ack}(m,n)\) terminates for all \(m,n \in \mathbb{N}\),
+first, we must find a well\hyp{}founded order on the calls
+\(\fun{ack}(m,n)\), that is, the calls must be totally ordered without
+any infinite descending chain. In this case, a lexicographic order on
+\((m,n) \in \mathbb{N}^2\) extended to \(\fun{ack}(m,n)\) works:
+\begin{equation*}
+\fun{ack}(a_0,b_0) \succ \fun{ack}(a_1,b_1) :\Leftrightarrow 
+\text{\(a_0 > a_1\) or (\(a_0 = a_1\) and \(b_0 > b_1\)).}
+\end{equation*}
+Clearly, \(\fun{ack}(0,0)\) is the minimum element. Second, we must
+prove that \fun{ack/2} rewrites to smaller calls. We are only
+concerned with rules \(\iota\)~and~\(\kappa\). With the former, we
+have \(\fun{ack}(m+1,0) \succ \fun{ack}(m,1)\). With the latter, we
+have \(\fun{ack}(m+1,n+1) \succ \fun{ack}(m+1,n)\) and
+\(\fun{ack}(m+1,n+1) \succ \fun{ack}(m,p)\), for all values~\(p\), in
+particular when \(\fun{ack}(m+1,n) \twoheadrightarrow
+p\)\index{ack@\fun{ack/2}|)}.\hfill\(\Box\)
+
+A series of examples of termination\index{termination}\index{rewrite
+  system!termination} proofs for term\hyp{}rewriting systems has been
+published by \cite{Dershowitz_1995,ArtsGiesl_2001}. An accessible
+survey is provided by \cite{Dershowitz_1987}. \cite{Knuth_2000a}
+analysed some famously involved recursive functions.
+
+\section{Implementation}
+\label{sec:implementation}
+
+\mypar{Translation to \Erlang}
+\index{functional language!Erlang@\Erlang}
+
+It is always enjoyable to have computers actually evaluate our
+function calls. We briefly introduce here \Erlang, a functional
+language that contains a pure core \citep{Armstrong_2007}. A
+\emph{module} is a collection of function definitions. The syntax of
+\Erlang is very close to our formalism and our previous rewrite
+systems become\index{stack!catenation!$\sim$ in
+  \Erlang}\index{factorial}
+\begin{verbatim}
+-module(mix).
+-export([cat/2,fact/1]).
+
+cat(   [],T) -> T;
+cat([X|S],T) -> [X|cat(S,T)].
+
+fact(N) -> f(fun f/2,N).
+
+f(_,0) -> 1;
+f(G,N) -> N * G(G,N-1).
+\end{verbatim}
+The differences are the headers and the lexical conventions of setting
+variables in big capitals and to mute unused variables in patterns
+with an underscore (\verb|_|). Moreover, the expression \verb|fun f/2|
+denotes~\fun{f/2} when used in stead of a value. From the \Erlang
+shell, we can compile and run some examples:
+\begin{verbatim}
+1> c(mix).
+{ok,mix}
+2> mix:cat([1,2,3],[4,5]).
+[1,2,3,4,5]
+3> mix:fact(30).
+265252859812191058636308480000000
+\end{verbatim}
+Note that \Erlang features exact integer arithmetic and that the order
+of the definitions is irrelevant.
+
+\mypar{Translation to \Java}
+\label{par:java}
+\index{Java@\Java|(}
+
+Functional programs on stacks can be systematically translated into
+\Java, following designs similar to those initially published
+by \cite{FelleisenFriedman_1997}, \cite{Bloch_2003}
+and \cite{Sher_2004}. This operation should transfer some interesting
+properties proved on the source to the target language: the whole
+point hinges on how the mathematical approach presented earlier, both
+with structural induction and functional programming, leads to trusted
+\Java programs and, therefore, constitutes a solid bridge between
+mathematics and computer science.
+
+Of course, the programs discussed in this book are extremely short and
+the topic at hand thus resorts to `programming in the small,' but,
+from the vantage point of software engineering, these functional
+programs can then be considered as \emph{formal specifications} of the
+\Java programs, and inductive proofs may be thought as instances of
+\emph{formal methods}, like the ones used to certify telecommunication
+protocols and critical embedded systems. Therefore, this book may be
+used as a prerequisite to a software engineering course, but also to
+an advanced programming course.
+
+\paragraph{Design Pattern}
+
+The design pattern in \Java which models a stack \index{stack!$\sim$
+  in \Java} relies on polymorphic methods, recursive classes and
+generics. A generic and abstract class \texttt{Stack} captures the
+essence of a stack as follows:
+\begin{alltt}
+// Stack.java
+\public \abstractX \class Stack<Item> \{
+  \public \final NStack<Item> push(\final Item item) \{
+    \return \new NStack<Item>(item,\this); \}
+\}
+\end{alltt}
+A stack is empty or not and the class \texttt{Stack} is abstract
+because it asserts that both are stacks and that they share common
+functionalities, like the method \texttt{push}, which is a wrapper
+around the constructor of non\hyp{}empty stacks, \texttt{NStack}, so
+both empty and non\hyp{}empty stacks are augmented by the same
+method. The argument \texttt{item} of \texttt{push} is declared
+\final{} because we want it to be constant in the body of the method,
+following the functional paradigm. The empty stack~\(\el\) is mapped
+to an extension \texttt{EStack} of \texttt{Stack}, capturing the
+relationship `An empty stack is a stack.' The class \texttt{EStack}
+contains no data.
+\begin{alltt}
+// EStack.java
+\public \final \class EStack<Item> \extends Stack<Item> \{\}
+\end{alltt}
+The non\hyp{}empty stack is logically encoded by \texttt{NStack},
+another subclass of \texttt{Stack}:
+\begin{alltt}
+// NStack.java
+\public \final \class NStack<Item> \extends Stack<Item> \{
+  \private \final Item head;
+  \private \final Stack<Item> tail;
+
+  \public NStack(\final Item item, \final Stack<Item> stack) \{
+    head = item; tail = stack; \}
+\}
+\end{alltt}
+The field \texttt{head} models the first item of a stack and
+\texttt{tail} corresponds to the rest of the stack (so \texttt{NStack}
+is a recursive class). The constructor just initialises
+these. Importantly, both are declared \texttt{final} to express that
+we do not expect reassignments after the first instantiation. Just as
+in the functional language, every time a new stack is needed, instead
+of modifying another with a side\hyp{}effect, a new one is created,
+perhaps reusing others as constant components.
+
+\paragraph{Catenation of stacks}
+
+As an illustration\index{stack!catenation!$\sim$ in \Java|(}, let us
+recall definition~\eqref{def:cat} \vpageref{def:cat}
+\index{cat@\fun{cat/2}|(} for catenating two stacks:
+\begin{equation*}
+\fun{cat}(        \el,t) \xrightarrow{\smash{\alpha}} t;\qquad
+\fun{cat}(\cons{x}{s},t) \xrightarrow{\smash{\beta}}
+                                          \cons{x}{\fun{cat}(s,t)}.
+\end{equation*}
+The translation into our \Java class hierarchy is as follows. The
+first argument of \fun{cat/2} is a stack, corresponding to
+\texttt{this} inside our classes \texttt{EStack} and
+\texttt{NStack}. Therefore, the translation of \fun{cat/2} is an
+abstract \Java method in class \texttt{Stack}, with one parameter (the
+second of \fun{cat/2}):
+\begin{alltt}
+\public \abstractX Stack<Item> cat(\final Stack<Item> t);
+\end{alltt}
+Rule~\(\alpha\) applies only if the current object represents~\(\el\),
+so the corresponding translation is a method of
+\texttt{EStack}. Dually, rule~\(\beta\) leads to a method of
+\texttt{NStack}. The former returns its argument, so the translation
+is
+\begin{alltt}
+\public Stack<Item> cat(\final Stack<Item> t) \{ \return t; \}
+\end{alltt}
+The latter returns an object of~\texttt{NStack} corresponding to
+\(\cons{x}{\fun{cat}(s,t)}\). It is built by translating this stack
+from the bottom up: translate
+\(\fun{cat}(s,t)\)\index{cat@\fun{cat/2}|)} and then push~\(x\). Let
+us recall that \(s\)~is the tail of \(\cons{x}{s}\) on the
+left\hyp{}hand side of rule~\(\beta\), hence \(\cons{x}{s}\) is
+\texttt{this} and \(s\)~corresponds to \texttt{this.tail}, or, simply,
+\texttt{tail}. Similarly, \(x\)~is~\texttt{head}. Finally,
+\begin{alltt}
+\public NStack<Item> cat(\final Stack<Item> t) \{
+  \return tail.cat(t).push(head);
+\}
+\end{alltt}
+\index{stack!catenation!$\sim$ in \Java|)}
+\index{Java@\Java|)}

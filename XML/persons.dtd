@@ -1,0 +1,5 @@
+<!ELEMENT persons (names,notes)>
+<!ELEMENT names (name*)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT notes (note*)>
+<!ELEMENT note (#PCDATA)>

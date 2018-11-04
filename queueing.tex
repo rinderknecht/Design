@@ -1,0 +1,374 @@
+\section{Queueing}
+\label{sec:queueing}
+\index{queue}
+
+Despite its didactic qualities, aggregate analysis (see
+page~\pageref{par:aggregate}) is less frequently applied when the data
+structures are not directly connected to numeration. We propose to
+extend its scope by showing a compelling case study on
+\emph{functional queues}
+\citep{Burton_1982,Okasaki_1995,Okasaki_1998b}. A functional queue is
+a linear data structure that is used in functional languages, whose
+semantics force the programmer to model a \emph{queue} with two
+stacks. Items can be pushed only on one stack and popped only on the
+other:
+\begin{equation*}
+\begin{array}{@{}l@{}r@{\;}cc|c|c|c|c|c|cc@{\;}l@{}}
+\cline{4-9}
+& \text{Push, Pop (top)} 
+& \leftrightsquigarrow & & a & b & c & d & e &&&\\
+\cline{4-9}
+\end{array}
+\end{equation*}
+A queue is like a stack where items are added, or \emph{enqueued}, at
+one end, called \emph{rear}, but taken out, or \emph{dequeued}, at the
+other end, called \emph{front}:
+\begin{equation*}
+\begin{array}{@{}l@{}r@{\;}cc|c|c|c|c|c|cc@{\;}l@{}}
+\cline{4-10}
+& \text{Enqueue (rear end)} 
+                & \rightsquigarrow & & a & b & c & d & e &
+& \rightsquigarrow & \text{Dequeue (front end).}\\
+\cline{4-10}
+\end{array}
+\end{equation*}
+Let us implement a queue with two stacks: one for enqueueing, called
+the \emph{rear stack}\index{queue!rear stack}\index{stack!rear
+  $\sim$|see{queue}}, and one for dequeueing, called the \emph{front
+  stack}\index{queue!front stack}\index{stack!front
+  $\sim$|see{queue}}. The previous ideal queue is equivalent to the
+functional queue
+\begin{equation*}
+\begin{array}{r@{\;}cc|c|c|c|c|c|c|cc@{\;}l}
+  \cline{3-6}\cline{8-10}
+  \text{Enqueue (rear)} & \rightsquigarrow & & a & b & c & & d & e & &
+  \rightsquigarrow & \text{Dequeue (front).}\\
+  \cline{3-6}\cline{8-10}
+\end{array}
+\end{equation*}
+Enqueueing is now pushing on the rear stack and dequeueing is popping
+on the front stack. In the latter case, if the front stack is empty
+and the rear stack is not, we swap the stacks and reverse the new
+front stack. Graphically, dequeueing in the configuration
+\begin{equation*}
+\begin{array}{c|c|c|c|c|c} \cline{1-4}\cline{6-6} & a & b & c &
+&\\ \cline{1-4}\cline{6-6}
+\end{array}
+\end{equation*}
+requires first to make
+\begin{equation*}
+\begin{array}{c|c|c|c|c|c}
+  \cline{1-1}\cline{3-6}
+  & & a & b & c &\\
+  \cline{1-1}\cline{3-6}
+\end{array}
+\end{equation*}
+and then dequeue~\(c\).
+
+Let us model a queue as we modelled the operation push by a function
+\fun{cons/2}\index{cons@\fun{cons/2}} without a definition, on
+page~\pageref{par:stacks}. We shall use the name
+\fun{q/2}\index{q@\fun{q/2}} and the call \(\fun{q}(r,f)\) denotes a
+functional queue with rear stack~\(r\) and front
+stack~\(f\). Enqueueing is performed by the function
+\fun{enq/2}\index{enq@\fun{enq/2}}:
+\begin{equation}
+\fun{enq}(x,\fun{q}(r,f)) \rightarrow \fun{q}(\cons{x}{r},f).
+\label{def:enq}
+\end{equation}
+Dequeueing requires the result to be a \emph{pair}\index{functional
+  language!pair} made of the dequeued item and the new queue without
+it. Actually, the new queue is the first component of the pair, to fit
+how the operation is depicted in the figures as a rightwards arrow. We
+could denote the mathematical pair \((x,y)\) by \(\fun{pair}(x,y)\),
+but a more symbolic notation is handy: \(\pair{x}{y}\). The angle
+brackets allow us to avoid writing \(f((x,y))\) when we mean
+\(f(\pair{x}{y})\). Let us call \fun{deq/1}\index{deq@\fun{deq/1}} the
+dequeueing function:
+\begin{equation}
+\begin{array}{@{}r@{\;}l@{\;}l@{}}
+  \fun{deq}(\fun{q}(\cons{x}{r},\el))
+& \xrightarrow{\smash{\theta}}
+& \fun{deq}(\fun{q}(\el,\fun{rcat}(r,[x])));\\
+  \fun{deq}(\fun{q}(r,\cons{x}{f}))
+& \xrightarrow{\smash{\iota}}
+& \pair{\fun{q}(r,f)}{x}.
+\end{array}
+\label{def:deq}
+\end{equation}
+See page~\pageref{def:rev} for the definition~\eqref{def:rev}
+of~\fun{rcat/2}\index{rcat@\fun{rcat/2}}. We shall say that the queue
+has size~\(n\) if the total number of items in both stacks
+is~\(n\). The cost of enqueueing\index{enq@$\C{\fun{enq}}{n}$} is
+\(\C{\fun{enq}}{n} = 1\). The minimum
+cost\index{deq@$\B{\fun{deq}}{n}$} for dequeueing is
+\(\B{\fun{deq}}{n} = 1\), by rule~\(\iota\). The maximum cost is
+\(\W{\fun{deq}}{n} = n+2\), as seen with the trace
+\(\theta\eta^{n-1}\zeta\iota\). Let~\(\A{n}\) be the cost of a
+sequence of \(n\)~updates on a functional queue originally empty. A
+first attempt at assessing~\(\A{n}\) consists in ignoring any
+dependence on previous operations and take the maximum individual
+cost. Since \(\C{\fun{enq}}{k} \leqslant \C{\fun{deq}}{k}\), we
+consider a series of \(n\)~dequeueings in their worst case, that is,
+with all the items located in the rear stack. Besides, after
+\(k\)~updates, there may be at most \(k\)~items in the queue, so
+\begin{equation*}
+\A{n} \leqslant \sum_{k=1}^{n-1}{\W{\fun{deq}}{k}} =
+\frac{1}{2}{(n-1)(n+4)} \sim \frac{1}{2}{n^2}.
+\end{equation*}
+
+\paragraph{Aggregate analysis}
+\index{cost!amortised $\sim$}
+\index{queue!amortised cost}
+
+Actually, this is overly pessimistic and even unrealistic. First, one
+cannot dequeue on an empty queue, therefore, at any time, the number
+of enqueueings since the beginning is always greater or equal than the
+number of dequeueings and the series must start with one
+enqueueing. Second, when dequeueing with the front being empty, the
+rear stack is reversed onto the front stack, so its items cannot be
+reversed again during the next dequeueing, whose cost will
+be~\(1\). Moreover, as remarked above, \(\C{\fun{enq}}{k} \leqslant
+\C{\fun{deq}}{k}\), so the worst case for a series of
+\(n\)~operations occurs when the number of dequeueings is maximum,
+that is, when it is \(\lfloor{n/2}\rfloor\). If we denote by~\(e\) the
+number of enqueueings and by~\(d\) the number of dequeueings, we have
+the relationship \(n = e + d\) and the two requisites for a worst case
+become \(e=d\) (\(n\)~even) or \(e=d+1\) (\(n\)~odd). The former
+corresponds graphically to a \emph{Dyck path}\index{Dyck path} and the
+latter to a \emph{Dyck meander}\index{Dyck meander}.
+
+\paragraph{Dyck path}
+\index{Dyck path}
+
+Let us depict updates as in \fig~\vref{fig:enq_deq}.
+\begin{figure}
+\centering
+\subfloat[Enqueue\label{fig:enqueue}]{%
+  \includegraphics[bb=69 662 132 721,scale=0.75]{enqueue}
+}
+\qquad
+\subfloat[Dequeue\label{fig:dequeue}]{%
+  \includegraphics[bb=69 662 132 721,scale=0.75]{dequeue}
+}
+\caption{Graphical representations of operations on
+  queues\label{fig:enq_deq}}
+\end{figure}
+Textually, we represent an enqueueing as an opening parenthesis and a
+dequeueing as a closing parenthesis. For example,
+\texttt{((()()(()))())} can be represented in \fig~\ref{fig:dyck_path}
+\begin{figure}
+\centering
+\includegraphics[bb=75 570 508 727,scale=0.7]{dyck_path}
+\caption{Dyck path modelling queue operations (cost \(24\))
+\label{fig:dyck_path}}
+\end{figure}
+as a Dyck path\index{Dyck path}. For a broken line to qualify
+as a Dyck path of length~\(n\), it has to start at the origin
+\((0,0)\) and end at coordinates \((n,0)\). In terms of a \emph{Dyck
+  language}, an enqueueing is called a \emph{rise}\index{Dyck
+  path!rise} and a dequeueing is called a \emph{fall}\index{Dyck
+  path!fall}. A rise followed by a fall, that is, \texttt{()}, is
+called a \emph{peak}\index{Dyck path!peak}. For instance, in
+\fig~\ref{fig:dyck_path}, there are four peaks. The number near each
+rise or fall is the cost incurred by the corresponding operation. The
+abscissa axis bears the ordinal of each operation.
+
+When \(e=d\), the line is a Dyck path of length \(n=2e=2d\). In order
+to deduce the total cost in this case, we must find a
+\emph{decomposition}\index{Dyck path!decomposition} of the path, by
+which we mean to identify patterns whose costs are easy to calculate
+and which make up any path, or to associate any path to another path
+whose cost is the same but easy to find. \Fig~\ref{fig:dyck_eq}
+\begin{figure}[!b]
+\centering
+\includegraphics[bb=75 570 508 727,scale=0.7]{dyck_eq}
+\caption{Dyck path equivalent to \fig~\ref{fig:dyck_path}
+\label{fig:dyck_eq}}
+\end{figure}
+shows how the previous path is mapped to an equivalent path only made
+of a series of isosceles triangles whose bases belong to the abscissa
+axis. Let us call them \emph{mountains}\index{Dyck path!mountain} and
+their series a \emph{range}\index{Dyck path!range}. The mapping is
+simple: after the first series of falls, if we are back to the
+abscissa axis, we have a mountain and we proceed with the rest of the
+path. Otherwise, the next operation is a rise and we exchange it with
+the first fall after it. This brings us down by~\(1\) and the process
+resumes until the abscissas are reached. We call this méthod
+\emph{rescheduling}\index{Dyck path!rescheduling} because it amounts,
+in operational terms, to reordering subsequences of operations a
+posteriori.
+
+For instance, \fig~\vref{fig:rescheduling}
+\begin{figure}
+\centering
+\subfloat[Initial\label{fig:initial}]{%
+  \includegraphics[scale=0.75,bb=48 588 218 726]{mount0}}
+\qquad
+\subfloat[Swapping \(4\nearrow 5\) and \(5\searrow 6\)]{%
+  \includegraphics[scale=0.75,bb=48 588 218 726]{mount1}}\\
+\subfloat[Swapping \(5\nearrow 6\) and \(8 \searrow 9\)\label{fig:valley}]{%
+  \includegraphics[scale=0.75,bb=48 588 218 726]{mount2}}
+\qquad
+\subfloat[Last one]{%
+  \includegraphics[bb=13 645 180 782,scale=0.75]{mount3}}
+\caption{Rescheduling of \fig~\ref{fig:dyck_path} into
+  \fig~\ref{fig:dyck_eq}\label{fig:rescheduling}}
+\end{figure}
+displays the rescheduling of \fig~\vref{fig:dyck_path}. Note that two
+different paths can be rescheduled into the same path. What makes
+\fig~\ref{fig:valley} equivalent to \fig~\ref{fig:initial} is the
+invariance of the cost because all operations have cost~\(1\). This
+always holds because enqueueings always have cost~\(1\) and the
+dequeueings involved in a rescheduling have cost~\(1\), because they
+found the front stack non\hyp{}empty after a peak. We proved that all
+paths are equivalent to a range with the same cost, therefore, the
+maximum cost can be found on ranges alone.
+
+Let us note \(e_1, e_2, \dots, e_k\) the maximal subsequences of
+rises; for example, in \fig~\ref{fig:dyck_eq}, we have \(e_1=3\),
+\(e_2 = 3\) and \(e_3 = 1\). Of course, \(e = e_1 + e_2 + \dots +
+e_k\). The fall making up the \(i\)th peak incurs the
+cost\index{deq@$\W{\fun{deq}}{n}$} \(\W{\fun{deq}}{e_i} = e_i + 2\),
+due to the front being empty because we started the rises from the
+abscissa axis. The next \(e_i-1\) falls have all cost~\(1\), because
+the front is not empty. For the \(i\)th mountain, the cost is thus
+\(e_i+(e_i+2)+(e_i-1) = 3e_i+1\). Then \(\A{e,k} =
+\sum_{i=1}^{k}{(3e_i+1)} = 3e + k\). The maximum cost is obtained by
+maximising \(\A{e,k}\) for a given~\(e\):
+\begin{equation*}
+\W{}{e,e} := \max_{1 \leqslant k \leqslant e}{\A{e,k}} = \A{e,e} = 4e
+= 2n,\,\; \text{with \(n=e+d=2e\)},
+\end{equation*}
+where \(\W{}{e,e}\) is the maximum cost when there are
+\(e\)~enqueueings and \({d=e}\) dequeueings. In other words, the worst
+case when \(e=d=7\) is the saw\hyp{}toothed Dyck path shown in
+\fig~\vref{fig:max_dyck}. 
+\begin{figure}
+\centering
+\includegraphics[bb=86 657 507 726,scale=0.7]{max_dyck}
+\caption{Worst case when \(e=d=7\) (cost \(28\))
+\label{fig:max_dyck}}
+\end{figure}
+Importantly, there are no other Dyck paths whose rescheduling lead to
+this worst case and the reason is that the reverse transformation from
+ranges to general Dyck paths works on dequeueings of cost~\(1\) and
+the solution we found is the only one with no dequeueing equal
+to~\(1\).
+
+\paragraph{Dyck meander}
+\index{Dyck meander}
+
+Another worst case occurs if \(e = d + 1\) and the line is then a Dyck
+meander whose extremity ends at ordinate \(e-d=1\). An example is
+given in \fig~\ref{fig:meander1},
+\begin{figure}[b]
+\centering
+\includegraphics[bb=75 570 480 727,scale=0.82]{meander1}
+\caption{Dyck meander modelling queue operations (total cost
+  \(21\))\label{fig:meander1}}
+\end{figure}
+where the last operation is a dequeueing. The dotted line delineates
+the result of applying the rescheduling we used on Dyck paths. Here,
+the last operation becomes an enqueueing.
+
+Another possibility is shown in \fig~\ref{fig:meander2},
+\begin{figure}[t]
+\centering
+\includegraphics[bb=75 570 480 727,scale=0.82]{meander2}
+\caption{Dyck meander modelling queue operations (total cost
+  \(23\))\label{fig:meander2}}
+\end{figure}
+where the last operation is left unchanged. The difference between the
+two examples lies in the fact that the original last dequeueing has,
+in the former case, a cost of~\(1\) (thus is changed) and, in the
+latter case, a cost greater than~\(1\) (thus is invariant). The third
+kind of Dyck meander is one ending with an enqueueing, but because
+this enqueueing must start from the abscissa axis, this is the same
+situation as the result of rescheduling a meander ending with a
+dequeueing with cost~\(1\) (see dotted line in \fig~\ref{fig:meander1}
+again). Therefore, we are left to compare the results of rescheduling
+meanders ending with a dequeueing, that is, we envisage two cases.
+\begin{itemize}
+
+  \item If we have a range of \(n-1\)~operations followed by an
+    enqueueing, the maximum cost of the range is the cost of a
+    saw\hyp{}toothed Dyck path, that is,
+    \(\W{}{e-1,e-1}=4(e-1)=2n-2\), because \(n=e+d=2e-1\), followed by
+    an enqueueing, totalling \(2n-1\).
+
+  \item Otherwise, we have a range of \(n-3\)~operations followed by
+    two rises and one fall (of cost~\(6\)). The cost is
+    \(\W{}{e-2,e-2}+6=2n\), which is marginally greater than the
+    previous case.
+
+\end{itemize}
+
+\mypar{Amortised cost}
+\index{cost!amortised $\sim$}
+\index{queue!amortised cost}
+
+The cost~\(\A{n}\) of a series of \(n\)~queue updates, starting on an
+empty queue, is tightly bounded as\index{queue@$\A{n}$}
+\begin{equation*}
+n \leqslant \A{n} \leqslant 2n,
+\end{equation*}
+where the lower bound is tight if all updates are enqueueings and the
+upper bound when a saw\hyp{}toothed range is followed by one
+enqueueing or else two enqueueings and one dequeueing. By definition,
+the amortised cost of one operation is~\(\A{n}/n\) and lies between
+\(1\)~and~\(2\), which is less than our first analysis (\(\sim
+n/2\)). We published a slightly different analysis on the same
+examples \citep{Rinderknecht_2011}.
+
+\paragraph{Side note}
+
+We can gain some more abstraction by using a dedicated constructor for
+the empty queue, \(\fun{nilq/0}\), and changing accordingly the
+definition of \fun{enq/2} in~\eqref{def:enq} \vpageref{def:enq} so it
+handles this case:
+\begin{equation*}
+\fun{enq}(x,\fun{nilq}()) \rightarrow \fun{q}([x],\el);
+\quad
+\fun{enq}(x,\fun{q}(r,f)) \rightarrow \fun{q}(\cons{x}{r},f).
+\end{equation*}
+We can improve this a little by pushing~\(x\) directly into the front
+stack:
+\begin{equation*}
+\fun{enq}(x,\fun{nilq}()) \rightarrow \fun{q}(\el,[x]);
+\quad
+\fun{enq}(x,\fun{q}(r,f)) \rightarrow \fun{q}(\cons{x}{r},f).
+\end{equation*}
+
+\paragraph{Exercises}
+\begin{enumerate}
+
+  \item Let \(\fun{nxt}(q)\)\index{nxt@\fun{nxt/1}} be the next item
+    to be dequeued from~\(q\):
+    \begin{equation*}
+      \begin{array}{r@{\;}l@{\;}l}
+        \fun{nxt}(\fun{q}(\cons{x}{r},\el)) & \rightarrow 
+        & \fun{nxt}(\fun{q}(\el,\fun{rcat}(r,[x])));\\
+        \fun{nxt}(\fun{q}(r,\cons{x}{f})) & \rightarrow & x.     
+        \index{q@\fun{q/2}}
+      \end{array}
+    \end{equation*}
+    Modify \fun{enq/2}\index{enq@\fun{enq/2}},
+    \fun{deq/1}\index{deq@\fun{deq/1}} and
+    \fun{nxt/1}\index{nxt@\fun{nxt/1}} in such a way that
+    \(\C{\fun{nxt}}{n} = 1\)\index{nxt@$\C{\fun{nxt}}{n}$}, where
+    \(n\)~is the number of items in the queue.
+
+    \item Find~\(\A{n}\) using the slightly different definition
+      \begin{equation*}
+        \begin{array}{@{}r@{\;}l@{\;}l@{}}
+          \fun{deq}(\fun{q}(\cons{x}{r},\el))
+          & \rightarrow
+          & \fun{deq}(\fun{q}(\el,\fun{rev}(\cons{x}{r})));\\
+          \fun{deq}(\fun{q}(r,\cons{x}{f}))
+          & \rightarrow
+          & \pair{\fun{q}(r,f)}{x}.
+        \end{array}
+      \end{equation*}
+
+\end{enumerate}

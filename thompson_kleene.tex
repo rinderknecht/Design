@@ -1,0 +1,34 @@
+%%-*-latex-*-
+ 
+\documentclass{article}
+
+\usepackage{vaucanson-g}
+\usepackage{pst-eps}
+
+%\ShowGrid
+ 
+\begin{document}
+
+\TeXtoEPS
+\VCDraw{%
+\begin{VCPicture}{(0,0)(10,5)}
+% States
+\FixStateDiameter{3cm}
+\StateVar[\phantom{IHHHH}N(s)\phantom{IHHHH}]{(5,2)}{A}
+\MediumState
+\State{(3,2)}{B}
+\State{(7,2)}{C}
+\State[i]{(0,2)}{i}
+\FinalState[f]{(10,2)}{f}
+% Initial and final states
+\Initial{i}
+% Edges
+\EdgeL[0.5]{i}{B}{\epsilon}
+\EdgeL[0.5]{C}{f}{\epsilon}
+\VArcR[0.5]{arcangle=-45}{i}{f}{\epsilon}
+\VArcR[0.5]{arcangle=-80,ncurv=1.3}{C}{B}{\epsilon}
+\end{VCPicture}
+}
+\endTeXtoEPS
+
+\end{document}

@@ -1,0 +1,460 @@
+%%-*-latex-*-
+
+% ------------------------------------------------------------------------
+% 
+\begin{slide}
+\titre{Subset construction (continued)}
+
+\raggedslides[0pt]
+
+Why is \(2^n\) the number of subsets of a finite set of cardinal
+\(n\)?
+
+Let us note \(\dbinom{n}{k}\) the number of \myblue{combinations} of
+\(k\) elements taken among \(n\).
+
+For instance, \(\dbinom{5}{3} = 10\) because, assuming \(\{a, b, c, d,
+e\}\), we can form the subsets
+\[abc, \quad adb, \quad abe, \quad acd, \quad ace, \quad ade, \quad
+bcd, \quad bce, \quad bde, \quad cde
+\]
+
+In general, the choice of the first element can be made among \(n\),
+so \[\dbinom{n}{k} = n \dots\]
+
+\end{slide}
+
+% ------------------------------------------------------------------------
+% 
+\begin{slide}
+\titre{Subset construction (continued)}
+
+\raggedslides[0pt]
+
+The second element can be chosen among \(n-1\) remining ones, but the
+choice of the second element does not depend on the choice of the
+first one, so
+\[\dbinom{n}{k} = n \times (n-1) \times \dots\]
+Until we choose the \(k\)-th element:
+\[\dbinom{n}{k} = n (n-1) \dots (n - k + 1) \dots\]
+But since there is no order among the \(k\) elements (it is a set), we
+have to not count the repeated \myblue{permutations}.
+
+In the example above, \(abc, bca, cab\) should be counted as one
+combination, not three.
+
+\end{slide}
+
+% ------------------------------------------------------------------------
+% 
+\begin{slide}
+\titre{Subset construction (continued)}
+
+\raggedslides[0pt]
+
+How many permutations of \(k\) elements are they? The first element
+can be chosen among \(k\), the second among the \(k-1\) remaining ones
+etc. So the number of permutations of \(k\) elements is \(k (k-1)
+\dots 1 = k!\)
+
+So, finally, the number of combinations of \(k\) elements chosen among
+\(n\), without order is:
+\[
+\dbinom{n}{k} = \frac{n (n-1) \dots (n - k + 1)}{k (k-1) \dots 1} =
+  \frac{n!}{k! (n-k)!}
+\quad \text{where} \; n \geqslant k \geqslant 0
+\]
+So the number of subsets of a set of size \(n\) is the number of
+subsets of size 0 plus the number of subsets of size 1 plus
+etc. Formally, it is
+\[
+\binom{n}{0} + \binom{n}{1} + \dots + \binom{n}{n}=
+\sum_{k=0}^{n}{\binom{n}{k}}
+\]
+
+\end{slide}
+
+
+
+
+
+% ------------------------------------------------------------------------
+% 
+\begin{slide}
+\titre{Recognition of tokens / Transition diagrams and double-buffering}
+
+\raggedslides[0pt]
+
+One solution is to put back the discarded character into the buffer,
+but this is not compatible with a pure queue data structure (the input
+side is different from the output side).
+
+So a better solution is to have a second buffer: when a character is
+removed from the (primary) input buffer, it is not discarded but put into
+this secondary buffer.
+\begin{center}
+\begin{tabular}{rcc@{\,}@{\,}c@{\,}@{\,}ccc@{\,}@{\,}c@{\,}@{\,}ccl}
+  \cline{3-5}\cline{7-9}
+  lexer
+& \(\longleftarrow\)
+& \multicolumn{1}{@{\,}c@{\,}|}{\(\cdots\)}
+& \multicolumn{1}{@{\,}c@{\,}|}{\(c\)}
+& \multicolumn{1}{@{\,}c@{\,}}{\(\cdots\)}
+& \(\longleftarrow\)
+& \multicolumn{1}{@{\,}c@{\,}|}{\(\cdots\)}
+& \multicolumn{1}{@{\,}c@{\,}|}{\(d\)}
+& \multicolumn{1}{@{\,}c@{\,}}{\(\cdots\)}
+& \(\longleftarrow\)
+& file\\
+  \cline{3-5}\cline{7-9}
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonright\)}
+&
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonright\)}\\
+&
+& \multicolumn{4}{@{}l@{}}{secondary}
+& \multicolumn{4}{@{}l@{}}{primary}\\
+&
+& \multicolumn{4}{@{}l@{}}{buffer}
+& \multicolumn{4}{@{}l@{}}{buffer}\\
+
+\end{tabular}
+\end{center}
+The lexer now only operates on the secondary buffer (it has no more
+access to the primary buffer).
+
+
+\end{slide}
+
+% ------------------------------------------------------------------------
+% 
+\begin{slide}
+\titre{Recognition of tokens / Transition diagrams and double-buffering
+(continued)}
+
+\raggedslides[0pt]
+
+So, initially, the current state is \(1\) and the secondary buffer is
+not empty.
+\begin{center}
+\begin{tabular}{rcc@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c
+c@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}ccl}
+  \cline{3-7}\cline{9-13}
+  lexer
+& \(\longleftarrow\)
+& \multicolumn{1}{|@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{>}}
+& \(\longleftarrow\)
+& \multicolumn{1}{|@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{1}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{+}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{2}}
+& \(\longleftarrow\)
+& file\\
+  \cline{3-7}\cline{9-13}
+&
+&
+&
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonright\)}
+&
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonright\)}
+\end{tabular}
+\end{center}
+When the lexer reads the next available character, it is \textbf{not}
+immediately removed from the secondary buffer: instead, the
+pointer \(\upharpoonright\) is shifted to the right of one position. 
+
+If the pointer was already at the last position, then some characters
+from the primary buffer are input into the secondary buffer.
+
+If the primary buffer becomes empty, some characters are read from the
+file, until \eof is found (and read).
+
+\end{slide}
+
+
+% ------------------------------------------------------------------------
+% 
+\begin{slide}
+\titre{Recognition of tokens / Transition diagrams and double-buffering
+(continued)}
+
+There are two special features in the secondary buffer, compared to the
+primary buffer:
+\begin{enumerate}
+  
+  \item we use a new pointer, noted \(\upharpoonleft\), to mark the
+  current character when the current state is initial;
+
+  \item if there is no position to the right, some characters are
+  input in the secondary buffer from the primary one (at least one).
+
+\end{enumerate}
+So, our example show be now depicted as
+\begin{center}
+\begin{tabular}{rcc@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c
+c@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}ccl}
+  \cline{3-7}\cline{9-13}
+  lexer
+& \(\longleftarrow\)
+& \multicolumn{1}{|@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{>}}
+& \(\longleftarrow\)
+& \multicolumn{1}{|@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{1}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{+}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{2}}
+& \(\longleftarrow\)
+& file\\
+  \cline{3-7}\cline{9-13}
+&
+&
+&
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonleft \upharpoonright\)}
+&
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonright\)}
+\end{tabular}
+\end{center}
+
+\end{slide}
+
+% ------------------------------------------------------------------------
+% 
+\begin{slide}
+\titre{Recognition of tokens / Transition diagrams and double-buffering
+(continued)}
+
+\raggedslides[0pt]
+
+The character \exc{>} in the buffer is compared to the labels of the
+out-going edges of the current state, i.e. the initial state. Such
+label exists on an edge to state \(2\), hence the current state
+becomes state \(2\).
+
+In the buffer, the current pointer \(\upharpoonright\) is shifted to
+the right. But is is already pointing to the last position, so we must
+input some characters from the primary buffer.
+
+Let us assume we input one character at a time. We get
+\begin{center}
+\begin{tabular}{rcc@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c
+c@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}ccl}
+  \cline{3-7}\cline{9-13}
+  lexer
+& \(\longleftarrow\)
+& \multicolumn{1}{|@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{>}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{1}}
+& \(\longleftarrow\)
+& \multicolumn{1}{|@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{+}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{2}}
+& \(\longleftarrow\)
+& file\\
+  \cline{3-7}\cline{9-13}
+&
+&
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonleft\)}
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonright\)}
+&
+&
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonright\)}
+\end{tabular}
+\end{center}
+
+\end{slide}
+
+% ------------------------------------------------------------------------
+% 
+\begin{slide}
+\titre{Recognition of tokens / Transition diagrams and double-buffering
+  (continued)}
+
+\raggedslides[0pt]
+
+We are now at state \(2\) and the next character is \exc{1}. 
+
+The only way to continue is to go to state \(4\), using the special
+label \other.
+
+We shift the pointer of the secondary buffer to the right and,
+since it points to the last position, we input one character from the
+primary buffer:
+\begin{center}
+\begin{tabular}{rcc@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c
+c@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}ccl}
+  \cline{3-7}\cline{9-13}
+  lexer
+& \(\longleftarrow\)
+& \multicolumn{1}{|@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{>}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{1}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{+}}
+& \(\longleftarrow\)
+& \multicolumn{1}{|@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{2}}
+& \(\longleftarrow\)
+& file\\
+  \cline{3-7}\cline{9-13}
+&
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonleft\)}
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonright\)}
+&
+&
+&
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonright\)}
+\end{tabular}
+\end{center}
+
+\end{slide}
+
+
+% ------------------------------------------------------------------------
+% 
+\begin{slide}
+\titre{Recognition of tokens / Transition diagrams and double-buffering
+(continued)}
+
+\raggedslides[0pt]
+
+State \(4\) is a final state a bit special: it is
+marked with \emph{\textsc{*}}. This means that before emitting the
+recognised lexeme we have to shift the current pointer by one position
+\emph{to the left}:
+\begin{center}
+\begin{tabular}{rcc@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c
+c@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}ccl}
+  \cline{3-7}\cline{9-13}
+  lexer
+& \(\longleftarrow\)
+& \multicolumn{1}{|@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{>}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{1}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{+}}
+& \(\longleftarrow\)
+& \multicolumn{1}{|@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{2}}
+& \(\longleftarrow\)
+& file\\
+  \cline{3-7}\cline{9-13}
+&
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonleft\)}
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonright\)}
+&
+&
+&
+&
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonright\)}
+\end{tabular}
+\end{center}
+\emph{This allows to recover the}
+\begin{tabular}{|@{\,}c@{\,}|}
+\hline
+\exc{1}\\
+\hline
+\end{tabular}
+\emph{character as next available character.}
+
+The recognised lexeme always starts at the \(\upharpoonleft\) pointer
+and ends one position before the \(\upharpoonright\). So, here, we
+get \exc{>}.
+
+We do not have to remove the recognised lexeme from the secondary
+buffer: if a character (here \texttt{>}) reaches the leftmost position
+of the buffer, it will be automatically discarded at the following
+input.
+
+\end{slide}
+
+% ------------------------------------------------------------------------
+% 
+\begin{slide}
+\titre{Recognition of tokens / Transition diagrams and double-buffering
+(continued)}
+
+\raggedslides[0pt]
+
+As a simplification, we can now consider that the lexer is connected
+to only one buffer which behaves as the secondary buffer for outputs
+and as the primary buffer for inputs and write
+\begin{center}
+\begin{tabular}{rcc@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}ccl}
+  \cline{3-7}
+  lexer
+& \(\longleftarrow\)
+& \multicolumn{1}{|@{\,}c@{\,}|}{\phantom{=}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{>}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{1}}
+& \multicolumn{1}{@{\,}c@{\,}|}{\exc{+}}
+& \multicolumn{1}{@{\,}c@{\,}}{\(\cdots\)}
+& \(\longleftarrow\)
+& file\\
+  \cline{3-7}
+&
+&
+& \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonleft \upharpoonright\)}
+\end{tabular}
+\end{center}
+
+\end{slide}
+
+
+The source language is often more abstract (e.g. the Ada programming
+language) than the target language (e.g. assembly or machine
+language).
+
+Compilers are sometimes called \myblue{translators} when they
+map programs to programs whose language is of the same level of
+abstraction.
+
+Usually, a language is considered more \myblue{abstract} than another
+if its underlying concepts (or ``its paradigms'') include the other
+ones or if they are ``more distant'' from the underlying machine model
+(including control stacks, registers, memory etc.).
+
+So this notion of abstraction is relative.
+

@@ -1,0 +1,26 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+%\psset{showbbox=true}
+\pstree[nodesep=2pt,levelsep=27pt,treesep=6pt,arrows=<-]%
+{\TR{\(2^2+2^1+2^0\)}}{
+  \pstree{\TR{\(2^2\)}}{
+    \skiplevel{\Tfan}
+  }
+  \pstree{\TR{\(2^1+2^0\)}}{
+    \pstree{\TR{\(2^1\)}}{
+      \Tfan
+    }
+    \psset{levelsep=24pt}
+    \skiplevel{\TR{\(2^0\)}}
+  }
+}
+\endTeXtoEPS
+
+\end{document}

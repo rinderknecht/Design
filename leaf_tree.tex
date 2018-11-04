@@ -1,0 +1,37 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\psset{radius=1.7pt}
+\pstree[levelsep=17pt,treesep=13pt]{\TC*}{
+  \pstree{\TC*}{
+    \pstree[nodesepB=1pt,treesep=19pt]{\TC*}{
+      \TR{\(6\)}
+      \psset{nodesep=0pt}
+      \pstree[nodesepB=1pt,treesep=13pt]{\TC*}{
+        \TR{\(2\)}
+        \TR{\(6\)}
+      }
+    }
+    \pstree[nodesepB=1pt]{\TC*}{
+      \TR{\(7\)}
+      \TR{\(1\)}
+    }
+  }
+  \pstree[nodesepB=1pt,treesep=19pt]{\TC*}{
+    \TR{\(2\)}
+    \psset{nodesepB=0pt}
+    \pstree[nodesepB=1pt,treesep=13pt]{\TC*}{
+      \TR{\(0\)}
+      \TR{\(3\)}
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}

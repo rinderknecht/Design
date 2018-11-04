@@ -1,0 +1,11 @@
+
+\begin{align}
+  \Expected{I_n} \cdot C_n
+  &:= \sum_{l=0}^{n}l\sum_{d=1}^{n}\mathcal{N}_n(l,d)
+   = \sum_{l=0}^{n}l\left[\binom{2n-1}{n+l} -
+     \binom{2n-1}{n+l+1}\right]\notag\\
+  &= \sum_{l=1}^{n-1}\binom{2n-1}{n+l} = \Expected{E_n} \cdot C_n -
+  \binom{2n-1}{n}\notag\\
+  &= 4^{n-1} - \frac{1}{2}\binom{2n}{n}
+   = 4^{n-1} - \frac{1}{2}(n+1)C_n.\notag
+

@@ -1,0 +1,30 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath,amssymb}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\(
+\boxed{
+\begin{array}{@{}r@{\;}c@{\;}l@{}}
+\fun{flat}(\el)                   & \xrightarrow{\smash{\psi}} 
+                                  & \el;\\
+\fun{flat}(\cons{\el}{t})         & \xrightarrow{\smash{\omega}}
+                                  & \fun{flat}(t);\\
+\fun{flat}(\cons{\cons{x}{s}}{t}) & \xrightarrow{\smash{\gamma}}
+                                  & \fun{flat}(\cons{x,s}{t});\\
+\fun{flat}(\cons{y}{t})           & \xrightarrow{\smash{\delta}}
+                                  & \cons{y}{\fun{flat}(t)}.
+\end{array}}
+\)
+\endTeXtoEPS
+
+\end{document}
+
+

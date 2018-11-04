@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE book SYSTEM "book_simple.dtd">
+
+<book title="Definitive XML Schema">
+  <author first="Priscilla" last="Walmsley"/>
+
+  <section title="[1] A quick tour of XML Schema">
+    <section title="[1.1] An example schema"/>
+    <section title="[1.2] The components of XML Schema">
+      <section title="[1.2.1] Declarations vs. definitions"/>
+      <section title="[1.2.2] Global vs. local components"/>
+    </section>
+    <section title="[1.3] Elements and attributes">
+      <section title="[1.3.1] The tag/type distinction"/>
+    </section>
+  </section>
+
+  <section title="[2] Instances and schemas">
+    <section title="[2.1] Using the instance attributes"/>
+    <section title="[2.2] Schema processing">
+      <section title="[2.2.1] Validation"/>
+      <section title="[2.2.2] Augmenting the instance"/>
+    </section>
+  </section>
+</book>

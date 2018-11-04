@@ -1,0 +1,29 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath,amssymb}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\(
+\boxed{
+\begin{array}{@{}r@{\;}c@{\;}l@{}}
+\fun{per}_0(\fun{ext}()) & \rightarrow & \fun{true}(0);\\
+\fun{per}_0(\fun{int}(x,t_1,t_2)) & \rightarrow &
+  \fun{t}_1(\fun{per}_0(t_1),t_2).\\
+\\
+\fun{t}_1(\fun{false}(),t_2) & \rightarrow & \fun{false}();\\
+\fun{t}_1(h,t_2) & \rightarrow & \fun{t}_2(h,\fun{per}_0(t_2)).\\
+\\
+\fun{t}_2(\fun{true}(h),\fun{true}(h)) & \rightarrow & \fun{true}(h+1);\\
+\fun{t}_2(h,x) & \rightarrow & \fun{false}().
+\end{array}}
+\)
+\endTeXtoEPS
+
+\end{document}

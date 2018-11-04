@@ -1,0 +1,33 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{vaucanson-g}
+\usepackage{pst-eps}
+
+%\ShowGrid
+ 
+\input{token}
+\input{grammar}
+
+\begin{document}
+
+\TeXtoEPS
+\VCDraw{%
+\begin{VCPicture}{(0,0)(3,0)}
+% States
+\State[1]{(0,0)}{A}
+\FinalState[2]{(3,0)}{B}
+% State annotations
+\nput{0}{B}{\large \texttt{switch(buffer,keywords)}}
+% Initial and final states
+\Initial{A}
+% Edges
+\EdgeL{A}{B}{\small \term{letter}}
+\LoopN[0.5]{B}{\small \term{letter}}
+\LoopS[0.5]{B}{\small \term{digit}}
+\end{VCPicture}
+}
+\endTeXtoEPS
+
+\end{document}

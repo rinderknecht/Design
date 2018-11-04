@@ -1,0 +1,72 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pst-infixplot,pstricks-add,pst-eps}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\psset{yunit=40mm}
+\begin{pspicture}(-1.4,0.1)(10,-1.2)
+% Axes
+%
+\psaxes[xlabelPos=top]{->}(10,-1.2)
+%\qdisk(1,-1){2pt} % Test
+
+% Abscissa
+%
+\rput[C](10,-0.07){\(p\)}
+
+% Ordinates
+%
+\rput[rC](-0.3,-0.2645){\(1 - \alpha\)}
+\rput[rC](-0.3,-0.5145){\(\myfrac3/4-\alpha\)}
+\rput[rC](-0.3,-0.5978){\(\myfrac2/3-\alpha\)}
+\rput[rC](-0.3,-0.7645){\(\myfrac1/2-\alpha\)}
+\rput[rC](-0.1,-1.2){\(\Phi(p,i)\)}
+
+%% Phi(p,3)
+\psPlot[linewidth=0.7pt]{-0.2}{10}{x-1.264499+1-1/4+3/(2^x+1)-((2^x+3)*log(2^x+3)/log(2)-3*log(3)/log(2)-2)/2^x}
+
+% Phi(p,2)
+\psPlot[linewidth=0.7pt]{-0.2}{10}{x-1.264499+1-1/3+2/(2^x+1)-((2^x+2)*log(2^x+2)/log(2)-4)/2^x}
+
+%% Phi(p,1)
+\psPlot[linewidth=0.7pt]{-0.2}{10}{x-1.264499+1-1/2+1/(2^x+1)-((2^x+1)*log(2^x+1)/log(2)-2)/2^x}
+
+% Asymptote of asymptotes
+%
+\psline[linewidth=0.7pt,linestyle=dashed](-0.1,-0.2645)(10,-0.2645)
+\rput[l](3,-0.2){limit of asymptotes}
+
+% Asymptotes
+%
+\rput[l](2.5,-0.68){asymptotes}
+
+% i=3
+\psline[linewidth=0.7pt,linestyle=dashed](-0.1,-0.5145)(10,-0.5145)
+\psline[linewidth=0.7pt,linestyle=dotted](2,0)(2,-1.15)
+\rput[l](9,-0.45){\(i=3\)}
+
+% i=2
+\psline[linewidth=0.7pt,linestyle=dashed](-0.1,-0.5978)(10,-0.5978)
+\psline[linewidth=0.7pt,linestyle=dotted](1,0)(1,-1.15)
+\rput[l](9,-0.68){\(i=2\)}
+
+% i=1
+\psline[linewidth=0.7pt,linestyle=dashed](-0.1,-0.7645)(10,-0.7645)
+\rput[l](9,-0.85){\(i=1\)}
+
+% Starting points
+\psdot[dotsize=4pt,dotstyle=Bo](2,-1.1386)
+\psdot[dotsize=4pt,dotstyle=Bo](1,-0.9311)
+\psdot[dotsize=4pt,dotstyle=Bo](0,-0.2645)
+
+\end{pspicture}
+\endTeXtoEPS
+
+\end{document}

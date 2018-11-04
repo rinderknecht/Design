@@ -1,0 +1,32 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesepA=2pt,nodesepB=1pt,levelsep=17pt,treesep=14pt]{\TR{\fun{cat}}}{
+  \TR{\([x_1]\)}
+  \Tn
+  \psset{linewidth=1.5pt,linestyle=dotted}
+  \pstree[linewidth=0.8pt,linestyle=solid]{\TR{\fun{cat}}}{
+    \TR{\([x_{\Gamma-\Omega}]\)}
+     \pstree{\TR{\fun{cat}}}{
+      \TR{\texttt{[]}}
+      \Tn
+      \psset{linewidth=1.5pt,linestyle=dotted}
+      \pstree[linewidth=0.8pt,linestyle=solid,treesep=4pt]%
+             {\TR{\fun{cat}}}{
+        \TR{\texttt{[]}}
+        \TR{\([x_{\Gamma-\Omega+1},\dots,x_n]\)}
+      }
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}

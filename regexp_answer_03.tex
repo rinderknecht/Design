@@ -1,0 +1,90 @@
+\paragraph{Answer 3.}
+
+\begin{enumerate}
+
+  \item The first regular expression can be simplified in the
+    following way:
+   \begin{align*}
+     \lparen \epsilon \, \disjM{} \, a\kleeneM{} \, \disjM{} \,
+     b\kleeneM{} \, \disjM{} \, a \, \disjM{} \, b \rparen\kleeneM
+     &= \lparen \epsilon \, \disjM{} \, a\kleeneM{} \, \disjM{} \,
+     b\kleeneM{} \, \disjM{} \, b\rparen\kleeneM, & \text{since}
+     \, L(a) \subset L(a\kleeneM);\\
+     &= \lparen \epsilon \, \disjM{} \, a\kleeneM{} \, \disjM{} \,
+     b\kleeneM\rparen\kleeneM, & \text{since} \,
+     L(b) \subset L(b\kleeneM);\\
+     &= \lparen \epsilon \, \disjM{} \, a\plusM{} \, \disjM{} \,
+     b\plusM\rparen\kleeneM, & \text{since} \, \{\epsilon\}
+     \subset L(x\kleeneM);\\
+     &= \lparen a\plusM{} \, \disjM{} \, b\plusM\rparen\kleeneM, &
+     \text{since} \, \lparen\epsilon \, \disjM{} \,
+     x\rparen\kleeneM = x\kleeneM.
+   \end{align*}
+   Words in \(L(\lparen a\plusM{} \, \disjM{} \,
+   b\plusM\rparen\kleeneM)\) are of the form \(\epsilon\) or
+   \((a\ldots a)\) \((b \ldots b)\) \((a\ldots a)\) \((b\ldots
+    b)\ldots\), where the ellipsis stands for `none or many times'.
+   So we recognise \(\lparen a \, \disjM{} \,
+   b\rparen\kleeneM\). Therefore \(\lparen \epsilon \, \disjM{}
+   \, a\kleeneM{} \, \disjM{} \, b\kleeneM{} \, \disjM{} \, a \,
+   \disjM{} \, b \rparen\kleeneM = \lparen a \, \disjM{} \,
+   b\rparen\kleeneM\).
+
+  \item The second regular expression can be simplified in the
+    following way. We note first that the expression is made of the
+    disjunction of three regular sub-expressions (\emph{i.e.,} it is a
+    union of three sub-languages). The simplest idea is then to check
+    whether one of these sub-languages is redundant, \emph{i.e.,} if
+    one is included in another. If so, we can simply remove it from
+    the expression.
+  \begin{align*}
+     a \lparen a \, \disjM{} \, b \rparen\kleeneM{} b 
+     \, \disjM{} \, \lparen a b \rparen\kleeneM{} 
+     \, \disjM{} \, \lparen b a \rparen\kleeneM
+     &= a \lparen a \, \disjM{} \, b \rparen\kleeneM{} b 
+     \, \disjM{} \, \epsilon
+     \, \disjM{} \, \lparen a b \rparen\plusM{} 
+     \, \disjM{} \, \lparen b a \rparen\kleeneM,\\
+     & \qquad \text{since} \, \lparen ab \rparen\kleeneM =
+     \epsilon \, \disjM{}\, \lparen ab \rparen\plusM;\\
+     &= a \lparen a \, \disjM{} \, b \rparen\kleeneM{} b 
+     \, \disjM{} \, \lparen a b \rparen\plusM{} 
+     \, \disjM{} \, \lparen b a \rparen\kleeneM,\\
+     & \qquad \text{since} \, \{\epsilon\} \subset L(\lparen ba
+     \rparen\kleeneM).
+  \end{align*}
+  We have:
+  \begin{align*}
+    \lparen ab\rparen\plusM
+   &= \lparen ab\rparen \lparen ab\rparen \ldots \lparen ab \rparen\\
+   &= a\lparen ba\rparen\lparen ba\rparen\ldots\lparen  ba\rparen b \;
+    \disjM{} \; ab\\
+   &= a\lparen ba \rparen\kleeneM b.
+   \end{align*}
+   Also \(L(\lparen ba \rparen) \subset L(\lparen a \, \disjM{}
+   \, b\rparen\kleeneM)\) and then \(L(\lparen ba
+   \rparen\kleeneM) \subset L(\lparen a \, \disjM{} \,
+   b\rparen\kleeneM)\), because \(\lparen a \, \disjM{} \,
+   b\rparen\kleeneM\) denotes all the words. Therefore
+   \begin{align*}
+      L(a\lparen ba \rparen\kleeneM b) 
+    &\subset L(a \lparen a \, \disjM{} \, b\rparen\kleeneM b)\\
+      L(\lparen ab\rparen\plusM) 
+    &\subset L(a \lparen a \, \disjM{} \, b\rparen\kleeneM b)
+   \end{align*}
+
+   As a consequence, one possible answer is
+   \begin{equation*}  
+     a \lparen a \, \disjM{} \, b \rparen\kleeneM{} b 
+     \, \disjM{} \, \lparen a b \rparen\kleeneM{} 
+     \, \disjM{} \, \lparen b a \rparen\kleeneM
+     = a \lparen a \, \disjM{} \, b\rparen\kleeneM b 
+     \, \disjM{} \, \lparen ba \rparen\kleeneM.
+   \end{equation*}
+   The intersection between \(L(a \lparen a \, \disjM{} \,
+   b\rparen\kleeneM b)\) and \(L(\lparen ba \rparen\kleeneM)\)
+   is empty because all the words of the former start with
+     \(a\), while all the words of the other start with \(b\) (or is
+     \(\epsilon\)).  Therefore we cannot simply further this way.
+
+\end{enumerate}

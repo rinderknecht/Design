@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE lists SYSTEM "list.dtd">
+<lists>
+  <list>
+    <item val="1"/>
+    <item val="7"/>
+    <item val="13"/>
+    <item val="15"/>
+    <item val="28"/>
+    <item val="33"/>
+  </list>
+  <list>
+    <item val="8"/>
+    <item val="9"/>
+    <item val="16"/>
+    <item val="19"/>
+  </list>
+</lists>

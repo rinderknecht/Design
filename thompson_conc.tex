@@ -1,0 +1,35 @@
+%%-*-latex-*-
+ 
+\documentclass{article}
+
+\usepackage{vaucanson-g}
+\usepackage{pst-eps}
+
+%\ShowGrid
+ 
+\begin{document}
+
+\TeXtoEPS
+\VCDraw{%
+\begin{VCPicture}{(0,0)(13,4)}
+% States
+\FixStateDiameter{3cm}
+\StateVar[\phantom{IHHHH}N(s)\phantom{IHHHH}]{(3,2)}{A}
+\MediumState
+\State[i]{(1,2)}{B}
+\State{(5,2)}{C}
+\FixStateDiameter{3cm}
+\StateVar[\phantom{IHHHH}N(t)\phantom{IHHHH}]{(10,2)}{D}
+\MediumState
+\State{(8,2)}{E}
+\FinalState[f]{(12,2)}{F}
+% State annotations
+% Initial and final states
+\Initial{B}
+% Edges
+\EdgeL[0.5]{C}{E}{\epsilon}
+\end{VCPicture}
+}
+\endTeXtoEPS
+
+\end{document}

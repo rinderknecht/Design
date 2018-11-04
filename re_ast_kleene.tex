@@ -1,0 +1,20 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{pstricks,pst-tree,pst-eps}
+\usepackage{amsmath,xspace}
+
+\input{grammar}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=20pt]{\TR{\kleene}}{
+  \Tr[ref=t]{\pstribox{s}}
+}
+\endTeXtoEPS
+
+\end{document}
+
+\begin{document}

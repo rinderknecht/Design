@@ -1,0 +1,34 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath,amssymb}
+\usepackage{mathpartir}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\framebox[0.87\columnwidth]{\vbox{%
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\begin{gather*}
+\inferrule
+  {}
+  {\fun{per}(\fun{ext}()) \rightarrow \fun{true}(0)};
+\;\;
+\inferrule
+  {\fun{per}(t_1) \twoheadrightarrow \fun{true}(h)
+   \and
+   \fun{per}(t_2) \twoheadrightarrow \fun{true}(h)}
+  {\fun{per}(\fun{int}(x,t_1,t_2)) \rightarrow \fun{true}(h+1)};
+\\
+\inferrule
+  {}
+  {\fun{per}(t) \rightarrow \fun{false}()}.
+\end{gather*}}}
+\endTeXtoEPS
+
+\end{document}

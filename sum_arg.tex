@@ -1,0 +1,20 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=16pt,treesep=14pt]{\TR{\texttt{|}}}{
+  \TR{\(3\)}
+  \pstree{\TR{\texttt{|}}}{
+    \TR{\(4\)}
+    \TR{\texttt{[]}}
+  }
+}
+\endTeXtoEPS
+
+\end{document}

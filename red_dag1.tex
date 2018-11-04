@@ -1,0 +1,32 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\fun{red}}}{
+  \pstree{\TR{\texttt{|}}}{
+    \TR{\(x\)}
+    \pstree{\TR{\texttt{|}}}{
+      \TR{\rnode[b]{to_I}{\(x\)}}
+      \TR{\rnode[b]{to_L}{\(s\)}}
+    }
+  }
+}
+\raisebox{-3pt}{\(\rightarrow\)}\quad
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]%
+  {\TR{\fun{red}}}{
+    \pstree{\TR{\rnode[bl]{from_I}{\rnode[br]{from_L}{\texttt{|}}}}}{
+      \Tn
+    }
+  }
+\nccurve[angleA=-120,angleB=-90,ncurv=1,nodesep=2pt]{->}{from_I}{to_I}
+\nccurve[angleA=-30,angleB=-90,ncurv=1,nodesep=2pt]{->}{from_L}{to_L}
+\endTeXtoEPS
+
+\end{document}

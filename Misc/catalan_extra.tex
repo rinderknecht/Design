@@ -1,0 +1,71 @@
+\begin{wrapfigure}[9]{r}[0pt]{0pt}
+% [9] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\includegraphics[bb=71 646 150 721]{ctree2}
+\caption{Catalan tree \label{fig:ctree2}}
+\end{wrapfigure}
+With these preliminaries in mind, let us consider an example with the
+Catalan tree of size \(n=16\) in \fig~\vref{fig:ctree2}. The node
+\((\circ)\) is a node at level \(l=2\) and of degree \(d=3\). We have
+seen that we can construct a Dyck path in bijection with that tree by
+performing a preorder traversal which yields an upward step, or rise,
+when going down an edge, and a rightward step, or fall, when going up
+an edge. We are interested here in distinguishing the three edges
+connecting our node \((\circ)\) to its children, on the way up.  The
+equivalent Dyck path\index{Dyck path} is shown in
+\fig~\vref{fig:Catalan_path_length},
+\begin{figure}[t]
+\centering
+\includegraphics[bb=28 452 302 721]{path_length}
+\caption{Dyck path equivalent to \fig~\vref{fig:ctree2} \label{fig:Catalan_path_length}}
+\end{figure}
+from \((0,0)\) to \(C(n-1,n-1)\). Recall that if~\(h\) is the height
+of the Catalan tree, the corresponding Dyck path has height~\(h-1\),
+therefore, the three oriented edges in the tree are mapped to the
+three oriented falls ending at level~\(l\) in the Dyck
+path. Precisely, the end points are \((i_1,i_1+l)\), \((i_2,i_2+l)\)
+and \(B(i_d,i_d+l)\), where \(d=3\), on the dotted diagonal
+\((A,B)\). The subtree rooted at \((\circ)\) in \fig~\vref{fig:ctree2}
+corresponds here to the lattice path from~\(A\) to~\(B\), which stays
+above the diagonal \((A,B)\), plus the preceding and following steps,
+which are right below it. Therefore, we divide the Dyck path in three
+successive paths: from the origin \((0,0)\) to~\(A\), from~\(A\)
+to~\(B\), and from~\(B\) to~\(C\). To map the node~\((\circ)\) to a
+unique path, we operate on these three paths successively as follows:
+\begin{enumerate*}
+
+  \item the initial path is left unchanged;
+
+  \item the oriented falls are removed;
+
+  \item the remaining path is reversed.
+
+\end{enumerate*}
+Note that there are actually \(d+1\) oriented falls, because we
+include the one right after~\(B\). The resulting lattice path goes
+from \((0,0)\) to~\(A\), then to~\(B'\), and ends
+at~\(C'(n-l-d-1,n+l-2)\). (The new steps that differ from the original
+Dyck path are drawn with a dashed line.) The straight line distance
+from~\(B\) to~\(B'\) is~\(d\), because we deleted the~\(d\) falls
+corresponding to the three oriented edges in the tree. The mapping is
+injective because the resulting path is unique. It is also
+surjective. First, let us note that, given~\(n\) and a lattice path
+ending at \((a,b)\), then \(l=b-n+2\) and \(d=2n-a-b-3\). Second, we
+remark that the reversed path stays above, or touches, the diagonal
+passing at~\(B'\), drawn with dots, whose equation is
+\(y=x+l+d\). Therefore, when we delete a fall \((i_k-1,i_k+l)
+\rightarrow (i_k,i_k+l)\), for \(1 \leqslant k \leqslant d\), we raise
+the rest of the path by one, which will remain above the diagonal
+\(y=x+l+k\). In other words, to recover the Dyck path, we start from
+\((0,0)\) and look for the first point at level~\(l+1\) after which
+the path remains above the diagonal at that point: this is where we
+restore a fall, and we resume the process \(d-1\) times.
+
+% The idea is to find a bijection between these specific nodes and some
+% combinatorial objects which are easy to count. Because we already know
+% from section~\vref{sec:Catalan_enumeration} that Catalan trees of
+% size~\(n\) are in bijection with Dyck paths \index{Dyck path} of
+% length \(2n-2\), we want to find lattice paths in bijection with the
+% nodes of interest: by counting these paths we will count the nodes.

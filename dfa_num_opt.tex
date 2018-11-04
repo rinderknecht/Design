@@ -1,0 +1,52 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{xspace}
+\usepackage{vaucanson-g}
+\usepackage{pst-eps}
+
+%\ShowGrid
+ 
+\input{token}
+\input{grammar}
+
+\begin{document}
+
+\TeXtoEPS
+\VCDraw{%
+\begin{VCPicture}{(0,0)(9,4)}
+% States
+\State[1]{(0,0)}{A}
+\FinalState[2]{(3,0)}{B}
+\State[3]{(6,0)}{C}
+\FinalState[4]{(9,0)}{D}
+\State[5]{(3,4)}{E}
+\State[6]{(6,4)}{F}
+\FinalState[7]{(9,4)}{G}
+% State annotations
+\nput{-90}{B}{\large \token{num}{lexeme(buffer)}}
+\nput{0}{D}{\large \token{num}{lexeme(buffer)}}
+\nput{0}{G}{\large \token{num}{lexeme(buffer)}}
+% Initial and final states
+\Initial{A}
+% Edges
+\EdgeL{A}{B}{\small \term{digit}}
+\LoopN[0.85]{B}{\small \term{digit}}
+\EdgeL{B}{C}{\exc{.}}
+\VArcL[0.5]{arcangle=45}{B}{E}{\exc{E}}
+\EdgeL[0.3]{C}{D}{\small \term{digit}}
+\LoopN[0.5]{D}{\small \term{digit}}
+\EdgeBorder
+\EdgeR{D}{E}{\exc{E}}
+\EdgeBorderOff
+\ArcL[0.5]{E}{F}{\exc{+}}
+\ArcR[0.5]{E}{F}{\exc{-}}
+\VArcL[0.5]{arcangle=45,arcangleB=40,ncurv=0.7}{E}{G}{\small \term{digit}}
+\EdgeL{F}{G}{\small \term{digit}}
+\LoopN[0.5]{G}{\small \term{digit}}
+\end{VCPicture}
+}
+\endTeXtoEPS
+
+\end{document}

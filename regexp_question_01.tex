@@ -1,0 +1,23 @@
+\paragraph{Question 1.}
+
+Let the alphabet \(\Sigma = \{a, b\}\) and the following regular
+expressions:
+\begin{align*}
+  r &= a \lparen a \, \disjM{} \, b \rparen\kleeneM{} ba,\\
+  s &= \lparen ab \rparen\kleeneM{} \, \disjM{} \, \lparen ba
+  \rparen\kleeneM{} \, \disjM{} \, \lparen a\kleeneM{} 
+  \, \disjM{} \, b\kleeneM\rparen.
+\end{align*}
+The language denoted by~\(r\) is noted \(L(r)\) and the language
+denoted by~\(s\) is noted \(L(s)\). Find a word~\(x\) such that
+\begin{enumerate*}
+
+  \item \(x \in L(r)\) and \(x \not\in L(s)\),
+
+  \item \(x \not\in L(r)\) and \(x \in L(s)\),
+
+  \item \(x \in L(r)\) and \(x \in L(s)\),
+
+  \item \(x \not\in L(r)\) and \(x \not\in L(s)\).
+
+\end{enumerate*}

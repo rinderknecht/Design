@@ -1,0 +1,254 @@
+\section{Deterministic finite automata}
+ 
+Transition diagrams are useful graphical representations of instances
+of the mathematical concept of \emph{deterministic finite automaton}
+(\emph{DFA}). Formally, a DFA \(\mathcal{D}\) is a 5-tuple
+\(\mathcal{D} = (Q, \Sigma, \delta, q_0, F)\) where
+\begin{enumerate*}
+
+  \item a finite set of \emph{states}, often noted \(Q\);
+
+  \item an \emph{initial state} \(q_0 \in Q\);
+
+  \item a set of \emph{final (\emph{or} accepting)
+  states} \(F \subseteq Q\);
+
+  \item a finite set of \emph{input symbols}, often noted \(\Sigma\);
+
+  \item a \emph{transition function} \(\delta\) that takes a state and
+    an input symbol and returns a state: if~\(q\) is a state with an
+    edge labelled \(a\), the edge leads to the state \(\delta(q, a)\).
+
+\end{enumerate*}
+
+\subsection*{Recognised words}
+
+Independently of the interpretation of the states, we can define how a
+given word is accepted (or recognised) or rejected by a given DFA. For
+example, the word \(a_1 a_2 \cdots a_n\), with \(a_i \in \Sigma\), is
+recognised by the DFA \(\mathcal{D} = (Q, \Sigma, \delta, q_0, F)\)
+if, for all \(0 \leqslant i \leqslant n-1\), there is a sequence of
+states \(q_i \in Q\) such that \(\delta (q_i, a_{i+1}) = q_{i+1}\) and
+\(q_n \in F\). The language recognised by \(\mathcal{D}\), noted
+\(L(\mathcal{D})\) is the set of words recognised
+by~\(\mathcal{D}\). For example, consider the DFA in
+\fig~\vref{fig:trie_then}.
+\begin{figure}[b]
+\centering
+\includegraphics[bb=48 644 218 730,scale=0.93]{trie_then}
+\caption{A trie recognising \textsf{they}, \textsf{then},
+  \textsf{this} and \textsf{thus} \label{fig:trie_then}}
+\end{figure}
+The word \textsf{then} is recognised because there is a sequence of
+states \((q_0, q_1, q_2, q_4, q_5)\) connected by edges which
+satisfies \(\delta (q_0, \textsf{t}) = q_1, \delta (q_1, \textsf{h}) =
+q_2, \delta (q_2, \textsf{e}) = q_4 \,\text{and}\, \delta (q_4,
+\textsf{n}) = q_5\), with \(q_5 \in F\), that is, \(q_5\)~is a final
+state.
+
+\subsection*{Recognised language}
+
+It is easy to define formally \(L(\mathcal{D})\). Let \(\mathcal{D} =
+(Q, \Sigma, \delta, q_0, F)\). First, let us extend~\(\delta\) to
+words and let us call this extension~\(\hat{\delta}\):
+\begin{itemize*}
+
+  \item for all state \(q \in Q\), let \(\hat{\delta} (q, \varepsilon)
+    = q\), where \(\varepsilon\) is the empty string;
+
+  \item for all state \(q \in Q\), all word \(w \in \Sigma^{*}\), all
+    input \(a \in \Sigma\), let us define \(\hat{\delta} (q, wa) =
+    \delta (\hat{\delta}(q,w),a)\).
+
+\end{itemize*}
+Then the word \(w\) is recognised by \(\mathcal{D}\) if
+\(\hat{\delta}(q_0, w) \in F\). The language \(L(\mathcal{D})\)
+recognised by~\(\mathcal{D}\) is defined as \(L(\mathcal{D}) = \{w \in
+\Sigma^{*} \; \lvert \; \hat{\delta}(q_0, w) \in F\}\). For example,
+in our last example:
+\begin{equation*}
+\begin{aligned}
+   \hat{\delta}(q_0, \epsilon)
+&= q_0,\\
+   \hat{\delta}(q_0, \textsf{t})
+&= \delta (\hat{\delta}(q_0, \epsilon), \textsf{t})
+= \delta (q_0, \textsf{t})
+= q_1,\\
+   \hat{\delta}(q_0, \textsf{th})
+&= \delta (\hat{\delta}(q_0, \textsf{t}), \textsf{h})
+= \delta (q_1, \textsf{h})
+= q_2,\\
+   \hat{\delta}(q_0, \textsf{the})
+&= \delta (\hat{\delta}(q_0, \textsf{th}), \textsf{e})
+= \delta (q_2, \textsf{e})
+= q_4,\\
+   \hat{\delta}(q_0, \textsf{then}) 
+&= \delta (\hat{\delta}(q_0, \textsf{the}), \textsf{n})
+= \delta (q_4, \textsf{n})
+= q_5 \in F.
+\end{aligned}
+\end{equation*}
+
+\subsection*{Transition diagrams}
+ 
+We can also redefine transition diagrams in terms of the concept of
+DFA. A transition diagram for a DFA \(\mathcal{D} = (Q, \Sigma,
+\delta, q_0, F)\) is a graph defined as follows:
+\begin{enumerate*}
+
+  \item for each state \(q\) in \(Q\) there is a \emph{node}, \emph{i.e.,} a
+    single circle with \(q\) inside;
+
+  \item for each state \(q \in Q\) and each input symbol \(a \in
+    \Sigma\), if \(\delta (q, a)\) exists, then there is an
+    \emph{edge}, \emph{i.e.,} an arrow, from the node denoting~\(q\) to the
+    node denoting \(\delta (q, a)\) labelled by \(a\); multiple edges
+    can be merged into one and the labels are then separated by
+    commas;
+
+  \item there is an edge coming to the node denoting~\(q_0\) without
+    origin;
+
+  \item nodes corresponding to final states are doubly circled.
+
+\end{enumerate*}
+Here is a transition diagram for the language over alphabet \(\{0,
+1\}\), called \emph{binary alphabet}, which contains the
+string~\(01\):
+\begin{center}
+\includegraphics[bb=48 710 185 760]{dfa_01}
+\end{center} 
+
+\subsection*{Transition table}
+
+There is a compact textual way to represent the transition function of
+a DFA: a \emph{transition table}. The rows of the table correspond to
+the states and the columns correspond to the inputs (symbols). In
+other words, the entry for the row corresponding to state~\(q\) and
+the column corresponding to input~\(a\) is the state~\(\delta (q,
+a)\), as seen in \fig~\ref{fig:gen_table}.
+\begin{figure}
+\centering
+\subfloat[General table\label{fig:gen_table}]{
+\(\begin{array}{c||c|c|c}
+\delta & \ldots & a & \ldots\\
+\hhline{=::===}
+\vdots & & &\\
+\hline
+q & & \delta (q, a)\\
+\hline
+\vdots & & &
+\end{array}
+\)}
+\qquad
+\subfloat[Example\label{fig:example_table}]{
+\(\begin{array}{r@{}l||c|c}
+\multicolumn{2}{c||}{\mathcal{D}} & 0 & 1\\
+\hhline{==::==}
+\rightarrow & q_0 & q_1 & q_0\\
+            & q_1 & q_1 & q_2\\
+         \# & q_2 & q_2 & q_2\\
+            &     &     &
+\end{array}\)
+}
+\caption{Transition tables}
+\end{figure}
+For instance, the transition table corresponding to the
+function~\(\delta\) of our last example is found in
+\fig~\vref{fig:example_table}. Actually, we added some extra
+information in the table: the initial state is marked with
+\(\rightarrow\) and the final states are marked
+with~\(\#\). Therefore, it is not only~\(\delta\) which is defined by
+means of the transition table here, but the whole DFA~\(\mathcal{D}\).
+
+Let us consider another example. We want to define formally a DFA
+which recognises the language \(L\) whose words contain an even number
+of 0's and an even number of 1's (the alphabet is binary). We should
+understand that the role of the states here is to \emph{not} count the
+exact number of 0's and 1's that have been recognised before, but,
+instead, this number \emph{modulo~2}. Therefore, there are four states
+because there are four cases:
+\begin{enumerate*}
+
+  \item there has been an even number of 0's and 1's (state \(q_0\));
+
+  \item there has been an even number of 0's and an odd number of 1's
+    (state \(q_1\));
+
+  \item there has been an odd number of 0's and an even number of 1's
+    (state \(q_2\));
+
+  \item there has been an odd number of 0's and 1's (state \(q_3\)).
+
+\end{enumerate*}
+What about the initial and final states?
+\begin{itemize*}
+
+  \item State~\(q_0\) is the initial state because before considering
+  any input, the number of 0's and 1's is zero and zero is even;
+
+  \item state~\(q_0\) is the lone final state because its definition
+  matches exactly the characteristic of~\(L\) and no other state
+  matches.
+
+\end{itemize*}
+We almost know now how to specify the DFA for the language~\(L\). It
+is
+\begin{equation*}
+\mathcal{D} = (\{q_0,q_1,q_2,q_3\}, \{0,1\}, \delta,q_0, \{q_0\}),
+\end{equation*}
+where the transition function~\(\delta\) is described by the
+transition diagram in \fig~\vref{fig:dfa_even01}.
+\begin{figure}
+\centering
+\subfloat[The DFA\label{fig:dfa_even01}]{
+\includegraphics[bb=48 653 138 737]{dfa_even01}
+}
+\qquad
+\subfloat[The table\label{fig:table_even01}]{
+\includegraphics{table_even01}
+}
+\caption{A deterministic finite automaton and its table}
+\end{figure}
+Notice how each input~0 causes the state to cross the horizontal
+line. Thus, after seeing an even number of 0's we are always above the
+horizontal line, in state~\(q_0\) or~\(q_1\), and after seeing an odd
+number of 0's we are always below this line, in state~\(q_2\)
+or~\(q_3\). There is a vertically symmetric situation for transitions
+on~1. We can also represent this DFA by the transition table in
+\fig~\vref{fig:table_even01}. We can use that table to illustrate the
+construction of~\(\hat{\delta}\) from~\(\delta\). Suppose the input is
+\(110101\). Since this string has even numbers of 0's and 1's, it
+belongs to~\(L\), that is, we expect \(\hat{\delta}(q_0,110101) =
+q_0\), since \(q_0\)~is the sole final state. We can check this by
+computing step by step \(\hat{\delta}(q_0,\verb+110101+)\), from the
+shortest prefix to the longest, which is the word \verb+110101+
+itself:
+\begin{align*}
+  \hat{\delta} (q_0, \varepsilon) 
+&= q_0,\\
+   \hat{\delta} (q_0, \texttt{1}) 
+&= \delta (\hat{\delta} (q_0, \varepsilon), \texttt{1})
+= \delta (q_0, \texttt{1})
+= q_1,\\
+   \hat{\delta} (q_0, \texttt{11}) 
+&= \delta (\hat{\delta} (q_0, \texttt{1}), \texttt{1}) 
+= \delta (q_1, \texttt{1}) 
+= q_0,\\
+   \hat{\delta} (q_0, \texttt{110}) 
+&= \delta (\hat{\delta} (q_0, \texttt{11}), \texttt{0}) 
+= \delta (q_0, \texttt{0}) 
+= q_2,\\
+   \hat{\delta} (q_0, \texttt{1101}) 
+&= \delta (\hat{\delta} (q_0, \texttt{110}), \texttt{1}) 
+= \delta (q_2, \texttt{1}) 
+= q_3,\\
+   \hat{\delta} (q_0, \texttt{11010}) 
+&= \delta (\hat{\delta} (q_0, \texttt{1101}), \texttt{0}) 
+= \delta (q_3, \texttt{0}) 
+= q_1,\\
+   \hat{\delta} (q_0, \texttt{110101}) 
+&= \delta (\hat{\delta} (q_0, \texttt{11010}), \texttt{1}) 
+= \delta (q_1, \texttt{1}) 
+= q_0 \in F.
+\end{align*}

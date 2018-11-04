@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book SYSTEM "book_bis.dtd">
+<book>
+  <author>Priscilla Walmsley</author>
+  <title>Definitive XML Schema</title>
+  <contents>
+    <chapter title="Schema: An Introduction"/>
+    <chapter title="A quick tour of XML Schema"/>
+    <chapter title="Namespaces"/>
+    <chapter title="Schema composition"/>
+    <chapter title="Instances and schemas"/>
+  </contents>
+</book>

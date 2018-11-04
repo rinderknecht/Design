@@ -1,0 +1,4 @@
+flat0(         []) -> [];
+flat0(     [[]|T]) -> flat0(T);
+flat0([Y=[_|_]|T]) -> cat(flat0(Y),flat0(T));
+flat0(      [Y|T]) -> [Y|flat0(T)].

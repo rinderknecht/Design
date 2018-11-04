@@ -1,0 +1,21 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=17pt,treesep=14pt]{\TR{\(+\)}}{
+  \TR{\(1\)}
+  \pstree{\TR{\(+\)}}{
+    \TR{\(2\)}
+    \psset{nodesepB=0pt}
+    \Tcircle[linestyle=dashed]{\textvisiblespace}
+  }
+}
+\endTeXtoEPS
+
+\end{document}

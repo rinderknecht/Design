@@ -1,0 +1,470 @@
+\section{Flattening}
+\label{sec:flattening}
+\index{stack!flattening|(}
+
+Let us design a function~\fun{flat/1}\index{flat@\fun{flat/1}} such
+that the call \(\fun{flat}(s)\), where \(s\)~is a stack, is rewritten
+into a stack containing only the non\hyp{}stack items found in~\(s\),
+in the same order. If \(s\)~contains no stack, then \(\fun{flat}(s)
+\equiv s\). Let us review some
+examples\index{stack!flattening!example} to grasp the concept:
+\begin{equation*}
+\fun{flat}(\el) \twoheadrightarrow \el; \quad
+\fun{flat}([\el,[\el]]) \twoheadrightarrow \el;\quad
+\fun{flat}([\el,[1,[2,\el],3],\el]) \twoheadrightarrow [1,2,3].
+\end{equation*}
+First, let us focus on designing the left\hyp{}hand sides of the
+rules, in order to ensure that our definition is \emph{complete} (all
+valid inputs are matched). A stack is either empty or not and, in the
+latter case, the specific issue at hand appears clearly: we need to
+distinguish the items which are stacks themselves from those which are
+not. This is very simply achieved by ordering the patterns so that
+\(\el\) and \(\cons{x}{s}\) \emph{as items} appear
+first:\index{flat@\fun{flat/1}|(}
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{flat}(\el)                   & \xrightarrow{\smash{\psi}}   & \fbcode{CCCCCCC}\,;\\
+\fun{flat}(\cons{\el}{t})         & \xrightarrow{\smash{\omega}} & \fbcode{CCCCCCC}\,;\\
+\fun{flat}(\cons{\cons{x}{s}}{t}) & \xrightarrow{\smash{\gamma}} & \fbcode{CCCCCCC}\,;\\
+\fun{flat}(\cons{y}{t})           & \xrightarrow{\smash{\delta}} & \fbcode{CCCCCCC}\,.
+\end{array}
+\end{equation*}
+We know that \(y\)~in the last line is not a stack, otherwise the
+penultimate or antepenultimate pattern would have matched. Almost all
+the right\hyp{}hand sides are easy to guess now:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{flat}(\el)                   & \xrightarrow{\smash{\psi}}   & \el;\\
+\fun{flat}(\cons{\el}{t})         & \xrightarrow{\smash{\omega}} & \fun{flat}(t);\\
+\fun{flat}(\cons{\cons{x}{s}}{t}) & \xrightarrow{\smash{\gamma}} & \fbcode{CCCCCCC}\,;\\
+\fun{flat}(\cons{y}{t})           & \xrightarrow{\smash{\delta}} & \cons{y}{\fun{flat}(t)}.
+\end{array}
+\end{equation*}
+\index{flat@\fun{flat/1}|)}The design of the remaining right\hyp{}hand
+side can be guided by two slightly different principles. If we look
+back at the definitions of~\fun{rev\(_0\)/1}
+\index{rev0@\fun{rev\(_0\)/1}|(}
+and~\fun{rev/1}\index{rev@\fun{rev/1}} in section~\ref{sec:reversal},
+we see that the former was designed with the result in mind, as if the
+arrows would reach a value, which is then decomposed in terms of the
+variables of the corresponding left\hyp{}hand side:
+\begin{equation*}
+\fun{rev}_0(\el) \rightarrow \el;\qquad
+\fun{rev}_0(\cons{x}{s}) \rightarrow \fun{cat}(\fun{rev}_0(s),[x]).
+\end{equation*}
+\index{rev0@\fun{rev\(_0\)/1}|)}By contrast,
+\fun{rev/1}\index{rev@\fun{rev/1}} relies on another function,
+\fun{rcat/2}\index{rcat@\fun{rcat/2}}, to accumulate partial results,
+as if each arrow covered a short distance, only contributing minimally
+to the final value:
+\begin{equation*}
+\fun{rev}(s) \xrightarrow{\smash{\epsilon}} \fun{rcat}(s,\el).\quad\;\;
+\fun{rcat}(\el,t) \xrightarrow{\smash{\zeta}} t;\quad\;\;
+\fun{rcat}(\cons{x}{s},t) \xrightarrow{\smash{\eta}} 
+\fun{rcat}(s,\cons{x}{t}).
+\end{equation*}
+The first approach might be called \emph{big\hyp{}step
+  design}\index{design!big-step $\sim$}, and the other
+\emph{small\hyp{}step design}\index{design!small-step $\sim$}. Another
+vantage point is to see that the former uses the context of the
+recursive call to build the value, whilst the latter relies
+exclusively on an argument (the accumulator\index{functional
+  language!accumulator}) and is in tail form\index{functional
+  language!tail form}. For example, in section~\ref{sec:skipping}, we
+may find that the definition of \fun{sfst/2}\index{sfst@\fun{sfst/2}}
+follows a big\hyp{}step design, while
+\fun{sfst\(_0\)/2}\index{sfst@\fun{sfst/2}} illustrates a
+small\hyp{}step design.
+
+
+\paragraph{Big-step design}
+\index{design!big-step $\sim$}
+\index{divide and conquer}
+\label{big-step}
+
+Abstractly, a big\hyp{}step design means that the right\hyp{}hand
+sides are made up of recursive calls on substructures, for instance,
+in the case of rule~\(\gamma\), the substructures of
+\(\cons{\cons{x}{s}}{t}\) are~\(x\), \(s\), \(t\) and
+\(\cons{x}{s}\). By thinking how to make up the value by means of
+\(\fun{flat}(\cons{x}{s})\)\index{flat@\fun{flat/1}} and
+\(\fun{flat}(t)\), we obtain a new version,
+\fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}}, in
+\fig~\vref{fig:flat0}.
+\begin{figure}
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{flat}_0(\el)                   & \xrightarrow{\smash{\psi}} 
+                                    & \el;\\
+\fun{flat}_0(\cons{\el}{t})         & \xrightarrow{\smash{\omega}}
+                                    & \fun{flat}_0(t);\\
+\fun{flat}_0(\cons{\cons{x}{s}}{t}) & \xrightarrow{\smash{\gamma}}
+        & \fun{cat}(\fun{flat}_0(\cons{x}{s}),\fun{flat}_0(t));\\
+\fun{flat}_0(\cons{y}{t})           & \xrightarrow{\smash{\delta}}
+                                    & \cons{y}{\fun{flat}_0(t)}.
+\end{array}}
+\end{equation*}
+\caption{Flattening a stack with \fun{flat\(_0\)/1}
+\label{fig:flat0}\index{stack!flattening!definition}}
+\end{figure}
+
+Let us consider an example in \fig~\vref{fig:flat0_ex}, where the call
+to be rewritten next is underlined in case of ambiguity.
+\begin{figure}
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{flat}_0([\el,[[1],2],3])
+& \xrightarrow{\smash{\omega}} 
+& \fun{flat}_0([[[1],2],3])\\
+& \xrightarrow{\smash{\gamma}}
+& \fun{cat}(\underline{\fun{flat}_0([[1],2])},\fun{flat}_0([3]))\\
+& \xrightarrow{\smash{\gamma}}
+& \fun{cat}(\fun{cat}(\underline{\fun{flat}_0([1])},\fun{flat}_0([2])),\fun{flat}_0([3]))\\
+& \xrightarrow{\smash{\delta}}
+& \fun{cat}(\fun{cat}([1|\underline{\fun{flat}_0(\el)}],\fun{flat}_0([2])),\fun{flat}_0([3]))\\
+& \xrightarrow{\smash{\psi}}
+& \fun{cat}(\fun{cat}([1],\underline{\fun{flat}_0([2])}),\fun{flat}_0([3]))\\
+& \xrightarrow{\smash{\delta}}
+& \fun{cat}(\fun{cat}([1],[2|\underline{\fun{flat}_0(\el)}]),\fun{flat}_0([3]))\\
+& \xrightarrow{\smash{\psi}}
+& \fun{cat}(\fun{cat}([1],[2]),\underline{\fun{flat}_0([3])})\\
+& \xrightarrow{\smash{\delta}}
+& \fun{cat}(\fun{cat}([1],[2]),[3|\underline{\fun{flat}_0(\el)}])\\
+& \xrightarrow{\smash{\psi}}
+& \fun{cat}(\fun{cat}([1],[2]),[3])\\
+& \twoheadrightarrow & [1,2,3].
+\end{array}
+}
+\end{equation*}
+\caption{\(\fun{flat}_0([\el,[[1],2],3]) \twoheadrightarrow [1,2,3]\)
+\label{fig:flat0_ex}\index{stack!flattening!example}}
+\end{figure}
+Note that the call\hyp{}by\hyp{}value\index{functional
+  language!call-by-value} strategy (section~\ref{sec:functional}) does
+not specify the order of evaluation of the arguments of a function
+call: in our example, we delayed the evaluation of
+\(\fun{cat}([1],[2])\) \index{cat@\fun{cat/2}|(} after that of the
+calls to \fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}}. When
+deriving complicated recurrences or traces, we may try instead
+counting the number of times each rule is used in any
+evaluation. Calling \fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}}
+results in
+\begin{itemize*}
+
+  \item using rule~\(\omega\) once for each empty stack originally in
+    the input;
+
+  \item using rule~\(\psi\) once when the end of the input is reached
+    \emph{and} once for each empty stack \(t\) in rule~\(\gamma\);
+
+  \item using rule~\(\delta\) once for each item which is not a stack;
+
+  \item using rule~\(\gamma\) once for each non\hyp{}empty embedded
+    stack;
+
+  \item calling \fun{cat/2}\index{cat@\fun{cat/2}|)} once for each
+    non\hyp{}empty embedded stack.
+
+\end{itemize*}
+We now know the parameters which the cost depends upon:
+\begin{enumerate*}
+
+  \item the length of\index{flat0@\fun{flat$_0$/1}}
+    \(\fun{flat}_0(s)\), noted~\(n\);
+
+  \item the number of non\hyp{}empty stacks embedded in the input,
+    say~\(\Gamma\);
+
+  \item the number of embedded empty stacks, denoted by~\(\Omega\).
+
+\end{enumerate*}
+The dependence upon the size of the output, \(n\), is an instance of
+\emph{output\hyp{}dependent cost}\index{cost!output-dependent
+  $\sim$}. We can reformulate the above analysis in the following
+terms: rule~\(\psi\) is used \(1 + \Gamma\)~times, rule~\(\omega\) is
+used \(\Omega\)~times, rule~\(\gamma\) is used \(\Gamma\)~times,
+rule~\(\delta\) is used \(n\)~times. So the cost due to the rules of
+\fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}} alone is \(1 + n +
+\Omega + 2\Gamma\). For instance, in the case of
+\(\fun{flat}_0([\el,[[1],2],3])\), we correctly find \(1 + 3 + 1 + 2
+\cdot 2 = 9 = \len{\omega\gamma^2(\delta\psi)^3}\).
+
+As far as the costs of the calls to \fun{cat/2} are concerned, their
+associativity\index{cat@\fun{cat/2}} was proved on
+page~\pageref{proof:assoc_cat} and equation~\eqref{ineq:cat_assoc}
+\vpageref{ineq:cat_assoc} suggests that there are configurations of
+the input to \fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}} that
+lead to greater costs, when the parameters \(n\), \(\Omega\)
+and~\(\Gamma\) are fixed. A similar pattern of calls to
+\fun{cat/2}\index{cat@\fun{cat/2}} with a quadratic cost is generated
+from the definition of
+\fun{rev\(_0\)/1}\index{rev0@\fun{rev\(_0\)/1}}, as seen in
+\fig~\vref{fig:rev0_321}, after the first application of
+rule~\(\alpha\). The right\hyp{}hand side of rule~\(\gamma\) is
+\(\fun{cat}(\fun{flat}_0(\cons{x}{s}),\fun{flat}_0(t))\)
+\index{flat0@\fun{flat$_0$/1}} and it implies that the arguments of
+\fun{cat/2}\index{cat@\fun{cat/2}} may be empty stacks.
+
+Given \(\Gamma\) \fun{cat}\hyp{}nodes, \(n\)~non\hyp{}stack nodes
+(\(x_1\), \dots, \(x_n\)), what are the abstract syntax trees with
+minimum and maximum costs? We found that the minimum cost for
+\fun{cat/2}\index{cat@\fun{cat/2}} is achieved when all the
+\fun{cat}\hyp{}nodes make up the rightmost
+\emph{branch}\index{tree!branch} of the abstract syntax tree. (A
+branch is a series of nodes such that one is the parent of the next,
+from the root to a leaf.) 
+\begin{itemize}
+
+  \item If \(\Omega \geqslant \Gamma\), the minimum configuration is
+  shown in \fig~\ref{fig:cat_min1}
+\begin{figure}[b]
+\centering
+\subfloat[If \(\Omega \geqslant \Gamma\), the minimum is \(\Gamma\).
+\label{fig:cat_min1}]{\includegraphics[bb=66 660 191 722]{cat_min1}}
+\quad
+\subfloat[If \(\Omega < \Gamma\), the minimum is \(2\Gamma-\Omega\).
+\label{fig:cat_min2}]{\includegraphics[bb=70 643 230 721]{cat_min2}}
+\caption{Minimum costs for the catenations in \fun{flat\(_0\)/1}
+\label{fig:cat_min}}
+\end{figure}
+  (at least one empty stack must be placed in any non\hyp{}empty stack
+  whose flattening results in an empty stack).
+
+\item Otherwise, the abstract syntax tree of minimum cost is found in
+  \fig~\ref{fig:cat_min2}, where all the available empty stacks
+  (\(\Omega\)) are used for the bottommost \fun{cat}\hyp{}nodes. We
+  draw that the minimum cost\index{stack!flattening!minimum cost}
+  is\index{flat0@$\B{\fun{flat}_0}{n}$}
+  \(\B{\fun{flat}_0}{n,\Omega,\Gamma} = 1 + n + \Omega + 3\Gamma +
+  \min\{\Omega,\Gamma\}\).
+
+\end{itemize}
+
+The maximum cost\index{stack!flattening!maximum cost} in
+\fig~\ref{fig:cat_max} occurs for the symmetrical tree of
+\fig~\ref{fig:cat_min1}. We
+have\index{flat0@$\W{\fun{flat}_0}{n,\Omega,\Gamma}$}
+\(\W{\fun{flat}_0}{n,\Omega,\Gamma} = \Omega + (n+3)(\Gamma+1) - 2\).
+\begin{figure}[t]
+\centering
+\subfloat[Maximum cost \((n+1)\Gamma\)\label{fig:cat_max}]{
+\includegraphics[bb=71 660 188 721]{cat_max}}
+\qquad
+\subfloat[$\protect\fun{flat}(\cons{\cons{x}{s}}{t})$\label{fig:lift1}]%
+{\includegraphics[bb=55 661 122 721]{flat_embed}}
+\qquad
+\subfloat[$\protect\fun{flat}(\cons{x,s}{t})$\label{fig:lift2}]%
+{\includegraphics[bb=57 661 120 721]{flat_lift}}
+\caption{Maximum cost and right rotations}
+\end{figure}
+
+% Wrapping figure better declared before a paragraph
+%
+\begin{wrapfigure}[7]{r}[0pt]{0pt}
+% [7] vertical lines
+% {r} mandatory right placement
+\centering
+\includegraphics[bb=71 658 220 710]{flat}%[... 721]
+\caption{Defining \fun{flat/1}\label{fig:flat}
+\index{stack!flattening!definition}}
+\end{wrapfigure}
+
+\paragraph{Small-step design}
+\index{design!small-step $\sim$}
+
+An alternative method for flattening of a stack consists in
+lifting~\(x\) in rule~\(\gamma\) one level up amongst the embedded
+stacks, thus approaching little by little a flat stack. In terms of
+the abstract syntax trees, this operation is a \emph{right
+  rotation}\index{binary tree!rotation} of the tree associated with
+the argument, as shown in \figs~\vrefrange{fig:lift1}{fig:lift2},
+where the new function is called
+\fun{flat/1}\index{flat@\fun{flat/1}|(} and defined in
+\fig~\vref{fig:flat}. Let us run the previous example of
+\fig~\vref{fig:flat0_ex} again in \fig~\vref{fig:flat_ex} with
+\fun{flat/1}. The difference in cost with
+\fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}} resides in the number
+of times rule~\(\gamma\) is used: once for each item in all the
+embedded stacks. Hence the
+cost\index{stack!flattening!cost}\label{cost:flat} is \(1 + n + \Omega
++ \Gamma + L\), where \(L\)~is the sum of the lengths of all the
+embedded stacks.
+
+\paragraph{Comparison}
+
+Consider the following costs:
+\begin{equation*}
+\begin{array}{@{}r@{\;}c@{\;}r@{\;}c@{\;}r@{\;}c@{\;}l@{}}
+\Call{\fun{flat}([[[[[1,2]]]]])}
+  &=& 12 &<& 23 &=& \Call{\fun{flat\(_0\)}([[[[[1,2]]]]])};\\
+\Call{\fun{flat}([\el,[[1],2],3])}
+  &=& 10 &<& 14 &=& \Call{\fun{flat\(_0\)}([\el,[[1],2],3])};\\
+\Call{\fun{flat}([\el,[[1,[2]]],3])}
+  &=& 12 &<& 19 &=& \Call{\fun{flat\(_0\)}([\el,[[1,[2]]],3])};\\
+\Call{\fun{flat}([[\el,\el,\el]])}
+  &=&  8 &>&  7 &=& \Call{\fun{flat\(_0\)}([[\el,\el,\el]])}.
+\end{array}
+\end{equation*}
+\begin{figure}
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{flat}([\el,[[1],2],3])
+& \xrightarrow{\smash{\omega}} & \fun{flat}([[[1],2],3])\\
+& \xrightarrow{\smash{\gamma}} & \fun{flat}([[1],[2],3])\\
+& \xrightarrow{\smash{\gamma}} & \fun{flat}([1,\el,[2],3])\\
+& \xrightarrow{\smash{\delta}} & [1|\fun{flat}([\el,[2],3])\\
+& \xrightarrow{\smash{\omega}} & [1|\fun{flat}([[2],3])]\\
+& \xrightarrow{\smash{\gamma}} & [1|\fun{flat}([2,\el,3])]\\
+& \xrightarrow{\smash{\delta}} & [1,2|\fun{flat}([\el,3])]\\
+& \xrightarrow{\smash{\omega}} & [1,2|\fun{flat}([3])]\\
+& \xrightarrow{\smash{\delta}} & [1,2,3|\fun{flat}(\el)]\\
+& \xrightarrow{\smash{\psi}}   & [1,2,3].
+\end{array}}
+\end{equation*}
+\caption{\(\fun{flat}([\el,[[1],2],3]) \twoheadrightarrow [1,2,3]\)
+\label{fig:flat_ex}
+\index{stack!flattening!example}}
+\end{figure}
+Simple algebra shows that\index{flat@$\C{\fun{flat}}{n,\Omega,\Gamma}$}
+\index{flat0@$\B{\fun{flat}_0}{n,\Omega,\Gamma}$}
+\begin{equation*}
+\C{\fun{flat}}{n,\Omega,\Gamma}
+\leqslant 
+\B{\fun{flat}_0}{n,\Omega,\Gamma} 
+\Leftrightarrow 
+\begin{cases}
+  L \leqslant 3\Gamma - \Omega,
+                         & \text{if \(\Omega \geqslant \Gamma\)};\\
+  L \leqslant 2\Gamma,   & \text{otherwise.}
+\end{cases}
+\end{equation*}
+\index{flat@\fun{flat/1}|)} This criterion is impractical to check and
+it is inconclusive if the inequalities on the right\hyp{}hand side
+fail. Things worsen if we settle for \(L \leqslant 2\Gamma \Rightarrow
+\smash[t]{\C{\fun{flat}}{n,\Omega,\Gamma}} \leqslant
+\smash[t]{\C{\fun{flat}_0}{n,\Omega,\Gamma}}\), because this condition
+is too strong when \(\Omega\)~is large. Let us examine what happens at
+the other extreme, when \(\Omega = 0\). Considering an example like
+\([0,[1,[2]],3,[4,5,[6,7],8],9]\), it may occur to us that if there
+are no empty stacks, the length of each stack is lower than or equal
+to the number of non\hyp{}stack items in it and its embeddings (it is
+equal if there is no further embedded stack). Therefore, summing up
+all these inequalities, the result \(\Omega = 0 \Rightarrow L
+\leqslant C\) ensues, where \(C\)~is the cost of rewriting the calls
+to~\fun{cat/2}\index{cat@\fun{cat/2}}
+in~\fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}}. Because
+\(\C{\fun{flat}}{n,\Omega,\Gamma} = (1 + n + \Omega + \Gamma) + L\)
+and \(\C{\smash{\fun{flat}_0}}{n,\Omega,\Gamma} = (1 + n + \Omega +
+\Gamma) + (C + \Gamma)\), the consequence is that, if there are no
+empty stacks, \fun{flat/1}\index{flat@\fun{flat/1}} is faster.
+
+
+\mypar{Termination}
+\label{flattening:termination}
+\index{stack!flattening!termination|(}
+
+As we have seen with the simplified Ackermann's function
+(section~\ref{par:ackermann}, \vpageref{par:ackermann}), termination
+follows from finding a well\hyp{}founded order \((\succ)\) on the
+recursive calls, which is entailed by the rewrite relation
+\((\rightarrow)\), that is, \(x \rightarrow y \Rightarrow x \succ
+y\). One well\hyp{}founded order for stacks is the \emph{immediate
+  subterm order}, satisfying \(\cons{x}{s} \succ s\) and \(\cons{x}{s}
+\succ x\). Since big\hyp{}step design uses recursive calls to subterms
+(section~\ref{par:well-founded}, \vpageref{par:well-founded}), it
+eases termination proofs based on such an ordering.
+
+For instance, let us recall the definition of
+\fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}|(} in
+\fig~\ref{fig:flat0} on page~\pageref{fig:flat0}. Since
+\fun{cat/2}\index{cat@\fun{cat/2}} is independent of
+\fun{flat\(_0\)/1}, we prove its termination in isolation by using the
+proper subterm order on its first argument. Assuming now that
+\fun{cat/2} terminates, let us prove the termination of
+\fun{flat\(_0\)/1}. Because the recursive calls of \fun{flat\(_0\)/1}
+contain only (stack) constructors, we can try to order their arguments
+\citep{ArtsGiesl_1996}. Again, the same order works: \(\cons{y}{t}
+\succ t\) (rule~\(\delta\) and rule~\(\omega\) when \(y=\el\));
+\(\cons{\cons{x}{s}}{t} \succ t\) and \(\cons{\cons{x}{s}}{t} \succ
+\cons{x}{s}\) (rule~\(\gamma\)). Termination ensues.\hfill\(\Box\)
+
+Let us further recall the definition of
+\fun{flat/1}\index{flat@\fun{flat/1}} in \fig~\ref{fig:flat} and
+prove its termination. Here, the order we used for \fun{flat\(_0\)/1}
+fails: \(\cons{\cons{x}{s}}{t} \nsucc \cons{x,s}{t} =
+\cons{x}{\cons{s}{t}}\). We could try the more general \emph{proper
+  subterm order}\index{induction!proper subterm order}, that is, the
+strict inclusion of a term into another, but, despite \(\cons{x}{s}
+\succ x\), we have \(t \nsucc \cons{s}{t}\). One way out is to define
+a \emph{measure}\index{termination!measure} on the stacks
+\citep{Giesl_1995a}.\index{flat0@\fun{flat$_0$/1}|)}
+
+A measure \(\measure{\cdot}\) is a map from terms to a
+well\hyp{}ordered set (\(A,\succ\)), which is \emph{monotone} with
+respect to rewriting: \(x \rightarrow y \Rightarrow \measure{x} \succ
+\measure{y}\). Actually, we will only consider \emph{dependency pairs}
+\citep{ArtsGiesl_2000}\index{termination!dependency pair}, that is,
+pairs of calls whose first component is the left\hyp{}hand side of a
+rule and the second components are the calls in the righ\hyp{}hand
+side of same rule. This is easier than working with \(x\)~and~\(y\) in
+\(x \rightarrow y\), as only subterms of~\(y\) are considered. The
+pairs are\index{flat@\fun{flat/1}} \((\fun{flat}(\cons{\el}{t}),
+\fun{flat}(t))_\omega\), \((\fun{flat}(\cons{\cons{x}{s}}{t}),
+\fun{flat}(\cons{x,s}{t}))_\gamma\) and \((\fun{flat}(\cons{y}{t}),
+\fun{flat}(t))_\delta\), with \(y \not\in S\). We can actually drop
+the function names, as all the pairs involve
+\fun{flat/1}\index{flat@\fun{flat/1}}. A common class of measures are
+monotone embeddings into (\(\mathbb{N},>\)), so let us seek a measure
+satisfying
+\begin{equation*}
+\measure{\cons{\cons{x}{s}}{t}} > \measure{\cons{x,s}{t}};\quad
+\measure{\cons{y}{t}} > \measure{t},
+\;\text{if \(y \not\in S\) or \(y=\el\)}.
+\end{equation*}
+For instance, let us set the following \emph{polynomial
+  measure}\index{termination!polynomial measure}:
+\begin{equation*}
+\measure{\cons{x}{s}} := 1 + 2\cdot\measure{x} + \measure{s};\quad
+\measure{y} := 0,\;\text{if \(y \not\in S\) or \(y=\el\)}.
+\end{equation*}
+We have \(\measure{\cons{\cons{x}{s}}{t}} = 3 + 4\cdot\measure{x} +
+2\cdot\measure{s} + \measure{t}\) and, for the other stack,
+\(\measure{\cons{x,s}{t}} = 2 + 2\cdot\measure{x} + 2\cdot\measure{s}
++ \measure{t}\). Because \(\measure{x} \in \mathbb{N}\), for
+all~\(x\), we have \(\measure{\cons{\cons{x}{s}}{t}} >
+\measure{\cons{x,s}{t}}\). The second inequality yields faster:
+\(\measure{\cons{y}{t}} = 1 + \measure{t} > \measure{t}\). This
+entails the termination of
+\fun{flat/1}\index{flat@\fun{flat/1}}.\index{stack!flattening!termination|)}\hfill\(\Box\)
+
+\cite{Giesl_1997} tackled the termination of mutually recursive
+functions. Functional programs, as special cases of
+term\hyp{}rewriting systems, have been considered by
+\cite{Giesl_1995b} and \cite{GieslWaltherBrauburger_1998}.
+
+% Wrapping figure better declared before a paragraph
+%
+\begin{wrapfigure}[6]{r}[0pt]{0pt}
+% [6] vertical lines
+% {r} mandatory right placement
+\centering
+\includegraphics[bb=71 644 227 708]{flat1}% Originally [... 721]
+\caption{Variant flattening\label{fig:flat1}
+\index{stack!flattening!definition}}
+\end{wrapfigure}
+\paragraph{Exercises}
+
+\begin{enumerate*}
+
+  \item Define \fun{gamma/1}, \fun{lambda/1} and \fun{omega/1}, which
+    compute \(\Gamma\), \(L\) and~\(\Omega\), respectively.
+
+  \item Compare the costs of \fun{flat/1}\index{flat@\fun{flat/1}} and
+    \fun{flat\(_1\)/1} \index{flat1@\fun{flat$_1$/1}} defined in
+    \fig~\ref{fig:flat1} (see~(\(\leadsto\))).
+
+\end{enumerate*}
+\index{stack!flattening|)}

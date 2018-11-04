@@ -1,0 +1,30 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-eps}
+\usepackage{amsmath,amssymb}
+\usepackage{mathpartir}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\framebox[0.7\columnwidth]{\vbox{%
+\begin{gather*}
+\inferrule{}{\fun{def}(\el) \rightarrow \pair{\el}{\el}};
+\quad
+\inferrule{}{\fun{def}(\cons{\fun{ext}()}{f})
+             \rightarrow \fun{def}(f)};
+\\
+\inferrule
+  {\fun{def}(f) \twoheadrightarrow \pair{r}{f'}}
+  {\fun{def}(\cons{\fun{int}(x,t_1,t_2)}{f}) 
+   \twoheadrightarrow \pair{\cons{x}{r}}{\cons{t_1,t_2}{f'}}}.
+\end{gather*}}}
+\endTeXtoEPS
+
+\end{document}

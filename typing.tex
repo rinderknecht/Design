@@ -1,0 +1,558 @@
+\section{Type inference}
+
+The aim of static typing is to detect and reject at compile\hyp{}time
+some kinds of programming errors which would otherwise result into an
+error at run\hyp{}time, like \lpar\num{1}\rpar{}\lpar\num{2}\rpar{} or
+$\cst{BinOp} \, \lpar\cst{Add}, \lpar\Xfun \, \ident{x} \rightarrow
+\ident{x}\rpar, \num{1}\rpar$. With this aim, a \emph{type} is
+assigned to each subexpression of the program, for example, \type{int}
+for an arithmetic expression, or $\type{int} \rightarrow \type{int}$
+for a function from the integers to the integers, and the coherence of
+these types is checked, that is, if we think of a type as an
+assumption, no assumption must invalidate another one.
+
+It is undecidable to determine all possible run\hyp{}time errors for
+all programs. Type systems, on the other hand, are often decidable,
+because it is considered a good design to ensure that the compiler
+terminates on all input programs. Therefore, it is impossible for the
+compiler to reject only those programs that are erroneous. In other
+words, all type systems reject innocent programs, and that is why the
+quest for better type systems, with better compromises between unfair
+rejection and guaranteed safety, will never end.
+
+\paragraph{The calculator revisited}
+
+Let us revisit the calculator and define suitable types for its
+expressions.
+\begin{itemize}
+
+  \item Concrete syntax\\
+    \texttt{Type ::= "int" | Type -> Type | "(" Type ")"}\\
+    \texttt{\hphantom{Type ::=} | "'a" | "'b" | ...}\\
+    We denote type variables with the metavariables $\alpha$, $\beta$
+    etc.
+
+  \item Abstract syntax\\
+     \Xtype \type{type\_expr} \equal \cst{TEint} \vbar{}
+     \cst{TEvar} \Xof \type{string}\\
+     \hphantom{\Xtype \type{type\_expr}} \vbar{} \cst{TEfun} \Xof    
+     \type{type\_expr} \(\times\) \type{type\_expr}
+
+    We denote types with the metavariable~$\meta{\tau}$.
+
+  \item Syntax analysis\\
+    The arrow associates to the right.
+    \begin{align*}
+     \src{\type{int}} &= \cst{TEint},\\
+     \src{\meta{\tau}_1 \rightarrow \meta{\tau}_2} &= \cst{TEfun} \,
+    \lpar \tau_1, \tau_2\rpar,\\
+    \src{\texttt{'a}} &= \cst{TEvar} \; \str{a},\,\text{etc.}
+    \end{align*}
+    Note that we write~$\tau$ instead of $\src{\meta{\tau}}$. We note
+    type variables as $\alpha$, $\beta$, $\gamma$ etc. instead of
+    \cst{TEvar} \str{a}, \cst{TEvar} \str{b}, \cst{TEvar} \str{c} etc.
+
+  \item Free variables\\ $\mathcal{F} \src{\type{int}} = \varnothing$
+    and $\mathcal{F} \src{\meta{\tau}_1 \rightarrow \meta{\tau}_2} =
+    \mathcal{F}(\tau_1) \cup \mathcal{F} (\tau_2)$ and $\mathcal{F}
+    \src{\meta{\alpha}} = \{\alpha\}$.
+
+\end{itemize}
+
+\paragraph{Monomorphic typing}
+
+A typing judgement has the form $\trel{\Gamma}{e}{\tau}$ and reads:
+`In the typing environment~\(\Gamma\), the expression~\(e\) has
+type~\(\tau\).' A typing environment~\(\Gamma\) binds variables~\(x\)
+to their type~\(\Gamma(x)\). A typing binding is noted \(x :
+\tau\). We have
+\begin{mathpar}
+\inferrule
+  {\trel{\Gamma}{\src{\meta{n}}}{\src{\type{int}}}}
+  {}\;\,\TirName{Tconst}
+\and
+\inferrule
+  {\trel{\Gamma}{e_1}{\src{\type{int}}}\\
+   \trel{\Gamma}{e_2}{\src{\type{int}}}
+  }
+  {\trel{\Gamma}
+        {\src{\meta{e}_1 \; \meta{o} \;\, \meta{e}_2}}
+        {\src{\type{int}}}
+  }
+  \;\TirName{Tbin}
+\end{mathpar}
+\begin{mathpar}
+\inferrule
+  {\trel{\Gamma}{\src{x}}{\Gamma(x)}}
+  {}\;\,\TirName{Tvar}
+\and
+\inferrule
+  {\trel{\Gamma}{e_1}{\tau_1}\\
+   \trel{\Gamma \oplus x : \tau_1}{e_2}{\tau_2}
+  }
+  {\trel{\Gamma}
+        {\src{\Xlet \; x \; \equal \; \meta{e}_1 \; \Xin \;
+         \meta{e}_2}} 
+        {\tau_2}} 
+  \;\TirName{Tlet}
+
+\inferrule*[right=Tfun]
+  {\trel{\Gamma \oplus x : \tau_1}{e}{\tau_2}}
+  {\trel{\Gamma}
+        {\src{\Xfun \; x \rightarrow \meta{e}}}
+        {\src{\meta{\tau}_1 \rightarrow \meta{\tau}_2}}}
+\and
+\inferrule*[right=Tapp]
+  {\trel{\Gamma}
+        {e_1}
+        {\src{\meta{\tau}' \rightarrow \meta{\tau}}}\\
+   \trel{\Gamma}{e_2}{\tau'}
+  }
+  {\trel{\Gamma}{\src{\meta{e}_1 \,\ \meta{e}_2}}{\tau}}
+\end{mathpar}
+Let us consider an example of typing derivation:
+\begin{mathpar}
+\inferrule*
+  {\inferrule*[leftskip=1em]
+     {\inferrule*
+        {\trel
+           {\ident{x} : \src{\type{int}}}
+           {\src{\ident{x}}}
+           {\src{\type{int}}}\\
+         \trel
+           {\ident{x} : \src{\type{int}}}
+           {\src{\num{1}}}
+           {\src{\type{int}}}
+        }
+        {\trel
+           {\ident{x} : \src{\type{int}}}
+           {\src{\ident{x} \; \texttt{+} \; \num{1}}}
+           {\src{\type{int}}}}
+     }
+     {\trel
+        {\varnothing}
+        {\src{\Xfun \; \ident{x} \rightarrow \ident{x} \; \texttt{+} \; \num{1}}}
+        {\src{\type{int} \rightarrow \type{int}}}
+     }\\
+     \inferrule*[rightskip=1em]
+       {\trel
+          {\ident{f} : \src{\type{int} \rightarrow \type{int}}}
+          {\src{\ident{f}\,}}
+          {\src{\type{int} \rightarrow \type{int}}}\\\\
+        \trel
+          {\ident{f} : \src{\type{int} \rightarrow \type{int}}}
+          {\src{\num{2}}}
+          {\src{\type{int}}}
+       }
+       {\trel 
+         {\ident{f} : \src{\type{int} \rightarrow \type{int}}}
+         {\src{\ident{f} \; \num{2}}}
+         {\src{\type{int}}}
+       }
+  }
+  {\trel
+        {\varnothing}
+        {\src{\Xlet \; \ident{f} \; \equal \; \Xfun \; \ident{x}
+           \rightarrow \ident{x} \; \texttt{+} \; \num{1} \; \Xin \;
+           \ident{f} \; \num{2}}}
+        {\src{\type{int}}}
+  }
+\end{mathpar}
+Here are some judgements that can be derived:
+$\trel
+   {\varnothing}
+   {\src{\Xfun \; \ident{x} \rightarrow \ident{x}}}
+   {\src{\meta{\alpha} \rightarrow \meta{\alpha}}}$ 
+and
+$\trel
+  {\varnothing}
+  {\src{\Xfun \; \ident{x} \rightarrow \ident{x}}}
+  {\src{\type{int} \rightarrow \type{int}}}$.
+\noindent Here are some judgements that cannot be derived:
+$\trel
+  {\varnothing}
+  {\src{\Xfun \; \ident{x} \rightarrow \ident{x} \; \texttt{+} \; \num{1}}}
+  {\src{\type{int}}}$
+and
+$\trel
+  {\varnothing}
+  {\src{\Xfun \; \ident{x} \rightarrow \ident{x} \; \texttt{+} \; \num{1}}}
+  {\src{\meta{\alpha} \rightarrow \type{int}}}$.
+
+In order to assign a type to $\Xfun \; \ident{f} \rightarrow
+\ident{f} \;\; \ident{f}$, we would need to construct the following
+derivation:
+\begin{mathpar}
+\inferrule*
+  {
+   \inferrule*
+     {
+      \trel
+        {\Gamma \oplus \ident{f}: \tau_1}
+        {\ident{f}}
+        {\src{\meta{\tau}_1 \rightarrow \meta{\tau}_2}}\\
+      \trel
+        {\Gamma \oplus \ident{f}: \tau_1}
+        {\ident{f}}
+        {\tau_2}    
+     }
+     {\trel
+        {\Gamma \oplus \ident{f}:\tau_1}
+        {\src{\ident{f} \; \ident{f}\,}}
+        {\tau_2}
+     }
+  }
+  {
+   \trel
+     {\Gamma}
+     {\src{\Xfun \; \ident{f} \rightarrow \ident{f} \;\; \ident{f}\,}}
+     {\src{\meta{\tau}_1 \rightarrow \meta{\tau}_2}}
+  }
+\end{mathpar}
+For the leaves of the derivation to be established by the axiom
+\RefTirName{Tvar}, we would require $\tau_1 = \src{\meta{\tau}_1
+  \rightarrow \meta{\tau}_2}$ and $\tau_1 = \tau_2$. The first of
+these equalities is impossible, for~$\tau_1$ would then be a strict
+subterm of itself, which is impossible for all finite
+terms~$\tau_1$. Here are some typing properties and definitions:
+\begin{itemize}
+
+  \item Well\hyp{}typed (or typable) expressions.\\ An
+    expression~\(e\) is typable is there exists a typing
+    environment~\(\Gamma\) and a type~\(\tau\) such that
+    $\trel{\Gamma}{e}{\tau}$.
+
+  \item Typing.\\ A typing is a pair $(\Gamma,\tau)$ or a typing
+    derivation.
+
+  \item Stability by substitution of type variables.\\ If we can
+    derive a non\hyp{}closed judgement, that is, containing free type
+    variables like $\trel{\ident{f}:\src{\meta{\alpha} \rightarrow
+        \meta{\alpha}} \oplus \ident{x}:\alpha}{\ident{f} \,
+      \lpar\ident{x}\rpar}{\alpha}$, then we can also derive all the
+    judgements obtained by replacing these variables by arbitrary
+    types, like $\trel{\ident{f}:\src{\type{int} \rightarrow
+        \type{int}} \oplus \ident{x}:\type{int}}{\ident{f} \,
+      \lpar\ident{x}\rpar}{\type{int}}$.
+  
+  \item Type safety\\ If $\trel{\Gamma}{e}{\tau}$ and
+    $\eval{\rho}{e}{r}$, then $r \neq \cst{Err} \,
+    \lpar\ldots\rpar$. This is the main rationale behind static
+    typing.
+
+\end{itemize}
+
+\paragraph{Strong and weak normalisation}
+
+The monomorphic type system presented here is \emph{strongly
+  normalising}, that is to say, well\hyp{}typed programs always
+terminate. Type systems enjoying that property are not interesting for
+programming because programmers expect their language to be
+Turing\hyp{}complete, so it expresses all the terminating programs. If
+the type system would also reject all the non\hyp{}terminating
+programs, we would have solved the halting problem of the Turing
+machine, which is known to be undecidable. Therefore, all
+Turing\hyp{}complete language with a decidable type system contains
+non\hyp{}terminating programs.
+
+That is why we usually consider type systems which do not guarantee
+that the typable programs terminate: this is \emph{weak
+  normalisation}. A good example is the monomorphic type system for a
+subset of \OCaml with a fixed point combinator \ident{fix}, or a native
+recursive binder \Xlet \Xrec:
+\begin{mathpar}
+\inferrule*[right=Tlet-rec]
+  {\trel{\Gamma \, \oplus \, x : \tau_1}{e_1}{\tau_1}\\
+   \trel{\Gamma \oplus x : \tau_1}{e_2}{\tau_2}
+  }
+  {\trel{\Gamma}
+        {\src{\Xlet \; \Xrec \; x \; \equal \; \meta{e}_1 \; \Xin \;
+         \meta{e}_2}} 
+        {\tau_2}} 
+\end{mathpar}
+Here, there is no difficulty with respect to \RefTirName{Tlet}; we
+only need to extend the typing environment of the first premisse with
+the binding $x : \tau_1$.
+
+\paragraph{From type checking to type inference}
+
+For a language statically typed, a \emph{type checker} is an algorithm
+which, given a program, determines whether it is typable and, if so,
+produces a type for it. If the program admits several types, a type
+checker must produce a \emph{principal type}, that is, a type which is
+more general than any of the possible types, given that, by
+definition, a type is more particular than another if it can be
+obtained by substituting type variables by type expressions. In a
+subset of \OCaml, the program \Xfun \ident{x} $\rightarrow$ \ident{x}
+has the types $\tau \rightarrow \tau$, for any type~\(\tau\), but the
+type $\alpha \rightarrow \alpha$ is principal, because all the other
+types are deduced by substitution of the
+variable~\(\alpha\). Depending on the nature and amount of information
+(provided as type annotations) required by the language, the task of
+the type checker is more or less complex and there exists many
+situations to consider.
+
+In the case of pure type checking, all subexpressions of a program, as
+well as all the identifiers, must be annotated by their type. For
+example,
+\begin{tabbing}
+\Xfun \= \lpar\ident{x}~:~\type{int}\rpar $\rightarrow$ \lpar\\
+\> \Xlet \ident{y}~:~\type{int} \equal \lpar\texttt{+}~:~\type{int}
+\(\times\) \type{int} $\rightarrow$ \type{int}\rpar{}
+\lpar\ident{x}~:~\type{int}\rpar{} \lpar\num{1}~:~\type{int}\rpar\\
+\> \Xin \ident{y}~:~\type{int}\\
+\rpar{}~:~\type{int}
+\end{tabbing}
+The type checker is then quite simple, since the programmer not only
+writes an expression, but a complete typing derivation. Of course,
+such a language would be pretty much useless in practice and no
+realistic language takes this extreme approach.
+
+Another way requires the programmer to declare the parameter types and
+the local variable types. The type checker then infers the type of
+each expression from the types of its subexpressions. In other words,
+the typing information is propagated through the expression from the
+leaves to the root (in a bottom\hyp{}up fashion). For example, given
+that \ident{x} has type \type{int}, the type checker can not only
+verify that the expression \ident{x} \texttt{+} \num{1} is correctly
+typed, but also infer that it has the type \type{int}. Thus, the
+previous example becomes
+\begin{center}
+\Xfun \lpar\ident{x}~:~\type{int}\rpar{} $\rightarrow$ \Xlet
+\ident{y}~:~\type{int} \equal \ident{x} \texttt{+} \num{1} \Xin
+\ident{y}
+\end{center}
+and the type checker infers the type \type{int} $\rightarrow$
+\type{int} for that expression. A similar approach has been adopted by
+most mainstream, imperative languages.
+
+Another approach requires the programmer to only declare the parameter
+types. The difference with the previous framework is that local
+variables (bound by \Xlet \dots \Xin \dots) are not necessarily
+annotated where they are declared. The type checker determines then
+their type by analysing the type of the expression they are associated
+with, that is, the contexts within which they are used. Our running
+example becomes:
+\begin{center}
+\Xfun \lpar\ident{x}~:~\type{int}\rpar{} $\rightarrow$ \Xlet \ident{y}
+\equal \ident{x} \texttt{+} \num{1} \Xin \ident{y}.
+\end{center}
+After determining that \ident{x} \texttt{+} \num{1} has type
+\type{int}, the type checker ascribes the type \type{int}
+to~\ident{y}.
+
+In the case of full type inference, no type annotation at all is
+needed and the type checker determines the type of the parameters from
+their use in the body of their function. Our example becomes:
+\begin{center}
+\Xfun \ident{x} $\rightarrow$ \Xlet \ident{y} \equal
+\ident{x} \texttt{+} \num{1} \Xin \ident{y}.
+\end{center}
+Because addition only operates on integers, the variable~\ident{x} is
+necessarily of the type \type{int}. This inference process is used in
+the languages of the ML family, like \OCaml. In order to implement
+type inference for a subset of \OCaml, we proceed in three steps:
+\begin{enumerate}
+
+  \item we annotate the abstract syntax tree with type variables;
+
+  \item from that decorated tree, we build a system of equations about
+    types, which characterises all the possible typing derivations for
+    the program;
+
+  \item we solve that system of equations: if there is no solution,
+    then the program is not well\hyp{}typed, otherwise, we determine a
+    principal solution, which allows us to deduce a principal typing
+    of the program.
+
+\end{enumerate}
+By composing these phases, we obtain an algorithm which determines
+whether a program is typable, and, if so, we provide a principal
+typing.
+
+\paragraph{Substitution}
+
+We need a new concept to describe type inference: substitution. It is
+a function whose application has the general shape:
+$\subst{\tau}{\alpha}{\tau'}$, read as: `The substitution of the type
+variable~\(\alpha\) by the type~\(\tau'\) in the type~\(\tau\).' It is
+defined inductively on the type structure:
+\begin{alignat*}{2}
+\subst{\src{\type{int}}}{\alpha}{\tau'} &= \src{\type{int}};\\
+\subst{\alpha}{\alpha}{\tau'} &= \tau';\\
+\subst{\beta}{\alpha}{\tau'} &= \beta,  && \quad \text{if} \; \beta \neq
+  \alpha;\\
+\subst{\src{\meta{\tau}_1 \rightarrow \meta{\tau}_2}}{\alpha}{\tau'}
+&= \src{\meta{\tau}'_1 \rightarrow \meta{\tau}'_2},
+&& \quad \text{with} \; \tau'_1 = \subst{\tau_1}{\alpha}{\tau'}\\
+&&& \quad \text{and} \; \tau'_2 = \subst{\tau_2}{\alpha}{\tau'}.
+\end{alignat*}
+The notion of substitution can be extended to other objects, like
+expressions. We will write $\varphi$, $\psi$ or $\theta$ to denote a
+substitution.
+
+\paragraph{Decorating the tree}
+
+Let us reconsider the abstract syntax tree in \fig~\vref{fig:graph_fv}
+and let us decorate it with unique type variables which respect the
+bindings, that is, a bound variable is annotated by the same type
+variable as that of its binder, and the other expressions are
+annotated by unique variables, as shown in
+\fig~\vref{fig:let_x_annotated}.
+\begin{figure}
+\centering
+\includegraphics[bb=76 632 346 730]{let_x_annotated}
+\caption{Type annotations on the AST of \fig~\vref{fig:graph_fv}
+\label{fig:let_x_annotated}}
+\end{figure}
+Let us write in superscript to an expression the type variable that
+annotates it, for instance $\te{\cst{Let}}{\alpha}(\te{x}{\beta},
+\te{e_1}{\gamma}, \te{e_2}{\delta})$.
+
+\paragraph{Collecting the constraints}
+
+From an annotated expression $\te{e}{\alpha}$, we build a system of equations
+$C(\te{e}{\alpha})$ which captures the typing constraints between the
+subexpressions of~\(e\). That system is defined inductively on the
+structure of~\(e\):
+\begin{align*}
+   C(\te{\cst{Var}}{\alpha} \, x)
+&= \varnothing\\
+   C(\te{\cst{Const}}{\alpha} \, n)
+&= \{\alpha = \src{\type{int}}\}\\
+   C(\te{\cst{BinOp}}{\alpha}(\textrm{\Large \_}, \te{e_1}{\beta},
+   \te{e_2}{\gamma}))
+&= \{\alpha = \src{\type{int}}; \beta = \alpha; \gamma = \alpha\}\\
+&\phantom{==} \cup C(\te{e_1}{\beta}) \cup C(\te{e_2}{\gamma})\\
+C(\te{\cst{Let}}{\alpha}(\te{x}{\beta}, \te{e_1}{\gamma},
+  \te{e_2}{\delta}) &= 
+  \{\beta = \gamma; \alpha = \delta\} \cup C(\te{e_1}{\gamma}) \cup
+  C(\te{e_2}{\delta})\\
+C(\te{\cst{Fun}}{\alpha} (\te{x}{\beta},\te{e}{\gamma})) &=
+  \{\alpha = \src{\meta{\beta} \rightarrow \meta{\gamma}}\} \cup
+  C(\te{e}{\gamma})\\
+C(\te{\cst{App}}{\alpha} (\te{e_1}{\beta},\te{e_2}{\gamma})) &=
+  \{\beta = \src{\meta{\gamma} \rightarrow \meta{\alpha}}\} \cup
+  C(\te{e_1}{\beta}) \cup C(\te{e_2}{\gamma})
+\end{align*}
+Let us resume our running example:
+\begin{equation*}
+\begin{array}{r@{\,}r@{\,}l}
+  C(\te{e}{\alpha}) = & \{ & \beta = \gamma; \alpha = \delta; \\
+                      & & \gamma = \src{\type{int}}; \\
+                      & & \delta = \src{\type{int}}; \eta = \delta;
+                          \beta = \delta; \\
+                      & & \zeta = \nu; \eta = \zeta;\\
+                      & & \nu = \src{\type{int}}\}
+\end{array}
+\end{equation*}
+
+\paragraph{From solutions to judgements}
+
+A solution of the equation set $C(\te{e}{\alpha})$ is a
+substitution~$\varphi$ such that for all equation $\tau_1 = \tau_2 \in
+C(\te{e}{\alpha})$, we have $\varphi(\tau_1) = \varphi(\tau_2)$. In
+other words, a solution is a \emph{unifier} of the equation
+system. The following propositions establish that the solutions of
+$C(\te{e}{\alpha})$ characterise exactly the typings of~\(e\).
+
+\begin{prop}[Soundness of the equations]
+If~$\varphi$ is a solution of $C(\te{e}{\alpha})$, then
+$\trel{\Gamma}{\te{e}{\alpha}}{\varphi(\alpha)}$, where~$\Gamma$ is
+the typing environment $\{\te{x}{\beta}:\varphi(\beta) \mid
+\te{x}{\beta} \in \mathcal{F}(e)\}$.
+\end{prop}
+
+\begin{prop}[Completion of the equations]
+Let~\(e\) be an expression. If there exists a typing
+environment~\(\Gamma\) and a type~\(\tau\) such that
+$\trel{\Gamma}{e}{\tau}$, then the equation system $C(\te{e}{\alpha})$
+admits a solution~$\varphi$ such that $\varphi(\alpha) = \tau$ and
+$\Gamma = \{\te{x}{\beta}:\varphi(\beta) \mid \te{x}{\beta} \in
+\mathcal{F}(e)\}$.
+\end{prop}
+
+\paragraph{Solving the equations (Robinson's unifier)}
+
+Let us define $\varphi \leqslant \psi$ if there exists a
+substitution~$\theta$ such that $\psi = \theta \circ \varphi$. By
+definition, a solution~$\varphi$ of $C(\te{e}{\alpha})$ is said
+\emph{principal} if any solution~\(\psi\) of $C(\te{e}{\alpha})$
+satisfies $\varphi \leqslant \psi$. There exists an algorithm \mgu
+which, given a system of equations~\(C\), either fails or produces a
+principal solution of~\(C\):
+\begin{align*}
+    \mgu(\varnothing) &=_1 \forall x.x \mapsto x\\
+    \mgu(\{\tau = \tau\} \cup C') &=_2 \mgu(C')\\
+    \mgu(\{\alpha = \tau\} \cup C') &=_3 \mgu(C'[\alpha
+    \leftarrow \tau]) \circ [\alpha \leftarrow \tau], \ \textnormal{if
+    $\alpha \not\in \mathcal{F}(\tau)$}\\
+    \mgu(\{\tau = \alpha\} \cup C') &=_4 \mgu(\{\alpha = \tau\} \cup
+    C')\\
+    \mgu(C \cup C') &=_5
+    \mgu(\{\tau_1 = \tau'_1; \tau_2 = \tau'_2\} \cup C')
+    \intertext{where \(C = \{\src{\meta{\tau_1} \rightarrow
+        \meta{\tau_2}} = \src{\meta{\tau_1}' \rightarrow
+        \meta{\tau_2}'}\}\)}
+\end{align*}
+In any other case, \mgu fails because there are no solutions. Let use
+this algorithm, called \emph{Robinson's unifier} to solve our system
+of equations, whose aim is to compute
+\begin{equation*}
+\mgu(C(\te{e}{\alpha})) =_3 \varphi_0 \circ [\beta \leftarrow
+\gamma], \,\text{where}
+\end{equation*}
+\begin{align*}
+  \varphi_0 &= \mgu(\{\alpha = \delta; \gamma = \src{\type{int}};
+  \delta = \src{\type{int}}; \eta = \delta;\\
+            &\phantom{=\mgu(\{)} \gamma = \delta; \zeta =
+  \nu; \eta = \zeta; \nu = \src{\type{int}}\})\\
+            &=_3 \varphi_1 \circ [\alpha \leftarrow \delta]\\
+  \varphi_1 &= \mgu(\{\gamma = \src{\type{int}};
+  \delta = \src{\type{int}}; \eta = \delta; \gamma = \delta; \zeta =
+  \nu; \eta = \zeta;\\
+            &\phantom{=\mgu(\{)} \nu = \src{\type{int}}\})\\
+            &=_3 \varphi_2 \circ [\gamma \leftarrow \src{\type{int}}]\\
+  \varphi_3 &= \mgu(\{\delta = \src{\type{int}}; \eta = \delta;
+  \src{\type{int}} = \delta; \zeta = \nu; \eta = \zeta; \nu =
+  \src{\type{int}}\})\\
+            &=_3 \varphi_4 \circ [\delta \leftarrow \src{\type{int}}]\\
+  \varphi_4 &= \mgu(\{\eta = \src{\type{int}}; \src{\type{int}} =
+  \src{\type{int}}; \zeta = \nu; \eta = \zeta; \nu =
+  \src{\type{int}}\})\\
+            &=_3 \varphi_5 \circ [\eta \leftarrow \src{\type{int}}]\\
+  \varphi_5 &= \mgu(\{\src{\type{int}} = \src{\type{int}}; \zeta =
+  \nu; \src{\type{int}} = \zeta; \nu = \src{\type{int}}\})\\
+  \varphi_5 &=_2 \mgu(\{\zeta = \nu; \src{\type{int}} = \zeta; \nu =
+  \src{\type{int}}\})\\
+            &=_3 \varphi_6 \circ [\zeta \leftarrow \nu]\\
+  \varphi_6 &= \mgu(\{\src{\type{int}} = \nu; \nu =
+  \src{\type{int}}\})\\
+            &=_4 \varphi_5 \circ [\nu \leftarrow \src{\type{int}}]\\
+  \varphi_5 &= \mgu(\{\src{\type{int}} = \src{\type{int}};
+  \src{\type{int}} = \src{\type{int}}\})\\
+            &= \mgu(\{\src{\type{int}} = \src{\type{int}}\})\\
+            &=_2 \mgu(\varnothing) =_1 \forall x.x \mapsto x.
+\end{align*}
+Consequently,
+\begin{align*}
+\mgu(C(\te{e}{\alpha})) &= [\nu \leftarrow \src{\type{int}}] \circ
+[\zeta \leftarrow \nu] \circ [\eta \leftarrow \src{\type{int}}] \circ
+[\delta \leftarrow \src{\type{int}}]\\ 
+& \circ \; [\gamma \leftarrow \src{\type{int}}] \circ [\alpha
+  \leftarrow \delta] \circ [\beta \leftarrow \gamma]\\
+\mgu(C(\te{e}{\alpha})) (\alpha) &= \alpha ([\delta \leftarrow
+  \src{\type{int}}] \circ [\alpha \leftarrow \delta]) = \delta [\delta
+  \leftarrow \src{\type{int}}] = \src{\type{int}}
+\end{align*}
+Robinson's unifier enjoys the following properties:
+
+\begin{prop}[Soundness of \mgu]
+If $\mgu(C) = \varphi$, then~$\varphi$ is a solution of~$C$.
+\end{prop}
+
+\begin{prop}[Completion of \mgu]
+If~$C$ admits a solution~$\psi$, then $\mgu(C)$ succeeds in producing
+a solution~$\varphi$ such that $\varphi \leqslant \psi$.
+\end{prop}
+

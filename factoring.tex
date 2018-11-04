@@ -1,0 +1,1204 @@
+\chapter{Word Factoring}
+\label{chap:factoring}
+\index{exact string matching|see{word fac\-toring}}
+\index{string matching|see{word factoring}}
+\index{word factoring|(}
+
+Let us call \emph{alphabet}\index{word factoring!alphabet} a
+non\hyp{}empty, finite set of symbols, called
+\emph{letters}\index{word factoring!letter} and set in a
+sans\hyp{}serif type, for example \word{a}, \word{b} etc. A
+\emph{word}\index{word factoring!word} is a finite series of letters,
+like \word{word}; in particular, a letter is a word, as in English. We
+denote repetition of a letter or word with an exponent, for instance,
+\(\word{a}^3 = \word{aaa}\). Just as letters can be joined to make up
+words, so can words: the word \(u \cdot v\) is made of the letters of
+word~\(u\) followed by the letters of word~\(v\), for instance, if
+\(u=\word{back}\) and \(v=\word{up}\), then \(u \cdot v =
+\word{backup}\). This operation is associative: \((u \cdot v) \cdot w
+= u \cdot (v \cdot w)\). As a shorthand, the operator may be omitted:
+\((uv)w = u(vw)\). Catenation on words behave like a
+non\hyp{}commutative product, so it has a neutral element
+\(\varepsilon\), called the \emph{empty word}: \(u \cdot \varepsilon =
+\varepsilon \cdot u = u\).
+
+A word~\(x\) is a \emph{factor}\index{word factoring!factor} of a
+word~\(y\) if there exists two words \(u\)~and~\(v\) such that \(y =
+uxv\). The word~\(x\) is a \emph{prefix}\index{word factoring!prefix}
+of~\(y\), noted \(x \prefeq y\), if~\(u=\varepsilon\), that is, if \(y
+= xv\). Moreover, it is a \emph{proper prefix}, noted \(x \pref y\),
+if \(v \neq \varepsilon\). Given \(y = uxv\), the word~\(x\) is a
+\emph{suffix}\index{word factoring!suffix} of~\(y\) if \(v =
+\varepsilon\). Furthermore, it is a \emph{proper suffix} if \(u \neq
+\varepsilon\). Let \(a\)~be any letter and \(x\), \(y\)~any word, then
+the prefix relation is easy to define by an inference system as
+\begin{mathpar}
+\inferrule*{}{\varepsilon \prefeq y}
+\qquad
+\inferrule{x \prefeq y}{a \cdot x \prefeq a \cdot y}
+\end{mathpar}
+
+The purpose being to write a functional program for factoring, we need
+to translate words and operations on them into terms of the
+language. A letter is translated into a constant data constructor; for
+example, \word{a} becomes \(\fun{a}()\). A word of more than one
+letter is mapped to a stack of mapped letters, such as \word{hi} in
+\([\fun{h}(),\fun{i}()]\). The catenation of a letter and a word is
+translated as a push, like \(\word{a} \cdot \word{bed}\) becomes
+\([\fun{a}(),\fun{b}(),\fun{e}(),\fun{d}()]\). The catenation of two
+words is associated to stack catenation, so \(\word{ab} \cdot
+\word{cd}\) leads to\index{cat@\fun{cat/2}}
+\(\fun{cat}([\fun{a}(),\fun{b}()],[\fun{c}(),\fun{d}()])\).
+
+% The transposition of a word is the reversal of the stack implementing
+% the word.
+
+As usual, the translation of the inference system defining
+\((\prefeqName)\) into a function \fun{pre/2}\index{pre@\fun{pre/2}}
+requires that the cases corresponding to the axioms evaluate in
+\(\fun{true}()\) and the cases left unspecified \((\nprefeqName)\)
+evaluate in \(\fun{false}()\):
+\begin{equation*}
+\fun{pre}(\el,y) \rightarrow \fun{true}();\quad
+\fun{pre}(\cons{a}{x},\cons{a}{y}) \rightarrow \fun{pre}(x,y);\quad
+\fun{pre}(x,y) \rightarrow \fun{false}().
+\end{equation*}
+The inference system is now a formal specification for the program.
+
+A letter in a word can be uniquely characterised by a natural number,
+called \emph{index}\index{word factoring!index}, assuming that the
+first letter has index~\(0\) \citep{Dijkstra_1982}. If
+\(x=\word{top}\), then the letter at index~\(0\) is written
+\(\ind{x}{0}=\word{t}\) and the one at index~\(2\) is
+\(\ind{x}{2}=\word{p}\). A factor~\(x\) of~\(y\) can be identified by
+the index of~\(\ind{x}{0}\) in~\(y\). The end of the factor can also
+be given; for example, \(x=\word{sit}\) is a factor of
+\(y=\word{curiousity}\) at index~\(6\), written \(\ind{y}{6,8} = x\),
+meaning \(\ind{y}{6} = \ind{x}{0}\), \(\ind{y}{7} = \ind{x}{1}\) and
+\(\ind{y}{8} = \ind{x}{2}\). Given two words \(p\)~and~\(t\),
+determining whether \(p\)~is a factor of~\(t\) is called
+\emph{factoring~\(p\) in~\(t\)}.
+
+Factor matching is common in text editing, although it is usually
+better known as \emph{exact string matching} in the academic field of
+\emph{stringology} or \emph{text
+  algorithmics} \citep{CharrasLecroq_2004,CrochemoreHancartLecroq_2007}
+\citep[\S{}32]{CLRS_2009}. Because of the asymmetric nature of
+factoring, the word~\(p\) is called the \emph{pattern}\index{word
+  factoring!pattern} and the word~\(t\) is the \emph{text}\index{word
+  factoring!text}.
+
+\section{Na\"{\i}ve factoring}
+\label{sec:naive_factoring}
+\index{word factoring!na\"{\i}ve $\sim$|(}
+
+In section~\ref{def:linear_search}, \vpageref{def:linear_search}, we
+introduced the linear search\index{linear search}, that is, the
+stepwise search for the occurrence of an item in a stack. We can
+generalise it to search for a series of items occurring consecutively
+in a stack, that is, to solve the factoring problem. This approach is
+qualified as being na\"{\i}ve because it is a simple extension of a
+simple idea and it is implied that it is not the most efficient.
+
+Everything starts with~\(\ind{p}{0}\) and~\(\ind{t}{0}\) being
+compared, then, assuming \(\ind{p}{0} = \ind{t}{0}\), letters
+\(\ind{p}{1}\) and~\(\ind{t}{1}\) are, in turn, compared etc. until
+one of the words is exhausted or a mismatch occurs. Assuming that
+\(p\)~is shorter than~\(t\), the former case means that \(p\)~is a
+prefix of~\(t\). In the latter case, \(p\)~is shifted so
+\(\ind{p}{0}\) is aligned with \(\ind{t}{1}\) and the comparisons are
+resumed from there. If \(p\)~cannot be shifted anymore because its end
+would surpass the end of~\(t\), then it is not a factor. The essence
+of this procedure is summed up in \fig~\vref{fig:naive},
+\begin{figure}[t]
+\centering
+\includegraphics[bb=75 621 352 715]{naive}
+\caption{Na\"{\i}vely matching pattern~\(p\) against text~\(t\)
+(failure in grey)\label{fig:naive}}
+\end{figure}
+where \(\ind{p}{i} \neq \ind{t}{j}\) (the letters
+\word{a}~and~\word{b} are not relevant in themselves).
+
+% Wrapping figure better declared before a paragraph
+%
+%\begin{wrapfigure}[15]{r}[0pt]{0pt}
+% [15] vertical lines
+% {r} right placement
+% [0pt] of margin overhang
+%\end{wrapfigure}
+
+\Fig~\vref{fig:loc0}
+\begin{figure}[t]
+\centering 
+\includegraphics[bb=71 548 253 721]{loc0}
+\caption{Na\"{\i}ve factoring with \fun{loc\(_0\)/2}
+\label{fig:loc0}}
+\end{figure}
+shows an abstract program implementing this scheme. The call
+\(\fun{loc}_0(p,t)\)\index{loc0@\fun{loc\(_0\)/2}} evaluates in
+\(\fun{absent}()\) if the pattern~\(p\) is not a factor of the
+text~\(t\), otherwise in \(\fun{factor}(k)\), where \(k\)~is the index
+in~\(t\) where~\(p\) occurs first. Conceptually, this design consists
+in combining a linear search for the first letter of the pattern and a
+prefix check for the rest of the pattern and text. It is important to
+verify whether the invariants implicit in general do not break in the
+presence of limit cases. For instance, in stack processing, set the
+different stacks to be empty and interpret the result of single
+rewrites and entire evaluations. We have \(\fun{pre}(\el,t)
+\twoheadrightarrow \fun{true}()\), because \(t = \varepsilon \cdot
+t\). Accordingly, \(\fun{loc}_0(\el,t) \twoheadrightarrow
+\fun{factor}(0)\).
+
+\paragraph{Refinements}
+
+While this program composition is intuitive, it is too long. We may
+remark that, after a call to \fun{pre/2}\index{pre@\fun{pre/2}}
+evaluates in \(\fun{true}()\), the interpretation ends with
+\(\fun{factor}(j)\). Dually, a value \(\fun{false}()\) is followed by
+the call
+\(\fun{loc}_0(p,t,j+1)\)\index{loc0@\fun{loc\(_0\)/3}}. Therefore,
+instead of calling \fun{pre/2} and then inspecting the resulting value
+to decide what to do next, we could have \fun{pre/2} take the
+lead. This entails that it needs to receive additional arguments to be
+able to end with \(\fun{factor}(j)\) or resume with
+\(\fun{loc}_0(p,t,j+1)\), as expected. The corresponding code is shown
+in \fig~\ref{fig:loc1}.
+\begin{figure}[t]
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{loc}_1(p,t)   & \rightarrow & \fun{loc}_1(p,t,0).\\
+\\
+\fun{loc}_1(\cons{a}{p},\el,j) & \rightarrow & \fun{absent}();\\
+\fun{loc}_1(p,t,j) & \rightarrow & \fun{pre}_1(p,t,p,t,j).\\
+\\
+\fun{pre}_1(\el,t,p',t',j) & \rightarrow & \fun{factor}(j);\\
+\fun{pre}_1(\cons{a}{p},\cons{a}{t},p',t',j)
+                   & \rightarrow & \fun{pre}_1(p,t,p',t',j);\\
+\fun{pre}_1(p,t,p',\cons{a}{t'},j) & \rightarrow & \fun{loc}_1(p',t',j+1).
+\end{array}}
+\end{equation*}
+\caption{Refinement of \fig~\vref{fig:loc0}
+\label{fig:loc1}}
+\end{figure}
+
+Further examination reveals that we can merge
+\fun{loc\(_1\)/3}\index{loc1@\fun{loc\(_1\)/3}} and
+\fun{pre\(_1\)/5}\index{pre1@\fun{pre\(_1\)/5}} into
+\fun{pre/5}\index{pre@\fun{pre/5}} in\index{word factoring!na\"{\i}ve
+  $\sim$!program} \fig~\vref{fig:loc}. This kind of progressive
+design, where a program is transformed into a guided series of
+equivalent programs is called a \emph{refinement}. Here, each
+refinement is more efficient than the preceding, but less legible than
+the original, so each step must be cautiously checked.
+\begin{figure}[h]
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{loc}(p,t)   & \xrightarrow{\smash{\pi}} & \fun{pre}(p,t,p,t,0).\\
+\\
+\fun{pre}(\el,t,p',t',j) & \xrightarrow{\smash{\rho}}
+                         & \fun{factor}(j);\\
+\fun{pre}(p,\el,p',t',j) & \xrightarrow{\smash{\sigma}}
+                         & \fun{absent}();\\
+\fun{pre}(\cons{a}{p},\cons{a}{t},p',t',j)
+                         & \xrightarrow{\smash{\tau}}
+                         & \fun{pre}(p,t,p',t',j);\\
+\fun{pre}(p,t,p',\cons{b}{t'},j) & \xrightarrow{\smash{\upsilon}}
+                         & \fun{pre}(p',t',p',t',j+1).
+\end{array}}
+\end{equation*}
+\caption{Refinement of \fig~\vref{fig:loc1}
+\label{fig:loc}}
+\end{figure}
+
+\paragraph{Termination}
+\index{word factoring!na\"{\i}ve $\sim$!termination|(}
+
+We want to show that the index in the text always increases, whether a
+comparison fails or not, so we choose a lexicographic order on the
+dependency pairs of \fun{pre/5}\index{termination!dependency pair}
+made of the fourth and second arguments (definition~\eqref{def:lexico}
+\vpageref{def:lexico}), where \(s \succ t\) if~\(t\) is the immediate
+substack of~\(s\). The third rule satisfies \((t',\cons{a}{t}) \succ
+(t',t)\). The fourth rule is also ordered, because \((\cons{b}{t'},t)
+\succ (t',t')\).\index{word factoring!na\"{\i}ve
+  $\sim$!termination|)}\hfill\(\Box\)
+
+\paragraph{Completeness}
+\index{word factoring!na\"{\i}ve $\sim$!completeness|(}
+\index{induction!example|(}
+
+Note how, in rule~\(\sigma\), the pattern~\(p\) can not be empty
+because the rules are ordered and that case would always match
+rule~\(\rho\). The completeness of the definition of \fun{pre/5}
+deserves some attention and we need to justify why the call
+\(\fun{pre}(\cons{a}{p},\cons{b}{t},p',\el,j)\), with \(a \neq b\),
+cannot happen. Perhaps surprisingly, a more general statement is
+easier to establish:
+\begin{center}
+\(\fun{loc}(p,t) \twoheadrightarrow \fun{pre}(p_0,t_0,p_0',t_0',j)\)
+\textsl{implies} \(t_0' \succcurlyeq t_0\),
+\end{center}
+where (\(\succcurlyeq\)) is the reflexive substack relation. Let us
+prove this property by \emph{induction on the length of the
+  derivation}\index{induction!$\sim$ on the length of the
+  derivation}. More precisely, we want to establish the proposition
+\begin{equation*}
+\pred{Comp}{n} \colon \fun{loc}(p,t) \xrightarrow{\smash{n}}
+\fun{pre}(p_0,t_0,p_0',t_0',j) \Rightarrow t_0' \succcurlyeq t_0.
+\index{Comp@\predName{Comp}}
+\end{equation*}
+\begin{itemize}
+
+  \item The basis \(\pred{Comp}{0}\) is easy to prove without
+    induction by means of rule~\(\pi\): \(\fun{loc}(p,t)
+    \xrightarrow{\smash{\pi}} \fun{pre}(p,t,p,t,0)\) and \(t
+    \succcurlyeq t\) trivially holds.
+
+    \item The induction hypothesis is \(\pred{Comp}{n}\) and we want
+      to show that, under this assumption, \(\pred{Comp}{n+1}\) holds
+      as well. In other words, let us suppose that \(\fun{loc}(p,t)
+      \xrightarrow{\smash{n}} \fun{pre}(p_0,t_0,p_0',t_0',j)\) implies
+      \(t_0' \succcurlyeq t_0\) and we want to prove that
+      \(\fun{pre}(p_0,t_0,p_0',t_0',j) \rightarrow
+      \fun{pre}(p_1,t_1,p_1',t_1',k)\) implies \(t_1' \succcurlyeq
+      t_1\). This rewrite can only be by means of~\(\tau\)
+      or~\(\upsilon\). 
+      \begin{itemize}
+
+      \item If~\(\tau\), the induction hypothesis on the
+        left\hyp{}hand side entails \(t' \succcurlyeq \cons{a}{t}\),
+        so \(t' \succcurlyeq t\) in the right\hyp{}hand side;
+
+      \item otherwise, the right\hyp{}hand side of~\(\upsilon\)
+        trivially satisfies \(t' \succcurlyeq t'\).
+
+      \end{itemize}
+\end{itemize}
+In summary, \(\pred{Comp}{0}\) is true and \(\pred{Comp}{n}
+\Rightarrow \pred{Comp}{n+1}\). Therefore, the induction principle
+yields \(\forall n.\pred{Comp}{n}\), which, in turn, entails our
+formulation with~(\(\twoheadrightarrow\)). Note how, in this case,
+this proof technique reduces to mathematical induction
+on~\(n\).\hfill\(\Box\)
+\index{induction!example|)}
+\index{word factoring!na\"{\i}ve $\sim$!completeness|)}
+
+\addcontentsline{toc}{subsection}{Cost}
+\paragraph{Cost}
+
+In the following cost analysis, let~\(m\) be the length of the
+pattern~\(p\) and \(n\)~be the length of the text~\(t\). Moreover, as
+it is common with search algorithms, we discriminate on \(p\)~being a
+factor of~\(t\) or not.
+
+\paragraph{Minimum cost}
+\index{word factoring!na\"{\i}ve $\sim$!minimum cost}
+
+If \(m \leqslant n\), the best case happens when the pattern is a
+prefix of the text, so the evaluation trace is \(\pi\tau^m\rho\) and
+\(\B{\fun{loc}}{m,n} = m + 2\). If \(m > n \), the minimum cost is
+\(\B{\fun{loc}}{m,n} = \len{\pi\tau^n\sigma} = n + 2\). We can gather
+these two cases in one formula:
+\begin{equation*}
+\B{\fun{loc}}{m,n} = \min\{m,n\} + 2.\index{loc@$\B{\fun{loc}}{m,n}$}
+\end{equation*}
+
+\paragraph{Maximum cost}
+\index{word factoring!na\"{\i}ve $\sim$!maximum cost|(}
+
+To find the maximum cost, let us investigate the cases where the
+pattern is a factor of the text and when it is not.
+\begin{itemize}
+
+  \item \emph{The text contains the pattern.} The discovery of the
+    pattern must be delayed as much as possible, therefore the worst
+    case is when \(w\)~is a suffix of~\(t\) and every mismatch
+    involves the last letter of the pattern. An example is \(p =
+    \word{a}^{m-1}\word{b}\) and \(t = \word{a}^{n-1}\word{b}\). The
+    evaluation trace corresponding to this case is \(\pi
+    (\tau^{m-1}\upsilon)^{n-m} \tau^m\rho\), whose length is
+    \(mn-m^2+m+2\).
+
+  \item \emph{The text does not contain the pattern.} The pattern is
+    not the prefix of any suffix of the text. The most delayed
+    comparison failure should occur at the last letter of the pattern,
+    like \(p = \word{a}^{m-1}\word{b}\) and \(t = \word{a}^{n}\). The
+    cost is \(\len{\pi(\tau^{m-1}\upsilon)^{n-m+1}\tau^{m-1}\sigma} =
+    mn - m^2 + 2m + 1\).
+
+\end{itemize}
+Therefore, the maximum cost is \(\W{\fun{loc}}{m,n} = mn - m^2 + 2m +
+1\) \index{loc@$\W{\fun{loc}}{m,n}$}, when the pattern is not a factor
+of the text and \(m \geqslant 1\). The previous analysis suggests an
+improvement for that case, but would make the case when the text
+contains the pattern the worst: just after rule~\(\tau\), let us add
+\index{word factoring!na\"{\i}ve $\sim$!maximum cost|)}
+\begin{equation*}
+\belowdisplayskip=0pt
+\fun{pre}([a],[b],p',t',j) \rightarrow \fun{absent}();\index{pre@\fun{pre/5}}
+\end{equation*}
+
+\paragraph{Average cost}
+\index{word factoring!na\"{\i}ve $\sim$!average cost|(}
+
+Let us suppose that \(0 < m \leqslant n\) and that the letters of
+\(p\)~and~\(t\) are chosen from the same alphabet, whose cardinal
+is~\(\breve{a} > 1\). Na\"{\i}ve factoring consists in matching a
+pattern against the prefixes of the suffixes of a text, by decreasing
+lengths. Let~\(\OM{\breve{a}}{m}\) \index{loc@$\OM{\breve{a}}{n}$} be
+the average number of letter comparisons for comparing two words of
+length~\(m\) over the alphabet~\(\breve{a}\). The average number
+\(\OM{\fun{loc}}{m,n}\) of comparisons for na\"{\i}ve factoring is
+\begin{equation}
+\OM{\fun{loc}}{m,n} = (n-m+1)\OM{\breve{a}}{m} + \OM{\breve{a}}{m-1},
+\label{eq:loc}
+\end{equation}
+because there are \(n-m+1\) suffixes of length at least~\(m\) and
+\(1\)~suffix of length~\(m-1\), against which the pattern is matched.
+
+The determination of \(\OM{\breve{a}}{m}\) is achieved by fixing the
+pattern~\(p\) and letting the text~\(t\) vary over all possible
+letters. There are \(\breve{a}^{m}\)~comparisons between
+\(\ind{p}{0}\) and~\(\ind{t}{0}\), as much as there are different
+texts; if \(\ind{p}{0}=\ind{t}{0}\), there are
+\(\breve{a}^{m-1}\)~comparisons between \(\ind{p}{1}\)
+and~\(\ind{t}{1}\), as much as there are different \(\ind{t}{1,m-1}\)
+etc. In total, there are
+\begin{equation*}
+\breve{a}^{m} + \breve{a}^{m-1} + \dots +
+\breve{a} = \breve{a}(\breve{a}^{m} - 1)/(\breve{a}-1)
+\end{equation*}
+comparisons. There are \(\breve{a}^m\)~possible texts, hence the
+average is
+\begin{equation*}
+\OM{\breve{a}}{m}
+ = \frac{\breve{a}(\breve{a}^{m}-1)}{\breve{a}^m(\breve{a}-1)}
+ = \frac{\breve{a}}{\breve{a}-1}\left(1
+                          - \frac{1}{\breve{a}^{m}}\right)
+ < \frac{\breve{a}}{\breve{a}-1}
+ \leqslant 2.
+\end{equation*}
+Since \(\OM{\breve{a}}{1} = 1\), we draw the following bounds from
+equation~\eqref{eq:loc}:
+\begin{equation*}
+n - m + 2 \leqslant \OM{\fun{loc}}{m,n} < 2(n-m+2) \leqslant 2n + 4.
+\end{equation*}
+Na\"{\i}ve factoring is thus efficient in average, but its hypothesis
+is unlikely to apply to random English texts. Moreover, notice how the
+average cost gets down as the alphabet grows since \(\lim_{\breve{a}
+  \to \infty}\OM{\breve{a}}{m} = 1\).\index{word
+  factoring!na\"{\i}ve $\sim$!average cost|)} \index{word
+  factoring!na\"{\i}ve $\sim$|)}
+
+
+\section{Morris-Pratt algorithm}
+\index{word factoring!Morris-Pratt|(}
+
+In case of mismatch, the na\"{\i}ve algorithm resumes comparing the
+first letters of~\(p\) without using the information of the partial
+success, to wit, we know \(\ind{p}{0,i-1} = \ind{t}{j-i,j-1}\) and
+\(\ind{p}{i} \neq \ind{t}{j}\) (see \fig~\vref{fig:naive}).  The
+attempt at matching~\(p\) with \(\ind{t}{j-i+1,j-1}\) could reuse
+\(\ind{t}{j-i+1,j-1} = \ind{p}{1,i-1}\), in other words,
+\(\ind{p}{0,i-2}\)~is compared to~\(\ind{p}{1,i-1}\), i.e., the
+pattern~\(p\) is compared to a part of itself. If we know an
+index~\(k\) such that \(\ind{p}{0,k-1} = \ind{p}{i-k,i-1}\), that is,
+\(\ind{p}{0,k-1}\)~is a \emph{border} of~\(\ind{p}{0,i-1}\) (also
+known as a \emph{side}\index{side|see{word factoring, border}}), then
+we can resume by comparing~\(\ind{t}{j}\)
+with~\(\ind{p}{k}\). Clearly, the greater~\(k\), the more comparisons
+are skipped, so we want to find the \emph{maximum borders} of the
+prefixes of~\(p\).
+
+\paragraph{Border}
+\index{word factoring!border|(}
+
+The border of a non\hyp{}empty word~\(y\) is a proper prefix of~\(y\)
+which is also a suffix. For example, the word \word{abacaba} has three
+borders: \(\varepsilon\), \word{a}~and~\word{aba}. The last one is the
+maximum border and we write
+\(\Border{}{\underline{\word{aba}}\word{c}\underline{\word{aba}}} =
+\word{aba}\). Another example is \(\Border{}{\word{abac}} =
+\varepsilon\), because \(\word{abac} =
+\underline{\varepsilon}\word{abac}\underline{\varepsilon}\). Maximum
+borders can overlap; consider, for example,
+\(\Border{}{\underline{\word{aaa}}\word{a}} =
+\Border{}{\word{a}\underline{\word{aaa}}} = \word{aaa}\).
+
+The speed\hyp{}up brought by Morris and Pratt to the na\"{\i}ve search
+is depicted in \fig~\vref{fig:mp}.
+\begin{figure}[b]
+\centering
+\includegraphics[bb=74 621 367 717]{mp}
+\caption{Morris-Pratt algorithm (failure in grey)
+\label{fig:mp}}
+\end{figure}
+Notice that, contrary to na\"{\i}ve factoring, letters in the text are
+compared in a strictly increasing order (never having to
+backtrack). Consider the complete run in \fig~\vref{fig:mp_ex} where,
+in the end,
+\begin{figure}[t]
+\centering
+\includegraphics{mp_ex}
+\caption{Morris\hyp{}Pratt algorithm at work (no match found)
+\label{fig:mp_ex}}
+\end{figure}
+\(p\)~is not found to be a factor of~\(t\). As usual, letters on a
+grey background correspond to mismatches. It is clear that
+\(\Border{}{a} = \varepsilon\), for all letters~\(a\).
+
+We now have the choice of finding either \(\Border{}{ay}\) or
+\(\Border{}{ya}\), where \(y\)~is a non\hyp{}empty word. Since we are
+interested in knowing the maximum borders of all the prefixes of a
+given pattern, the latter is more suitable (\(y \pref ya\)). The idea
+is to recursively consider \(\Border{}{y} \cdot a\): if it is a prefix
+of~\(y\), then \(\Border{}{ya} = \Border{}{y} \cdot a\); otherwise, we
+seek the maximum border of the maximum border of~\(y\), namely,
+\(\Border{2}{y} \cdot a\) etc. until \(\Border{q}{y} \cdot a\) is a
+prefix of~\(y\) or else \(\Border{q}{y} = \varepsilon\). For example,
+\(\Border{}{y \cdot \word{a}} = \Border{3}{y} \cdot \word{a}\) in
+\fig~\vref{fig:max_B}.
+\begin{figure}[b]
+\centering
+\includegraphics{max_B}
+\caption{\(\Border{}{y \cdot \word{a}}
+   = \Border{}{\Border{}{y} \cdot \word{a}}
+   = \Border{}{\Border{2}{y} \cdot \word{a}}
+   = \Border{3}{y} \cdot \word{a}\).
+\label{fig:max_B}}
+\end{figure}
+
+\par\vskip\baselineskip
+
+Formally, for all words~\({y \neq \varepsilon}\) and any
+letter~\(a\),
+\begin{equation}
+  \Border{}{a}         := \varepsilon;\qquad
+  \Border{}{y \cdot a} := \left\{
+    \begin{aligned}
+      & \Border{}{y} \cdot a,
+      && \text{if \(\Border{}{y} \cdot a \prefeq y\)};\\
+      & \Border{}{\Border{}{y} \cdot a},
+      && \text{otherwise.}
+    \end{aligned}
+  \right.
+\label{eq:Border}
+\end{equation}
+Consider the following examples where \(y\)~and~\(\Border{}{y}\) are
+given:
+\begin{align*}
+  y             &= \word{abaabb},
+& \Border{}{y}  &= \varepsilon,
+& \Border{}{y \cdot \word{b}}
+                &= \Border{}{\Border{}{y} \cdot \word{b}}
+                 = \Border{}{\word{b}} = \varepsilon;\\
+  y             &= \word{baaaba},
+& \Border{}{y}  &= \word{ba},
+& \Border{}{y \cdot \word{a}}
+                &= \Border{}{y} \cdot \word{a}
+                 = \word{baa};\\
+  y             &= \word{abbbab},
+& \Border{}{y}  &= \word{ab},
+& \Border{}{y \cdot \word{a}}
+                &= \Border{}{\Border{}{y} \cdot \word{a}}
+                 = \Border{2}{y} \cdot \word{a}
+                 = \word{a}.
+\end{align*}
+\index{word factoring!border|)}
+
+\paragraph{Failure function}
+\index{word factoring!failure function|(}
+
+Let us note~\(\wlen{y}\) the length of a word~\(y\). For a given
+word~\(x\), let us define a function \(\MPfailureName_{x}\) on all its
+prefixes as
+\begin{equation}
+  \MPfailure{x}{}{\wlen{y}}
+:= \wlen{\Border{}{y}},\,\; \text{for
+    all \(x\) and \(y \neq \varepsilon\) such
+    that \(y \prefeq x\)}.\label{eq:MP_failure}
+\end{equation}
+For reasons which will be clear soon, this function is called the
+\emph{failure function} of~\(x\). An equivalent definition is
+\begin{equation*}
+  \MPfailure{x}{}{i}
+= \wlen{\Border{}{\ind{x}{0,i-1}}}, \,\;
+\text{for all \(x\) and  \(i\) such that
+\(0 < i \leqslant \wlen{x}\)}.
+\end{equation*}
+For example, \fig~\vref{fig:mp_fail} shows the table of the maximum
+borders for the prefixes of the word \word{abacabac}.
+\begin{figure}
+\centering
+\includegraphics{mp_fail}
+\caption{Failure function of \word{abacabac}
+\label{fig:mp_fail}}
+\end{figure}
+In \fig~\vref{fig:mp}, the length of the maximum border is~\(k\), so
+\(k=\MPfailure{p}{}{i}\) and \(\smash{\Ind{p}{\MPfailure{p}{}{i}}}\)
+is the first letter to be compared with~\(\ind{t}{j}\) after the
+shift. Also, the figure assumes that \({i>0}\), so the border in
+question is defined. Equations \eqref{eq:Border} \vpageref{eq:Border}
+defining the maximum border can be unfolded as follows:
+\begin{align*}
+   \Border{}{ya}
+&= \Border{}{\Border{}{y} \cdot a},
+& \Border{}{y} \cdot a &\nprefeq y;\\
+   \Border{}{\Border{}{y} \cdot a}
+&= \Border{}{\Border{2}{y} \cdot a},
+&  \Border{2}{y} \cdot a &\nprefeq \Border{}{y};\\
+&\;\;\smash{\vdots} & &\;\;\smash{\vdots}\\
+   \smash{\Border{}{\Border{p-1}{y} \cdot a}}
+&= \smash{\Border{}{\Border{p}{y} \cdot a}},
+& \smash{\Border{p}{y} \cdot a} &\nprefeq \smash{\Border{p-1}{y}};
+\end{align*}
+and \(\varepsilon \not\in \{y,\Border{}{y}, \dots,
+\Border{p-1}{y}\}\). By transitivity, the equations entail
+\(\Border{}{ya} = \Border{}{\Border{p}{y} \cdot a}\). Two cases are
+possible: either \(\Border{p}{y} = \varepsilon\), so \(\Border{}{ya} =
+\Border{}{a} = \varepsilon\), or the unfolding resumes until we find
+the smallest \(q > p\) such that \(\Border{}{\Border{q-1}{y} \cdot a}
+= \Border{}{\Border{q}{y} \cdot a}\) with \(\Border{q}{y} \cdot a
+\prefeq \Border{q-1}{y}\). Because a border is a proper prefix, that
+is to say, \(\Border{}{y} \pref y\), we have \(\Border{2}{y} =
+\Border{}{\Border{}{y}} \pref \Border{}{y}\), yielding \(\Border{q}{y}
+\cdot a \prefeq \Border{q-1}{y} \pref \dots \pref \Border{}{y} \pref
+y\). Therefore \(\Border{q}{y} \cdot a \prefeq y\), since \({q > 0}\),
+and \(\Border{}{ya} = \Border{q}{y} \cdot a\). This reasoning
+establishes that
+\begin{equation*}
+\Border{}{ya} = 
+\left\{
+  \begin{aligned}
+   & \Border{q}{y} \cdot a,
+   && \text{if \(\Border{q}{y} \cdot a \prefeq y\)};\\
+   & \varepsilon, 
+   && \text{otherwise;}
+  \end{aligned}
+\right.
+\end{equation*}
+with the additional constraint that \(q\)~must be as small as
+possible. This form of the definition of~\(\BorderName\) is simpler
+because it does not contain an embedded call like
+\(\Border{}{\Border{}{y} \cdot a}\). We can now take the lengths of
+each sides of the equations, leading to
+\begin{equation*}
+\wlen{\Border{}{ya}} = 
+\left\{
+  \begin{aligned}
+   & \wlen{\Border{q}{y} \cdot a} = 1 + \wlen{\Border{q}{y}},
+   && \text{if \(\Border{q}{y} \cdot a \prefeq y\)};\\
+   & \wlen{\varepsilon} = 0,
+   && \text{otherwise.}
+  \end{aligned}
+\right.
+\end{equation*}
+If~\({ya \prefeq x}\), then \(\wlen{\Border{}{ya}} =
+\MPfailure{x}{}{\wlen{ya}} = \MPfailure{x}{}{\wlen{y}+1}\). Let \(i :=
+\wlen{y} > 0\).
+\begin{equation*}
+\MPfailure{x}{}{i+1} =
+\left\{
+  \begin{aligned}
+   & 1 + \wlen{\Border{q}{y}},
+   && \text{if \(\Border{q}{y} \cdot a \prefeq y\)};\\
+   & 0,
+   && \text{otherwise.}
+  \end{aligned}
+\right.
+\end{equation*}
+We need to work on~\(\wlen{\Border{q}{y}}\) now. From the definition
+of~\(\MPfailureName\) by equation~\eqref{eq:MP_failure}
+\vpageref{eq:MP_failure}, we deduce
+\begin{equation}
+\MPfailure{x}{q}{\wlen{y}} = \wlen{\Border{q}{y}},
+\,\; \text{with \(y \prefeq x\)},
+\label{eq:MP_failure_p}
+\end{equation}
+which we can prove by complete induction on~\(q\). Let us call this
+property \(\pred{P}{q}\). Trivially, we have \(\pred{P}{0}\). Let us
+suppose \(\pred{P}{n}\) for all \(n \leqslant q\): this is the
+induction hypothesis. Let us suppose \(y \prefeq x\) and prove now
+\(\pred{P}{q+1}\):
+\begin{equation*}
+  \MPfailure{x}{q+1}{\wlen{y}}
+= \MPfailure{x}{q}{\MPfailure{x}{}{\wlen{y}}} 
+= \MPfailure{x}{q}{\wlen{\Border{}{y}}}
+\doteq \wlen{\Border{q}{\Border{}{y}}}
+= \wlen{\Border{q+1}{y}},
+\end{equation*}
+where \((\smash{\doteq})\)~is a valid application of the induction
+hypothesis because \(\Border{}{y} \pref y \prefeq x\). This proves
+\(\pred{P}{q+1}\) and the induction principle entails that
+\(\pred{P}{n}\) holds for all \(n \geqslant 0\). Therefore, equation
+\eqref{eq:MP_failure_p} allows us to refine our definition of
+\(\MPfailure{x}{}{i+1}\) as follows, with \(i>0\):
+\begin{equation*}
+\MPfailure{x}{}{i+1} =
+\left\{
+  \begin{aligned}
+   & 1 + \MPfailure{x}{q}{i},
+   && \text{if \(\Border{q}{y} \cdot a \prefeq y\)};\\
+   & 0,
+   && \text{otherwise.}
+  \end{aligned}
+\right.
+\end{equation*}
+There is one part of the definition \eqref{eq:Border}
+\vpageref{eq:Border} that we did not use: \({\Border{}{a} :=
+  \varepsilon}\). It implies \(\MPfailure{x}{}{1} =
+\MPfailure{x}{}{\wlen{a}} = \wlen{\Border{}{a}} = \wlen{\varepsilon} =
+0\) and, since the definition of~\(\MPfailureName\) implies
+\(\MPfailure{x}{}{1} = 1 + \MPfailure{x}{}{0}\), so
+\(\MPfailure{x}{}{0} = -1\). Property `\(\Border{q}{y} \cdot a \prefeq
+y\) and \({ya \prefeq x}\) and \({\wlen{y} = i}\)' implies any of the
+equalities \(\smash{\Ind{y}{\wlen{\Border{q}{y}}}} = a \Leftrightarrow
+\smash{\Ind{y}{\MPfailure{x}{q}{i}}} = a \Leftrightarrow
+\smash{\Ind{x}{\MPfailure{x}{q}{i}}} = \smash{\Ind{x}{\wlen{y}}}
+\Leftrightarrow \smash{\Ind{x}{\MPfailure{x}{q}{i}}} = \ind{x}{i}\).
+We now know
+\begin{equation*}
+ \MPfailure{x}{}{0}   = -1\quad\text{and}\quad
+ \MPfailure{x}{}{i+1} =
+   \left\{
+     \begin{aligned}
+       & 1 + \MPfailure{x}{q}{i},
+       && \text{if \(\Ind{x}{\MPfailure{x}{q}{i}} = \ind{x}{i}\)};\\
+       & 0,
+       && \text{otherwise;}
+     \end{aligned}
+   \right.
+\end{equation*}
+where \(q\)~is the smallest nonzero natural satisfying the
+condition. This can be further simplified into
+\begin{equation*}
+\MPfailure{x}{}{0} = -1
+\quad \text{and} \quad
+\MPfailure{x}{}{i+1} = 1 + \MPfailure{x}{q}{i},
+\end{equation*}
+where~\(i \geqslant 0\) and \(q>0\)~is the smallest natural such that
+\(\MPfailure{x}{q}{i} = -1\) or \(\smash{\Ind{x}{\MPfailure{x}{q}{i}}}
+= \ind{x}{i}\).
+
+\mypar{Preprocessing}
+\index{word factoring!Morris-Pratt preprocessing!definition|(}
+
+The function call
+\(\fun{fail}_0(x,i)\)\index{fail0@\fun{fail\(_0\)/2}}, defined in
+\fig~\vref{fig:fail0}, implements \(\MPfailure{x}{}{i}\).
+\begin{figure}[t]
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\framebox[\columnwidth]{\vbox{%
+\begin{gather*}
+\fun{fail}_0(x,0) \rightarrow -1;\quad
+\fun{fail}_0(x,i) \rightarrow
+          1 + \fun{fp}(x,\fun{nth}(x,i-1),\fun{fail}_0(x,i-1)).\\
+\fun{nth}(\cons{a}{x},0) \rightarrow a;\quad
+\fun{nth}(\cons{a}{x},i) \rightarrow \fun{nth}(x,i-1).
+\\
+\inferrule*{}{\fun{fp}(x,a,-1) \rightarrow -1;}
+\quad
+\inferrule
+  {\fun{nth}(x,k) \twoheadrightarrow a}
+  {\fun{fp}(x,a,k) \twoheadrightarrow k}
+\,;\quad
+\fun{fp}(x,a,k) \rightarrow \fun{fp}(x,a,\fun{fail}_0(x,k)).
+\end{gather*}
+}}
+\caption{The failure function \(\MPfailureName\) as \fun{fail\(_0\)/2}
+\label{fig:fail0}}
+\end{figure}
+The function \fun{fp/3}\index{fp@\fun{fp/3}} (\emph{fixed point})
+computes \(\MPfailure{x}{q}{i-1}\), starting with
+\(\fun{fail}_0(x,i-1)\) and
+\(\fun{nth}(x,i-1)\)\index{nth@\fun{nth/2}}, which denotes
+\(\ind{x}{i-1}\) and is needed to check the condition
+\(\smash{\Ind{x}{\MPfailure{x}{q}{i-1}}} = \ind{x}{i-1}\). The
+equality test \(\MPfailure{x}{q}{i-1} = -1\) is performed by the first
+rule of \fun{fp/3}.\index{word factoring!failure function|)}
+
+The algorithm of Morris and Pratt requires that \(\MPfailure{x}{}{i}\)
+be computed for all indexes~\(i\) of the pattern~\(x\) and, since it
+depends on the values of some calls \(\MPfailure{x}{}{j}\), with \(j <
+i\), it is more efficient to compute \(\MPfailure{x}{}{i}\) for
+increasing values of~\(i\) and store them, so they can be reused
+instead of being recomputed. This technique is called
+\emph{memoisation}\index{memoisation} (not to be confused with
+memorisation). In this instance, the evaluation of
+\(\MPfailure{x}{}{i}\) relies on the memo
+\([\pair{\ind{x}{i-1}}{\MPfailure{x}{}{i-1}},
+\pair{\ind{x}{i-2}}{\MPfailure{x}{}{i-2}}, \dots,
+\pair{\ind{x}{0}}{\MPfailure{x}{}{0}}]\). The memoising version of
+\fun{fail\(_0\)/2} is named \fun{fail/2}\index{fail@\fun{fail/2}} in
+\fig~\ref{fig:fail}.
+\begin{figure}[b]
+\centering
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\framebox[0.85\columnwidth]{\vbox{%
+\begin{gather*}
+\fun{fail}(p,0) \rightarrow -1;
+\quad
+\fun{fail}(\cons{\pair{a}{k}}{p},i) \rightarrow 
+\fun{fp}(p,a,k,i-1).
+\\
+\inferrule*{}{\fun{fp}(p,a,-1,i) \rightarrow 0;}\quad
+\inferrule
+  {\fun{suf}(p,i-k-1) \twoheadrightarrow \cons{\pair{a}{k'}}{p'}}
+  {\fun{fp}(p,a,k,i) \twoheadrightarrow k+1}\,;\\
+\inferrule
+  {\fun{suf}(p,i-k-1) \twoheadrightarrow \cons{\pair{b}{k'}}{p'}}
+  {\fun{fp}(p,a,k,i) \twoheadrightarrow \fun{fp}(p',a,k',k)}\,.
+\\
+\fun{suf}(p,0) \rightarrow p;\quad
+\fun{suf}(\cons{a}{p},i) \rightarrow \fun{suf}(p,i-1).
+\end{gather*}
+}}
+\caption{The failure function with memoisation\label{fig:fail}}
+\end{figure}
+Here, we work with the memo~\(p\), which is a reversed prefix, instead
+of~\(x\), so we need to know its length~\(i\) in order to know how
+many letters must be discarded by \fun{suf/2}\index{suf@\fun{suf/2}}
+(\emph{suffix}): \(\fun{suf}(x,i-k-1)\) instead of
+\(\fun{fail}_0(x,k)\). Thanks to the memo, \fun{fp/4} does not need to
+call \fun{fail/2}, just to look in~\(p\) with \fun{suf/2}. Note that,
+as a small improvement, we also moved the increment: instead of \(1 +
+\fun{fp}(\dots)\) and \(\dots \twoheadrightarrow k\), we do now
+\(\fun{fp}(\dots)\) and \(\dots \twoheadrightarrow k+1\).
+
+Let us name \fun{pp/1}\index{pp@\fun{pp/1}} (\emph{preprocessing}) the
+function computing the stack \([\pair{\ind{x}{0}}{\MPfailure{x}{}{0}},
+\pair{\ind{x}{1}}{\MPfailure{x}{}{1}}, \dots,
+\pair{\ind{x}{m-1}}{\MPfailure{x}{}{m-1}}]\) for a pattern~\(x\) of
+length~\(m\). Its definition is shown in \fig~\vref{fig:pp},
+\begin{figure}[t]
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{pp}(x) & \rightarrow & \fun{pp}(x,\el,0).\\
+\\
+\fun{pp}(\el,p,i) & \rightarrow & \fun{rev}(p);\\
+\fun{pp}(\cons{a}{x},p,i)
+  & \rightarrow
+  & \fun{pp}(x,\cons{\pair{a}{\fun{fail}(p,i)}}{p},i+1).
+\end{array}}
+\end{equation*}
+\caption{Preprocessing of a pattern~\(y\) by \fun{pp/1}
+\label{fig:pp}}
+\end{figure}
+where \fun{rev/1}\index{rev@\fun{rev/1}} is the reversal function
+(definition~\eqref{def:rev} \vpageref{def:rev}), and
+\fun{pp/1}\index{pp@\fun{pp/1}} simply calls the failure function
+\fun{fail/2} for each new index~\(i\) on the current memo~\(p\) and
+creates a new memo by pairing the failure index with the current
+letter and pushing on the current memo
+(\(\cons{\pair{a}{\fun{fail}(p,i)}}{p}\)). The stack reversal at the
+end is necessary because the memo contains the letters in reversed
+order with respect to the pattern. For example, the example in
+\fig~\vref{fig:mp_fail} leads to the evaluation
+\begin{equation*}
+\fun{pp}(x) \twoheadrightarrow
+[\pair{\word{a}}{-1}, \pair{\word{b}}{0},
+\pair{\word{a}}{0}, \pair{\word{c}}{1},
+\pair{\word{a}}{0}, \pair{\word{b}}{1},
+\pair{\word{a}}{2}, \pair{\word{c}}{3}],
+\end{equation*}
+where \(x=\word{abacabac}\). If \(x=\word{ababaca}\), then
+\begin{equation*}
+\belowdisplayskip=0pt
+\fun{pp}(x) \twoheadrightarrow
+[\pair{\word{a}}{-1}, \pair{\word{b}}{0},
+\pair{\word{a}}{0}, \pair{\word{b}}{1},
+\pair{\word{a}}{2}, \pair{\word{c}}{3},
+\pair{\word{a}}{0}].
+\end{equation*}
+\index{word factoring!Morris-Pratt preprocessing!definition|)}
+
+%\addcontentsline{toc}{subsection}{Cost}
+\paragraph{Minimum cost} 
+\index{word factoring!Morris-Pratt preprocessing!minimum cost|(}
+
+It is clear from the definition~\eqref{eq:Border} \vpageref{eq:Border}
+that the determination of the maximum border of a non\hyp{}empty word
+requires finding the maximum borders of some or all proper prefixes,
+so, if the word contains \(n\)~letters, at least \(n-1\) comparisons
+are needed, as the border of the first letter alone needs no
+comparison. This lower bound is tight, as the following reasoning
+shows. Let us call \emph{positive comparison}\index{word
+  factoring!comparison!positive $\sim$} a successful prefix test as
+found in the definition of~\(\BorderName\), that is, \(\Border{}{y}
+\cdot a \prefeq y\). Dually, a \emph{negative comparison}\index{word
+  factoring!comparison!negative $\sim$} is a failed prefix test. In
+order to minimise the number of calls to evaluate \(\Border{}{ya}\),
+we may notice that a positive comparison only entails the evaluation
+of~\(\Border{}{y}\), whilst a negative comparison requires two:
+\(\Border{}{\Border{}{y} \cdot a}\). Therefore, the first idea may be
+to assume that only positive comparisons occur:
+\begin{equation*}
+\Border{}{x} \!\eqn{n-2}\! 
+\Border{}{\ind{x}{0,n-2}} \cdot \ind{x}{n-1}
+\!\eqn{n-1}\!\! \dots
+\eqn{0}\! \Border{}{\ind{x}{0}} \cdot \ind{x}{1,n-1}
+\!=\! \ind{x}{1,n\!-\!1},
+\end{equation*}
+where \((\smash{\eqn{i}})\)~implies \(\Border{}{\ind{x}{0,i}} \cdot
+\ind{x}{i+1} \prefeq \ind{x}{0,i}\), for \(0 \leqslant i \leqslant
+n-2\). Firstly, \(i=0\) and the corresponding positive comparison
+yields \(\ind{x}{0} = \ind{x}{1}\). Unfolding the other comparisons
+yields \(\ind{x}{0} = \ind{x}{1} = \dots = \ind{x}{n-1}\), so a best
+case is \(x=a^n\), for any letter~\(a\).
+
+But there is another case,
+because the outermost call to~\(\BorderName\) after a negative
+comparison does not imply a comparison if its argument is a single
+letter:
+\begin{align*}
+\Border{}{x}
+&\eqn{n-2} \Border{}{\Border{}{\ind{x}{0,n-2}} \cdot \ind{x}{n-1}}\\
+&\eqn{n-3} \Border{}{\Border{}{\Border{}{\ind{x}{0,n-3}} \cdot
+    \ind{x}{n-2}} \cdot \ind{x}{n-1}}\\
+&\;\;\;\smash{\vdots}\\
+&\;\mathrel{\stackrel{\smash[t]{0}}{=}}
+  \Border{}{\Border{}{\ldots \Border{}{\Border{}{\ind{x}{0}} \cdot
+        \ind{x}{1}} \dots} \cdot \ind{x}{n-1}}\\
+&\,\,\doteq
+  \Border{}{\Border{}{\ldots \Border{}{\Border{}{\ind{x}{1}} \cdot
+            \ind{x}{2}} \dots} \cdot \ind{x}{n-1}}\\
+&\;\;\;\smash{\vdots}\\
+&\,\,\doteq \Border{}{\ind{x}{n-1}} = \varepsilon.
+\end{align*}
+where \((\smash{\eqn{i}})\)~implies \(\Border{}{\ind{x}{0,i}} \cdot
+\ind{x}{i+1} \nprefeq \ind{x}{0,i}\), for \(0 \leqslant i \leqslant
+n-2\) and \((\smash{\doteq})\) involves no comparisons. Starting with
+\(i=0\) yields \(\ind{x}{1} \neq \ind{x}{0}\), then \(i=1\) leads to
+\(\ind{x}{2} \neq \ind{x}{0}\) etc. so the consequences of all these
+negative comparisons are \(\ind{x}{0} \neq \ind{x}{i}\), for \(1
+\leqslant i \leqslant n-2\). The number of negative comparisons is
+\(n-1\), thus is minimal, but the shape of the word is different than
+previously, as the first letter must differ from all the
+following. Let \(\OB{\fun{pp}}{n}\)\index{pp@$\OB{\fun{pp}}{n}$} be
+the minimum number of comparisons involved in the evaluation of
+\(\fun{pp}(x)\)\index{pp@\fun{pp/1}}, where the length of the
+pattern~\(x\) is~\(n\). It is the same as the number of comparisons to
+evaluate \(\Border{}{\ind{x}{0,n-2}}\) when \(\ind{x}{0,n-2}\)~is a
+best case. Therefore,
+%\begin{equation*}
+\(\OB{\fun{pp}}{n} = n - 2\).
+%\end{equation*}
+\index{word factoring!Morris-Pratt preprocessing!minimum cost|)}
+
+\paragraph{Maximum cost}
+\index{word factoring!Morris-Pratt preprocessing!maximum cost|(}
+
+The determination of the maximum border of a word implies finding the
+maximum borders of some or all proper prefixes, so, if we want to
+maximise the number of comparisons, we may want to compute as many
+borders as possible. In order to do so, evaluating \(\Border{}{x}\)
+would lead to finding the maximum border of a factor of
+length~\(n-1\), where \(n\)~is the length of~\(x\). The best case
+\(x=a^{n}\) showed that \(\Border{}{x} = \ind{x}{1,n-1}\), which fits
+our purpose, except we would like \(\Border{}{\ind{x}{1,n-1}}\). In
+other words, we add the constraint that the first comparison is
+negative:
+\begin{align*}
+\Border{}{x}
+&\eqn{n-1} \Border{}{\Border{}{\ind{x}{0,n-2}} \cdot \ind{x}{n-1}}\\
+&\eqn{n-2} \Border{}{\Border{}{\ind{x}{0,n-3}} \cdot \ind{x}{n-2,n-1}}\\
+&\;\;\;\smash{\vdots}\\
+&\;\mathrel{\stackrel{\smash[t]{1}}{=}}
+  \Border{}{\Border{}{\ind{x}{0}} \cdot \ind{x}{1,n-1}}
+= \Border{}{\ind{x}{1,n-1}},
+\end{align*}
+where \((\smash{\eqn{n-1}})\) supposes \(\Border{}{\ind{x}{0,n-2}}
+\cdot \ind{x}{n-1} \nprefeq \ind{x}{0,n-2}\), and
+\((\smash{\eqn{i}})\), with \(1 \leqslant i \leqslant n-2\),
+corresponds to \(\Border{}{\ind{x}{0,i}} \cdot \ind{x}{i+1} \prefeq
+\ind{x}{0,i}\). These constraints imply \(\ind{x}{0} = \ind{x}{1} =
+\dots = \ind{x}{n-2} \neq \ind{x}{n-1}\), that is to say,
+\(x=a^{n-1}b\), with \(a \neq b\). Up to now, the number of
+comparisons is~\(n-1\), as in the minimal case, but the evaluation
+continues as follows:
+\begin{equation*}
+\Border{}{a^{i}b}
+\eqn{i} \Border{}{\Border{}{a^{i}} \cdot b}\\
+\doteq \Border{}{\Border{}{a^{i-1}} \cdot ab}\\
+\doteq \dots \doteq \Border{}{a^{i-1}b},
+\end{equation*}
+for \(1 \leqslant i \leqslant n-2\) and \((\smash{\eqn{i}})\) entails
+the negative comparisons \(\Border{}{a^{i}} \cdot b \nprefeq a^{i}\)
+and the positive comparisons \((\smash{\doteq})\), which we do not
+count because we have in mind to find
+\(\OW{\fun{pp}}{n}\)\index{pp@$\OW{\fun{pp}}{n}$}, so repeated
+evaluations of the same border do not entail repeated comparisons
+thanks to memoisation\index{memoisation}. Thus, we have \(n-2\)
+negative comparisons until \(\Border{}{b} = \varepsilon\), which, with
+the \(n-1\) earlier positive comparisons, sum up \(2n-3\). Since
+\(\OW{\fun{pp}}{n}\) is the number of comparisons to compute
+\(\Border{}{\ind{x}{0,n-2}}\) without repetitions, we have
+\begin{equation*}
+\belowdisplayskip=0pt
+\OW{\fun{pp}}{n} = 2(n-1)-3 = 2n - 5.
+\end{equation*}
+\index{word factoring!Morris-Pratt preprocessing!maximum cost|)}
+
+\vspace*{-20pt}
+
+\mypar{Search}
+\index{word factoring!Morris-Pratt!search|(}
+
+We found above that \(n-2 \leqslant \OC{\fun{pp}}{n} \leqslant 2n -
+5\), where the bounds are tight if \(n \geqslant 3\). To make use of
+the value of \(\fun{pp}(p)\), we could start by modifying the linear
+search in section~\ref{sec:naive_factoring}, in particular the program
+in \fig~\ref{fig:loc} on page~\pageref{fig:loc}, while keeping an eye
+on \fig~\vref{fig:mp}. The result is displayed in
+\fig~\vref{fig:mp_def}. Note how the first argument of
+\fun{mp/5}\index{mp@\fun{mp/5}}, \(p\), is the working copy and the
+third, \(p'\), is the original which remains invariant (it is used to
+reset~\(p\) after a letter mismatch). Indexes~\(i\), \(j\) and~\(k\)
+are the same as in \fig~\vref{fig:mp}. The latter is none other than
+the value computed by the failure function; variables \(i\)~and~\(j\)
+are incremented each time a letter in the pattern is successfully
+matched against a letter in the text (third rule of \fun{mp/5}) and
+\(j\)~is also incremented each time there is a mismatch of the first
+letter of the pattern (fourth rule of \fun{mp/5}).\index{word
+  factoring!Morris-Pratt!search|)}
+\begin{figure}[h]
+\centering
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\framebox[0.8\columnwidth]{\vbox{%
+\begin{gather*}
+\inferrule
+  {\fun{pp}(p) \twoheadrightarrow p'}
+  {\fun{mp}(p,t) \twoheadrightarrow \fun{mp}(p',t,p',0,0)}.
+\\
+\begin{array}{r@{\;}l@{\;}l}
+\fun{mp}(\el,t,p',i,j)   & \rightarrow & \fun{factor}(j-i);\\
+\fun{mp}(p,\el,p',i,j)   & \rightarrow & \fun{absent}();\\
+\fun{mp}(\cons{\pair{a}{k}}{p},\cons{a}{t},p',i,j)
+                         & \rightarrow & \fun{mp}(p,t,p',i+1,j+1);\\
+\fun{mp}(\cons{\pair{a}{-1}}{p},\cons{b}{t},p',0,j)
+                         & \rightarrow & \fun{mp}(p',t,p',0,j+1);\\
+\fun{mp}(\cons{\pair{a}{k}}{p},t,p',i,j)
+                         & \rightarrow
+                         & \fun{mp}(\fun{suf}(p',k),t,p',k,j).
+\end{array}
+\end{gather*}}}
+\caption{Morris-Pratt algorithm (search phase)\label{fig:mp_def}}
+\end{figure}
+
+
+\addcontentsline{toc}{subsection}{Cost}
+\paragraph{Minimum cost} 
+\index{word factoring!Morris-Pratt!minimum cost|(}
+
+Let
+\(\smash[t]{\OB{\fun{mp/5}}{m,n}}\)\index{mp@$\OB{\fun{mp/5}}{m,n}$}
+be the minimum number of comparisons performed during the evaluation
+of \fun{mp/5}, where \(m\)~is the length of the pattern and \(n\)~is
+the length of the text. Just as with na\"{\i}ve factoring, the best
+case is when the pattern is a prefix of the text, so
+\(\OB{\fun{mp/5}}{m,n} = m\). Taking into account the preprocessing
+stage, the minimum number of comparisons
+\(\OB{\fun{mp}}{m,n}\)\index{mp@$\OB{\fun{mp}}{m,n}$} of
+\fun{mp/2}\index{mp@\fun{mp/2}} is
+\begin{equation*}
+\belowdisplayskip=0pt
+\OB{\fun{mp}}{m,n} = \OB{\fun{pp}}{m} + \OB{\fun{mp/5}}{m,n} = (m-2)
++ m = 2m - 2.
+\end{equation*}
+\index{word factoring!Morris-Pratt!minimum cost|)}
+
+\vspace*{-10pt}
+
+\paragraph{Maximum cost}
+\index{word factoring!Morris-Pratt!maximum cost|(}
+
+Since the Morris\hyp{}Pratt algorithm only reads the text forwards,
+the worst case must maximise the number of times the letters of the
+text~\(t\) are compared with a letter in the pattern~\(p\). Therefore,
+the first letter of the pattern cannot differ from all the letters of
+the text, otherwise each letter of the text would be compared exactly
+once. Let us assume the exact opposite: \(\ind{p}{0} = \ind{t}{i}\),
+with \(i \geqslant 0\). But this would also imply one comparison per
+letter in the text. The way to force the pattern to shift as little as
+possible is to further impose \(\ind{p}{1} \neq \ind{t}{i}\), for
+\(i>0\). In short, this means that \(ab \prefeq p\), with letters
+\(a\)~and~\(b\) such that \(a \neq b\) and \(t=a^n\). A simple
+drawing is enough to reveal that this configuration leads to the
+maximum number of comparisons \(\OW{\fun{mp/5}}{m,n} = 2n -
+1\)\index{mp@$\OW{\fun{mp/5}}{m,n}$}, as each letter in the text is
+compared twice, except the first, which is compared once. Taking into
+account the preprocessing stage, the maximum number of comparisons
+\(\OW{\fun{mp}}{m,n}\) \index{mp@$\OW{\fun{mp}}{m,n}$} of
+\fun{mp/2}\index{mp@\fun{mp/2}} satisfies
+\begin{equation*}
+\belowdisplayskip=0pt
+\OW{\fun{mp}}{m,n} = \OW{\fun{pp}}{m} + \OB{\fun{mp/5}}{m,n} = (2m-5)
++ (2n-1) = 2(n + m - 3).
+\end{equation*}
+\index{word factoring!Morris-Pratt!maximum cost|)}
+
+\vspace*{-10pt}
+
+\mypar{Metaprogramming}
+\index{word factoring!Morris-Pratt!metaprogramming|(}
+
+The previous study leads to programs for the preprocessing and search
+phases that somewhat obscure the main idea supporting the algorithm of
+Morris and Pratt, to wit, the use of the maximum borders of the proper
+prefixes of the pattern and the forward\hyp{}only reading of the
+text. The reason for that somewhat unfortunate situation is that, for
+efficiency imperatives, we have to memoise\index{memoisation} the
+values of the failure function and, instead of working with the
+original pattern, we proceed with a version of it augmented with these
+values. Also, the utilisation of stacks for modelling the pattern
+slows down and obfuscates the reading of the letters and the shifts.
+
+If the pattern is fixed, a more legible approach is available,
+consisting in the modification of the preprocessing stage so that a
+dedicated program is output. This kind of taylored method, where a
+program is the result of the execution of another, is called
+\emph{metaprogramming}\index{metaprogramming}. Of course, it is an
+option only if the time needed to output, compile and execute a
+program is amortised in the long run, which implies for the problem at
+hand that the pattern and the text are expected to be significantly
+long or that the search is likely to be repeated with the same pattern
+on other texts (or the remainder of the same text after an occurrence
+of the pattern has been found).
+
+% Wrapping figure better declared before a paragraph
+%
+\setlength{\intextsep}{0pt}
+\begin{wrapfigure}[29]{r}[0pt]{0pt}
+% 29 vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\includegraphics[bb=71 360 238 723]{metaprog}
+\caption{Factoring \word{abacabac} %in~\(t\) with a metaprogram
+\label{fig:metaprog}}
+\end{wrapfigure}
+There is a graphical way to represent the contents of the table in
+\fig~\vref{fig:mp_fail} called \emph{deterministic finite automaton}
+\index{word factoring!Morris-Pratt!automaton} \index{finite
+  automaton!deterministic $\sim$} and shown in
+\fig~\vref{fig:abacabac}.
+\begin{figure}[b]
+\centering
+\includegraphics[bb=80 651 390 710]{abacabac}
+\caption{Morris-Pratt automaton for the pattern \word{abacabac}
+\label{fig:abacabac}}
+\end{figure}
+We will here only describe informally automata; for a full treatment,
+see \cite{VanLeeuwen_1990c, HopcroftMotwaniUllman_2003,
+  Sakarovitch_2003}. Consider that the circles, called
+\emph{states}\index{states}, contain the values of~\(i\) from the
+table. The edges, called \emph{transitions}\index{transition}, between
+two states are of two kinds: either solid and carrying a letter,
+called \emph{label}\index{label}, or dotted and going backwards. The
+succession of states throughout solid edges make the word
+\(x=\word{abacabac}\). The rightmost state is distinguished by a
+double circling because it marks the end of~\(x\). There is a back
+edge between state~\(i\) and~\(j\) only if \(\MPfailure{x}{}{i} = j\).
+The leftmost state has an incoming, solid edge without a source and a
+dotted, outgoing edge. The former simply denotes the beginning of the
+word and the latter corresponds to the special value
+\(\MPfailure{x}{}{0} = -1\).  What matters for us is that the
+intuitive support brought by an automaton also can be implemented
+intuitively, with each state corresponding to one function and the
+outgoing transitions associated with different rules of the definition
+of the state function. The example \word{abacabac} is shown in
+\fig~\ref{fig:metaprog}. The automaton states, \(0\), \(1\), through
+\(7\), correspond to the functions \fun{zero/2}, \fun{one/2}
+etc. through \fun{seven/2}. Notice how
+\fun{mp\(_0\)/1}\index{mp0@\fun{mp\(_0\)/1}} sets the index to~\(0\)
+when initialising the first state, that is, calling
+\fun{zero/2}\index{zero@\fun{zero/2}}. The index~\(j\) plays the same
+role as in \fig~\ref{fig:mp} on page~\pageref{fig:mp}. The first rule
+of each function corresponds to a rightwards transition in the
+automaton in \fig~\vref{fig:abacabac} and the second rule is a
+backwards transition, that is, a failure, except in \fun{zero/2},
+where it means that the pattern is shifted by one letter. The function
+\fun{zero/2} has a third rule handling the case when the pattern is
+absent in the text. We could add a similar rule to the other
+functions, as an optimisation, but we opt for brevity and let
+successive failure rules bring us back to
+\fun{zero/2}\index{zero@\fun{zero/2}}. The first rule of
+\fun{seven/2}\index{seven@\fun{seven/2}} is special as well, because
+it is used when the pattern has been found. Note the index \(j-6\),
+clearly showing that the length of the pattern is part of the program,
+which is hence a metaprogram.\index{word
+  factoring!Morris-Pratt!metaprogramming|)} \index{word
+  factoring!Morris-Pratt|)}
+
+\mypar{Knuth's variant}
+\index{word factoring!Knuth-Morris-Pratt|(}
+
+In \fig~\vref{fig:mp}, if \(a = \word{a}\), then the sliding would
+immediately lead to a comparison failure. Hence let us compare
+\(\smash{\Ind{p}{\MPfailure{p}{}{i}}}\) to~\(\ind{t}{j}\) only if
+\(\smash{\Ind{p}{\MPfailure{p}{}{i}}} \neq \ind{p}{i}\). Else, we
+consider the maximum border of the maximum border etc. until we find
+the smallest~\(q\) such that \(\smash{\Ind{p}{\MPfailure{p}{q}{i}}}
+\neq \ind{p}{i}\). This is an improvement by
+\cite{KnuthMorrisPratt_1977}. There is an updated reprint by
+\cite{Knuth_2010} and a treatment based on automata theory by
+\cite{CrochemoreHancartLecroq_2007}, in its section~2.6. See also an
+interesting derivation of the program by algebraic refinements in the
+book by \cite{Bird_2010}. In terms of the search automaton, when a
+failure occurs at state~\(i\) on the letter~\(a\), we follow the back
+edge to state \(\MPfailure{x}{}{i}\), but, if the normal transition
+is~\(a\) again, we follow another back edge etc. until there is a
+transition different from~\(a\) or we have to shift the pattern. The
+improvement proposed by Knuth consists in replacing 
+\begin{figure}[b]
+\centering
+\includegraphics[bb=82 646 388 720]{kmp_abac}
+\caption{Knuth-Morris-Pratt automaton for the pattern \word{abacabac}
+\label{fig:kmp_abac}}
+\end{figure}
+all these successive failure transitions by only one. For example, the
+automaton in \fig~\ref{fig:kmp_abac} is Knuth's optimisation of the
+one in \fig~\ref{fig:abacabac}.
+
+\index{word factoring!Knuth-Morris-Pratt|)}
+\index{word factoring|)}
+
+\paragraph{Exercises}
+
+\begin{enumerate}
+
+  \item Find \(\M{\fun{loc}}{m,n}\).
+
+  \item Prove that \fun{pp/1} and \fun{mp/2} terminate.
+
+  \item Prove \(\fun{loc/2} = \fun{mp/2}\) (correctness of the
+    algorithm of Morris and Pratt).
+
+  \item Find \(\B{\fun{pp}}{m}\) and \(\W{\fun{pp}}{m}\). (Mind
+    the cost of \fun{suf/2}.)
+
+  \item Find \(\B{\fun{mp}}{m,n}\) and \(\W{\fun{mp}}{m,n}\).
+
+  \item Find a simple modification to avoid calling \fun{rev/1} in
+  \fig~\vref{fig:pp}.\label{factoring:trick}
+
+  \item Modify \fun{fail/2} so that \fun{mp/2} implements the
+    Knuth\hyp{}Morris\hyp{}Pratt algorithm. Study the best and worst
+    cases of this variant and show that \(\OW{\fun{pp}}{m} = 2m-6\),
+    for \(m \geqslant 3\).
+
+  \item Write the metaprogram corresponding to the automaton in
+    \fig~\vref{fig:kmp_abac}.
+
+  \item Write a function \fun{rlw/2}\index{rlw@\fun{rlw/2}}
+    (\emph{remove the last word}) such that \(\fun{rlw}(w,t)\) is
+    rewritten into the text~\(t\) if the word~\(w\) is absent,
+    otherwise into~\(t\) without the last occurrence of~\(t\) in it.
+
+\end{enumerate}

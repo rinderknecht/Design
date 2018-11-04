@@ -1,0 +1,58 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pstricks,pst-node,pst-eps}
+\usepackage[scaled=0.8]{beramono}
+
+\newcommand\erlcode[1]{\texttt{#1}}
+\newcommand\erlnode[1]{\TR{\erlcode{#1}}}
+\newcommand\erlbox[1]{\TR{\fbox{\erlcode{#1}}}}
+
+\begin{document}
+
+\TeXtoEPS
+\begin{pspicture}[showgrid=false](0,-1)(9,1)
+\rnode{zero}{\erlcode{fib(0)}}
+\quad
+\rnode{one}{\erlcode{fib(1)}}
+\quad
+\rnode{two}{\erlcode{fib(2)}}
+\quad
+\rnode{three}{\erlcode{fib(3)}}
+\quad
+\rnode{four}{\erlcode{fib(4)}}
+\quad
+\rnode{five}{\erlcode{fib(5)}}
+\ncline[nodesep=3pt]{one}{two}
+\ncline[nodesep=3pt]{two}{three}
+\ncline[nodesep=3pt]{three}{four}
+\ncline[nodesep=3pt]{four}{five}
+\ncbar[nodesep=3pt,angle=-90,arm=0.25]{->}{two}{zero}
+\ncbar[nodesep=3pt,angle=90,arm=0.25]{->}{four}{two}
+\ncbar[nodesep=3pt,angle=-90,arm=0.5]{->}{three}{one}
+\ncbar[nodesep=3pt,angle=90,arm=0.5]{->}{five}{three}
+\end{pspicture}
+\endTeXtoEPS
+
+\end{document}
+%% \rnode[b]{zero}{\erlcode{fib(0)}}
+%% \hspace*{11.5pt}
+%% \rnode{one}{\rnode[t]{one_in}{\erlcode{fib(1)}}}
+%% \hspace*{11.5pt}
+%% \rnode{two}{\rnode[b]{two_in}{\rnode[b]{two_out}{\erlcode{fib(2)}}}}
+%% \hspace*{11.5pt}
+%% \rnode{three}{\rnode[t]{three_in}{\rnode[t]{three_out}{\erlcode{fib(3)}}}}
+%% \hspace*{11.5pt}
+%% \rnode{four}{\rnode[b]{four_out}{\erlcode{fib(4)}}}
+%% \hspace*{11.5pt}
+%% \rnode{five}{\rnode[t]{five_out}{\erlcode{fib(5)}}}
+%% \ncline[nodesep=3pt]{one}{two}
+%% \ncline[nodesep=3pt]{two}{three}
+%% \ncline[nodesep=3pt]{three}{four}
+%% \ncline[nodesep=3pt]{four}{five}
+%% \ncarc[nodesep=3pt,arcangle=-30]{-}{zero}{two_in}
+%% \ncarc[nodesep=3pt,arcangle=-30]{<-}{two_out}{four_out}
+%% \ncarc[nodesep=3pt,arcangle=30]{<-}{one_in}{three_in}
+%% \ncarc[nodesep=3pt,arcangle=30]{<-}{three_out}{five_out}

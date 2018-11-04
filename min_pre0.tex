@@ -1,0 +1,25 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\psset{radius=3pt}
+\pstree[levelsep=17pt,treesep=14pt]{\TC}{
+  \Tf[framesize=6pt]
+  \psset{linewidth=1.5pt,linestyle=dotted}
+  \pstree[linewidth=0.8pt,linestyle=solid]%
+    {\TC[linewidth=0.8pt,linestyle=solid]}{
+    \Tf[framesize=6pt]
+    \pstree{\TC*[linecolor=black]}{
+      \Tf[framesize=6pt]
+      \Tf[framesize=6pt]
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}

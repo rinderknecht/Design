@@ -1,0 +1,715 @@
+\section{Skipping}
+\label{sec:skipping}
+
+Here we envisage how to copy a stack while ignoring a given
+item. [\emph{The progression is very slow on purpose.}]
+
+\paragraph{First occurrence}
+\label{def:linear_search}
+\index{stack!skipping an item!first occurrence}
+
+Let us suppose that \(\fun{sfst}(s,x)\)\index{sfst@\fun{sfst/2}|(}
+(\emph{skip the first occurrence}) evaluates in a stack identical
+to~\(s\) but without the first occurrence of~\(x\), starting from the
+top. In particular, if~\(x\) is absent in~\(s\), then the value of the
+call is identical to~\(s\). This is our
+\emph{specification}.\index{specification} For instance, we expect the
+following evaluations:\label{sfst_ex}
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{sfst}(\el,3) & \twoheadrightarrow & \el;\\
+\fun{sfst}(\el,\el) & \twoheadrightarrow & \el;\\
+\fun{sfst}([3,\el],[5,2]) & \twoheadrightarrow & [3,\el];\\
+\fun{sfst}([\el,[1,2],4,\el,4],4) & \twoheadrightarrow & 
+  [\el,[1,2],\el,4];\\
+\fun{sfst}([4,[1,2],\el,\el,4],\el)
+ & \twoheadrightarrow & [4,[1,2],\el,4].
+\end{array}
+\end{equation*}
+
+\paragraph{First attempt}
+
+Let us try a direct approach. In particular, at this point, it is
+important \emph{not} to seek a definition in tail form. Tail form must
+be considered as an optimisation and early optimisation is opening
+Pandora's jar. The first idea that may come to mind is to define an
+auxiliary function \fun{mem/2} such that the call \(\fun{mem}(s,x)\)
+checks whether a given item \(x\)~is in a given stack~\(s\), because
+that notion of membership is implicit in the wording of the
+specification. But two problems then arise. Firstly, what would be the
+result of such a function? Secondly, what would be the additional cost
+for using it? For the sake of the argument, let us follow this track
+and find out how where it leads. A stack can either be empty or not,
+so let us make two rules:
+\begin{equation*}
+\fun{mem}(\el,x) \rightarrow \fbcode{CCCCC}\,;\quad
+\fun{mem}(\cons{y}{s},x) \rightarrow \fbcode{CCCCC}\,.
+\end{equation*}
+Note that we introduced a variable~\(y\), distinct from
+variable~\(x\). \emph{Two different variables may or may not denote
+  the same value, but two occurrences of the same variable always
+  denote the same value.} Had we written instead
+\begin{equation*}
+\fun{mem}(\el,x) \rightarrow \fbcode{CCCCC}\,;\quad
+\fun{mem}(\cons{\underline{x}}{s},x) \rightarrow \fbcode{CCCCC}\,.
+\end{equation*}
+one case would be missing, namely when the top of the stack is not the
+item sought for, for instance, \(\fun{mem}(3,[4])\) would fail due to
+a match failure. Now, what is the first right\hyp{}hand side? The
+first pattern matches only if the stack is empty. In particular, this
+means that the item is not in the stack, since, by definition, an
+empty stack is a stack containing no item. How do we express that?
+Since the original problem is silent on the matter, it is said to be
+\emph{underspecified}.\index{underspecification} We may think that
+zero would be a token of choice to denote the absence of the item in
+the stack:
+\begin{equation*}
+\fun{mem}(\el,x) \rightarrow 0;\quad
+\fun{mem}(\cons{y}{s},x) \rightarrow \fbcode{CCCCC}\,.
+\end{equation*}
+But this would be a mistake because there is no natural and necessary
+relationship between the concept of emptiness and the number
+zero. Zero is best understood algebraically as the number noted~\(0\)
+such that \(0 + n = n + 0 = n\), for any number~\(n\). Then, let us
+try the empty stack:
+\begin{equation*}
+\fun{mem}(\el,x) \rightarrow \el;\quad
+\fun{mem}(\cons{y}{s},x) \rightarrow \fbcode{CCCCC}\,.
+\end{equation*}
+The next step is to find a way to actually compare the value of~\(x\)
+to the value of~\(y\). We can use the rule above about variables: two
+occurrences of the same variable mean that they hold the same
+value. Therefore
+\begin{equation*}
+\fun{mem}(\el,x) \rightarrow \el;\quad
+\fun{mem}(\cons{x}{s},x) \rightarrow \fbcode{CCCCC}\,.
+\end{equation*}
+was not so bad, after all? Indeed, but we know now that a case is
+missing, so let us add it at the end, where \(x \neq y\):
+\begin{equation*}
+\fun{mem}(\el,x) \rightarrow \el;\;\;
+\fun{mem}(\cons{x}{s},x) \rightarrow \fbcode{CCCCC};\;\:
+\underline{\fun{mem}(\cons{y}{s},x)} \rightarrow \fbcode{CCCCC}.
+\end{equation*}
+Now, what is the second right\hyp{}hand side? It is evaluated if the
+item we were looking for is present at the top of the stack. How do we
+express that? We may think of ending with the item itself, the
+rationale being that if the result is the empty stack, then the item
+is not in the input stack, otherwise the result is the item itself:
+\begin{equation*}
+\fun{mem}(\el,x) \rightarrow \el;\quad
+\fun{mem}(\cons{x}{s},x) \rightarrow x;\quad
+\fun{mem}(\cons{y}{s},x) \rightarrow \fbcode{CCCCC}\,.
+\end{equation*}
+The last right\hyp{}hand side is easier to guess since it deals with
+the case where the top of the stack (\(y\)) is not the item we seek
+(\(x\)), so a recursive call which ignores~\(y\) should come to mind:
+\begin{equation*}
+\fun{mem}(\el,x) \rightarrow \el;\quad
+\fun{mem}(\cons{x}{s},x) \rightarrow x;\quad
+\fun{mem}(\cons{y}{s},x) \rightarrow \fun{mem}(s,x).
+\end{equation*}
+
+Some tests would increase the confidence that this definition is
+correct\index{soundness} and complete\index{completeness} with respect
+to the specification. Let us label the rules first:
+\begin{equation*}
+\fun{mem}(\el,x)         \smashedrightarrow{\zeta} \el;\quad
+\fun{mem}(\cons{x}{s},x) \smashedrightarrow{\eta}   x;\quad
+\fun{mem}(\cons{y}{s},x) \smashedrightarrow{\theta} \fun{mem}(s,x).
+\end{equation*}
+Then we could try the following cases:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l@{\;}l@{\;}l}
+\fun{mem}(\el,3) & \smashedrightarrow{\zeta} & \el,\\
+\fun{mem}([1],3) & \smashedrightarrow{\theta} & \fun{mem}(\el,3)
+& \smashedrightarrow{\zeta} & \el,\\
+\fun{mem}([1,3,2],3) & \smashedrightarrow{\theta} & \fun{mem}([3,2],3)
+& \smashedrightarrow{\eta} & 3.
+\end{array}
+\end{equation*}
+The code seems to work: item~\(x\) is in stack~\(s\) if the result
+is~\(x\), otherwise it is~\(\el\). However, this function is not
+correct.\index{soundness} The hidden and flawed assumption is `items
+can not be stacks,' in spite of the counter\hyp{}examples given at the
+beginning for illustrating the expected behaviour of \fun{sfst/2}. In
+particular, an item can be the empty stack and this situation leads to
+an ambiguity with our definition of \fun{mem/2}:
+\begin{equation*}
+  \fun{mem}(\el,\el) \smashedrightarrow{\zeta} \el \xleftarrow{\smash{\eta}} \fun{mem}([\el],\el).
+\end{equation*}
+It is impossible to discriminate the two cases, the first one meaning
+absence of the item and the second presence, because they both end
+with the empty stack. In fact, we should have distinguished two data
+constructors to denote the outcomes `the item was found' and `the item
+was not found'. For example,
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{mem}(\el,x)         & \smashedrightarrow{\zeta}  & \fun{false}();\\
+\fun{mem}(\cons{x}{s},x) & \smashedrightarrow{\eta}   & \fun{true}();\\
+\fun{mem}(\cons{y}{s},x) & \smashedrightarrow{\theta} & \fun{mem}(s,x).
+\end{array}
+\end{equation*}
+But, for now, let us backtrack and ask ourselves again whether using
+\fun{mem/2} is really a good idea.
+
+\paragraph{Better approach}
+
+Let us suppose that the input stack contains the item at the
+bottom. Using \fun{mem/2} to find it leads to a complete traversal of
+the input stack. Then another traversal from the beginning (the top of
+the stack) is needed to copy the stack without its last item, so, in
+total, two complete traversals are performed.
+
+A better idea consists in \emph{interleaving} these two passes into
+one because the problem stems from the fact that \fun{mem/2} forgets
+about the items which are not the item of interest, thus, when it is
+found or known to be absent, there is no way to build a copy to make
+the result. By interleaving, we mean that during the traversal, the
+concepts of membership and of copying are combined, instead of being
+used sequentially as two function calls. A similar situation was
+encountered in the design of a function reversing a stack:
+\fun{rev\(_0\)/1}, which calls \fun{cat/2}, is much slower than
+\fun{rev/1}, which uses an auxiliary stack.
+
+Here, our algorithm consists in memorising all visited items and, if
+the item is not found, the resulting stack is rebuilt from them; if
+found, the result is built from them \emph{and} the remaining,
+unvisited, items. There are usually two ways to keep visited items:
+either in an accumulative parameter, called \emph{accumulator}, or in
+the context of recursive calls. At this point, it is important to
+recall a cardinal guideline: Do not try first to design a definition
+in tail form, but opt instead for a direct approach. In some simple
+cases, a direct approach may actually be in tail form, but the point
+is methodological: a priori ignore all concerns about tail
+forms. Accordingly, let us use the context of a recursive call to
+record the visited items. A stack being either empty or not, it is
+natural to start with
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{sfst}(\el,x) & \rightarrow & \fbcode{CCCCC}\,;\\
+\fun{sfst}(\cons{y}{s},x) & \rightarrow & \fbcode{CCCCC}\,.
+\end{array}
+\end{equation*}
+Then, just as we tried with \fun{mem/2}, we must distinguish the
+case when \(x\)~is the same as~\(y\):
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{sfst}(\el,x) & \rightarrow & \fbcode{CCCCC}\,;\\
+\underline{\fun{sfst}(\cons{x}{s},x)} & \rightarrow & \fbcode{CCCCC}\,;\\
+\fun{sfst}(\cons{y}{s},x) & \rightarrow & \fbcode{CCCCC}\,.
+\end{array}
+\end{equation*}
+This method is a \emph{linear search}\index{linear search}: the items
+in the stack are compared one by one to~\(x\), starting from the top,
+until the bottom or an item equal to~\(x\) is reached. Since we know
+that the last rule deals with the case when \(x \neq y\), we must
+memorise~\(y\) and go on comparing~\(x\) with the other items in~\(s\)
+(if any). This is where the recursive call with a context, discussed
+above, is set as \(\cons{y}{\text{\textvisiblespace}}\):
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{sfst}(\el,x) & \rightarrow & \fbcode{CCCCC}\,;\\
+\fun{sfst}(\cons{x}{s},x) & \rightarrow & \fbcode{CCCCC}\,;\\
+\fun{sfst}(\cons{y}{s},x) & \rightarrow & \cons{y}{\fun{sfst}(s,x)}.
+\end{array}
+\end{equation*}
+Very importantly, let us remark that the position of~\(y\) in the
+result is the same as in the input (the top). The second rule
+corresponds to the case where the item we are looking for,
+namely~\(x\), is found to be the top of the current stack, which is a
+substack of the original input. A stack made of successive items from
+the beginning of a given stack is called a \emph{prefix} of the
+latter. When a stack is a substack of another, that is, it is made of
+successive items including the last, it is called a \emph{suffix}. We
+know that the~\(x\) in \(\cons{x}{s}\) is the first occurrence
+of~\(x\) in the original stack (the one in the first call), because we
+wouldn't be dealing with this case \emph{again}: the specification
+states that this first occurrence must be absent from the resulting
+stack; since it is now at the top of a suffix, we just need to end
+with~\(s\), \emph{which we do not visit}:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{sfst}(\el,x)         & \rightarrow & \fbcode{CCCCC}\,;\\
+\fun{sfst}(\cons{x}{s},x) & \rightarrow & \underline{s}\,;\\
+\fun{sfst}(\cons{y}{s},x) & \rightarrow & \cons{y}{\fun{sfst}(s,x)}\,.
+\end{array}
+\end{equation*}
+The first rule handles the case where we traversed the whole original
+stack (up to \(\el\)) without finding~\(x\). Thus the result is simply
+the empty stack because the empty stack without~\(x\) is the empty
+stack:
+\begin{equation*}
+\fun{sfst}(\el,x)         \rightarrow \el;\quad
+\fun{sfst}(\cons{x}{s},x) \rightarrow s;\quad
+\fun{sfst}(\cons{y}{s},x) \rightarrow \cons{y}{\fun{sfst}(s,x)}.
+\end{equation*}
+
+Let us run some tests now and, in order avoid mistakes, it is handy to
+label the rules with some Greek letters:
+\begin{equation*}
+\fun{sfst}(\el,x)          \xrightarrow{\smash{\theta}} \el;\quad
+\fun{sfst}(\cons{x}{s},x)  \xrightarrow{\smash{\iota}}  s;\quad
+\fun{sfst}(\cons{y}{s},x)  \xrightarrow{\smash{\kappa}}
+\cons{y}{\fun{sfst}(s,x)}.
+\end{equation*}
+The item is absent in~\(\theta\), the item is found in~\(\iota\) and
+the search continues with~\(\kappa\). Note that equality is implicitly
+meant in non\hyp{}linear rules like~\(\iota\); in other words, the
+cost of such equality test is~\(0\) in our model. Also remark how
+important is for rule~\(\iota\) to be written before~\(\kappa\),
+otherwise \(\iota\)~would be useless (so\hyp{}called \emph{dead
+  code}\index{functional language!dead code}). Here is an
+example\index{stack!skipping an item!example} of a successful search:
+\begin{equation*}
+\fun{sfst}([3,0,1,2],1) \xrightarrow{\smash{\kappa}}
+\cons{3}{\fun{sfst}([0,1,2],1)} \xrightarrow{\smash{\kappa}}
+\cons{3,0}{\fun{sfst}([1,2],1)} \xrightarrow{\smash{\iota}} [3,0,2].
+\end{equation*}
+Now an example of an unsuccessful\index{stack!skipping an
+  item!example} search:
+\begin{equation*}
+\fun{sfst}([3,0],4) \xrightarrow{\smash{\kappa}}
+\cons{3}{\fun{sfst}([0],4)} \xrightarrow{\smash{\kappa}}
+\cons{3,0}{\fun{sfst}(\el,4)} \xrightarrow{\smash{\theta}}
+[3,0].
+\end{equation*}
+More complicated examples, given \vpageref{sfst_ex}, yield
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{sfst}([4,[1,2],\el,\el,4],\el)
+& \smashedrightarrow{\kappa} &
+  [4|\fun{sfst}([[1,2],\el,\el,4],\el)]\\
+& \smashedrightarrow{\kappa} &
+  [4|[[1,2]|\fun{sfst}([\el,\el,4],\el)]]\\
+& = & [4,[1,2]|\fun{sfst}([\el,\el,4],\el)]\\
+& \smashedrightarrow{\iota} & [4,[1,2]|[\el,4]]\\
+& = & [4,[1,2],\el,4].
+\end{array}
+\end{equation*}
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{sfst}([3,\el],[5,2])
+& \smashedrightarrow{\kappa} & [3|\fun{sfst}([\el],[5,2])]\\
+& \smashedrightarrow{\kappa} & [3|[\el|\fun{sfst}(\el,[5,2])]]\\
+& = & [3,\el|\fun{sfst}(\el,[5,2])]\\
+& \smashedrightarrow{\theta} & [3,\el|\el]\\
+& = & [3,\el].
+\end{array}
+\end{equation*}
+Once we are convinced that our definition is correct\index{soundness}
+and complete with respect to the specification, there is a little
+extra worth testing: we can check \emph{what happens for inputs which
+  are not expected by the specification.} Our specification says at
+one point that the second argument of \fun{sfst/2} is a stack. What
+happens if we supply an integer instead? For example, we have
+\(\fun{sfst}(3,\el) \nrightarrow\). We have a match failure, that is,
+the rewrites are stuck, so that our definition is not
+\emph{robust},\index{robustness} in other words, it fails abruptly on
+unspecified inputs.
+
+When programming in the small, as we do here, robustness is usually
+not a concern because we want to focus on learning a language by
+expressing simple algorithms, but when developing large applications,
+we must take care of making the code robust by catching and signalling
+errors. Notice that a program can be complete\index{completeness} but
+not robust,\index{robustness} because completeness is relative to
+what is specified behaviour (all valid inputs must be accepted and not
+lead to an error), whereas robustness is relative to what is left
+unspecified.
+
+These considerations are germane to discussing the merits and
+weaknesses of scripting languages, whose semantics try hard to ignore
+errors by defaulting on special values (like the empty string) to keep
+running. In the setting of our abstract functional language, we can
+use a data constructor, that is, a function without evaluation rules,
+like \(\fun{error}()\), to signal an error or notify some piece of
+information about the arguments. For instance, here is the definition
+of a function which distinguishes between stacks and non\hyp{}stack
+arguments:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{is\_a\_stack}(\el) & \rightarrow & \fun{yes}();\\
+\fun{is\_a\_stack}(\cons{x}{s}) & \rightarrow & \fun{yes}();\\
+\fun{is\_a\_stack}(s) & \rightarrow & \fun{no}().
+\end{array}
+\end{equation*}
+Data constructors come handy in signalling errors because they are
+like unique identifiers, therefore they cannot be confused with any
+other kind of data the function computes and so can be detected easily
+by the caller. Consider this robust\index{robustness} version of
+\fun{sfst/2} which discriminates errors:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{sfst}(\el, x) & \rightarrow & \el;\\
+\fun{sfst}(\cons{x}{s},x) & \rightarrow & s;\\
+\fun{sfst}(\cons{y}{s},x) & \rightarrow & \cons{y}{\fun{sfst}(s,x)};\\
+\fun{sfst}(s,x) & \rightarrow & \underline{\fun{error}()}.
+\end{array}
+\end{equation*}
+Then a function calling \fun{sfst/2} can make the difference between a
+normal rewrite and an error by using a data constructor in a pattern:
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{caller}(s,x) & \rightarrow & \fun{check}(\fun{sfst}(s,x)).\\
+\fun{check}(\fun{error}()) & \rightarrow & \fbcode{CCCCC}\,;\\
+\fun{check}(r) & \rightarrow & \fbcode{CCCCC}\,.
+\end{array}
+\end{equation*}
+%%% END
+
+\paragraph{Cost}
+
+In general, the cost
+\(\C{\fun{sfst}}{n}\)\index{sfst@$\C{\fun{sfst}}{n}$|(} of
+\(\fun{sfst}(s,x)\), where \(n\)~is the length of~\(s\), depends
+on~\(x\) being present in~\(s\) or not. In the latter case, the trace
+is \(\kappa^n\theta\), so \(\C{\fun{sfst}}{n} = \len{\kappa^n\theta} =
+n + 1\). If the former, the cost depends on the position of~\(x\)
+in~\(s\). Let us set that the top of~\(s\) is at position~\(0\) and
+\(x\)~occurs at position~\(j\). We then have \(\C{\fun{sfst}}{n,j} =
+\len{\kappa^j\iota} = j + 1\)\index{sfst@$\C{\fun{sfst}}{n}$|)}. If we
+decide that position~\(n\) (or greater) means absence, we can actually
+retain the last formula for both cases.
+
+The minimum cost \(\B{\fun{sfst}}{n}\)\index{sfst@$\B{\fun{sfst}}{n}$}
+is then the minimum\index{stack!skipping an item!minimum cost} value
+of \(\C{\fun{sfst}}{n,j}\), for \(j\)~ranging from \(0\)~to~\(n\),
+therefore \(\B{\fun{sfst}}{n} = \C{\fun{sfst}}{n,0} = 1\), that is,
+when the item occurs at the top, and, dually, the maximum
+cost\index{stack!skipping an item!maximum cost}
+is\index{sfst@$\W{\fun{sfst}}{n}$} \(\W{\fun{sfst}}{n} =
+\C{\fun{sfst}}{n,n} = n + 1\), that is, when the item is absent. The
+average cost
+\(\M{\fun{sfst}}{n}\)\index{sfst@$\M{\fun{sfst}}{n}$}\index{stack!skipping
+  an item!average cost} of a successful search assumes that \(j\)~can
+take all the positions in the stack:
+\begin{equation*}
+  \M{\fun{sfst}}{n} = \frac{1}{n}\sum_{j=0}^{n-1}\C{\fun{sfst}}{n,j} =
+  \frac{1}{n}\sum_{j=0}^{n-1}(j+1) = \frac{1}{n}\sum_{j=0}^{n}j
+  = \frac{n+1}{2} \sim \frac{n}{2},
+\end{equation*}
+by equation~\eqref{eq:sum_k} \vpageref{eq:sum_k}.
+
+Notice that rule~\(\kappa\) implies the creation of a
+(\texttt{|})\hyp{}node, which we call
+\emph{cons\hyp{}node}\index{cons-node}, as shown in
+\fig~\vref{fig:sfst_dag}.
+\begin{figure}
+\centering
+\includegraphics[bb=71 664 345 721]{sfst_dag}
+\caption{Directed acyclic graphs for \fun{sfst/2}
+\label{fig:sfst_dag}}
+\end{figure}
+Hence, whilst the contents of the new stack is shared with the
+original stack, \(j\)~nodes are newly allocated if~\(x\) occurs at
+position~\(j\) in~\(s\). The worst case happens when \(x\)~is absent
+so the memory\index{stack!skipping an item!memory} needed amounts to
+\(n\)~nodes, all of which being useless because in this case
+\(\fun{sfst}(s,x) \equiv s\). If we want to avoid this situation,
+another definition of \fun{sfst/2} has to be devised, one that
+discards all constructed nodes and allows us to reference the input
+when~\(x\) is missing.
+
+The crux of the matter is embodied in the construct
+\(\cons{y}{\texttt{\textvisiblespace}}\) of rule~\(\kappa\), called
+the \emph{context}\index{functional language!context of a call} of the
+call \(\fun{sfst}(s,x)\)\index{sfst@\fun{sfst/2}|)}, which we want
+if~\(x\) is present, but not otherwise. To resolve this conflicting
+requirement, we opt for removing the context and store the information
+it contains (\(y\)) into an accumulator\index{functional
+  language!accumulator}, in a new rule~\(\xi\) derived
+from~\(\kappa\). We use the accumulator in a new rule~\(\nu\) derived
+from~\(\iota\). The new \fun{sfst/2} is called
+\fun{sfst\(_0\)/2}\index{sfst0@\fun{sfst\(_0\)/2}} and is shown in
+\fig~\ref{fig:sfst0}.\index{sfst@\fun{sfst/4}}
+\begin{figure}[b]
+\begin{equation*}
+\boxed{%
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\fun{rcat}(\el,t)              & \xrightarrow{\smash{\zeta}} & t; &
+\fun{sfst}(\el,x,t,u)          & \xrightarrow{\smash{\mu}} & u;\\
+\fun{rcat}(\cons{x}{s},t)      & \xrightarrow{\smash{\eta}} 
+                               & \fun{rcat}(s,\cons{x}{t}). & 
+\fun{sfst}(\cons{x}{s},x,t,u)  & \xrightarrow{\smash{\nu}}
+                               & \fun{rcat}(t,s);\\
+\fun{sfst}_0(s,x)              & \xrightarrow{\smash{\lambda}} 
+                               & \fun{sfst}(s,x,\el,s). &
+\fun{sfst}(\cons{y}{s},x,t,u)  & \xrightarrow{\smash{\xi}}
+                               & \fun{sfst}(s,x,\cons{y}{t},u).
+\end{array}}
+\end{equation*}
+\caption{Skipping the first occurrence with maximum sharing
+\label{fig:sfst0}}
+\end{figure}
+Of course, whilst in~\(\iota\) we just referenced~\(s\), the
+construction corresponding to the now missing context of~\(\kappa\)
+must be performed by~\(\nu\). Also, we must add another argument which
+refers to the original stack, so we can use it in a new rule~\(\mu\),
+the pendant of~\(\theta\). Note the shapes of the right\hyp{}hand
+sides: they are either a value~(\(\zeta\) and~\(\mu\)) or a function
+call whose arguments contain values. In other words, no function call
+has a context. This syntactic property of a definition is named
+\emph{tail form}\index{functional language!tail form}. Intuitively,
+the practical consequence of such a form is that terminating calls
+unfold until a value is reached and nothing else is left to be done:
+\emph{the value of the last call is the value of the first call}. This
+kind of definition enables the sharing in rule~\clause{\mu}, where
+\(u\) (the reference to the original stack) becomes the value, instead
+of \(\fun{rev}(t)\).
+
+Implementations of functional language often use this property to
+optimise the evaluation, as we shall see in the last part of this
+book. The downside of \fun{sfst\(_0\)/2} with respect to \fun{sfst/2}
+is the additional cost incurred by having to reverse~\(t\) in
+rule~\clause{\nu}, that is, the call \(\fun{rcat}(t,s)\). More
+precisely, there are two complementary cases: either \(x\)~is missing
+in~\(s\) or \(x\)~occurs in~\(s\). Let us assume that \(s\)~contains
+\(n\)~items and \(x\)~is absent in~\(s\). The evaluation trace
+\index{functional language!evaluation!trace} of the call
+\(\fun{sfst}_0(s,x)\) is \(\lambda\xi^n\mu\), so \(\C{\fun{sfst}_0}{n}
+= \len{\lambda\xi^n\mu} = \len{\lambda} + n \len{\xi} + \len{\mu} = n
++ 2\). Let us now assume that \(x\)~occurs at position \(k\) in~\(s\),
+with the first item having position~\(0\). The evaluation trace is
+then \(\lambda \xi^{k}\nu\eta^k\zeta\), hence \(\C{\fun{sfst}_0}{n,k}
+= \len{\lambda \xi^{k}\nu\eta^k\zeta} = 2k + 3\). Clearly now,
+\begin{gather*}
+\B{\fun{sfst}_0}{0} = 2,\quad
+\B{\fun{sfst}_0}{n} = \min_{0 \leqslant k < n}\{\C{\fun{sfst}_0}{n}, \C{\fun{sfst}_0}{n,k}\}
+                    = \min_{0 \leqslant k < n}\{n+2,2k+3\} = 3,\\
+\W{\fun{sfst}_0}{n} = \max_{0 \leqslant k < n}\{n+2,2k+3\} = 2n+1,
+\end{gather*}
+where the minimum cost occurs when the item is the top of the stack;
+the maximum cost happens when the sought item is last in the stack (at
+the bottom).
+
+Since calling \fun{rcat/2}\index{rcat@\fun{rcat/2}} to reverse the
+visited items is the source of the extra cost, we might try to
+maintain the order of these items in \fig~\vref{fig:sfst1}\index{sfst1@\fun{sfst\(_1\)/1}}
+\begin{figure}[b]
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{sfst}_1(s,x)               & \rightarrow
+                                & \fun{sfst}_2(s,x,\el,s).\\
+\fun{sfst}_2(\el,x,t,u)         & \rightarrow & u;\\
+\fun{sfst}_2(\cons{x}{s},x,t,u) & \rightarrow & \fun{cat}(t,s);\\
+\fun{sfst}_2(\cons{y}{s},x,t,u) & \rightarrow
+                                & \fun{sfst}_2(s,x,\fun{cat}(t,[y]),u).
+\end{array}}
+\end{equation*}
+\caption{Skipping the first occurrence (bad design)
+\label{fig:sfst1}}
+\end{figure}
+but using stack catenation instead of pushing. The problem is that the
+last rule of \fun{sfst\(_2\)/4}\index{sfst@\fun{sfst\(_2\)/4}}
+\index{cat@\fun{cat/2}} yields
+\(\fun{cat}(\dots\fun{cat}(\fun{cat}(\el,[x_1]),[x_2])\dots)\), whose
+cost we know to be quadratic \index{cost!quadratic $\sim$} as in the
+rewrite~\eqref{eq:rev0}
+\vpageref{eq:rev0}\index{rev0@\fun{rev\(_0\)/1}}, from which we can
+quickly conclude that \(\W{\fun{sfst}_1}{n} \sim \tfrac{1}{2}n^2\).
+
+\paragraph{Last occurrence}
+\index{stack!skipping an item!last occurrence}
+
+Let us suppose that \(\fun{slst}(s,x)\)\index{slst@\fun{slst/2}}
+(\emph{skip the last occurrence}) evaluates in a stack identical
+to~\(s\) but without the last occurrence of~\(x\). In particular,
+if~\(x\) is absent in~\(s\), then the value of the call is identical
+to~\(s\). The first design that may come to mind is to see this
+problem as the dual problem of ignoring the first occurrence:
+\begin{equation}
+\fun{slst}_0(s,x) \xrightarrow{\smash{\pi}}
+                  \fun{rev}(\fun{sfst}(\fun{rev}(s),x)).
+\label{eq:slst0}
+\end{equation}
+If~\(x\) is missing in~\(s\), we
+have\index{slst0@$\C{\fun{slst}_0}{n}$}\index{rev@$\C{\fun{rev}}{n}$}
+\(\C{\fun{slst}_0}{n} = 1 + \C{\fun{rev}}{n} + \W{\fun{sfst}}{n} +
+\C{\fun{rev}}{n} = 3n+6\). If~\(x\) occurs in~\(s\) at position~\(k\),
+\(\C{\fun{slst}_0}{n,k} = 1 + \C{\fun{rev}}{n} +
+\C{\fun{sfst}}{n,n-k-1} + \C{\fun{rev}}{n-1} = 3n - k +
+4\). Therefore, we can derive the minimum and
+maximum\index{stack!skipping an item!minimum
+  cost}\index{stack!skipping an item!maximum cost} costs:
+\begin{equation*}
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\B{\fun{slst}_0}{n} = \min_{k < n}\{3n+6,3n-k+4\} = 2n + 5,
+\end{equation*}
+when\index{slst@$\B{\fun{slst}_0}{n}$} \(x\)~is last in~\(s\), and
+\begin{equation*}
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\W{\fun{slst}_0}{n} = \max_{k < n}\{3n+6,3n-k+4\} = 3n+6,
+\end{equation*}
+when\index{slst@$\W{\fun{slst}_0}{n}$} \(x\)~is missing in~\(s\).  The
+mean cost\index{stack!skipping an item!average
+  cost}\index{slst@$\M{\fun{slst}_0}{n}$} when \(x\)~is present is
+\begin{equation*}
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\M{\fun{slst}_0}{n} = \frac{1}{n}\sum_{k=0}^{n-1}\C{\fun{slst}_0}{n,k}
+                    = \frac{1}{n}\sum_{k=0}^{n-1}(3n - k + 4)
+                    = \frac{5n+9}{2} \sim \frac{5}{2}n.
+\end{equation*}
+When \(x\)~is present, the worst case is when it is the top of the
+stack: \(\W{\fun{slst}_0}{n} = \max_{k<n}\{3n - k + 4\} = 3 n+ 4
+\leqslant 3n + 6\).
+
+In any case, the maximum cost is asymptotically equivalent to~\(3n\),
+that is, three complete traversals of~\(s\) are performed, whilst the
+absence of~\(x\) could be detected with one. Dually, the minimum cost
+is asymptotically equivalent to~\(2n\), accounting for two full
+traversals, whilst \(x\)~being the last item could be assessed with
+one. All this suggests that a better design is worth thinking about.
+
+Consider \fig~\ref{fig:slst},
+\begin{figure}[b]
+\begin{equation*}
+\boxed{%
+\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+  \fun{slst}(\el,x)           & \xrightarrow{\smash{\rho}} & \el;
+& \fun{slst}(\el,x,t)         & \xrightarrow{\smash{\upsilon}} & t;\\
+  \fun{slst}(\cons{x}{s},x)   & \xrightarrow{\smash{\sigma}} & 
+                                           \fun{slst}(s,x,s);
+& \fun{slst}(\cons{x}{s},x,t) & \xrightarrow{\smash{\phi}} &
+                                           \cons{x}{\fun{slst}(t,x)};\\
+  \fun{slst}(\cons{y}{s},x)   & \xrightarrow{\smash{\tau}} &
+                                           \cons{y}{\fun{slst}(s,x)}.
+& \fun{slst}(\cons{y}{s},x,t) & \xrightarrow{\smash{\chi}} &
+                                           \fun{slst}(s,x,t).
+\end{array}}
+\end{equation*}
+\caption{Skipping the last occurrence with \fun{slst/2}
+\label{fig:slst}\index{stack!skipping an item!last occurrence}}
+\end{figure}
+where, with a linear search\index{linear search} (rules
+\(\rho\)~and~\(\tau\)), we find the first occurrence of~\(x\)
+(rule~\(\sigma\)), but, in order to check whether it is also the last,
+another linear search has to be run~(\(\chi\)). If it is successful
+(\(\phi\)), we retain the occurrence find earlier (\(x\)) and resume
+another search; if it is unsuccessful~(\(\upsilon\)), the~\(x\) found
+earlier was indeed the last occurrence.  Notice how we have two
+mutually recursive functions, \fun{slst/2}\index{slst@\fun{slst/2}}
+and~\fun{slst/3}\index{slst@\fun{slst/3}}. The definition of the
+latter features a third parameter, \(t\), which is a copy of the
+stack~\(s\) when an occurrence of~\(x\) was found
+by~\fun{slst/2}\index{slst@\fun{slst/2}} (\(\sigma\)). This copy is
+used to resume~(\(\phi\)) the search from where the previous
+occurrence was found. This is necessary as \(y\) in rule~\(\chi\) must
+be discarded because we do not know at that point whether the
+previous~\(x\) was the last. Consider \fig~\vref{fig:slst_27071}.
+\begin{figure}
+\begin{equation*}
+\boxed{%
+\begin{array}{r@{\;}l@{\;}l}
+\fun{slst}([2,7,0,7,1],7)
+& \xrightarrow{\smash{\tau}}
+& \cons{2}{\fun{slst}([7,0,7,1],7)}\\
+& \xrightarrow{\smash{\sigma}}
+& \cons{2}{\fun{slst}([0,7,1],7,[0,7,1])}\\
+& \xrightarrow{\smash{\chi}} 
+& \cons{2}{\fun{slst}([7,1],7,[0,7,1])}\\
+& \xrightarrow{\smash{\phi}}
+& \cons{2,7}{\fun{slst}([0,7,1],7)}\\
+& \xrightarrow{\smash{\tau}}
+& \cons{2,7,0}{\fun{slst}([7,1],7)}\\
+& \xrightarrow{\smash{\sigma}}
+& \cons{2,7,0}{\fun{slst}([1],7,[1])}\\
+& \xrightarrow{\smash{\chi}} 
+& \cons{2,7,0}{\fun{slst}(\el,7,[1])}\\
+& \xrightarrow{\smash{\upsilon}}
+& \cons{2,7,0}{[1]} = [2,7,0,1].
+\end{array}}
+\end{equation*}
+\caption{\(\fun{slst}([2,7,0,7,1],7) \twoheadrightarrow
+  [2,7,0,1]\)\label{fig:slst_27071}\index{stack!skipping an item!example}}
+\end{figure}
+If the item is missing, the linear search fails as usual with a cost
+of \(\len{\tau^n\rho} = n + 1\). Otherwise, let us name \( 0 \leqslant
+x_1 < x_2 < \dots < x_p < n\) the positions of the \(p\)~occurrences
+of~\(x\) in~\(s\). The evaluation trace\index{functional
+  language!evaluation!trace} is
+\begin{equation*}
+\abovedisplayskip=0pt
+\belowdisplayskip=0pt
+\tau^{x_1} 
+\cdot
+\prod_{k=2}^{p}(\sigma\chi^{x_k-x_{k-1}-1})(\phi\tau^{x_k-x_{k-1}-1})
+\cdot
+(\sigma\chi^{n-x_p-1}\upsilon),
+\end{equation*}
+whose length is \(x_1 + 2\sum_{k=2}^{p}(x_k-x_{k-1}) + (n - x_p + 1) =
+n + x_p - x_1 + 1\). In other words, if the position of the first
+occurrence is noted~\(f\) and the position of the last is~\(l\), we
+find that\index{slst@$\C{\fun{slst}}{n}$}
+\begin{equation*}
+\C{\fun{slst}}{n,f,l} = n + l - f + 1.
+\end{equation*}
+We deduce that the minimum cost\index{stack!skipping an item!minimum
+  cost} happens when \(l-f+1 = p\), that is, when all the occurrences
+are consecutive, so \(\B{\fun{slst}}{n,p} = n +
+p\)\index{slst@$\B{\fun{slst}}{n}$}. The maximum
+cost\index{stack!skipping an item!maximum cost} occurs when~\({f=0}\)
+and~\({l=n-1}\), that is, when there is at least two occurrences
+of~\(x\), one at the top and one at the bottom: \(\W{\fun{slst}}{n} =
+2n\)\index{slst@$\W{\fun{slst}}{n}$}. We can check that when the stack
+is entirely made of~\(x\), minimum and maximum costs concur
+in~\(2n\). The average cost\index{stack!skipping an item!average cost}
+\index{slst@$\M{\fun{slst}}{n}$} when \(x\)~is present requires
+determining the cost for every possible pair \((f,l)\), with \(0
+\leqslant f \leqslant l < n\):
+\begin{align*}
+\M{\fun{slst}}{n} 
+  &= \frac{2}{n(n+1)} \sum_{f=0}^{n-1}\sum_{l=f}^{n-1}{\C{\fun{slst}}{n,f,l}}
+   = \frac{2}{n(n+1)} \sum_{f=0}^{n-1}\sum_{l=f}^{n-1}{(n+l-f+1)}\\
+  &= \frac{2}{n(n+1)} \sum_{f=0}^{n-1}\bigg(\!\!(n-f+1)(n-f)
+     + \!\!\sum_{l=0}^{n-f-1}\!\!(l+f)\!\!\bigg)\\
+  &= \frac{1}{n(n+1)}\sum_{f=0}^{n-1}(3n + 1 - f)(n-f)\\
+  &= \frac{n(3n+1)}{n+1} - \frac{4n+1}{n(n+1)}\sum_{f=0}^{n-1}f
+     + \frac{1}{n(n+1)}\sum_{f=0}^{n-1}f^2
+  = \frac{4}{3}{n} + \frac{2}{3} \sim \frac{4}{3}n,
+\end{align*}
+where \(\sum_{f=0}^{n-1}{f} = n(n-1)/2\) is equation~\eqref{eq:sum_k},
+\vpageref{eq:sum_k}, and the sum of the successive squares is obtained
+as follows. We use the \emph{telescoping} or \emph{difference} method
+on the series \((k^3)_{k>0}\). We start with the equality \((k+1)^3 =
+k^3 + 3k^2 + 3k + 1\), hence \((k+1)^3 - k^3 = 3k^2 + 3k + 1\). Then
+we can sum these differences, whose terms cancel out, leaving the
+first and the last:
+\begin{align}
+  && (1+1)^3 - \boxed{1^3} &= 3 \cdot 1^2 + 3 \cdot 1 + 1\notag\\
++ && (2+1)^3 - 2^3         &= 3 \cdot 2^2 + 3 \cdot 2 + 1\notag\\
++ &&&\;\;\vdots\notag\\
++ && \boxed{(n+1)^3} - n^3 &= 3n^2 + 3n + 1\notag
+\intertext{\rule{\linewidth}{0.4pt}}
+\Rightarrow 
+  &&\boxed{(n+1)^3} - \boxed{1^3}
+  &= 3 \sum_{k=1}^{n}{k^2} + 3 \sum_{k=1}^{n}{k} + n\notag\\
+  && n^3 + 3n^2 + 3n
+  &= 3 \sum_{k=1}^{n}{k^2} + 3 \cdot \frac{n(n+1)}{2} + n\notag\\
+\Leftrightarrow && \sum_{k=1}^{n}{k^2} &= \frac{n(n+1)(2n+1)}{6}.
+\label{eq:sum_of_squares}
+\end{align}
+
+\paragraph{Exercises}
+\begin{enumerate*}
+
+  \item Prove that \(\fun{sfst/2} = \fun{sfst\(_0\)/2}\).
+    \index{sfst@\fun{sfst/2}}\index{sfst0@\fun{sfst\(_0\)/2}}
+
+  \item Show that \(\B{\fun{sfst}_0}{n} = 3\), \(\W{\fun{sfst}_0}{n} =
+    2n+1\) and \(\M{\fun{sfst}_0}{n} = n+2\) (successful
+    search). 
+
+  \item Prove \fun{slst/2} = \fun{slst\(_0\)/2}.
+
+  \item Show that, in a worst case to be identified,
+    \(\fun{slst}_0(s,x)\) creates \(3n\)~useless nodes if~\(s\)
+    contains \(n\)~items. Compare the memory usage of
+    \fun{slst\(_0\)/2}\index{slst@\fun{slst\(_0\)/2}} with that of
+    \fun{slst/2}\index{slst@\fun{slst/2}}.
+
+\end{enumerate*}

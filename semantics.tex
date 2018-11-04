@@ -1,0 +1,1766 @@
+\section{Operational semantics}
+
+The \emph{operational semantics} of a programming language is a
+mathematical description that ascribes meaning to programs by defining
+the effect of each construct on the state of an abstract machine, each
+state depending on the previous one. It defines a set of values and an
+evaluation relationship between programs and values, the latter
+containing the results. Evaluation is defined inductively on the
+abstract syntax of the language under consideration, that is to say,
+the value of a construct solely depends on its shape and those of its
+subparts. In other words again, the value of an abstract syntax tree
+(AST) depends on the pattern matched by its root and the value of its
+immediate subtrees. Formally, an \emph{interpreter} is the
+implementation of an operational semantics, which, by construction, is
+defined in terms of the syntax of the language being interpreted and
+on the semantics of the implementation language.
+
+\paragraph{A basic calculator}
+
+Let us quickly envisage a simple calculator as an \OCaml interpreter
+whose values are integers: \Xtype \type{value} \equal
+\type{int}\textsf{;;} We need first to define the concrete syntax of
+the language by means of a context-free grammar expressed in
+Backus-Naur Form:
+\begin{verbatim}
+Expression ::= integer
+             | Expression BinOp Expression
+             | "(" Expression ")"
+BinOp ::= "+" | "-" | "*" | "/"
+\end{verbatim}
+Next, we define the abstract syntax in \OCaml as follows:
+\begin{tabbing}
+\Xtype \type{expr} \= \equal \= \cst{Const} \Xof
+\type{int} \vbar \cst{BinOp} \Xof \type{bin\_op} \(\times\)
+\type{expr} \(\times\) \type{expr}\\
+\Xand \type{bin\_op} \equal \cst{Add} \vbar \cst{Sub}
+\vbar \cst{Mult} \vbar \cst{Div}
+\end{tabbing}
+Note that we will sometimes use the font for the abstract syntax trees
+for the source code. For example
+\lpar\num{1}\texttt{+}\num{7}\rpar\texttt{*}\num{9} (mixed fonts)
+instead of \texttt{(1+7)*9}.
+
+For the sake of brevity, and because we want to focus on the
+evaluation, we left out the definition of the lexemes denoted by
+\texttt{integer} in the grammar above. For example, the syntax
+analysis would transform the concrete syntax excerpt
+\texttt{"(1+2)*(5/1)"} or \texttt{"(1 +2)*(5 / 1)"} into the
+\emph{term} \textsf{BinOp (Mult, BinOp (Add, Const 1, Const 2), BinOp
+  (Div, Const 5, Const 1))}, which is the preorder traversal of the
+abstract syntax tree shown in \fig~\vref{fig:binop}.
+\begin{figure}[b]
+\centering
+\includegraphics{binop}
+\caption{Abstract syntax tree of \texttt{(1+2)*(5/1)}
+\label{fig:binop}}
+\end{figure}
+
+The interpreter, that is, the evaluation function
+is then
+\begin{tabbing}
+\Xlet \= \Xrec \= \ident{eval} \ident{e} = \Xmatch
+ \ident{e} \Xwith\\
+ \> \cst{Const} \ident{n} \(\rightarrow\) \ident{n}\\
+ \vbar \> \cst{BinOp}
+ \lpar\ident{op},\ident{e}\(\sb{1}\),\ident{e}\(\sb{2}\)\rpar{}
+ \(\rightarrow\) \= \Xlet \ident{v\(\sb{1}\)} = \ident{eval e\(\sb{1}\)}
+ \Xand  \ident{v\(\sb{2}\)} = \ident{eval e\(\sb{2}\)}\\
+ \> \> \Xin \= \Xmatch \ident{op} \Xwith \= \;\, \cst{Add} \(\rightarrow\)
+ \ident{v}\(\sb{1}\) \texttt{+} \ident{v}\(\sb{2}\)\\
+ \> \> \> \> \vbar  \cst{Sub} \(\rightarrow\)
+ \ident{v}\(\sb{1}\) \texttt{-} \ident{v}\(\sb{2}\)\\
+ \> \> \> \> \vbar \cst{Mult} \(\rightarrow\) 
+ \ident{v}\(\sb{1}\) \texttt{*} \ident{v}\(\sb{2}\)\\
+ \> \> \> \> \vbar \cst{Div} \(\rightarrow\)
+ \ident{v}\(\sb{1}\) \texttt{/} \ident{v}\(\sb{2}\)
+\end{tabbing}
+Let us consider again the example \texttt{"(1+2)*(5/1)"}. Let~$e$ be
+the corresponding AST. Its evaluation is the value of the call
+$(\ident{eval} \, e)$, whose data flow is represented in
+\fig~\vref{fig:binop_15}
+\begin{figure}
+\centering
+\includegraphics{binop_15}
+\caption{Evaluation of \texttt{(1+2)*(5/1)}
+\label{fig:binop_15}}
+\end{figure}
+with upwards arrows --~pointing to partial results until the root is
+reached and the final value computed. The control flow is descendant
+(the root is examined before the subtrees) and the data flow is
+ascending (the value of the root depends on the values of the
+immediate subtrees).
+
+\paragraph{Inference rules}
+
+Another, more mathematical representation consists in the definition
+of a relationship $\ceval{e}{v}$, called \emph{judgement}, which
+reads: `The expression~$e$ is evaluated into the value~$v$', by means
+of \emph{inference rules}. These are logical implications $P_1 \wedge
+P_2 \wedge \ldots \wedge P_n \Rightarrow C$ conveniently laid out as
+\begin{equation*}
+\inferrule
+  {P_1 \\ P_2 \\ \ldots \\ P_n}
+  {C}
+\end{equation*}
+The propositions~$P_i$ are the \emph{premises} and~$C$ is the
+\emph{conclusion}. When there are no premises, then~$C$ is an
+\emph{axiom} and simply noted~$C$. The computational reading of the
+rule is: in order to evaluate~$C$, we need first to evaluate the~$P_i$
+in an unspecified order.
+
+Rules and axioms can contain variables which are not explicitly
+quantified by~$\forall$ or~$\exists$, in which case they are
+implicitly and universally quantified at the head of the rule. For
+instance, the axiom $A(x)$ means $\forall x.A(x)$, and the rule
+\begin{equation*}
+\inferrule
+  {P_1(x) \\ P_2(y)}
+  {P(x,y)}
+\end{equation*}
+signifies $\forall x,y.(P_1(x) \, \wedge \, P_2(y) \Rightarrow
+P(x,y))$. Given a set of inference rules about one or more
+relationships, we implicitly define those as the smallest
+relationships satisfying the rules.
+
+\paragraph{Operational semantics of a calculator}
+
+A \emph{metavariable} is a variable of the descriptive language
+--~here, formal logic~-- and not a variable of the described language
+--~here, the expressions inputted in the calculator.
+\begin{itemize*}
+
+  \item Expressions, that is, the values of type \type{expr}, are
+    noted~$e$;
+
+  \item values are written~$v$ ($v \in \mathbb{Z}$);
+
+  \item the mathematical integers associated to their \OCaml
+    representation~$n$ are noted $\dot{n}$ ($\dot{n} \in \mathbb{Z}$).
+
+\end{itemize*}
+Therefore, $e$, $v$, $n$ and $\dot{n}$ are metavariables and
+judgements comply with the pattern $\ceval{e}{v}$. Here are the rules:
+\begin{mathpar}
+\inferrule
+  {\ceval{\cst{Const} \; n}{\dot{n}}}
+  {}\;\,\TirName{const}
+\and
+\inferrule
+  {\ceval{e_1}{v_1}\\ \ceval{e_2}{v_2}}
+  {\ceval{\cst{BinOp} \, \lpar\cst{Add},e_1,e_2\rpar}{v_1 + v_2}}
+  \;\TirName{add}
+\and
+\inferrule*[right=sub]
+  {\ceval{e_1}{v_1}\\ \ceval{e_2}{v_2}}  
+  {\ceval{\cst{BinOp} \, \lpar\cst{Sub},e_1,e_2\rpar}{v_1 - v_2}}
+\and
+\inferrule*[right=mult]
+  {\ceval{e_1}{v_1}\\ \ceval{e_2}{v_2}}
+  {\ceval{\cst{BinOp} \, \lpar\cst{Mult},e_1,e_2\rpar}
+         {v_1 \times v_2}}
+\and
+\inferrule*[right=div]
+  {\ceval{e_1}{v_1}\\ \ceval{e_2}{v_2}}  
+  {\ceval{\cst{BinOp} \, \lpar\cst{Div},e_1,e_2\rpar}{v_1 / v_2}}
+\end{mathpar}
+
+\paragraph{Implementation}
+
+The systematic way to program an operational semantics in \OCaml
+consists in matching the patterns given by the conclusions of the
+inference rules, as suggested below:
+\begin{mathpar}
+\inferrule*[right=sub]
+  {\ceval{e_1}{v_1}\\ \ceval{e_2}{v_2}}  
+  {\ceval{\cst{BinOp} \, \lpar\cst{Sub},e_1,e_2\rpar}{v_1 - v_2}}
+\end{mathpar}
+which becomes 
+\begin{center}
+\vbar \cst{BinOp}
+\lpar\cst{Sub},\ident{e\(\sb{1}\)},\ident{e\(\sb{2}\)}\rpar{}
+\(\rightarrow\) \Xlet \ident{v\(\sb{1}\)} \equal \ident{eval}
+\ident{e\(\sb{1}\)} \Xand \ident{v\(\sb{2}\)} \equal \ident{eval}
+\ident{e\(\sb{2}\)} \Xin \ident{v\(\sb{1}\)} \texttt{-}
+\ident{v\(\sb{2}\)}
+\end{center}
+
+Note that we grouped all the rules with \cst{BinOp} in the conclusion,
+in order to create a single pattern. We should keep in mind that the
+evaluation of pattern matchings in \OCaml is fully specified (they are
+checked in order), whereas there is no such notion in the operational
+semantics: the rules are not ordered.
+
+\paragraph{Determinacy}
+
+It is important that an expression cannot evaluate to more than one
+value and that property is called \emph{determinacy}. Formally, the
+determinacy of an operational semantics $\ceval{e}{v}$ is formally
+expressed as the proposition
+\begin{center}
+\emph{If $\ceval{e}{v}$ and $\ceval{e}{v'}$, then $v=v'$.}
+\end{center}
+In order to prove it, we proceed by structural induction on the proof
+trees of $\ceval{e}{v}$ and $\ceval{e}{v'}$, while selecting the rules
+depending on the shape of~$e$.
+
+\mypar{Local bindings}
+
+In order to simplify the writing of expressions, we wish to name
+sub-expressions, as in the following excerpt of concrete syntax:
+\begin{center}
+\sf \textbf{let} x = 1+2*7 \textbf{in} 9*x*x - x + 2
+\end{center}
+In that aim, we add \emph{identifiers} (\verb+x+) and \emph{local
+  bindings} (\textsf{\textbf{let} ... \textbf{in} ...}) to the
+concrete syntax of expressions. Note that we use the term `variable'
+to qualify the identifiers in the abstract syntax for historical
+reasons (since these really denote constants and do not vary), but a
+variable is a name, not the object it denotes.
+
+The concrete syntax is:
+\begin{verbatim}
+Expression ::= ...  | ident                     /* identifier */
+                    | "let" ident "=" Expression "in" Expression
+\end{verbatim}
+Notice that we should define the set of lexemes denoted by
+\texttt{ident}, but we don't. The extension to the abstract syntax is:
+
+\bigskip
+
+\noindent \Xtype \type{expr} \equal \texttt{...} \vbar{} \cst{Var}
+\Xof \type{string} \vbar \cst{Let} \Xof \type{string} \(\times\)
+\type{expr} \(\times\) \type{expr}
+
+\bigskip
+
+Variables are written~$x$. We should not confuse~$x$, a meta variable
+meaning `any variable', with \cst{Var} \str{x} (a particular AST of
+the described language) and \str{x} or \texttt{x} (pieces of source
+code of the preceding variable).
+
+Let us see now what operational semantics we ascribe to these
+expressions with variables.
+
+\paragraph{Environments}
+
+An \emph{environment} associates variables to values (by construction,
+these are their values). One of such an association is called a
+\emph{binding}. More precisely, a binding is a pair $(x,v)$, which we
+will sometimes write instead $x \mapsto v$, as if it were an
+environment reduced to a single variable in its domain. An environment
+is a partial function from variables to values.
+
+The empty environment in \OCaml is
+\begin{center}
+\Xlet \ident{empty\_env} \equal \Xfun \_ $\rightarrow$
+\ident{raise} \cst{Not\_found}
+\end{center}
+The addition of a binding $x \mapsto v$ to an environment~$\rho$ is
+noted $(x \mapsto v) \oplus \rho$. If~$x$ was already bound in~$\rho$,
+that is, if~$\rho (x)$ was defined, then this new binding hides the
+older, that is to say that $(x \mapsto v \oplus \rho) (x) = v$, even
+if $\rho (x) \neq v$. A na\"{\i}ve but direct implementation would be
+\begin{center}
+\Xlet \ident{extend} \lpar\ident{x},\ident{v}\rpar{} \ident{env}
+\equal \Xfun \ident{y} $\rightarrow$ \Xif \ident{x} \equal \ident{y}
+\Xthen \ident{v} \Xelse \ident{env} \ident{y}
+\end{center}
+Judgements take now the form $\eval{\rho}{e}{v}$ and they feature the
+environment~$\rho$ in the context, that is, the left\hyp{}hand side of
+the judgements:
+\begin{mathpar}
+\inferrule
+  {\eval{\rho}{\cst{Const} \; n}{\dot{n}}}
+  {}\;\,\TirName{const}
+\\
+\inferrule
+  {x \in \dom{\rho}}
+  {\eval{\rho}{\cst{Var} \; x}{\rho (x)}}\;\TirName{var}
+\\
+\inferrule*[right=add]
+  {\eval{\rho}{e_1}{v_1}\\ \eval{\rho}{e_2}{v_2}}
+  {\eval{\rho}
+        {\cst{BinOp} \, \lpar\cst{Add},e_1,e_2\rpar}
+        {v_1 + v_2}}
+\and
+\inferrule*[right=sub]
+  {\eval{\rho}{e_1}{v_1}\\ \eval{\rho}{e_2}{v_2}}  
+  {\eval{\rho}
+        {\cst{BinOp} \, \lpar\cst{Sub},e_1,e_2\rpar}
+        {v_1 - v_2}}
+
+\inferrule*[right=mult]
+  {\eval{\rho}{e_1}{v_1}\\ \eval{\rho}{e_2}{v_2}}  
+  {\eval{\rho}
+         {\cst{BinOp} \, \lpar\cst{Mult},e_1,e_2\rpar}
+        {v_1 \times v_2}} 
+\and
+\inferrule*[right=div]
+  {\eval{\rho}{e_1}{v_1}\\ \eval{\rho}{e_2}{v_2}}  
+  {\eval{\rho}
+        {\cst{BinOp} \, \lpar\cst{Div},e_1,e_2\rpar}
+        {v_1 / v_2}}
+\and
+\inferrule*[right=let]
+  {\eval{\rho}{e_1}{v_1}\\ 
+   \eval{x \mapsto v_1 \oplus \rho}{e_2}{v_2}}
+  {\eval{\rho}
+        {\cst{Let} \, \lpar{x},e_1,e_2\rpar}
+        {v_2}}
+\end{mathpar}
+
+We can now translate these inference rules into \OCaml, which results
+in a slight modification of the first version:
+\begin{tabbing}
+\Xlet \= \Xrec \= \ident{eval} \ident{env} \ident{e} = \Xmatch
+ \ident{e} \Xwith\\
+ \> \cst{Const} \ident{n} \(\rightarrow\) \ident{n}\\
+ \vbar \> \cst{BinOp}
+ \lpar\ident{op},\ident{e}\(\sb{1}\),\ident{e}\(\sb{2}\)\rpar{}
+ \(\rightarrow\) \= \Xlet \ident{v\(\sb{1}\)} = \ident{eval e\(\sb{1}\)}
+ \Xand  \ident{v\(\sb{2}\)} = \ident{eval e\(\sb{2}\)}\\
+ \> \> \Xin \= \lpar\Xmatch \ident{op} \Xwith \= \;\, \cst{Add} \(\rightarrow\)
+ \ident{v}\(\sb{1}\) \texttt{+} \ident{v}\(\sb{2}\)\\
+ \> \> \> \> \vbar  \cst{Sub} \(\rightarrow\)
+ \ident{v}\(\sb{1}\) \texttt{-} \ident{v}\(\sb{2}\)\\
+ \> \> \> \> \vbar \cst{Mult} \(\rightarrow\) 
+ \ident{v}\(\sb{1}\) \texttt{*} \ident{v}\(\sb{2}\)\\
+ \> \> \> \> \vbar \cst{Div} \(\rightarrow\)
+ \ident{v}\(\sb{1}\) \texttt{/} \ident{v}\(\sb{2}\)\rpar\\
+
+\vbar \> \cst{Var} \ident{x} \(\rightarrow\) \ident{env} \ident{x}\\
+\vbar \> \cst{Let} \lpar\ident{x},\ident{e}\(\sb{1}\),\ident{e}\(\sb{2}\)\rpar{}
+\(\rightarrow\) \= \Xlet \ident{v}\(\sb{1}\) \equal \ident{eval}
+\ident{env} \ident{e}\(\sb{1}\)\\
+\>\>\Xin  \ident{eval} \lpar\ident{extend}
+\lpar\ident{x},\ident{v}\(\sb{1}\)\rpar{} \ident{env}\rpar{}
+\ident{e}\(\sb{2}\)
+\end{tabbing}
+Note the encoding of $x \mapsto v_1 \oplus \rho$ by \ident{extend}
+\lpar\ident{x},\ident{v}\(\sb{1}\)\rpar{} \ident{env}, and how the
+evaluation of the initial expression must take place in the empty
+environment. The values of the semantics are in~$\mathbb{Z}$, whereas,
+in the interpreter, they have the type \type{int}, hence can
+overflow. We will not discuss this issue here.
+
+\paragraph{An example}
+
+Let us consider an example with variables: \textsf{\textbf{let} x = 1
+  \textbf{in} (1+2)*(5/x)}. Let~$e$ be the AST corresponding to that
+expression. \Fig~\vref{fig:binop_15_var}
+\begin{figure}[b]
+\centering
+\includegraphics[scale=0.84]{binop_15_var}
+\caption{Evaluation of \textsf{\textbf{let} x = 1 \textbf{in} (1+2)*(5/x)}
+\label{fig:binop_15_var}}
+\end{figure}
+shows its evaluation, that is, how \textsf{(eval empty\_env $e$)} is
+computed. Note that, we write~$\varnothing$ instead of
+\ident{empty\_env}, and \ident{env} instead of \lpar\ident{extend}
+\lpar\str{x},\num{1}\rpar{} \ident{empty\_env}\rpar.
+
+In order to simplify further the presentation of the evaluations, we
+can use an auxiliary function, from character strings to expressions,
+corresponding to the composition of the lexical and syntactical
+analyses. We will write it \mbox{$\src{\_}$: \type{string}
+  $\rightarrow$ \type{expr}}, where the underscore is a placeholder
+for the actual argument, but we will omit the quotes of the string
+itself:
+
+\medskip
+
+\noindent $\src{\text{\Xlet \ident{x} \equal{} \num{1} \Xin \Xlet
+  \ident{y} \equal{} \num{2} \Xin \ident{x} \texttt{+} \ident{y}}}$\\
+= \text{
+      \cst{Let} \lpar\str{x},
+         \cst{Const} \num{1}, 
+         \cst{Let} \lpar\str{y},
+            \cst{Const} \num{2},
+            \cst{BinOp} \lpar\cst{Add},
+              \cst{Var} \str{x},
+              \cst{Var}
+              \str{y}\rpar\!\rpar\!\rpar}.
+
+\medskip
+
+Metavariables~$\meta{e}$ may occur in the concrete syntax to designate
+character strings produced by the grammar rule \texttt{Expression},
+like so:
+\begin{equation*}
+\src{\Xlet \; \ident{x} \; \equal \; \num{2} \; \Xin \; \meta{e}} =
+\cst{Let} \; \lpar\str{x}, \cst{Const} \, \num{2},
+\src{\meta{e}}\!\rpar.
+\end{equation*}
+To simplify further, we will write~$e$ in stead
+of~$\src{\meta{e}}$. Actually, we can easily write a formal
+definition of the syntax analysis on programs whose syntax is already
+correct:
+\begin{align*}
+\src{\meta{n}} & = \cst{Const} \, \lpar\ident{int\_of\_string} \;
+\meta{n}\rpar = \cst{Const} \; n = \dot{n},\\
+\src{\meta{e}_1 \, \texttt{+} \, \meta{e}_2} & = \cst{BinOp} \,
+\lpar\cst{Add}, e_1, e_2\rpar,\\
+\src{\meta{e}_1 \, \texttt{-} \, \meta{e}_2} & = \cst{BinOp} \,
+\lpar\cst{Sub}, e_1, e_2\rpar,\\
+\src{\meta{e}_1 \, \texttt{*} \, \meta{e}_2} & = \cst{BinOp} \,
+\lpar\cst{Mult}, e_1, e_2\rpar,\\
+\src{\meta{e}_1 \, \texttt{/} \, \meta{e}_2} & = \cst{BinOp} \,
+\lpar\cst{Div}, e_1, e_2\rpar,\\
+\src{x} & = \cst{Var} \, x,\\
+\src{\Xlet \; x \; \equal \; \meta{e}_1 \; \Xin \;
+  \meta{e}_2} & = \cst{Let} \, \lpar{x}, e_1, e_2\rpar,\\
+\src{\lpar\meta{e}\rpar} & = e.
+\end{align*}
+
+\paragraph{More legible rules}
+
+Here are the inference rules revisited in the light of the previous
+simplifications:
+\begin{mathpar}
+\inferrule
+  {\meval{\rho}{\meta{n}}{\dot{n}}}
+  {}\;\,\TirName{const}
+\and
+\inferrule
+  {x \in \dom{\rho}}
+  {\meval{\rho}{x}{\rho (x)}}\;\TirName{var}
+\and
+\inferrule*[right=add]
+  {\eval{\rho}{e_1}{v_1}\\ 
+   \eval{\rho}{e_2}{v_2}}
+  {\meval{\rho}{\meta{e}_1 \, \texttt{+} \, \meta{e}_2}{v_1 + v_2}}
+\and
+\inferrule*[right=sub]
+  {\eval{\rho}{e_1}{v_1}\\ 
+   \eval{\rho}{e_2}{v_2}}
+  {\meval{\rho}{\meta{e}_1 \, \texttt{-} \, \meta{e}_2}{v_1 - v_2}}
+\and
+\inferrule*[right=mult]
+  {\eval{\rho}{e_1}{v_1}\\ 
+   \eval{\rho}{e_2}{v_2}}
+  {\meval{\rho}{\meta{e}_1 \, \texttt{*} \, \meta{e}_2}{v_1 \times v_2}}
+\and
+\inferrule*[right=div]
+  {\eval{\rho}{e_1}{v_1}\\ 
+   \eval{\rho}{e_2}{v_2}}
+  {\meval{\rho}{\meta{e}_1 \, \texttt{/} \, \meta{e}_2}{v_1 / v_2}}
+\and
+\inferrule*[right=let]
+  {\eval{\rho}{e_1}{v_1}\\ 
+   \eval{x \mapsto v_1 \oplus \rho}{e_2}{v_2}}
+  {\meval{\rho}{\Xlet \; x \; \equal \; \meta{e}_1 \; \Xin
+  \; \meta{e}_2}{v_2}}
+\end{mathpar}
+
+\paragraph{Another evaluation}
+%XXX
+Given the following excerpt of concrete syntax, `\Xlet \ident{x}
+\equal \num{1} \Xin ((\Xlet \ident{x} \equal \num{2} \Xin \ident{x}) +
+\ident{x})', the abstract syntax tree generated by the parser is shown
+in \fig~\vref{fig:let_x}.
+\begin{figure}[b]
+\centering
+\includegraphics{let_x}
+\caption{AST of \Xlet \ident{x}
+\equal \num{1} \Xin ((\Xlet \ident{x} \equal \num{2} \Xin \ident{x}) +
+\ident{x}) \label{fig:let_x}}
+\end{figure}
+We combine the inference rules to evaluate the expression: we obtain a
+\emph{proof tree} (of the evaluation of the expression into the
+value~3), also called \emph{derivation}, shown in
+\fig~\vref{fig:eval_tree}.
+\begin{figure}
+\centering
+\includegraphics[bb=48 642 414 719,scale=0.93]{eval_tree}
+\caption{Proof tree of \Xlet \ident{x}
+\equal \num{1} \Xin ((\Xlet \ident{x} \equal \num{2} \Xin \ident{x}) +
+\ident{x}) \label{fig:eval_tree}}
+\end{figure}
+The proof tree is built bottom\hyp{}up, that is, from the root to the
+leaves (beware that proof trees are laid out on the page with their
+root below their leaves), depending on the shape of the conclusions,
+and we deduce step by step equations involving metavariables denoting
+variables. Next, these equations are solved and provide us with the
+sought value, that is, the result of the evaluation.
+
+Let~$v$ be the value of the term $\src{\text{\Xlet \ident{x} \equal
+    \num{1} \Xin \lpar\lpar\Xlet \ident{x} \equal \num{2} \Xin
+    \ident{x}\rpar{} \texttt{+} \ident{x}\rpar}}$. The only rule
+having a conclusion of that form is \RefTirName{let}. We therefore
+apply an instance of it, in an empty environment:
+\begin{mathpar}
+\inferrule
+  {\eval{\varnothing}{\src{\num{1}}}{1}\\
+     {\eval
+        {\str{x} \mapsto 1}
+        {\src{\Xlet \; \ident{x} \; \equal \; 2 \; \Xin \;
+              \ident{x} \; \texttt{+} \; \ident{x}}}
+        {v}}
+  }
+  {\eval
+    {\varnothing}
+    {\src{\Xlet \; \ident{x} \; \equal \; \num{1} \; \Xin \;
+       \lpar\lpar\Xlet \; \ident{x} \; \equal \; 2 \;
+       \Xin \; \ident{x}\rpar \; \texttt{+} \; \ident{x}\rpar}}
+    {v}}
+\end{mathpar}
+The second premise can only be a conclusion of the rule
+\RefTirName{add}:
+\begin{mathpar}
+    \inferrule*
+      {\eval
+         {\str{x} \mapsto 1}
+         {\src{\Xlet \; \ident{x} \; \equal \; \num{2} \; \Xin \; \ident{x}}}
+         {v_1}\\
+        {\eval
+           {\str{x} \mapsto 1}
+           {\src{\ident{x}}}
+           {1}
+        }
+     }
+     {\eval
+        {\str{x} \mapsto 1}
+        {\src{\lpar\Xlet \; \ident{x} \; \equal \; \num{2} \;
+         \Xin \; \ident{x}\rpar{} \; \texttt{+} \;
+         \ident{x}}}
+        {v_1+1}
+     }
+\end{mathpar}
+\noindent and the deduced equation is simply $v = v_1 + 1$.
+
+\noindent The first premise can only be the conclusion of the rule \RefTirName{let}:
+\begin{mathpar}
+  \inferrule
+     {\eval
+        {\str{x} \mapsto 1}
+        {\src{2}}
+        {2}\\
+      \eval
+        {\str{x} \mapsto 2 \oplus \str{x} \mapsto 1}
+        {\src{\ident{x}}}
+        {2}
+     }
+     {\eval
+        {\str{x} \mapsto 1}
+        {\src{\Xlet \; \ident{x} \; \equal \; \num{2} \; \Xin \; \ident{x}}}
+        {2}
+     }
+\end{mathpar}
+Thus, $v_1=2$. By substituting $v_1$ by its value, we draw $v=2+1=3$.
+
+\mypar{Formalising errors}
+
+During the evaluation presented above, several problems might have
+arisen: \ident{x}~could have valued~0 (division by zero) or $\str{x}
+\not\in \dom{\rho}$. In the former case, the rule is
+\begin{mathpar}
+\inferrule*[right=div]
+  {\eval{\rho}{e_1}{v_1}\\
+   \eval{\rho}{e_2}{v_2}}
+  {\eval{\rho}{\src{\meta{e}_1 \, \texttt{/} \, \meta{e}_2}}{v_1 /
+    v_2}}
+\end{mathpar}
+\noindent We can formalise the correct cases and the division error:
+\begin{mathpar}
+\inferrule
+  {\eval{\rho}{e_1}{v_1}\\
+   \eval{\rho}{e_2}{v_2}\\
+   v_2 \neq 0}
+  {\eval{\rho}{\src{\meta{e}_1 \, \texttt{/} \, \meta{e}_2}}{v_1/v_2}}
+\and
+\inferrule
+  {\eval{\rho}{e_2}{0}}
+  {\eval{\rho}{\src{\meta{e}_1 \, \texttt{/} \, \meta{e}_2}}
+        {\textsl{error}}}
+\end{mathpar}
+To formalise \textsl{error}, we replace the relationship
+$\eval{\rho}{e}{v}$ by $\eval{\rho}{e}{r}$, where~$r$ is a
+\emph{result}: results are values or errors. Moreover, from now on, we
+consider that values in the semantics have the type \type{int} instead
+of the mathematical set~$\mathbb{Z}$, because we do not need so much
+abstraction and this will get us closer to the implementation, that
+is, the interpreter.
+
+\medskip
+
+\begin{raggedright}
+\Xtype \type{value} \equal \type{int}\textsf{;;}{}\\
+\Xtype \type{error} \equal \cst{DivByZero} \vbar \cst{FreeVar}
+\Xof \type{string}\textsf{;;}{}\\ 
+\Xtype \type{result} \equal \cst{Val} \Xof \type{value}
+\vbar \cst{Err} \Xof \type{error}\textsf{;;}{}
+\end{raggedright}
+
+\medskip
+
+\noindent The rules which can produce errors are
+\begin{mathpar}
+\inferrule*[right=div-zero]
+  {\eval{\rho}{e_2}{\cst{Val} \, \num{0}}}
+  {\eval
+     {\rho}
+     {\src{\meta{e}_1 \, \texttt{/} \, \meta{e}_2}}
+     {\cst{Err} \, \cst{DivByZero}}}
+
+\inferrule*[right=free-var]
+  {x \not\in \dom{\rho}}
+  {\eval{\rho}
+        {\src{x}}
+        {\cst{Err} \, \lpar\cst{FreeVar} \, x\rpar}}
+
+\inferrule*[right=div]
+  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\ 
+   \eval{\rho}{e_2}{\cst{Val} \, v_2}}
+  {\meval{\rho}
+         {\meta{e}_1 \, \texttt{/} \, \meta{e}_2}
+         {\cst{Val} \, \lpar v_1 \, \texttt{/} \, v_2\rpar}}
+
+\inferrule*[right=mult]
+  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\ 
+   \eval{\rho}{e_2}{\cst{Val} \, v_2}}
+  {\meval{\rho}
+        {\meta{e}_1 \, \texttt{*} \, \meta{e}_2}
+        {\cst{Val} \, \lpar{v_1 \, \texttt{*} \, v_2\rpar}}}
+
+\inferrule
+  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\ 
+   \eval{\rho}{e_2}{\cst{Val} \, v_2}}
+  {\meval{\rho}
+         {\meta{e}_1 \, \texttt{+} \, \meta{e}_2}
+         {\cst{Val} \, \lpar{v_1 \, \texttt{+} \, v_2}\rpar}}
+\;\TirName{add}
+
+\inferrule*[right=sub]
+  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\ 
+   \eval{\rho}{e_2}{\cst{Val} \, v_2}}  
+  {\meval{\rho}
+         {\meta{e}_1 \, \texttt{-} \, \meta{e}_2}
+         {\cst{Val} \, \lpar{v_1 \, \texttt{-} \, v_2}\rpar}}
+\\
+\inferrule
+  {\meval{\rho}{\meta{n}}{\cst{Val} \, n}}
+  {}\;\,\TirName{const}
+\and
+\inferrule
+  {x \in \dom{\rho}}
+  {\meval{\rho}{x}{\cst{Val} \, \lpar\rho(x)\rpar}}
+\;\TirName{var}
+
+\inferrule*[right=let]
+  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\ 
+   \eval{x \mapsto v_1 \oplus \rho}{e_2}{\cst{Val} \, v_2}}
+  {\meval{\rho}{\Xlet \; x \; \equal \; \meta{e}_1 \; \Xin
+  \; \meta{e}_2}{\cst{Val} \, v_2}}
+\end{mathpar}
+\begin{mathpar}
+\inferrule*[right=add-err$_1$]
+  {\eval{\rho}{e_1}{\cst{Err} \, z}\\
+   \eval{\rho}{e_2}{r}}
+  {\meval{\rho}
+         {\meta{e}_1 \, \texttt{*} \, \meta{e}_2}
+         {\cst{Err} \, z}}
+
+\inferrule*[right=add-err$_2$]
+  {\eval{\rho}{e_1}{r}\\
+   \eval{\rho}{e_2}{\cst{Err} \, z}}
+  {\meval{\rho}
+         {\meta{e}_1 \, \texttt{+} \, \meta{e}_2}
+         {\cst{Err} \, z}}
+\end{mathpar}
+Let us remark first that we need two rules because two premises can be
+evaluated into errors, and the semantics does not express the
+commutative property of the addition over integers. The other cases
+are similar. Second, in case of multiple errors, only one will be
+propagated and the evaluation order, having been left unspecified on
+purpose, we cannot say \emph{a priori} which error will be propagated.
+
+For the sake of simplicity, let us use the exceptions of \OCaml to
+implement the propagation of errors, and, thereby, avoid the type
+\type{result}. 
+\begin{tabbing}
+\Xexception \cst{Err} \Xof \type{error}\\
+\\
+\Xlet \= \Xrec \ident{eval} \ident{env} \ident{e} \equal \Xmatch
+\ident{e} \Xwith \texttt{...} \\
+\vbar \> \cst{Var} \ident{x} \(\rightarrow\)
+ \underline{\lpar\Xtry} \ident{env} \ident{x} \underline{\Xwith \cst{Not\_found}
+  \(\rightarrow\) \ident{raise} \lpar\cst{Err} \lpar\cst{FreeVar}
+  \ident{x}\rpar\rpar\rpar}\\
+\vbar \> \cst{BinOp}
+\lpar\textbf{\cst{Div}},\ident{e}\(\sb{1}\),\ident{e}\(\sb{2}\)\rpar{}
+\(\rightarrow\)\\
+\> \Xlet v\(\sb{1}\) \equal \ident{eval env}
+\ident{e}\(\sb{1}\) \Xand v\(\sb{2}\) \equal \ident{eval env}
+\ident{e}\(\sb{2}\)\\
+\> \Xin \underline{\Xif v\(\sb{2}\) \equal \num{0} \Xthen
+\ident{raise} \lpar\cst{Err} \cst{DivByZero}\rpar{}
+\Xelse} v\(\sb{1}\)\textsf{/}v\(\sb{2}\) \\
+\texttt{| ...}
+\end{tabbing}
+(The underlined code is the difference with the previous version.)
+Notice that we could speed up error handling by evaluating
+first~\ident{e}$_2$, then~\ident{e}$_1$ if and only if \ident{v}$_2$
+\nequal \num{0}. The interpreter enforces then a particular order of
+evaluation for the arguments of the division operation, but this order
+must not be relied upon by the user. In general terms, if the order of
+evaluation is specified, like in \Java, then there is no ambiguity,
+otherwise, the ambiguity might be used by the implementors of the
+compiler for optimisations.
+
+The operational semantics sometimes seems not to say anything, but it
+can express the dependencies between evaluations (see rule
+\RefTirName{let}), and the evaluations in case of errors: contrast the
+rule
+\begin{mathpar}
+\inferrule*[right=div-zero]
+  {\eval{\rho}{e_1}{r_1}\\
+   \eval{\rho}{e_2}{\cst{Val} \, \num{0}}
+  }
+  {\meval
+     {\rho}
+     {\meta{e}_1 \, \texttt{/} \, \meta{e}_2}
+     {\cst{Err} \, \cst{DivByZero}}
+  }
+\end{mathpar}
+
+\paragraph{Free variables}
+
+It is possible to determine whether some variables are free in an
+expression before evaluation, thereby avoiding the error \cst{FreeVar}
+at run\hyp{}time. That kind of analysis is a particular case of
+\emph{static analysis}, that is, taking place at compile\hyp{}time.
+
+Let~$\mathcal{F}$ the function which associates an expression to its
+free variables. We can write~$\mathcal{F} \src{\_}$ instead of
+$\mathcal{F}(\src{\_})$. It is defined by the following equations,
+where the priority of~`$\backslash$' is higher than that of~`$\cup$',
+and~$\meta{o}$ denotes a character string generated by the grammatical
+rule \texttt{BinOp}:
+\begin{align*}
+\mathcal{F} \src{\meta{n}} & = \varnothing,\\
+\mathcal{F} \src{x} & = \{x\},\\
+\mathcal{F} \src{\meta{e}_1 \; \meta{o} \;\, \meta{e}_2} & = \mathcal{F}(e_1) \cup \mathcal{F}(e_2),\\
+\mathcal{F} \src{\Xlet \; x \; \equal \; \meta{e}_1 \; \Xin \;
+  \meta{e}_2} & = \mathcal{F}(e_1) \cup \mathcal{F}(e_2) \backslash \{x\}.
+\end{align*}
+Let us revisit the example \textsf{\textbf{let} x = 1 \textbf{in}
+  ((\textbf{let} x = 2 \textbf{in} x) + x)}. We have:
+
+\begin{equation*}
+\begin{array}{lcl}
+\multicolumn{3}{l}{
+\mathcal{F} \src{\Xlet \; \ident{x} \; \equal \; \num{1} \; \Xin \;
+  \lpar\lpar\Xlet \; \ident{x} \; \equal \; \num{2} \; \Xin \;
+  \ident{x}\rpar{} \; \texttt{+} \; \ident{x}\rpar}}\\
+\phantom{XXX}
+ &=& \mathcal{F} \src{\num{1}} \, \cup \, \mathcal{F} \src{\lpar\Xlet \; \ident{x} \;
+     \equal \; \num{2} \; \Xin \; \ident{x}\rpar{} \; \texttt{+}
+    \; \ident{x}} \backslash \{\str{x}\}\\ 
+ &=& \varnothing \, \cup \,
+     (\mathcal{F} \src{\Xlet \; \ident{x} \; \equal \; \num{2} \;
+     \Xin \; \ident{x}} \, \cup \, \mathcal{F} \src{\ident{x}})
+     \backslash \{\str{x}\} \\
+ &=& (\mathcal{F} \src{\num{2}} \, \cup \, \mathcal{F} \src{\ident{x}} \backslash
+      \{\str{x}\} \, \cup \, \{\str{x}\}) \backslash \{\str{x}\}\\
+ &=& (\varnothing \, \cup \, \{\str{x}\} \backslash \{\str{x}\}
+     \, \cup \, \{\str{x}\}) \backslash \{\str{x}\}\\
+ &=& \varnothing.
+\end{array}
+\end{equation*}
+The expression does not contain any free variable. By definition, such
+an expression is said to be \emph{closed}. Moreover, since the
+expression does not contain any division, we have proved that 
+no error will occur during evaluation.
+
+\paragraph{Graphical representation of bindings}
+
+Until now, the data constructor \cst{Let} is the only one that adds
+bindings to the environment: it is said to be `binding'. Let us resume
+the previous example. From each occurrence of a variable (\cst{Var}),
+let us move up towards the root: if we find a \cst{Let} binding that
+variable, we create an edge from it to its binding \cst{Let}; if, once
+the root has been reached, no \cst{Let} has been found, the variable
+is free in the expression. The example is seen in
+\fig~\vref{fig:graph_fv}.
+\begin{figure}
+\centering
+\includegraphics[bb=71 632 282 726]{graph_fv}
+\caption{Free variables bound by upward edges in the AST
+\label{fig:graph_fv}}
+\end{figure}
+
+\paragraph{Testing zero}
+
+Let us come back once again to our language and let us add a
+conditional construct with test against zero.
+\begin{itemize}
+
+  \item The extension to the concrete syntax is
+\begin{verbatim}
+Expression ::=  ... | "ifz" Expression "then" Expression 
+                      "else" Expression
+\end{verbatim}
+
+  \item The extension to the abstract syntax is
+
+\noindent \Xtype \type{expr} \equal \texttt{...} \vbar \cst{Ifz} \Xof
+\type{expr} \(\times\) \type{expr} \(\times\) \type{expr}
+
+  \item The syntax analysis (in the absence of error) is
+
+\noindent $\src{\kwd{ifz} \; \meta{e}_1 \; \Xthen \; \meta{e}_2 \;
+  \Xelse \; \meta{e}_3} = \cst{Ifz} \, \lpar e_1, e_2, e_3\rpar$.
+
+  \item The free variables are found with
+
+\noindent $\mathcal{F} \src{\kwd{ifz} \; \meta{e}_1 \; \Xthen \;
+  \meta{e}_2 \; \Xelse \; \meta{e}_3} = \mathcal{F} (e_1) \, \cup \,
+          \mathcal{F} (e_2) \, \cup \, \mathcal{F} (e_3)$.
+
+\end{itemize}
+The operational semantics is extended with the following rules:
+\begin{mathpar}
+  \inferrule*[right=if-then]
+    {\eval{\rho}{e_1}{0}\\
+     \eval{\rho}{e_2}{v_2}}
+    {\meval{\rho}{\kwd{ifz} \; \meta{e}_1 \; \Xthen \;
+     \meta{e}_2 \; \Xelse \; \meta{e}_3}{v_2}}
+\and
+  \inferrule*[right=if-else]
+    {\eval{\rho}{e_1}{\dot{n}}\\
+     \dot{n} \neq 0\\
+     \eval{\rho}{e_3}{v_3}}
+    {\meval{\rho}{\kwd{ifz} \; \meta{e}_1 \; \Xthen \;
+     \meta{e}_2 \; \Xelse \; \meta{e}_3}{v_3}}
+\end{mathpar}
+
+\paragraph{Functions}
+
+Let us add to the calculator function abstractions and their
+corresponding calls, called \emph{applications} in the
+\(\lambda\)-calculus.
+\begin{itemize}
+
+  \item The concrete syntax is extended like so:
+\begin{verbatim}
+Expression ::= ... 
+             | "fun" ident "->" Expression /* abstraction */
+             | Expression Expression       /* application */
+\end{verbatim}
+
+  \item The abstract syntax becomes:
+
+  \noindent \Xtype \type{expr} \equal \texttt{...} \vbar \cst{Fun}
+  \Xof \type{string} \(\times\) \type{expr} \vbar \cst{App}
+  \Xof \type{expr} \(\times\) \type{expr}
+
+  \noindent where
+  \begin{itemize*}
+
+    \item \cst{Fun} \lpar$x$, $e$\rpar{} denotes a function which
+      associates the expression~$e$, called the \emph{body}, to the
+      variable~$x$, called the \emph{parameter} (which may or may not
+      be free in~\(e\));
+
+    \item \cst{App} \lpar$e_1$, $e_2$\rpar{} represents the
+      application of an expression~$e_1$, which is expected to be
+      evaluated into an abstraction, to an expression~$e_2$, called
+      the \emph{argument}.
+
+  \end{itemize*}
+
+  \item The syntax analysis needs to record the fact that abstraction
+    (respectively, application) has a lower (respectively, higher)
+    priority than operators. All we can do here is say:
+\begin{align*}
+\src{\Xfun \; x \rightarrow \meta{e}}
+  &= \cst{Fun} \, \lpar{x}, e\rpar,\\
+\src{\meta{e}_1 \; \meta{e}_2}
+  &= \cst{App} \, \lpar e_1, e_2\rpar.
+\end{align*}
+
+\end{itemize}
+We want the language of our calculator to have the same semantics as
+the subset of \OCaml which its syntax coincides. The implementation of
+an interpreter or a compiler in the same language it interprets or
+compile is called \emph{bootstrapping}. For instance, the \OCaml
+compiler itself is bootstrapped, a first compiler being written
+in~\Clang.
+
+What operational semantics can be ascribed to abstraction and
+application?
+
+First, we need to extend the computation of the free variables of an
+expression to abstractions and applications, like so:
+\begin{equation*}
+\left\{
+\begin{aligned}
+\mathcal{F} \src{\Xfun \; x \rightarrow \meta{e}} &= 
+  \mathcal{F} (e) \backslash \{x\}\\
+\mathcal{F} \src{\meta{e}_1 \, \meta{e}_2} &= 
+  \mathcal{F} (e_1) \cup \mathcal{F} (e_2)
+\end{aligned}
+\right.
+\end{equation*}
+For example, $\mathcal{F} \src{\Xfun \; \ident{y} \rightarrow \ident{x}
+\; \texttt{+} \; \lpar\Xfun \; \ident{x} \rightarrow \ident{x}\rpar{}
+\; \ident{y}} = \{\ident{x}\}$. Graphically, this is represented as in
+\fig~\vref{fig:fun_fv},
+\begin{figure}
+\centering
+\includegraphics{fun_fv}
+\caption{Variables bound in $\mathcal{F} \src{\Xfun \; \ident{y}
+    \rightarrow \ident{x} \; \texttt{+} \; \lpar\Xfun \; \ident{x}
+  \rightarrow \ident{x}\rpar{} \; \ident{y}}$
+\label{fig:fun_fv}}
+\end{figure}
+where the free variable is framed.
+
+\mypar{Abstraction and application}
+
+Let us try first the following semantics for the abstraction:
+\begin{equation*}
+\inferrule*[right=\;\, abs-dyn]
+  {}
+  {\meval{\rho} 
+         {\Xfun \; x \rightarrow \meta{e}}
+         {\src{\Xfun \; x \rightarrow \meta{e}}}}
+\end{equation*}
+The rule \RefTirName{abs-dyn} implies that the programs in
+\fig~\vref{fig:equiv_src}
+\begin{figure}
+\centering
+\subfloat[\label{fig:first_src}]{
+\begin{minipage}{0.2\linewidth}{
+\begin{tabbing}
+\Xlet \ident{x} \equal \num{1} \Xin \\
+\quad \= \Xlet \ident{f} \equal \Xfun \ident{y} \(\rightarrow\)
+\ident{x} \texttt{+} \ident{y} \Xin \\
+\> \Xlet \ident{x} \equal \num{2} \\
+\Xin \underline{\ident{f}} \ident{x}
+\end{tabbing}}
+\end{minipage}
+}
+\qquad
+\subfloat[\label{fig:snd_src}]{
+\begin{minipage}{0.2\linewidth}{
+\begin{tabbing}
+\Xlet \ident{x} \equal \num{1} \Xin\\
+\quad \= \Xlet \ident{f} \equal \Xfun \ident{y} \(\rightarrow\)
+\ident{x} \texttt{+} \ident{y} \Xin\\ 
+\> \Xlet \ident{x} \equal \num{2}\\
+\Xin \underline{\lpar\Xfun \ident{y} \(\rightarrow\) \ident{x} \texttt{+}
+\ident{y}\rpar} \ident{x}
+\end{tabbing}}
+\end{minipage}
+}
+\caption{Two equivalent programs under rule \RefTirName{abs-dyn} \label{fig:equiv_src}}
+\end{figure}
+are equivalent. Consider in \fig~\ref{fig:first_abs}
+\begin{figure}[!t]
+\centering
+\includegraphics{first_abs}
+\caption{AST of the program in \fig~\vref{fig:first_src}\label{fig:first_abs}}
+\end{figure}
+the abstract syntax tree of the program in \fig~\ref{fig:first_src}
+and, in \fig~\ref{fig:snd_abs},
+\begin{figure}[!b]
+\centering
+\includegraphics[bb=71 563 406 721]{snd_abs}
+\caption{AST of the program in \fig~\vref{fig:snd_src}\label{fig:snd_abs}}
+\end{figure}
+that of \fig~\ref{fig:snd_src}. The variable~\ident{x} under the \Xfun
+has been \emph{captured} by the third \Xlet. (A fact denoted by a
+dashed line to the now incorrect binder.) This means that, with our
+semantics \RefTirName{abs-dyn}, the value of a variable may change
+over the course of the evaluation, depending on the current
+environment: this is called \emph{dynamic binding}. Few programming
+languages feature it, notably Lisp, \TeX{} and \textsf{cpp} macros,
+because programs tend to be more difficult to understand and
+maintain. In general, \emph{static binding} --~also called
+\emph{lexical scoping}~-- is preferred: the value of the free
+variables in the body of functions is fixed at the declaration
+site. The first program would then result in~3 and the second in~4. We
+must come up with a semantics for the abstraction which respects
+referential transparency (that is, the fact that a variable can be
+replaced by its value between parentheses, without altering the
+meaning of the embedding expression) and static binding.
+
+\paragraph{Semantics for the application}
+
+If functions are values, they can be returned by functions, that is,
+they can be the value of an application. For instance:
+\begin{tabbing}
+ \Xlet \ident{add} \equal \Xfun \ident{x} \(\rightarrow\) \Xfun
+ \ident{y} \(\rightarrow\) \ident{x} \texttt{+} \ident{y} \Xin\\
+ \quad \Xlet \ident{incr} \equal \ident{add} \num{1}\\
+ \Xin \ident{incr} \num{5}
+\end{tabbing}
+That kind of application is said to be \emph{partial}, as opposed
+to \emph{complete}, like (\ident{add} \num{1} \num{5}). We have to
+find a semantics for the application that enables partial
+applications.
+
+\paragraph{Closures and typing}
+
+The general solution to the above design constraints on the
+abstraction and the application consists in evaluating functions into
+a new kind of value called \emph{closure}. A closure
+$\clos{x}{e}{\rho}$ is made of a functional expression
+$\cst{Fun} \, \lpar{x},e\rpar$ and an environment~$\rho$. We then have
+to redefine the type of values, like so:
+
+\bigskip
+
+\noindent\Xtype \type{value} \equal \cst{Int} \Xof \type{int} \vbar
+\cst{Clos} \Xof \type{string} \(\times\) \type{expr} \(\times\)
+\lpar\type{string} $\rightarrow$ \type{value}\rpar\textsf{;;}{}
+
+\bigskip
+
+\noindent and also the implementation of the \OCaml function \ident{eval}. Note
+that expressions can make inconsistent assumptions with regards to
+their context, what is called \emph{typing errors}, in particular,
+arithmetic operations must have integer operands and only functions
+can be called.
+
+\paragraph{Semantics for abstraction and application}
+
+\begin{mathpar}
+\inferrule*[right=\;\, abs]
+  {\meval{\rho}
+         {\Xfun \; x \rightarrow \meta{e}}
+         {\clos{x}{e}{\rho}}}
+  {}
+\and
+\inferrule*[right=app]
+  {\eval{\rho}{e_1}{\clos{x_0}{e_0}{\rho_0}}\\
+   \eval{\rho}{e_2}{v_2}\\
+   \eval{x_0 \mapsto v_2 \oplus \rho_0}{e_0}{v_0}
+  }
+  {\meval{\rho}{\meta{e}_1 \; \meta{e}_2}{v_0}}
+\end{mathpar}
+The implementation of rule \RefTirName{App} should evaluate~$e_1$
+before~$e_2$ in order to check if~$e_1$ indeed is evaluated into a
+closure --~otherwise, we save time by signalling an error at an early
+stage. As for rule \RefTirName{Abs}, we can restrict the
+environment~$\rho$ in a closure $\clos{x}{e}{\rho}$ to the free
+variables of the function $\cst{Fun} \, \lpar{x},e\rpar$:
+\begin{equation*}
+\inferrule*[right=\;\, abs-opt]
+     {\eval{\rho}
+           {\src{\Xfun \; x \rightarrow \meta{e}} \, \Xas \, f}
+           {\clos{x}{e}{\rho\arrowvert\mathcal{F}(f)}}}
+     {}
+\end{equation*}
+where \(\rho \arrowvert d\) is~\(\rho\) restricted to the domain~\(d\)
+and `\(e \; \Xas \; x\)' binds the metavariable~\(x\) to the
+expression~\(e\).
+
+\paragraph{Evaluation strategies}
+
+In the rule \RefTirName{App}, the expression~\(e_1\) is first
+evaluated into a closure to which is passed the value~\(v_1\)
+of~\(e_1\): that strategy is called \emph{call by value}, or
+\emph{strict semantics}, in use in programming languages like \OCaml
+and \Java. Other languages, notably \Haskell and \Clean, feature a
+strategy called \emph{call by name} or \emph{lazy evaluation}, which
+consists in passing the non\hyp{}evaluated argument~\(e_1\) to the
+closure, to be evaluated only if the result requires it. An
+optimisation of call by name is \emph{call by need}, whereby the same
+expression is not recomputed, as their values are cached by the
+run\hyp{}time.
+
+\paragraph{Non-termination}
+
+In theory, we can already use our calculator to compute anything
+computed by the underlying computer. For instance, we already have the
+power of recursion thanks to the auto\hyp{}application, as
+demonstrated by the following non\hyp{}terminating program:
+\begin{center}
+\Xlet \ident{omega} \equal \Xfun \ident{f} $\rightarrow$ \ident{f}
+\ident{f} \Xin \ident{omega} \ident{omega}
+\end{center}
+The operational style we followed up to this point evaluates an
+expression into its value, but this is not practical when studying the
+termination of computations. For the previous program, this issue
+would manifest itself as the occurrence in the derivation of
+\begin{mathpar}
+\inferrule
+  {\meval{\rho}{\ident{f}\,}{v_1}\\
+   \eval{\str{f} \mapsto v_1 \oplus \rho}
+        {\src{\ident{f} \; \ident{f}\,}}
+        {v}
+  }
+  {\eval{\rho}
+        {\src{\ident{f} \; \ident{f}\,}}
+        {v}
+  }
+\end{mathpar}
+The first premise states that $\rho(\str{f}) = v_1$, hence $\rho =
+\str{f} \mapsto v_1 \oplus \rho$, therefore the conclusion and the
+second premise are identical, implying that the evaluation never ends.
+
+A programming language featuring a conditional construct and
+recursion or auto\hyp{}application enables the specification of all
+computations available to the underlying computer: it is
+\emph{Turing\hyp{}complete}. This property is very useful, but it
+entails the existence of non\hyp{}terminating programs and the
+nonexistence of programs which can recognise them all (by G{\"o}del's
+incompleteness theorem). A very rough sketch of the idea is as
+follows. Let us use \emph{reductio ad absurdum} and suppose the
+existence of a predicate for termination. Let~$f$ be the function such
+that for all function~$g$, if~$g$ always terminates (that is, for
+all~$x$, $g(x)$ is defined), then $f(g)$ does not terminate;
+otherwise, $f(g)$ terminates. Therefore, $f(f)$ does not terminate
+is~$f$ terminates, and $f(f)$ terminates if~$f$ does not terminate.
+This is a contradiction from which we deduce that the hypothesis is
+false and there is no termination predicate.
+
+\mypar{Recursive functions}
+
+To bring to the fore the expressiveness of our toy language, let us
+define functions with the help of the auto\hyp{}applicative
+function \ident{omega}. First, let us define a function \ident{fix},
+traditionally called the \emph{Y~combinator}:
+\begin{tabbing}
+\Xlet \ident{omega} \equal \Xfun \ident{f} $\rightarrow$ \ident{f}
+\ident{f} \Xin\\
+\quad \Xlet \ident{fix} \equal \Xfun \ident{g} $\rightarrow$
+\ident{omega} \lpar\Xfun \ident{h} $\rightarrow$ \underline{\Xfun \ident{x}
+$\rightarrow$} \ident{g} \lpar\ident{h} \ident{h}\rpar{} \underline{\ident{x}}\rpar{}
+\Xin\\
+\quad \texttt{...}
+\end{tabbing}
+Note the underlined code (technically, an \(\eta\)-expansion),
+necessary to deal with a strict semantics. It is possible, albeit
+rather tedious, to show that the evaluation of \lpar\ident{fix}
+\ident{f} \ident{x}\rpar{} has the pattern
+\begin{mathpar}
+\inferrule
+  {\ldots\\
+   \inferrule*[vdots=1.5em]
+     {\ldots \\
+      \meval{\rho}
+            {\ident{f} \; \lpar\ident{fix} \; \ident{f}\rpar{} \; \ident{x}}
+            {v}}
+     {\ldots}}
+  {\meval{\rho}
+         {\lpar\ident{fix} \; \ident{f}\rpar{} \; \ident{x}}
+         {v}}
+\end{mathpar}
+In other words, for all \ident{x}, \lpar\ident{fix} \ident{f}\rpar{}
+\ident{x} \equal \ident{f} \lpar\ident{fix} \ident{f}\rpar{}
+\ident{x}, that is, \lpar\ident{fix} \ident{f}\rpar{} \equal \ident{f}
+\lpar\ident{fix} \ident{f}\rpar{}. Also, by definition, the fixed
+point~$p$ of a function~$f$ satisfies $p = f(p)$. Therefore, the fixed
+point of a function~\ident{f}, if it exists, is \lpar\ident{fix}
+\ident{f}\rpar{}.
+
+\paragraph{Factorial revisited}
+
+Let
+\begin{tabbing}
+\quad \Xlet \ident{pre\_fact} \equal \Xfun \ident{f} $\rightarrow$
+\Xfun \ident{n} $\rightarrow$ \kwd{ifz} \ident{n} \Xthen \num{1}
+\Xelse \ident{n} \texttt{*} \ident{f}
+\lpar\ident{n}\texttt{-}\num{1}\rpar{} \Xin\\
+\quad \Xlet \ident{fact} \equal \ident{fix} \ident{pre\_fact}
+\Xin \texttt{...}
+\end{tabbing}
+Therefore, \ident{fact} is the fixed point of \ident{pre\_fact}, if
+any, that is to say
+\begin{center}
+\ident{fact} \equal \ident{pre\_fact} \ident{fact} \equal \Xfun
+\ident{n} $\rightarrow$ \kwd{ifz} \ident{n} \Xthen \num{1} \Xelse
+\ident{n} \texttt{*} \ident{fact}
+\lpar\ident{n}\texttt{-}\num{1}\rpar.
+\end{center}
+Therefore, \ident{fact} is the factorial function, because it
+satisfies the defining recurrent equations.
+
+\paragraph{Local recursive binding}
+
+For additional flexibility, let us extend the syntax with a local
+recursive binding, as follows:
+\begin{itemize}
+
+  \item Concrete syntax\\
+\texttt{Expression ::= ...}\\
+\texttt{\hphantom{Expression} | "let rec" ident "=" Expression "in" Expression}
+
+  \item Abstract syntax\\
+  \Xtype \type{expr} \equal \texttt{...} \vbar \cst{LetRec} \Xof
+  \type{string} \(\times\) \type{expr} \(\times\) \type{expr}\textsf{;;}
+
+  \medskip 
+
+  \item Syntax analysis\\
+  $\src{\Xlet \; \Xrec \;
+  x \; \equal \; \meta{e}_1 \; \Xin \; \meta{e}_2}
+  = \cst{LetRec} \, \lpar x, e_1, e_2\rpar$
+
+  \medskip 
+
+  \item Free variables\\ $\mathcal{F} \src{\Xlet \;
+  \Xrec \; x \; \equal \; \meta{e}_1 \; \Xin \; \meta{e}_2}
+  = (\mathcal{F} (e_1) \cup \mathcal{F} (e_2)) \backslash \{x\}$
+
+\end{itemize}
+We can define the operational semantics of that construct in two
+ways. The first consists in not considering it as elementary (native),
+and express its semantics in terms of another construct and, in this
+instance, assuming that the operator \ident{fix} is predefined:
+\begin{mathpar}
+\inferrule*[right=let-rec]
+  {\meval
+     {\rho}
+     {\Xlet \; x \; \equal \; \ident{fix} \; \lpar\Xfun \; x \rightarrow
+      \meta{e}_1\rpar{} \; \Xin \; \meta{e}_2}
+     {v}
+  }
+  {\meval
+     {\rho}
+     {\Xlet \; \Xrec \; x \; \equal \; \meta{e}_1 \; \Xin \; \meta{e}_2}
+     {v}
+  }
+\end{mathpar}
+The second way consists in considering that construct as different
+from the others:
+\begin{mathpar}
+\inferrule*[right=let-rec]
+   {\eval{x \mapsto v_1 \oplus \rho}{e_1}{v_1}\\
+    \eval{x \mapsto v_1 \oplus \rho}{e_2}{v_2}}
+   {\meval{\rho}{\Xlet \; \Xrec \; x \; \equal \; \meta{e}_1
+    \; \Xin \; \meta{e}_2}{v_2}}
+\end{mathpar}
+The straightforward implementation of the latter rule is
+\begin{tabbing}
+ \Xlet \= \Xrec \ident{eval} \ident{env} \ident{e} \equal
+ \Xmatch \ident{e} \Xwith \texttt{...} \\ 
+ \vbar \> \cst{LetRec} \lpar\ident{x},\ident{e}$_1$,\ident{e}$_2$\rpar{}
+ $\rightarrow$\\
+ \> \quad \Xlet \Xrec \ident{env'} \equal \ident{extend} 
+ \lpar\ident{x},\ident{v}$_1$\rpar{} \ident{env}\\
+ \> \quad \Xand \ident{v}$_1$ \equal \ident{eval} \ident{env'} \ident{e}$_1$\\
+ \> \quad \Xin \ident{eval} \ident{env'} \ident{e}$_2$
+\end{tabbing}
+\noindent For technical reasons linked to the type system of \OCaml
+(the so\hyp{}called \emph{value restriction} on recursive values), we
+actually have to write:
+\begin{tabbing}
+ \Xlet \= \Xrec \ident{eval} \ident{env} \ident{e} \equal
+ \Xmatch \ident{e} \Xwith \texttt{...} \\ 
+ \vbar \> \cst{LetRec}
+ \lpar\ident{x},\ident{e}$_1$,\ident{e}$_2$\rpar{} $\rightarrow$\\
+ \> \quad \Xlet \Xrec \ident{env'} \equal \underline{\Xfun
+ \ident{x} $\rightarrow$} \ident{extend} 
+ \lpar\ident{x}, \ident{v}$_1$\underline{\lpar\rpar}\rpar{} \ident{env} \underline{\ident{x}}\\
+ \> \quad \Xand \ident{v}$_1$ \equal \underline{\Xfun \lpar\rpar{}
+ $\rightarrow$} \ident{eval} \ident{env'} \ident{e}$_1$\\
+ \> \quad \Xin \ident{eval} \ident{env'} \ident{e}$_2$
+\end{tabbing}
+A multiple \Xlet \Xrec (with \Xand) can always be reduced to
+a simple \Xlet \Xrec (with \Xin) by parameterising one of the
+definitions by the other. Let
+\begin{center}
+\Xlet \Xrec $x$ \equal $\meta{e}_1$ \Xand $y$ \equal $\meta{e}_2$ \Xin
+$\meta{e}$
+\end{center}
+where $x \neq y$. It is equivalent, by definition, to
+\begin{tabbing}
+\Xlet \= \Xrec $x$ \equal \underline{\Xfun $y$
+  $\rightarrow$} $\meta{e}_1$ \Xin\\
+\> \Xlet \Xrec $y$ \equal \underline{\Xlet $x$ \equal $x \, y$
+  \Xin} $\meta{e}_2$ \Xin\\
+\> \underline{\Xlet $x$ \equal $x \, y$}\\
+\underline{\Xin} $\meta{e}$
+\end{tabbing}
+We can then encode the simple \Xlet \Xrec with \ident{fix}, or else
+consider it as native to the interpreted language. In both cases,
+there is no need to extend the operational semantics.
+
+Nevertheless, we should think about generalising our syntactic
+equivalence to~\(n\) variables:
+\begin{center}
+\Xlet \Xrec $x_1$ \equal $\meta{e}_1$ \Xand $x_2$ \equal
+$\meta{e}_2$ \Xand~\ldots~\Xand $x_n$ \equal $\meta{e}_n$ \Xin
+$\meta{e}$
+\end{center}
+
+\paragraph{Parallel definitions}
+
+We can add to our language the construct
+\begin{center}
+\Xlet $x$ \equal $\meta{e}_1$ \Xand $y$ \equal
+$\meta{e}_2$ \Xin $\meta{e}$
+\end{center}
+where $x \neq y$. If~$x \in \mathcal{F}(e_2)$, we define it as being
+equivalent to
+\begin{tabbing}
+\underline{\Xlet} \= \underline{$z$ \equal $x$ \Xin}\\
+\> \Xlet $x$ \equal $\meta{e}_1$ \Xin\\
+\> \Xlet $y$ \equal \underline{\Xlet $x$ \equal $z$ \Xin} $\meta{e}_2$\\
+\Xin $\meta{e}$
+\end{tabbing}
+where
+$z \not\in \mathcal{F}(e_1) \cup \mathcal{F}(e_2) \cup \mathcal{F}(e)$,
+in order to avoid capture by~$e_1$, $e_2$, or~$e$. Therefore, there is
+no need to extend the operational semantics to cope with this
+construct: an equivalence between abstract syntax trees is sufficient
+to provide the meaning. Nevertheless, we should care to generalise
+that equivalence:
+\begin{center}
+\Xlet $x_1$ \equal $\meta{e}_1$ \Xand $x_1$ \equal
+$\meta{e}_2$ \Xand~\ldots~\Xand $x_n$ \equal $\meta{e}_n$
+\Xin $\meta{e}$
+\end{center}
+
+\paragraph{Occam's razor}
+
+The observation of the rules \RefTirName{let}, on the one hand, and
+\RefTirName{abs} and \RefTirName{app}, on the other hand, leads us to
+realise that the rule \RefTirName{let} can be removed without
+consequence on the expressivity of the language. More precisely, we
+will prove that the constructs \kwd{let} $x$ \equal{}
+$\meta{e}_1$ \kwd{in} $\meta{e}_2$ and \lpar\kwd{fun} $x$
+$\rightarrow$ $\meta{e}_2$\rpar{} $\meta{e}_1$ are equivalent from the
+standpoint of evaluation, that is to say, one yields a value~$v$ if
+and only if the other yields~$v$ as well.
+
+The rule \RefTirName{app} can be rewritten by swapping~$e_1$ and~$e_2$:
+\begin{mathpar}
+\inferrule
+  {\eval{\rho}{e_2}{\clos{x_0}{e_0}{\rho_0}}\\
+   \eval{\rho}{e_1}{v_1}\\
+   \eval{x_0 \mapsto v_1 \oplus \rho_0}{e_0}{v_0}
+  }
+  {\meval{\rho}{\meta{e}_2 \; \meta{e}_1}{v_0}}
+\end{mathpar}
+By substituting $\Xfun \; x \rightarrow \, \meta{e}_2$ in stead
+of~$\meta{e}_2$, we draw
+\begin{mathpar}
+\inferrule
+  {\meval{\rho}{\Xfun \; x \rightarrow \, \meta{e}_2}
+        {\clos{x_0}{e_0}{\rho_0}}\\
+   \eval{\rho}{e_1}{v_1}\\
+   \eval{x_0 \mapsto v_1 \oplus \rho_0}{e_0}{v_0}
+  }
+  {\meval
+     {\rho}
+     {\lpar\Xfun \; x \rightarrow \, \meta{e}_2\rpar{} \; \meta{e}_1}
+     {v_0}
+  }
+\end{mathpar}
+The axiom \RefTirName{abs} states
+\(\inferrule
+  {\meval{\rho}
+         {\Xfun \; x \rightarrow \meta{e}_2}
+         {\clos{x}{e_2}{\rho}}}
+  {}\),
+hence $x = x_0$, $e_2 = e_0$ and $\rho = \rho_0$, which implies, by
+substituting in the penultimate rule and renaming $v_0$ into~$v_2$:
+\begin{mathpar}
+\inferrule
+  {\meval{\rho}{\Xfun \; x \rightarrow \, \meta{e}_2}
+        {\clos{x}{e_2}{\rho}}\\
+   \eval{\rho}{e_1}{v_1}\\
+   \eval{x \mapsto v_1 \oplus \rho}{e_2}{v_2}
+  }
+  {\meval
+     {\rho}
+     {\lpar\Xfun \; x \rightarrow \, \meta{e}_2\rpar{} \; \meta{e}_1}
+     {v_2}
+  }
+\end{mathpar}
+Since an axiom is, by definition, true, we can remove it from a
+premise:
+\begin{mathpar}
+\inferrule
+  {\eval{\rho}{e_1}{v_1}\\
+   \eval{x \mapsto v_1 \oplus \rho}{e_2}{v_2}
+  }
+  {\meval
+     {\rho}
+     {\lpar\Xfun \; x \rightarrow \, \meta{e}_2\rpar{} \; \meta{e}_1}
+     {v_2}
+  }
+\end{mathpar}
+The rule \RefTirName{let} is
+\begin{mathpar}
+\inferrule*[right=let]
+  {\eval{\rho}{e_1}{v_1}\\ 
+   \eval{x \mapsto v_1 \oplus \rho}{e_2}{v_2}}
+  {\meval{\rho}{\Xlet \; x \; \equal \; \meta{e}_1 \; \Xin
+  \; \meta{e}_2}{v_2}}
+\end{mathpar}
+The premisses are the same as in the previous rule, therefore the
+conclusions are identical, which was to be demonstrated. It is thus
+possible, in theory, to do without the local bindings in our language,
+either at the level of the semantics, or the abstract syntax. (This
+situation will change when type inference will come into play later
+on.)
+
+In general, when a programming construct is found to have the same
+semantics as a combination of other constructs, it is best to retain
+that construct in the abstract syntax because this allows the lexer to
+assign physical locations to the corresponding lexemes, in view of
+possible error messages. Indeed, the other option, consisting in
+producing the abstract syntax tree of the combination at
+parse\hyp{}time, loses that information, although the semantics is
+likely simpler, like stating
+\begin{mathpar}
+\inferrule*[right=let]
+  {\meval
+     {\rho}
+     {\lpar\Xfun \; x \rightarrow \, \meta{e}_2\rpar{} \; \meta{e}_1}
+     {v_2}
+  }
+  {\meval{\rho}{\Xlet \; x \; \equal \; \meta{e}_1 \; \Xin
+  \; \meta{e}_2}{v_2}
+  }
+\end{mathpar}
+
+\mypar{Imperative programming}
+
+Until now, variables were actually constants: once assigned, their
+value remain unchanged during the course of evaluation. In this
+section, we are going to show how we can model variables whose values
+do really vary over time, that is, they \emph{mutate}. The programming
+style based on the use of such variables is called \emph{imperative},
+or \emph{effectful}.
+
+Even though, for the sake of the presentation, we wish to have all
+variable become mutable, we nevertheless would like to be able to
+distinguish at the level of the concrete syntax their mutations by
+means of assignments. For example \Xlet \ident{x} \equal \num{1} \Xin
+\Xlet \ident{y} \equal \lpar\ident{x} \assign \ident{x} \texttt{+}
+\num{2}\rpar{} \Xin \ident{x} is evaluated into \cst{Int} \num{3}, and
+\ident{x} \assign \ident{x} \texttt{+} \num{2} is an assignment.
+
+\paragraph{A functional model for mutable variables}
+
+In order to model mutable variables in a purely functional setting, we
+have to introduce the new concepts of \emph{address} and \emph{store}
+(or \emph{memory}). An address is an element of a numerable,
+infinite set --~very much like variables. A store~$\sigma$ binds
+addresses~$a$ to values~$v$. An environment~$\rho$ has to be redefined
+now to bind a variable~$x$ to its address~$a$, and not to its value
+directly as before. This is how we can hide a binding by another in
+the store without changing the environment, which effectfully models
+assignments in a functional manner. Therefore, we do not need a native
+notion for assignment in the semantics: as far as the interpreter is
+concerned, if it is itself written in a functional language, that
+language can remain pure.
+
+Next, we either introduce the notion of \emph{instruction}, as found
+in programming languages like~\Clang and \Java, or we extend the
+expressions, as does \OCaml. In the latter case, we need to add a
+special value which is the result of the evaluation of an assignment:
+the value \cst{Unit}. For instance, \ident{x} \assign \num{2} is
+evaluated into \cst{Unit}.
+
+For the sake of generality and simplicity, it is good to also add an
+expression which is evaluated immediately into \cst{Unit}. We will
+note it \lpar\rpar, after the convention in \OCaml, like
+\Xlet \ident{f} \equal \Xfun \ident{x} $\rightarrow$ \num{1}
+\Xin \ident{f} \lpar\rpar. Note that we must distinguish the
+value \cst{Unit} and the corresponding expression, which we will
+denote by \cst{U} in the abstract syntax.
+\begin{itemize}
+
+  \item Concrete syntax\\
+\texttt{Expression ::= ... | ident ":=" Expression | ()}
+
+  \item Abstract syntax\\
+     \Xtype \type{expr} \equal \texttt{...} \vbar \cst{Assign} \Xof
+    \type{string} \(\times\) \type{expr} \vbar \cst{U}\textsf{;;}{} 
+
+  \item Syntax analysis\\
+  $\src{x \; \assign \; \meta{e}} = \cst{Assign} \, \lpar{x},
+  e\rpar$, and $\src{\unit} = \cst{U}$.
+
+  \item Free variables\\
+  $\mathcal{F} \src{x \; \assign \; \meta{e}} = \{x\} \cup \mathcal{F}(e)$,
+  and $\mathcal{F}\src{\lpar\rpar} = \varnothing$.
+
+  \item Operational semantics
+
+  We need to revisit our judgement and inference rules and have
+  instead $\ieval{\rho}{\sigma}{e}{v}{\sigma'}$, meaning: `Given the
+  context made of the environment~$\rho$ and the store~$\sigma$, the
+  evaluation of~$e$ yields the value~$v$ and a new store~$\sigma'$.'
+
+\end{itemize}
+First, here are the simpler inference rules (to contrast with 
+\RefTirName{var} above):
+\begin{mathpar}
+\inferrule
+  {}
+  {\ieval{\rho}{\sigma}{\src{\lpar\rpar}}{\cst{Unit}}{\sigma}}
+  {}\;\,\TirName{unit}
+\and
+\inferrule
+  {x \in \dom{\rho}\\
+   \rho(x) \in \dom{\sigma}}
+  {\ieval{\rho}{\sigma}{\src{x}}{\sigma \circ \rho (x)}{\sigma}}
+  {}\;\TirName{var}
+\end{mathpar}
+In order to access the content of a variable, we thus have to go
+through the environment and the store, and that is why we must make
+sure that $x \in \dom{\rho}$ and $\rho(x) \in \dom{\sigma}$. Our new
+judgement $\ieval{\rho}{\sigma}{e}{v}{\sigma'}$ must satisfy the
+following property:
+\begin{center}
+\sl if $\codom{\rho} \subseteq \dom{\sigma}$, then
+$\dom{\sigma} \subseteq \dom{\sigma'}$,
+\end{center}
+that is to say, the evaluation may hide a binding by another in the
+store, or add a new binding, but cannot retract any --~it is
+monotonic. Again, in other words, when the evaluation is over,
+variables still have an associated value, potentially different from
+their initial value.
+
+\paragraph{Proof by induction on the length of the derivations}
+
+The operational semantics enables a kind of proof called `by induction
+on the length of the derivation (or the height of the proof
+trees)'. By \emph{derivation}, we either mean a proof tree which is
+isomorphic to a list, or a subtree of the proof tree, in which case
+the proper measure would be the height. The sketch of this technique
+is as follows. First, the property to establish is checked on the
+axioms (derivation of length~\(1\)). Second, we assume that the
+property is true for all the derivations of length~\(n-1\), and we
+prove that all the derivations of length~\(n\) by examining all
+available rules, and imagining that they are the roots of a proof of
+length~\(n\). By the induction hypothesis, the premisses satisfy the
+property, because their derivation has a length strictly lower
+than~\(n\).
+
+Let us try an example by considering the following property:
+\begin{center}
+\sl If $\ieval{\rho}{\sigma}{e}{v}{\sigma'}$ and $\codom{\rho} \subseteq
+ \dom{\sigma}$, then $\dom{\sigma} \subseteq \dom{\sigma'}$.
+\end{center}
+It is clearly satisfied by all the axioms. Assignments hide the
+binding of a variable in the store:
+\begin{mathpar}
+\inferrule*[right=assign]
+  {\ieval{\rho}{\sigma}
+         {e}
+         {v}{\sigma'}\\
+   x \in \dom{\rho}\\
+   \rho(x) \in \dom{\sigma'}
+  }
+  {\ieval{\rho}{\sigma}
+         {\src{x \; \assign \; \meta{e}}}
+         {\cst{Unit}}{(\rho(x) \mapsto v \oplus \sigma')}
+  }
+\end{mathpar}
+That rule satisfies the property at hand. Indeed, by the induction
+hypothesis (on the length of the derivation), the first premisse
+implies that, if $\codom{\rho} \subseteq \dom{\sigma}$, then
+$\dom{\sigma} \subseteq \dom{\sigma'}$. The third premisse then
+implies $\dom{\rho(x) \mapsto v \oplus \sigma'} = \dom{\sigma'}$, thus
+$\dom{\sigma} \subseteq \dom{(\rho(x) \mapsto v \oplus \sigma')}$. We
+need~$\sigma$ because it may be the case that the evaluation of~$e$
+hides bindings of~\(\sigma\) other than~\(\rho \mapsto v\), and we
+must consider these possible occlusions. For instance,
+\begin{center}
+\Xlet \ident{x} \equal \num{1} \Xin \Xlet \ident{y} \equal \num{2}
+\Xin \Xlet \ident{z} \equal \lpar\ident{x} \assign \lpar\ident{y} \assign
+\num{3}\rpar\!\rpar{} \Xin \ident{y}
+\end{center}
+is evaluated into \cst{Int} \num{3}.
+
+The rule \RefTirName{let} introduces a new binding in the environment
+and the store, which obeys the invariant above:
+\begin{mathpar}
+\inferrule*[right=let]
+  {\ieval{\rho}{\sigma}{e_1}{v_1}{\sigma_1}\\
+   a \not\in \dom{\sigma_1}\\\\
+   \ieval{(x \mapsto a \oplus \rho)}{(a \mapsto v_1 \oplus \sigma_1)}
+         {e_2}
+         {v_2}{\sigma_2}
+  }
+  {\ieval{\rho}{\sigma}{\src{\Xlet \,\ x \; \equal \; \meta{e}_1
+  \; \Xin \; \meta{e}_2}}{v_2}{\sigma_2}}
+\end{mathpar}
+Indeed, if $\codom{\rho} \subseteq \dom{\sigma}$, then, by the
+induction hypothesis (on the length of the derivation of the first
+premisse), we have $\dom{\sigma} \subseteq \dom{\sigma_1}$, thus, by
+transitivity, $\codom{\rho} \subseteq \dom{\sigma_1}$, whence
+$\codom{(x \mapsto a \oplus \rho)} \subseteq \dom{(a \mapsto v_1
+  \oplus \sigma_1)}$. From the induction hypothesis on the third
+premisse, this entails that $\dom{(a \mapsto v_1 \oplus \sigma_1)}
+\subseteq \dom{\sigma_2}$. But $a \not\in \dom{\sigma_1}$ implies
+$\dom{\sigma_1} \subset \dom{(a \mapsto v_1 \oplus \sigma_1)}$,
+therefore $\dom{\sigma} \subset \dom{\sigma_2}$. In particular, there
+is no equality.
+
+\paragraph{Garbage collection}
+
+When we introduced the environments in the semantics, we saw that
+local bindings could mask other bindings. With the addition of stores,
+we realise that local bindings can hide and add bindings in the store
+which are not accessible from the environment. In both cases, bindings
+in the environment or the store become definitively inaccessible,
+therefore the space the corresponding value occupy in the memory of
+the computer is lost for the rest of the evaluation. That is why the
+compilers of certain programming languages, like \OCaml, \Java
+and \Ada, generate a code that dynamically performs an accessibility
+analysis on the data, and it devolves back to the underlying process
+the space used by the inaccessible cells: this is the \emph{garbage
+collector}.
+
+\paragraph{Order of evaluation}
+
+We need to fix the order of evaluation of the arithmetic operands in
+the semantics in order to keep track, in the store, of the effects of
+the assignments which may have taken place during the evaluation of
+the operands:
+\begin{mathpar}
+\inferrule
+  {\ieval{\rho}{\sigma}{\src{\meta{n}}}{\dot{n}}{\sigma}}
+  {}\;\,\TirName{const}
+\and
+\inferrule
+  {\ieval{\rho}{\sigma}{e_1}{v_1}{\sigma_1}\\ 
+   \ieval{\rho}{\sigma_1}{e_2}{v_2}{\sigma_2}}
+  {\ieval{\rho}{\sigma}{\src{\meta{e}_1 \, \texttt{+} \, \meta{e}_2}}
+         {v_1 + v_2}{\sigma_2}}
+  {}\;\,\TirName{add}
+\end{mathpar}
+(The other arithmetic rules would follow the same schema.) It is
+nevertheless always possible that the documentation of the compiler
+states that the order is left unspecified, leaving room for the
+compiler's implementors to modify the order as they see fit, for
+example to perform some platform\hyp{}dependent optimisations.
+
+The semantics with mutation for the abstraction and the application is
+as follows:
+\begin{mathpar}
+\inferrule*[right=\;\, abs]
+  {\ieval{\rho}{\sigma}
+         {\src{\Xfun \; x \rightarrow \meta{e}}}
+         {\clos{x}{e}{\rho}}{\sigma}}
+  {}
+\and
+\inferrule*[right=app]
+  {\ieval{\rho}{\sigma}{e_1}{\clos{x_0}{e_0}{\rho_0}}{\sigma_1}\\
+   \ieval{\rho}{\sigma_1}{e_2}{v_2}{\sigma_2}\\
+   a \not\in \dom{\sigma_2}\\
+   \ieval{(x_0 \mapsto a \oplus \rho_0)}{(a \mapsto v_2 \oplus \sigma_2)}
+         {e_0}
+         {v_0}{\sigma_3}
+  }
+  {\ieval{\rho}{\sigma}{\src{\meta{e}_1 \; \meta{e}_2}}{v_0}{\sigma_3}}
+\end{mathpar}
+In comparison with the semantics without mutation, the order of
+evaluation is here fixed in the semantics: \(e_1\)~is evaluated
+before~\(e_2\), in order to check first that~\(e_1\) is indeed
+evaluated into a closure (if not, we save time by signalling an error
+as early as possible). Furthermore, the fact that $a \not\in
+\codom{\rho}$ allows us to forget the assignments on the parameter,
+for example, \Xlet \ident{f} \equal \Xfun \ident{x} $\rightarrow$
+\ident{x} \assign \ident{x} \texttt{+} \num{1} \Xin \ident{f} \num{3}.
+
+The semantics with mutation of the native recursive expressions is as follows.
+\begin{mathpar}
+\inferrule*[right=let-rec]
+  {a \not\in \dom{\sigma}\\\\
+   \ieval
+     {(x \mapsto a \oplus \rho)}
+     {(a \mapsto v_1 \oplus \sigma)}
+     {e_1}{v_1}{\sigma_1}\\
+   \ieval
+     {(x \mapsto a \oplus \rho)}
+     {\sigma_1}
+     {e_2}{v_2}{\sigma_2}
+  }
+  {\ieval{\rho}{\sigma}{\src{\Xlet \; \Xrec \; x \; \equal \;
+     \meta{e}_1 \; \Xin \; \meta{e}_2}}{v_2}{\sigma_2}
+  }
+\end{mathpar}
+
+\paragraph{Sequences and general iterators}
+
+We can now add to our language the sequence construct, and a general
+iterator. 
+\begin{itemize}
+
+  \item Concrete syntax\\
+\texttt{Expression ::= ...}\\
+\texttt{\hphantom{Expression} | Expression ";" Expression}\\
+\texttt{\hphantom{Expression} | "while" Expression "do" Expression "done"}
+
+  \item Abstract syntax\\
+     \Xtype \type{expr} \equal \texttt{...} \vbar{} \cst{Seq}
+     \Xof \type{expr} \(\times\) \type{expr} 
+     \vbar{} \cst{While} \Xof \type{expr} \(\times\)
+     \type{expr}\textsf{;;}{}
+
+  \item Syntax analysis\\ $\src{\meta{e}_1\!\texttt{;} \meta{e}_2} =
+    \cst{Seq} \, \lpar e_1, e_2\rpar$, and $\src{\Xwhile \; \meta{e}_1
+      \; \Xdo \; \meta{e}_2 \; \Xdone} = \cst{While} \, \lpar e_1,
+    e_2\rpar$.
+
+  \item Free variables\\
+    $\mathcal{F} \src{\meta{e}_1\!\texttt{;} \meta{e}_2}
+    = \mathcal{F}(e_1) \cup \mathcal{F}(e_2)$, and\\
+    $\mathcal{F} \src{\Xwhile \; \meta{e}_1 \; \Xdo \; \meta{e}_2 \; \Xdone}
+    = \mathcal{F}(e_1) \cup \mathcal{F}(e_2)$.
+
+\end{itemize}
+The operational semantics is as follows:
+\begin{mathpar}
+\inferrule*[right=seq]
+  {x \not\in \mathcal{F} (e_2)\\
+   \meval
+     {\rho}
+     {\Xlet \; x \; \equal \; \meta{e}_1 \; \Xin \; \meta{e}_2}
+     {v}
+  } 
+  {\meval{\rho}{\meta{e}_1\!\texttt{;} \meta{e}_2}{v}}
+\and
+\inferrule[while]
+  {f,p \not\in \mathcal{F} (e_2)\\
+   x \not\in \mathcal{F} (e_1)\\
+   \meval
+     {\rho} 
+     {\small \Xlet \; \Xrec \; f \; \equal \; \Xfun \; p \rightarrow \Xif \; p
+      \lpar\rpar \; \Xthen \; \meta{e}_2\!\texttt{;} f \, p \; \Xelse \;
+      \lpar\rpar \; \Xin \; f \lpar\Xfun \; x \rightarrow \meta{e}_1\rpar}
+     {v}
+  }
+  {\meval
+     {\rho}
+     {\Xwhile \; \meta{e}_1 \; \Xdo \; \meta{e}_2 \; \Xdone}
+     {v}
+  }
+\end{mathpar}
+Let us remark that the value~\(v\) is actually always \lpar\rpar{} in
+the rule \RefTirName{while}. Moreover, if we added Boolean comparisons
+over integers, we could write
+\begin{center}
+\Xlet \ident{x} \equal \num{0} \Xin
+\lpar\Xwhile \ident{x} \texttt{<} \num{10} \Xdo \ident{x} \assign \ident{x}
+\texttt{+} \num{1} \Xdone \texttt{;} \ident{x}\rpar
+\end{center}
+
+\paragraph{Implementation of the semantics with mutation}
+
+To implement our new semantics, the first choice to commit is that of
+the \OCaml data type for addresses. Even though \OCaml integers can
+overflow, we will use them for implementing addresses. The next point
+to make is about the rules where we must chose an address which is
+free in the store, formally $a \not\in \dom{\sigma}$. A solution
+consists to create each time an address which is absolutely unique,
+for instance, it may be a strictly increasing integer. We should then
+thread an additional argument, representing that counter, through our
+evaluation function \ident{eval}, and, every time we need a new
+address, we would increment that argument and pass along further its
+value plus one. The polymorphic functions operating over the
+environments (\ident{extend}, for adding a binding, and
+\ident{lookup}, for seeking a binding), can also be used on stores.

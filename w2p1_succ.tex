@@ -1,0 +1,25 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath}
+
+\input{commands}
+
+\begin{document}
+
+\TeXtoEPS
+%\psset{showbbox=true}
+\pstree[nodesepA=1pt,nodesepB=0pt,levelsep=25pt,treesep=6pt,arrows=<-]{\TR{\(\sum_{j=q}^{r}{2^{e_{j}}}+2^{q}\,\boxed{-1}\)}}{
+  \TR{\(\OW{\fun{bms}}{2^{e_r}}\)}
+  \psset{linestyle=dotted}
+  \pstree[linestyle=solid]{\TR{\(2^{e_q}+2^{q}\,\boxed{-1}\)}}{
+    \TR{\(\OW{\fun{bms}}{2^{e_{q}}}\)}
+    \Tn
+    \TR{\(\boxed{\OW{\fun{bms}}{2^{q}}}\)}
+  }
+}
+\endTeXtoEPS
+
+\end{document}

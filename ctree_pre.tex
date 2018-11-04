@@ -1,0 +1,21 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[nodesep=2pt,levelsep=17pt,treesep=13pt]{\TR{\(1\)}}{
+  \TR{\(2\)}
+  \TR{\(3\)}
+  \pstree{\TR{\(4\)}}{
+    \pstree{\TR{\(5\)}}{\TR{\(6\)}}
+    \TR{\(7\)}
+  }
+}
+\endTeXtoEPS
+
+\end{document}

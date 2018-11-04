@@ -1,0 +1,85 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pst-tree,pst-eps}
+\usepackage{amsmath,amssymb}
+
+\input{commands}
+
+\newcommand\ghostnode{\TR{\phantom{\texttt{[]}}}}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[arrows=->,nodesep=0pt,levelsep=20pt,treesep=14pt]{\TR{\fbox{\fun{sum}}}}{
+  \ghostnode
+}
+%%
+\hspace*{1pt}\raisebox{-3pt}{\(\stackrel{\beta}{\dashrightarrow}\)}
+\hspace*{-3pt}
+%%
+\pstree[arrows=->,nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\fun{sum}}}{
+  \ghostnode
+}
+\hspace*{-14pt}
+\pstree[nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\(+\)}}{
+  {\psset{arrows=->}\ghostnode}
+  \psset{nodesepB=0pt,levelsep=20pt}
+  \pstree[arrows=->,nodesepA=0pt]{\TR{\fbox{\fun{sum}}}}{
+    \ghostnode
+  }
+}
+%%
+\hspace*{-22pt}
+\raisebox{-3pt}{\(\stackrel{\beta}{\dashrightarrow}\)}
+\hspace*{1pt}
+%%
+\pstree[arrows=->,nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\fun{sum}}}{
+  \ghostnode
+}
+\hspace*{-11pt}
+\pstree[nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\(+\)}}{
+  {\psset{arrows=->}\ghostnode}
+  \pstree[arrows=->]{\TR{\fun{sum}}}{
+    \ghostnode
+  }
+}
+\hspace*{-15pt}
+\pstree[nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\(+\)}}{
+  {\psset{arrows=->}\ghostnode}
+  \psset{nodesepB=0pt,levelsep=20pt}
+  \pstree[arrows=->,nodesepA=0pt]{\TR{\fbox{\fun{sum}}}}{
+    \ghostnode
+  }
+}
+%%
+\hspace*{-22pt}
+\raisebox{-3pt}{\(\stackrel{\alpha}{\dashrightarrow}\)}
+\hspace*{0pt}
+%%
+\pstree[arrows=->,nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\fun{sum}}}{
+  \ghostnode
+}
+\hspace*{-12pt}
+\pstree[nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\(+\)}}{
+  {\psset{arrows=->}\ghostnode}
+  \pstree[arrows=->]{\TR{\fun{sum}}}{
+    \ghostnode
+  }
+}
+\hspace*{-15pt}
+\pstree[nodesep=2pt,levelsep=20pt,treesep=14pt]{\TR{\(+\)}}{
+  {\psset{arrows=->}\ghostnode}
+  \pstree[arrows=->]{\TR{\fun{sum}}}{
+    \ghostnode
+  }
+}
+\hspace{-10pt}
+\pstree[arrows=->,nodesepA=-1pt,nodesepB=2pt,levelsep=20pt,treesep=14pt]{\TR{\(\circ\)}}{
+  \ghostnode
+}
+\endTeXtoEPS
+
+\end{document}

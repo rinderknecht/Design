@@ -1,0 +1,37 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-tree,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\pstree[levelsep=17pt,treesep=14pt,nodesepA=2pt,nodesepB=1pt]%
+  {\TR{\({}^{0}{8}\)}}{
+  \pstree{\TR{\({}^{1}{1}\)}}{
+    \pstree[nodesepB=0pt,treesep=20pt]{\TR{\({}^{2}{3}\)}}{
+      \Tf[framesize=6pt]
+      \psset{nodesepB=1pt}
+      \pstree[nodesepB=0pt,treesep=14pt]{\TR{\({}^{3}{5}\)}}{
+        \Tf[framesize=6pt]
+        \Tf[framesize=6pt]
+      }
+    }
+    \pstree[nodesepB=0pt]{\TR{\({}^{4}{9}\)}}{
+      \Tf[framesize=6pt]
+      \Tf[framesize=6pt]
+    }
+  }
+  \pstree[nodesepB=0pt,treesep=20pt]{\TR{\({}^{5}{3}\)}}{
+    \Tf[framesize=6pt]
+    \psset{nodesepB=1pt}
+    \pstree[nodesepB=0pt,treesep=14pt]{\TR{\({}^{6}{2}\)}}{
+      \Tf[framesize=6pt]
+      \Tf[framesize=6pt]
+    }
+  }
+}
+\endTeXtoEPS
+
+\end{document}

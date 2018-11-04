@@ -1,0 +1,33 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc} % Needed for Luximono
+\usepackage{pst-eps}
+\usepackage{booktabs}
+\usepackage{amsmath,bbold}
+\usepackage[scaled=0.8]{beramono}
+
+\newcommand\bold[1]{\texttt{\textbf{#1}}}
+\newcommand\floor[1]{\lfloor{#1}\rfloor}
+
+\begin{document}
+
+\TeXtoEPS
+\(
+\begin{array}{@{}crc@{\;}c@{\;}c@{\;}c@{\;}c@{\;}c@{}}
+\toprule
+ k & \floor{n/2^k} & \multicolumn{5}{c}{\text{Bits}}% of \(\floor{n/2^k}\)}} 
+   & \sum_{i=0}^k\floor{n/2^i}\\
+\midrule
+0 & 22 & \boldsymbol{1} &        0 & \mathbb{1} & \boldsymbol{1} & 0 & 22\\
+1 & 11 &        0 & \boldsymbol{1} &          0 & \mathbb{1} & \boldsymbol{1} & 33\\
+2 &  5 &        0 &        0 &   \boldsymbol{1} & 0 & \mathbb{1} & 38\\
+3 &  2 &        0 &        0 &          0 & \boldsymbol{1} & 0 & 40\\
+4 &  1 &        0 &        0 &          0 & 0 & \boldsymbol{1} & 41\\
+\bottomrule
+\end{array}
+\)
+\endTeXtoEPS
+
+\end{document}

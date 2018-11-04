@@ -1,0 +1,27 @@
+%%-*-latex-*-
+
+\documentclass{article}
+
+\usepackage{vaucanson-g}
+\usepackage{pst-eps}
+
+%\ShowGrid
+ 
+\begin{document}
+
+\TeXtoEPS
+\VCDraw{%
+\begin{VCPicture}{(0,0)(3,0)}
+% States
+\State[i]{(0,0)}{i}
+\FinalState[f]{(3,0)}{f}
+% State annotations
+% Initial and final states
+\Initial{i}
+% Edges
+\EdgeL{i}{f}{\epsilon}
+\end{VCPicture}
+}
+\endTeXtoEPS
+
+\end{document}

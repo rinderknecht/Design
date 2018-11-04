@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cookbook author="Salvatore Mangano">
+  <title>XSLT Cookbook</title>
+  <chapter>XPath</chapter>
+  <chapter>Selecting and Traversing</chapter>
+  <chapter>XML to Text</chapter>
+  <chapter>XML to XML</chapter>
+  <chapter>XML to HTML</chapter>
+</cookbook>

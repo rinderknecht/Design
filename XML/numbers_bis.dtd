@@ -1,0 +1,3 @@
+<!ELEMENT numbers (num*)>
+<!ELEMENT num EMPTY>
+<!ATTLIST num val NMTOKEN #REQUIRED>

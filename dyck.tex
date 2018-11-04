@@ -1,0 +1,17 @@
+%%-*-latex-*-
+
+\documentclass[11pt]{article}
+
+\usepackage{pst-plot,pst-eps}
+
+\begin{document}
+
+\TeXtoEPS
+\begin{pspicture}[showgrid=false](0,0)(3,3)
+\psgrid[griddots=0,gridwidth=0.1pt,subgriddiv=2,gridlabels=0]
+\psline[linewidth=0.5pt](0,0)(3,3)
+\psline[linewidth=1.2pt](0,0)(0,0.5)(0.5,0.5)(0.5,1)(1,1)(1,2.5)(2,2.5)(2,3)(3,3)
+\end{pspicture}
+\endTeXtoEPS
+
+\end{document}
