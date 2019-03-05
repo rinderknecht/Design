@@ -43,7 +43,7 @@ us to wonder whether all strings have a normal form; if so, if it is
 unique and, furthermore, if it is either all\hyp{}white or
 black\hyp{}only.
 
-First, let us note that the system is  
+First, let us note that the system is
 \emph{terminating}\index{termination}, that is, there is no infinite
 chain of rewrites, because the number of beads strictly decreases in
 all the rules, although this is not a necessary condition in general,
@@ -81,12 +81,14 @@ strings because they overlap. For instance, \(\circ \, \circ
 \xrightarrow{\smash{\alpha}} \bullet \, \bullet\). The important point
 is that \(\circ \, \circ\) and \(\bullet \, \bullet\) can be rewritten
 into~\(\circ\) at the next step by \(\delta\)~and~\(\gamma\),
-respectively. In general, what matters is that all pairs of strings
-resulting from the application of overlapping rules, called
-\emph{critical pairs}\index{rewrite system!critical pair}, can be
-rewritten to the same string, to wit, they are \emph{joinable}. In our
-example, all interactions occur on substrings made of three beads, so
-we must examine in \fig~\vref{fig:bullets}
+respectively.
+
+In general, what matters is that all pairs of strings resulting from
+the application of overlapping rules, called \emph{critical
+  pairs}\index{rewrite system!critical pair}, can be rewritten to the
+same string, to wit, they are \emph{joinable}. In our example, all
+interactions occur on substrings made of three beads, so we must
+examine in \fig~\vref{fig:bullets}
 \begin{figure}[b]
 \centering
 \includegraphics{bullets}
@@ -95,17 +97,19 @@ we must examine in \fig~\vref{fig:bullets}
 eight cases, which we can order as if counting in binary from
 \(0\)~to~\(7\), (\(\circ\))~being interpreted as~\(0\) and
 (\(\bullet\))~as~\(1\). In all the cases, the divergences are joinable
-in one step at most. In general, it is not necessary for critical
-pairs to be joinable in one rewrite just after the divergence, but,
-more generally, to be joinable. This property is called \emph{local
+in one step at most.
+
+In general, it is not necessary for critical pairs to be joinable in
+one rewrite just after the divergence, but, more generally, to be
+joinable. This property is called \emph{local
   confluence}\index{rewrite system!confluence!local $\sim$}. Together
-with termination it implies that \emph{every} string has exactly one
-normal form (a strong property entailing confluence).
+with termination, it implies that \emph{every} string has exactly one
+normal form, which is a strong property entailing confluence.
 
 The system we defined is \emph{ground}\index{rewrite system!ground
-  $\sim$}, that is, it involves no variables. These allow a finite
+  $\sim$}, that is, it involves no variables. Variables allow a finite
 system to denote an infinite number of ground rules or, simply, to
-reduce the size of rewrite systems, for instance, the previous example
+reduce the size of rewrite systems. For instance, the previous example
 is equivalent to
 \begin{equation*}
 \bullet \; \circ \xrightarrow{\smash{\alpha}} \bullet
@@ -117,14 +121,14 @@ is equivalent to
 If we accept multiple occurrences of a variable on the left\hyp{}hand
 side of a rule, a so\hyp{}called \emph{non left\hyp{}linear
   rule}\index{rewrite system!linear $\sim$}, we can further decrease
-the size of the system:
+the size of the system as follows:
 \begin{equation*}
 x  \; x \xrightarrow{\smash{\gamma+\delta}} \circ\qquad\qquad
 x  \; y \xrightarrow{\smash{\alpha+\beta}} \bullet
 \end{equation*}
-Notice that there is now an implicit order over the rules: the rule
-\(\gamma+\delta\) must be examined first for a \emph{match} with a
-part of the current string, because it is included in the second (set
+Notice that there is now an \emph{implicit order over the rules}: the
+rule \(\gamma+\delta\) must be examined first for a match with a part
+of the current string, because it is included in the second (set
 \(x=y\) in \(\alpha+\beta\)). In general, the order in which the rules
 are written on the page is their logical order. Moreover, let us
 remark that the system does not specify that \(x\)~must either
@@ -174,20 +178,20 @@ factorial\index{factorial} coincides with the transitive closure of
 \((\rightarrow)\), namely, \(n \twoheadrightarrow n!\). Let
 \((\xrightarrow{\smash{*}})\) be the reflexive\hyp{}transitive closure
 of \((\rightarrow)\), that is, \((\xrightarrow{\smash{*}}) := (=) \cup
-(\twoheadrightarrow)\). 
+(\twoheadrightarrow)\).
 
-A confluent system defines a \emph{function} and it is then convenient
-to name it; for example, \(\fun{c}(1, \fun{d}(n))\)~is a term
-constructed with \emph{function names} \fun{c}~and~\fun{d}, as well as
-variable~\(n\). A tuple tagged with a function name, like
+A confluent system defines a \emph{partial function}, and it is then
+convenient to name it; for example, \(\fun{c}(1, \fun{d}(n))\)~is a
+term constructed with \emph{function names} \fun{c}~and~\fun{d}, as
+well as variable~\(n\). A tuple tagged with a function name, like
 \(\fun{f}(x,y)\), is called a \emph{function call}. The components of
 the tuples are then called \emph{arguments}, for example
 \(\fun{d}(n)\) is the second argument of the call \(\fun{c}(1,
 \fun{d}(n))\). It is possible for a function call to hold no
-arguments, like \(\fun{d}()\). We restrict the left\hyp{}hand sides of
-rules to be function calls.
+arguments, like \(\fun{d}()\). For a given system, we restrict the
+left\hyp{}hand sides of rules to be calls to the same function.
 
-\section{Trees for depicting terms}\index{term|see{tree}} 
+\section{Trees for depicting terms}\index{term|see{tree}}
 \label{def:tree}
 
 % Wrapping figure better declared before a paragraph
@@ -197,7 +201,7 @@ rules to be function calls.
 % {r} mandatory right placement
 % [0pt] of margin overhang
 \centering
-\includegraphics[bb=71 645 192 710]{tree_for_term}% [...720]
+\includegraphics[bb=65 645 192 710]{tree_for_term}% [...720]
 \caption{Shape of a tree\label{fig:tree_for_term}}
 \end{wrapfigure}
 The topological understanding of a function call or a tuple is the
@@ -239,15 +243,16 @@ invisible function name represented by a node with a period
 are its children. For example, the tree in \fig~\vref{fig:tree} has
 root~\fun{f} and leaves~\(0\), \(x\), \(1\) and~\(y\). Note how
 variables \(x\)~and~\(y\) are set in italics to differentiate them
-from function names \fun{x}~and~\fun{y}, set in sans\hyp{}serif. For
-example \(\fun{d}((), \fun{e}([1]))\) can be interpreted as a tree of
-root~\fun{d} and whose first immediate subtree is the representation
-of the empty tuple \(()\) and second immediate subtree corresponds to
-\(\fun{e}([1])\). \Fig~\ref{fig:tree} represents the tree
-corresponding to \(\fun{f}((\fun{g}(0),(x,1)),(),\fun{g}(y))\). Note
-that tuples, except the empty tuple, are not represented in the tree,
-since they encode the structure, which is already visible. The number
-of arguments of a function is called \emph{arity}\index{functional
+from function names \fun{x}~and~\fun{y}, set in
+\textsf{sans\hyp{}serif}. For example \(\fun{d}((), \fun{e}([1]))\)
+can be interpreted as a tree of root~\fun{d} and whose first immediate
+subtree is the representation of the empty tuple \(()\) and second
+immediate subtree corresponds to \(\fun{e}([1])\). \Fig~\ref{fig:tree}
+represents the tree corresponding to
+\(\fun{f}((\fun{g}(0),(x,1)),(),\fun{g}(y))\). Note that tuples,
+except the empty tuple, are not represented in the tree, since they
+encode the structure, which is already visible. The number of
+arguments of a function is called \emph{arity}\index{functional
   language!arity}. Functions with the same name but different arities
 are permitted; for instance, we could have both \(\fun{c}(\fun{a}())\)
 and \(\fun{c}(\fun{a}(x),0)\). This is called
@@ -258,18 +263,18 @@ indicated after a slash, for example \fun{c/1} and \fun{c/2}.
 \section{Purely functional languages}
 \label{sec:functional}
 
-We only want to consider confluent systems because they define
+We only want to consider confluent systems because they define partial
 functions. This property can be trivially enforced by setting an order
 on the rules, as we did in previous examples. Another restriction we
 impose is for normal forms to be \emph{values}\index{functional
   language!value}, to wit, they do not contain any function call which
 can be further reduced. These two constraints define a \emph{purely
-  functional
-  language} \citep{Hughes_1989,Hinsen_2009}\index{functional
-  language}. Notice that we do not require by construction that a
-system terminates, although that is a desirable property. Not doing so
-enables more expressivity, at the expense of some more caution, as we
-shall soon realise.
+  functional language}
+\citep{Hughes_1989,Hinsen_2009}\index{functional language}. Notice
+that we do not require by construction that a system terminates,
+although that is a desirable property. Not doing so enables more
+expressivity, at the expense of some more work to prove termination
+case by case.
 
 We would like to further constrain the computation of function calls
 by imposing that arguments are rewritten before the call is. This
@@ -278,7 +283,7 @@ strategy is named \emph{call\hyp{}by\hyp{}value}\index{functional
 enables otherwise terminating programs to not terminate. For instance,
 let us consider
 \begin{equation*}
-\fun{f}(x) \xrightarrow{\smash{\alpha}} 0.\qquad 
+\fun{f}(x) \xrightarrow{\smash{\alpha}} 0.\qquad
 \fun{g}() \xrightarrow{\smash{\beta}} \fun{g}().
 \end{equation*}
 We have \(\fun{f}(\fun{g}()) \xrightarrow{\smash{\alpha}} 0\) but
@@ -355,7 +360,7 @@ It defines the function \fun{cat/2}\index{cat@\fun{cat/2}|)} that
 catenates \index{stack!catenation} two \emph{stacks}. Functions
 \fun{nil/0} and \fun{cons/2} are \emph{data
   constructors}\index{functional language!data constructor}, that is,
-functions that are \emph{not} defined by the system: their irreducible
+functions that are \emph{not} defined by any system: their irreducible
 calls model data, so they are values and are allowed in patterns. The
 function call \(\fun{nil}()\) denotes the empty stack and
 \(\fun{cons}(x,s)\) is the stack obtained by putting the item~\(x\) on
@@ -363,8 +368,10 @@ top of the stack~\(s\), an action commonly referred as
 \textsl{pushing~\(x\) on~\(s\)}. A non\hyp{}empty stack can be thought
 of as a finite series of items that can only be accessed sequentially
 from the top, as suggested by the analogy with a stack of material
-objects. Let~\(T\) be the set of all possible terms and \(S \subseteq
-T\) be the set of all stacks. Formally, \(S\)~can by defined by
+objects.
+
+Let~\(T\) be the set of all possible terms and \(S \subseteq T\) be
+the set of all stacks. Formally, \(S\)~can by defined by
 \emph{induction}\index{induction!definition by
   $\sim$}\index{stack!inductive definition}\index{inductive
   definition|see{induction}} as the smallest set~\(\mathcal{S}\) such
@@ -384,18 +391,30 @@ rewrites never end, but because the normal form\index{rewrite
   system!normal form} is not a value. In operational terms, the
 interpreter fails to rewrite the call for some arguments.
 
-Let us set the abbreviations \(\el :=
-\fun{nil}()\)\index{nil@\fun{nil/0}|)} and \(\cons{x}{s} :=
-\fun{cons}(x,s)\)\index{cons@\fun{cons/2}|)}, after the convention of
-the programming language
-\Prolog \citep{SterlingShapiro_1994,Bratko_2000}. For instance, we may
-write \([1|[2|[3|\el]]]\) in stead of
+Let us set the abbreviations
+\begin{itemize}
+
+  \item \(\el := \fun{nil}()\)\index{nil@\fun{nil/0}|)},
+
+  \item \(\cons{x}{s} := \fun{cons}(x,s)\)\index{cons@\fun{cons/2}|)},
+
+\end{itemize}
+after the convention of the programming language \Prolog
+\citep{SterlingShapiro_1994,Bratko_2000}. For instance, we may write
+\([1|[2|[3|\el]]]\) in stead of
 \(\fun{cons}(1,\fun{cons}(2,\fun{cons}(3,\fun{nil}())))\).  We can
-further abbreviate the notation \(\cons{x_1}{\cons{x_2}{\dots
-    \cons{x_n}{s}}}\) into \(\cons{x_1,x_2,\dots,x_n}{s}\) and
-\(\cons{x}{\el}\) into \([x]\). For example, \([1|[2|[3|\el]]]\) is
-more compactly written as \([1,2,3]\). Our system for
-\fun{cat/2}\index{cat@\fun{cat/2}} now becomes a bit more legible:
+further abbreviate the notations as follows:
+\begin{itemize}
+
+  \item \(\cons{x_1,x_2,\dots,x_n}{s} := \cons{x_1}{\cons{x_2}{\dots
+      \cons{x_n}{s}}}\),
+
+  \item \([x] := \cons{x}{\el}\).
+
+\end{itemize}
+For example, \([1|[2|[3|\el]]]\) is more compactly written as
+\([1,2,3]\). Our system for \fun{cat/2}\index{cat@\fun{cat/2}} now
+becomes a bit more legible:
 \begin{equation}
 \fun{cat}(        \el,t) \xrightarrow{\smash{\alpha}} t;\qquad
 \fun{cat}(\cons{x}{s},t) \xrightarrow{\smash{\beta}}
@@ -432,7 +451,7 @@ sharing. When trees are used to visualise terms, they are called
 some trees share subtrees, the whole forest is called a \emph{directed
   acyclic graph}.\index{directed acyclic graph}
 \index{tree|see{directed acyclic graph}}
-\begin{figure}[h]
+\begin{figure}%[h]
 \centering
 \includegraphics[bb=73 654 300 720]{cat_dag}
 \caption{Definition of \fun{cat/2} with directed acyclic graphs
@@ -478,10 +497,13 @@ We observe that \(t\)~is invariant, so the cost depends only on the
 size of the first argument. Let
 \(\C{\fun{cat}}{n}\)\index{cat@$\C{\fun{cat}}{n}$} be the cost of the
 call \(\fun{cat}(s,t)\)\index{cat@\fun{cat/2}}, where \(n\)~is the
-size of~\(s\). Rule~\(\alpha\) leads to the equation
-\(\C{\fun{cat}}{0} \eqn{\smash{\alpha}} 1\) and rule~\(\beta\) to
-\(\C{\fun{cat}}{n+1} \eqn{\smash{\beta}} 1 + \C{\fun{cat}}{n}\),
-yielding together \(\C{\fun{cat}}{n} = n +
+size of~\(s\). Rules~\(\alpha\) and~\(\beta\) respectively lead to the
+equations
+\begin{equation*}
+\C{\fun{cat}}{0} \eqn{\smash{\alpha}} 1\qquad
+\C{\fun{cat}}{n+1} \eqn{\smash{\beta}} 1 + \C{\fun{cat}}{n}.
+\end{equation*}
+which together yield \(\C{\fun{cat}}{n} = n +
 1\).\label{cost:cat}\index{stack!catenation!cost}
 
 
@@ -667,16 +689,19 @@ the previous example consists in determining the average number of
 Let us notice that \(\fun{cat}([1], [2,3,4]) \twoheadrightarrow
 [1,2,3,4] \twoheadleftarrow \fun{cat}([1,2],
 [3,4])\)\index{cat@\fun{cat/2}|(}. It is enlightening to create
-\emph{equivalence classes} of terms that are joinable, based
-on~\((\equiv)\) \index{equivalence@$a \equiv b$|see{equivalence of
-    expressions}} \index{equivalence!$\sim$ of expressions} defined
-as: \(a \equiv b\) if there exists a value~\(v\) such that \(a
-\xrightarrow{\smash[t]{*}} v\) and \(b \xrightarrow{\smash{*}}
-v\). For instance, \(\fun{cat}([1,2], [3,4]) \equiv \fun{cat}([1],
+\emph{equivalence classes} of terms that are joinable. Theses classes
+then define an equivalence relationship~\((\equiv)\)
+\index{equivalence@$a \equiv b$|see{equivalence of expressions}}
+\index{equivalence!$\sim$ of expressions} as follows:
+\begin{center}
+  \(a \equiv b\) if there exists a value~\(v\) such that \(a
+  \xrightarrow{\smash[t]{*}} v\) and \(b \xrightarrow{\smash{*}} v\).
+\end{center}
+For instance, \(\fun{cat}([1,2], [3,4]) \equiv \fun{cat}([1],
 [2,3,4])\). The relation (\(\equiv\)) is indeed an equivalence
 because it is
 \begin{itemize*}
- 
+
   \item \emph{reflexive}: \(a \equiv a\);
 
   \item \emph{symmetric}: if \(a \equiv b\), then \(b \equiv a\);
@@ -685,15 +710,16 @@ because it is
     \(a \equiv c\).
 
 \end{itemize*}
-Of some interest are the following facts. If \(f(x)\) and~\(f(y)\)
-have a value, then \(x \equiv y\) implies \(f(x) \equiv f(y)\). If
-\(x_1 \leftarrow x_2 \twoheadrightarrow x_3 \equiv x_4 \rightarrow x_5
-\twoheadleftarrow x_6\), then \(x_1 \equiv x_2 \equiv x_3 \equiv x_4
-\equiv x_5 \equiv x_6\). In the case \(x \twoheadrightarrow z
-\xrightarrow{\smash{\alpha}} t \twoheadleftarrow y\), we use the
-special notation \(x \Rra{\alpha} y\) to underline the role played by
-rule~\(\alpha\) in the equivalence, instead of simply \(x \equiv
-y\). If we want to prove equivalences with variables ranging over
+%% Of some interest are the following facts. If \(f(x)\) and~\(f(y)\)
+%% have a value, then \(x \equiv y\) implies \(f(x) \equiv f(y)\). If
+%% \(x_1 \leftarrow x_2 \twoheadrightarrow x_3 \equiv x_4 \rightarrow x_5
+%% \twoheadleftarrow x_6\), then \(x_1 \equiv x_2 \equiv x_3 \equiv x_4
+%% \equiv x_5 \equiv x_6\). In the case \(x \twoheadrightarrow z
+%% \xrightarrow{\smash{\alpha}} t \twoheadleftarrow y\), we use the
+%% special notation \(x \Rra{\alpha} y\) to underline the role played by
+%% rule~\(\alpha\) in the equivalence, instead of simply \(x \equiv y\).
+
+If we want to prove equivalences with variables ranging over
 infinite sets, like \(\fun{cat}(s,\fun{cat}(t,u)) \equiv
 \fun{cat}(\fun{cat}(s,t),u)\)\index{cat@\fun{cat/2}|)}, we need some
 induction principle.
@@ -709,9 +735,12 @@ set~\(A\) as being a binary relation \((\succ)\) which does not have
 any \emph{infinite descending chains}\index{induction!infinite
   descending chain}, to wit, no \(a_0 \succ a_1 \succ \dots\) The
 \emph{well\hyp{}founded induction principle} then states that, for any
-predicate~\(\aleph\), \(\forall a \in A.\aleph(a)\) is implied by
-\(\forall a.(\forall b.a \succ b \Rightarrow \aleph(b)) \Rightarrow
-\aleph(a)\). Because there are no infinite descending chains, any
+predicate~\(\aleph\),
+\begin{center}
+  \(\forall a \in A.\aleph(a)\) is implied by \(\forall a.(\forall b.a
+  \succ b \Rightarrow \aleph(b)) \Rightarrow \aleph(a)\).
+\end{center}
+Because there are no infinite descending chains, any
 subset \(B \subseteq A\) contains minimal elements \(M \subseteq B\),
 that is, there is no \(b \in B\) such that \(a \succ b\), if \(a \in
 M\). In this case, proving by well\hyp{}founded induction degenerates
@@ -723,10 +752,11 @@ this principle is called \emph{mathematical (complete) induction}
 only if, \(s\)~is a proper
 \emph{subterm}\index{term!subterm}\index{term!proper subterm}
 of~\(t\), namely, the abstract syntax tree of~\(s\) is included in the
-tree of~\(t\) and \(s \neq t\). Sometimes, a restricted form is
-enough. For instance, we can define \(\cons{x}{s} \succ
-s\)\index{cons@\fun{cons/2}}, for any term~\(x\) and any stack~\(s \in
-S\). (Both \(x\)~and~\(s\) are \emph{immediate
+tree of~\(t\) and \(s \neq t\).
+
+Sometimes, a restricted form is enough. For instance, we can define
+\(\cons{x}{s} \succ s\)\index{cons@\fun{cons/2}}, for any term~\(x\)
+and any stack~\(s \in S\). (Both \(x\)~and~\(s\) are \emph{immediate
   subterms}\index{term!immediate subterm} of
 \(\cons{x}{s}\)\index{cons@\fun{cons/2}}.) There is no infinite
 descending chain since \(\el\)~is the unique minimal element of~\(S\):
@@ -734,63 +764,6 @@ no~\(s\) satisfies \(\el \succ s\); so the basis is \(t=\el\) and
 \(\forall t.(\forall s.t \succ s \Rightarrow \aleph(s)) \Rightarrow
 \aleph(t)\) degenerates into \(\aleph(\el)\).
 
-\paragraph{Associativity}
-\label{proof:assoc_cat}
-
-Let us prove the associativity\index{stack!catenation!associativity}
-\index{induction!example} of \fun{cat/2}\index{cat@\fun{cat/2}}, which
-we express formally by \(\pred{CatAssoc}{s,t,u} \colon
-\fun{cat}(s,\fun{cat}(t,u)) \equiv
-\fun{cat}(\fun{cat}(s,t),u)\)\index{CatAssoc@\predName{CatAssoc}|(},
-where \(s\), \(t\) and~\(u\) are stack values. We apply the
-well\hyp{}founded induction principle to the structure of~\(s\), so we
-must establish
-\begin{itemize*}
-
-  \item the basis \(\forall t,u \in S.\pred{CatAssoc}{\el,t,u}\);
-
-  \item step \(\forall s,t,u \in S.\pred{CatAssoc}{s,t,u}
-    \Rightarrow \forall x \in T.\pred{CatAssoc}{\cons{x}{s},t,u}\).
-
-\end{itemize*}
-The base case is direct: \(\fun{cat}(\el,\fun{cat}(s,t))
-\xrightarrow{\smash{\alpha}} \fun{cat}(s,t)
-\xleftarrow{\smash{\alpha}}
-\fun{cat}(\fun{cat}(\el,t),u)\)\index{cat@\fun{cat/2}}. Let us assume
-now \(\pred{CatAssoc}{s,t,u}\), called the \emph{induction
-  hypothesis}\index{induction!$\sim$ hypothesis}, and let us prove
-\(\pred{CatAssoc}{\cons{x}{s},t,u}\)\index{CatAssoc@\predName{CatAssoc}|)},
-for any term~\(x\). We have
-\begin{equation*}
-\begin{array}{r@{\;}l@{\;}l@{\qquad}r@{}}
-  \fun{cat}(\cons{x}{s},\fun{cat}(t,u))
-& \Rra{\beta}
-& \cons{x}{\fun{cat}(s,\fun{cat}(t,u))}\\
-& \equiv
-& \cons{x}{\fun{cat}(\fun{cat}(s,t),u)}
-& (\pred{CatAssoc}{s,t,u})\\
-& \Lla{\beta}
-& \fun{cat}(\cons{x}{\fun{cat}(s,t)},u)\\
-& \Lla{\beta}
-& \fun{cat}(\fun{cat}(\cons{x}{s},t),u).\index{cat@\fun{cat/2}}
-\end{array}
-\end{equation*}
-Thus\index{CatAssoc@\predName{CatAssoc}}
-\(\pred{CatAssoc}{\cons{x}{s},t,u}\) holds and \(\forall s,t,u \in
-S.\pred{CatAssoc}{s,t,u}\)\index{CatAssoc@\predName{CatAssoc}}.\hfill\(\Box\)
-
-Writing \(\fun{cat}(\cons{x}{s},\fun{cat}(t,u))
-\xrightarrow{\smash{\beta}} \cons{x}{\fun{cat}(s,\fun{cat}(t,u))}\) is
-incorrect because the semantics of our functional language requires
-that arguments are evaluated before the call is. Nevertheless,
-if~\(s\), \(t\) and~\(u\) are not values, it is sufficient that they
-have one for \(\pred{CatAssoc}{s,t,u}\) to hold as well; for example,
-if \(f(s)\) has a value~\(v\), then \(\pred{CatAssoc}{f(s),t,u}\) is
-true because \(\fun{cat}(f(s),\fun{cat}(t,u)) \twoheadrightarrow
-\fun{cat}(v,\fun{cat}(t,u)) \equiv \fun{cat}(\fun{cat}(v,t),u)
-\twoheadleftarrow \fun{cat}(\fun{cat}(f(s),t),u)\). Therefore,
-termination is an important property we need to check.
- 
 \mypar{Termination}
 \label{par:ackermann}
 When defining our purely functional language, we allowed programs to
@@ -800,18 +773,21 @@ termination of all functions. A well\hyp{}known class of such
 terminating functions makes exclusively use of a bridled form of
 recursion called \emph{primitive recursion}
 \citep{Robinson_1947,Robinson_1948}\index{termination!primitive
-  recursion}. Unfortunately, many useful functions do not fit easily
-in this framework and, as a consequence, most functional languages
-leave to the programmers the responsibility to check the termination
-of their programs. For theoretical reasons, it is not possible to
-provide a general criterion for termination, but many standard rules
-exists that cover many usages. Consider the following example where
-\(m,n \in \mathbb{N}\):
+  recursion}.
+
+Unfortunately, many useful functions do not fit easily in this
+framework and, as a consequence, most functional languages leave to
+the programmers the responsibility to check the termination of their
+programs. For theoretical reasons, it is not possible to provide a
+general criterion for termination, but many standard rules exists that
+cover many usages.
+
+Consider the following example where \(m,n \in \mathbb{N}\):
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{}}
 \fun{ack}(0,n)     & \xrightarrow{\smash{\theta}} & n+1;\\
 \fun{ack}(m+1,0)   & \xrightarrow{\smash{\iota}}  & \fun{ack}(m,1);\\
-\fun{ack}(m+1,n+1) & \xrightarrow{\smash{\kappa}} 
+\fun{ack}(m+1,n+1) & \xrightarrow{\smash{\kappa}}
                    & \fun{ack}(m,\fun{ack}(m+1,n)).
 \end{array}
 \end{equation*}
@@ -822,8 +798,9 @@ computable function which is not primitive recursive. It makes use of
 double recursion and two parameters to grow values as towers of
 exponents, for example, \(\fun{ack}(4,3) \twoheadrightarrow
 2^{2^{65536}} - 3\). It is not obviously terminating, because if the
-first argument does decrease, the second largely increases. Let us
-define a well\hyp{}founded ordering on pairs, called
+first argument does decrease, the second largely increases.
+
+Let us define a well\hyp{}founded ordering on pairs, called
 \emph{lexicographic order}\index{induction!lexicographic order}. Let
 \((\succ_A)\) and \((\succ_B)\) be well\hyp{}founded orders on the
 sets \(A\) and~\(B\). Then \((\succ_{A \times B})\) defined as follows
@@ -837,26 +814,111 @@ If \(A=B=\mathbb{N}\) then \((\succ_A) = (\succ_B) = (>)\). To prove
 that \(\fun{ack}(m,n)\) terminates for all \(m,n \in \mathbb{N}\),
 first, we must find a well\hyp{}founded order on the calls
 \(\fun{ack}(m,n)\), that is, the calls must be totally ordered without
-any infinite descending chain. In this case, a lexicographic order on
-\((m,n) \in \mathbb{N}^2\) extended to \(\fun{ack}(m,n)\) works:
+any infinite descending chain. Here, a lexicographic order on \((m,n)
+\in \mathbb{N}^2\) extended to \(\fun{ack}(m,n)\) works:
 \begin{equation*}
-\fun{ack}(a_0,b_0) \succ \fun{ack}(a_1,b_1) :\Leftrightarrow 
+\fun{ack}(a_0,b_0) \succ \fun{ack}(a_1,b_1) :\Leftrightarrow
 \text{\(a_0 > a_1\) or (\(a_0 = a_1\) and \(b_0 > b_1\)).}
 \end{equation*}
 Clearly, \(\fun{ack}(0,0)\) is the minimum element. Second, we must
 prove that \fun{ack/2} rewrites to smaller calls. We are only
 concerned with rules \(\iota\)~and~\(\kappa\). With the former, we
 have \(\fun{ack}(m+1,0) \succ \fun{ack}(m,1)\). With the latter, we
-have \(\fun{ack}(m+1,n+1) \succ \fun{ack}(m+1,n)\) and
-\(\fun{ack}(m+1,n+1) \succ \fun{ack}(m,p)\), for all values~\(p\), in
-particular when \(\fun{ack}(m+1,n) \twoheadrightarrow
-p\)\index{ack@\fun{ack/2}|)}.\hfill\(\Box\)
+have
+\begin{equation*}
+  \begin{array}{@{}r@{\;}l@{\;}l@{}}
+    \fun{ack}(m+1,n+1) & \succ & \fun{ack}(m+1,n),\\
+    \fun{ack}(m+1,n+1) & \succ & \fun{ack}(m,p),
+  \end{array}
+\end{equation*}
+for all values~\(p\), in particular when \(\fun{ack}(m+1,n)
+\twoheadrightarrow p\)\index{ack@\fun{ack/2}|)}.\hfill\(\Box\)
 
 A series of examples of termination\index{termination}\index{rewrite
   system!termination} proofs for term\hyp{}rewriting systems has been
 published by \cite{Dershowitz_1995,ArtsGiesl_2001}. An accessible
 survey is provided by \cite{Dershowitz_1987}. \cite{Knuth_2000a}
 analysed some famously involved recursive functions.
+
+\paragraph{Associativity}
+\label{proof:assoc_cat}
+
+Let us recall the definition~\eqref{def:cat} of the catenation of two
+stacks:
+\begin{equation*}
+\fun{cat}(        \el,t) \xrightarrow{\smash{\alpha}} t;\qquad
+\fun{cat}(\cons{x}{s},t) \xrightarrow{\smash{\beta}}
+\cons{x}{\fun{cat}(s,t)}.
+\index{stack!catenation!definition}
+\end{equation*}
+and let us prove the
+associativity\index{stack!catenation!associativity}
+\index{induction!example} of \fun{cat/2}\index{cat@\fun{cat/2}}, which
+we express formally as
+\begin{equation*}
+  \pred{CatAssoc}{s,t,u} \colon
+\fun{cat}(s,\fun{cat}(t,u)) \equiv
+\fun{cat}(\fun{cat}(s,t),u)
+\index{CatAssoc@\predName{CatAssoc}|(}
+\end{equation*}
+where \(s\), \(t\) and~\(u\) are stack values.
+
+The goal here is to use the rewrite system as an abstract machine to
+prove a property, with the timely help of the induction
+principle. Precisely, we want to rewrite each side of the equivalence
+we wish to prove until we either find the same term (equality), or we
+use the induction hypothesis (equivalence). We want to be free to
+choose a rewrite amongst those possible for a term, and this freedom
+is entailed by the termination and the confluence of the rewrite
+system defining the functions, which we assume here.
+
+We apply the well\hyp{}founded induction principle to the structure
+of~\(s\), so we must establish
+\begin{itemize*}
+
+  \item the basis \(\forall t,u \in S.\pred{CatAssoc}{\el,t,u}\);
+
+  \item step \(\forall s,t,u \in S.\pred{CatAssoc}{s,t,u}
+    \Rightarrow \forall x \in T.\pred{CatAssoc}{\cons{x}{s},t,u}\).
+
+\end{itemize*}
+The base case is direct:
+\begin{equation*}
+  \fun{cat}(\el,\fun{cat}(s,t))
+\xrightarrow{\smash{\alpha}} \fun{cat}(s,t)
+\xleftarrow{\smash{\alpha}}
+\fun{cat}(\fun{cat}(\el,t),u).
+\index{cat@\fun{cat/2}}
+\end{equation*}
+Let us assume now \(\pred{CatAssoc}{s,t,u}\), called the
+\emph{induction hypothesis}\index{induction!$\sim$ hypothesis}, and
+let us prove
+\(\pred{CatAssoc}{\cons{x}{s},t,u}\)\index{CatAssoc@\predName{CatAssoc}|)},
+for any term~\(x\). We have
+\begin{equation*}
+\begin{array}{r@{\;}l@{\;}l@{\qquad}r@{}}
+  \fun{cat}(\cons{x}{s},\fun{cat}(t,u))
+& \xrightarrow{\smash\beta}
+& \cons{x}{\fun{cat}(s,\fun{cat}(t,u))}\\
+& \equiv
+& \cons{x}{\fun{cat}(\fun{cat}(s,t),u)}
+& (\pred{CatAssoc}{s,t,u})\\
+& \xleftarrow{\smash\beta}
+& \fun{cat}(\cons{x}{\fun{cat}(s,t)},u)\\
+& \xleftarrow{\smash\beta}
+& \fun{cat}(\fun{cat}(\cons{x}{s},t),u).\index{cat@\fun{cat/2}}
+\end{array}
+\end{equation*}
+Thus\index{CatAssoc@\predName{CatAssoc}}
+\(\pred{CatAssoc}{\cons{x}{s},t,u}\) holds and \(\forall s,t,u \in
+S.\pred{CatAssoc}{s,t,u}\)\index{CatAssoc@\predName{CatAssoc}}.\hfill\(\Box\)
+
+Note that we matched here an expression, namely
+\(\fun{cat}(\cons{x}{s},\fun{cat}(t,u))\), instead of a value, as is
+normally done with the call\hyp{}by\hyp{}value evaluation strategy,
+because we work with equivalences and we assumed that the system is
+terminating and confluent, so any reduction strategy will do.
+
 
 \section{Implementation}
 \label{sec:implementation}
