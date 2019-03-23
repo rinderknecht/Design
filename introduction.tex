@@ -152,12 +152,13 @@ n     \rightarrow (n,1).
 \end{equation}
 where rules are separated by a semi\hyp{}colon and the last one is
 ended by a period. Arithmetic operators \((-)\)~and~\((\cdot)\) are
-defined out of the system and \(m\)~and~\(n\) are variables denoting
+defined outside the system, and \(m\)~and~\(n\) are variables denoting
 natural numbers. Would the rules not be ordered as they are actually
 laid out, the second rule would match any pair. Instead, it can be
-assumed that \(n \neq 0\) when matching with it. We can easily see
-that all the compositions of rewrites starting with a natural
-number~\(n\) end with the factorial\index{factorial} of~\(n\):
+assumed that \(n \neq 0\) in the second one. We can easily see that
+all compositions of rewrites starting with a natural number~\(n\) end
+with the \emph{factorial}\index{factorial} of~\(n\), that is, \(1
+\cdot 2 \cdot 3 \dots \cdot n\), or simply~\(n!\):
 \begin{equation*}
 n \rightarrow (n,1) \rightarrow \dots \rightarrow (0,n!) \rightarrow
 n!, \quad \text{for \(n \in \mathbb{N}\)}.
@@ -170,7 +171,8 @@ Let us note \((\xrightarrow{\smash{n}})\) the composition of
      (\rightarrow) \circ (\xrightarrow{\smash{n}}),
 \quad \text{with \(n > 0\)}.
 \end{equation*}
-The \emph{transitive closure}\index{transitive
+The symbol `\(:=\)' is the definitional equality, meaning: `is, by
+definition,'. The \emph{transitive closure}\index{transitive
   closure} \label{transitive_closure} of \((\rightarrow)\) is defined
 as \((\twoheadrightarrow) := \bigcup_{i >
   0}{(\xrightarrow{\smash{i}})}\). In the present case, the
@@ -290,10 +292,10 @@ We have \(\fun{f}(\fun{g}()) \xrightarrow{\smash{\alpha}} 0\) but
 \(\fun{f}(\fun{g}()) \xrightarrow{\smash{\beta}} \fun{f}(\fun{g}())
 \xrightarrow{\smash{\beta}} \dots\) Despite this inconvenience, we
 shall retain call\hyp{}by\hyp{}value because it facilitates some
-analyses. (As an illustration of a more powerful strategy, the purely
-functional language \Haskell \citep{DoetsVanEijck_2004} features
-\emph{lazy evaluation}.) Also it allows us to restrict the shape of
-the left\hyp{}hand sides, called \emph{patterns}\index{functional
+analyses. (As an illustration of a reduction strategy more powerful
+than call-by-value, see the purely functional language \Haskell
+\citep{DoetsVanEijck_2004}.) Also it allows us to restrict the shape
+of the left\hyp{}hand sides, called \emph{patterns}\index{functional
   language!pattern}, to one, outermost function call. For instance, we
 can then disallow for being useless a rule like
 \begin{equation*}
@@ -460,22 +462,31 @@ some trees share subtrees, the whole forest is called a \emph{directed
 
 \section{Analysis of algorithms}
 
-The branch of theoretical computer science devoted to the mathematical
-study of the efficiency of programs has been pioneered by Donald
-Knuth, who named it \emph{analysis of algorithms}
-\citep{SedgewickFlajolet_1996,Knuth_1997}. Given a function
-definition, this approach consists basically in three steps: defining
-a measure on the arguments, which represents their size; defining a
-measure on time, which abstracts the wall\hyp{}clock time; expressing
-the abstract time needed to compute calls to that function in terms of
-the size of its arguments. This function models the efficiency and is
-called the \emph{cost}\index{cost} (the lower the cost, the higher the
+The branch of theoretical informatics (or \emph{computer science})
+devoted to the mathematical study of the efficiency of programs has
+been pioneered by Donald Knuth, who named it \emph{analysis of
+  algorithms} \citep{SedgewickFlajolet_1996,Knuth_1997}. Given a
+function definition, this approach consists basically in three steps:
+\begin{enumerate}
+
+  \item defining a measure on the arguments, which represents their
+    size;
+
+  \item defining a measure on time, which abstracts the
+    wall\hyp{}clock time;
+
+  \item expressing the abstract time needed to compute calls to that
+    function in terms of the size of its arguments.
+
+\end{enumerate}
+This function models the efficiency and is called the
+\emph{cost}\index{cost} (the lower the cost, the higher the
 efficiency). For example, when sorting objects, also called
 \emph{keys}\index{key|see{sorting}} in this context, by comparing
 them, the input size is the number of keys and the abstract unit of
 time is often one comparison, so the cost is the mathematical function
-which associates the number of keys and the number of comparisons
-to sort them.
+which associates the number of keys and the number of comparisons to
+sort them.
 
 
 \mypar{Exact cost}
@@ -551,23 +562,22 @@ like \emph{Hoare's sort}, also known as \emph{quicksort}
 rate of their average cost being of a lower magnitude than the maximum
 cost, on an asymptotic scale \cite[\S{}9]{GrahamKnuthPatashnik_1994}.
 
-\paragraph{On-line vs. off-line}
+\paragraph{Online versus off-line}
 \label{par:online_vs_offline}
 
 Sorting algorithms can be distinguished depending on whether they
 operate on the whole series of keys, or key by key. The former are
 said \emph{off\hyp{}line}\index{off-line algorithm}, as keys are not
 sorted while they are coming in, and the latter are called
-\emph{on\hyp{}line}\index{on-line algorithm}, as the sorting process
-can be temporally interleaved with the input process. For example,
-insertion sort is an on\hyp{}line algorithm, whereas Hoare's sort is
-not because it is an instance of the divide\hyp{}and\hyp{}conquer
-strategy that splits the data. This distinction is pertinent in other
-contexts as well, like with algorithms that are intrinsically
-\emph{sequential}, instead of enabling some degree of
-\emph{parallelism}, e.g., a database is updated by a series of atomic
-requests, but requests on non\hyp{}overlapping parts of the data might
-be performed in parallel.
+\emph{online}\index{online algorithm}, as the sorting process can be
+temporally interleaved with the input process. For example, insertion
+sort is an online algorithm, whereas Hoare's sort is not because it is
+an instance of the divide\hyp{}and\hyp{}conquer strategy that splits
+the whole data set. This distinction is pertinent in other contexts,
+as with algorithms that are intrinsically \emph{sequential}, instead
+of enabling some degree of \emph{parallelism}, e.g., a database is
+updated by a series of atomic requests, but requests on
+non\hyp{}overlapping parts of the data might be performed in parallel.
 
 \mypar{Amortised cost}
 \label{par:amortised_cost}
@@ -594,12 +604,12 @@ analysis of a sequence of updates, not of a single one.
 \index{aggregate cost|see{cost, amortised}}
 \index{enumerative combinatorics}
 
-Let us consider a counter enumerating the integers from~\(0\) to~\(n\)
-in binary by updating an array containing
-bits \cite[\S{}17.1]{CLRS_2009}. In the worst case, an increment leads
-to inverting all the bits. The number~\(m\) of bits of~\(n\) can be
-found by setting \(n := \sum_{i=0}^{m-1}{b_i2^i}\), where the~\(b_i\)
-are the bits and \(b_{m-1}=1\). Then
+As an example, let us consider a counter enumerating the integers
+from~\(0\) to~\(n\) in binary by updating an array containing bits
+\cite[\S{}17.1]{CLRS_2009}. In the worst case, an increment leads to
+inverting all the bits. The number~\(m\) of bits of~\(n\) can be found
+by setting \(n := \sum_{i=0}^{m-1}{b_i2^i}\), where the~\(b_i\) are
+the bits and \(b_{m-1}=1\). Then
 \begin{equation}
 2^{m-1} \leqslant n < 2^m \Rightarrow m - 1 \leqslant \lg n
 < m \Rightarrow m = \floor{\lg n} + 1,
@@ -756,9 +766,9 @@ tree of~\(t\) and \(s \neq t\).
 
 Sometimes, a restricted form is enough. For instance, we can define
 \(\cons{x}{s} \succ s\)\index{cons@\fun{cons/2}}, for any term~\(x\)
-and any stack~\(s \in S\). (Both \(x\)~and~\(s\) are \emph{immediate
+and any stack~\(s \in S\). Both \(x\)~and~\(s\) are \emph{immediate
   subterms}\index{term!immediate subterm} of
-\(\cons{x}{s}\)\index{cons@\fun{cons/2}}.) There is no infinite
+\(\cons{x}{s}\)\index{cons@\fun{cons/2}}. There is no infinite
 descending chain since \(\el\)~is the unique minimal element of~\(S\):
 no~\(s\) satisfies \(\el \succ s\); so the basis is \(t=\el\) and
 \(\forall t.(\forall s.t \succ s \Rightarrow \aleph(s)) \Rightarrow
@@ -874,14 +884,14 @@ system defining the functions, which we assume here.
 
 We apply the well\hyp{}founded induction principle to the structure
 of~\(s\), so we must establish
-\begin{itemize*}
+\begin{itemize}
 
   \item the basis \(\forall t,u \in S.\pred{CatAssoc}{\el,t,u}\);
 
   \item step \(\forall s,t,u \in S.\pred{CatAssoc}{s,t,u}
     \Rightarrow \forall x \in T.\pred{CatAssoc}{\cons{x}{s},t,u}\).
 
-\end{itemize*}
+\end{itemize}
 The base case is direct:
 \begin{equation*}
   \fun{cat}(\el,\fun{cat}(s,t))
