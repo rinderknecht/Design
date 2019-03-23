@@ -1,19 +1,20 @@
 -module(mean).
 -compile(export_all).
+-compile({no_auto_import,[floor/1]}).
 
 floor(X) when X < trunc(X)   -> trunc(X) - 1;
 floor(X)                     -> trunc(X).
 
 ceiling(X) when X > trunc(X) -> trunc(X) + 1;
 ceiling(X)                   -> trunc(X).
-     
+
 log2(X) -> math:log(X)/math:log(2).
 exp2(0) -> 1;
 exp2(N) -> E=exp2(N div 2), (1 + N rem 2)*(E*E).
 
 mrg(M,N) -> M + N - M/(N+1) - N/(M+1).
 bms0(N) -> bms(N) + N + ceiling(N/2) + 2*ceiling(log2(N)) - 1.
-    
+
 bms(0) -> 0;
 bms(1) -> 0;
 bms(N) -> E=exp2(ceiling(log2(N))-1),

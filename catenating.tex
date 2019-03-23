@@ -37,10 +37,10 @@ empty:
   \phantom{\cons{x}{\fun{join}(s,\cons{y}{t})}.}
 \end{array}
 \end{equation*}
-It is important not to rush to write the right\hyp{}hand sides. Are
-some cases left out? No, because there are exactly two arguments which
-can each be either empty or not, leading to exactly \(2 \cdot 2 = 4\)
-cases. Then, we write the corresponding canvas:
+It is important not to rush to write the right\hyp{}hand sides and
+wonder: Are some cases left out? No, because there are exactly two
+arguments which can each be either empty or not, leading to exactly
+\(2 \cdot 2 = 4\) cases. Then, we write the corresponding canvas:
 \begin{equation*}
 \begin{array}{r@{\;}l@{\;}l}
 \fun{join}(\el,\el) & \rightarrow & \fbcode{CCCCCCCCCC};\\
@@ -109,7 +109,7 @@ The answer is yes: it must be the top of the result.
 \fun{join}(\cons{x}{s},\cons{y}{t}) \rightarrow \cons{x}{\fbcode{II}
   \; s \; \fbcode{II} \; y \; \fbcode{II} \; t \; \fbcode{II}}.
 \end{equation*}
-What about the other top, variable~\(y\)? It should remain on 
+What about the other top, variable~\(y\)? It should remain on
 top of~\(t\):
 \begin{equation*}
 \fun{join}(\cons{x}{s},\cons{y}{t}) \rightarrow \cons{x}{\fbcode{II}
@@ -118,7 +118,7 @@ top of~\(t\):
 What is the relationship between \(s\)~and~\(\cons{y}{t}\)? We
 may be tempted by
 \begin{equation*}
-\fun{join}(\cons{x}{s},\cons{y}{t}) \rightarrow 
+\fun{join}(\cons{x}{s},\cons{y}{t}) \rightarrow
   \cons{x}{\cons{s}{\cons{y}{t}}}.
 \end{equation*}
 which is flawed. The reason is that, while we may allow stacks to be
@@ -136,13 +136,14 @@ not~\erlcode{5}.
 
 How can \(s\)~and~\(\cons{y}{t}\) be catenated? Of course, this is
 exactly the purpose of the function \fun{join/2} currently being
-defined. Therefore, what we need here is a recursive call:
+defined. Therefore, what we need here is a \emph{recursive call}
+(underlined below):
 \begin{equation*}
 \begin{array}{r@{\;}l@{\;}l}
 \fun{join}(\el,\el) & \rightarrow & \el;\\
 \fun{join}(\el,\cons{y}{t}) & \rightarrow & \cons{y}{t};\\
 \fun{join}(\cons{x}{s},\el) & \rightarrow & \cons{x}{s};\\
-\fun{join}(\cons{x}{s},\cons{y}{t}) & \rightarrow & \underline{\cons{x}{\fun{join}(s,\cons{y}{t})}}.
+\fun{join}(\cons{x}{s},\cons{y}{t}) & \rightarrow & \cons{x}{\underline{\fun{join}(s,\cons{y}{t})}}.
 \end{array}
 \end{equation*}
 
@@ -180,16 +181,23 @@ justify that fact and record the reason in a comment. The
 left\hyp{}hand sides of \fun{join/2} match all the combinations of two
 stacks, whether they are empty or not, and this is exactly what was
 expected: no more, no less. The next step is to inspect the
-right\hyp{}hand sides and wonder twofold: (1)~Are the right\hyp{}hand
-sides rewritten into the expected type of value, for all function
-calls?  (2)~Are the function calls being provided the expected type of
-arguments?  These checks stem from the fact that some functional
-languages, like \Erlang, do not include \emph{type inference} at
+right\hyp{}hand sides and wonder twofold:
+\begin{enumerate}
+
+  \item Are the right\hyp{}hand sides rewritten into the expected type
+    of value, for all function calls?
+
+  \item Are the function calls being provided the expected type of
+    arguments?
+
+\end{enumerate}
+These checks stem from the fact that some functional languages, like
+\Erlang, do not include \emph{type inference} at
 compile\hyp{}time. Other functional languages, like \OCaml and
 \Haskell, would have their compilers automatically establish these
 properties. The examination of the right\hyp{}hand sides in the
 definition of \fun{join/2} confirms that
-\begin{itemize*}
+\begin{itemize}
 
 \item the right\hyp{}hand sides of the first three rules are stacks
   containing the same kind of items as the arguments;
@@ -201,7 +209,7 @@ definition of \fun{join/2} confirms that
   deduce that the right\hyp{}hand side of the last rule is a stack
   made of items from the arguments.
 
-\end{itemize*}
+\end{itemize}
 As a conclusion, the two questions above have been positively
 answered. Notice how we had to assume that the recursive call already
 had the type we were trying to establish for the current
@@ -232,10 +240,10 @@ complete,\index{soundness|)} \index{completeness|)}
 improvement. There are several directions in which improvements, often
 called \emph{optimisations} although the result may not be optimal,
 can be achieved:
-\begin{itemize*}
+\begin{itemize}
 
   \item Can we rewrite the definition so that in all or some cases it
-    is faster? 
+    is faster?
 
   \item Is there an equivalent definition which uses less memory in
     all or some cases?
@@ -246,7 +254,7 @@ can be achieved:
   \item Can we use less parameters in the definition? (This is related
     to memory usage.)
 
-\end{itemize*}
+\end{itemize}
 Let us reconsider \fun{join/2}:
 \begin{equation*}
 \begin{array}{r@{\;}l@{\;}l}
@@ -338,17 +346,17 @@ Had rule~\clause{\beta} been erased, we would have had instead the
 series
 \begin{equation*}
 \begin{array}{r@{\;}c@{\;}l}
-\fun{join}(s,\el) 
+\fun{join}(s,\el)
 & \smashedrightarrow{\gamma} &
   [x\sb{0}|\fun{join}([x\sb{1},\ldots,x\sb{n-1}],\el)]\\
-& \smashedrightarrow{\gamma} & 
+& \smashedrightarrow{\gamma} &
   [x\sb{0}|[x\sb{1}|\fun{join}([x\sb{2},\ldots,x\sb{n-1}],\el)]]\\
 & = & [x\sb{0},x\sb{1}|\fun{join}([x\sb{2},\ldots,x\sb{n-1}],\el)]\\
 & \smashedrightarrow{\gamma} &
   [x\sb{0},x\sb{1}|[x\sb{2}|\fun{join}([x\sb{3},\ldots,x\sb{n-1}],\el)]]\\
 & = & [x\sb{0},x\sb{1},x\sb{2}|\fun{join}([x\sb{3},\ldots,x\sb{n-1}],\el)]\\
 & \smash{\vdots} &\\
-& \smashedrightarrow{\gamma} & 
+& \smashedrightarrow{\gamma} &
   [x\sb{0},x\sb{1},\ldots,x\sb{n-1}|\fun{join}(\el,\el)]\\
 & \smashedrightarrow{\alpha} & [x\sb{0},x\sb{1},\ldots,x\sb{n-1}|\el]\\
 & = & [x\sb{0},x\sb{1},\ldots,x\sb{n-1}]\\
@@ -398,7 +406,7 @@ are either values, or arithmetic expressions, or expressions made only
 of data constructors, or one function call whose arguments are values
 or arithmetic expressions or data constructors, it is said to be in
 \emph{tail form}.
- 
+
 We may wonder whether a tail form variant is necessary or not and we
 will discuss this issue later. At the moment, let us take this as a
 stylistic exercise and, instead of presenting a systematic
@@ -448,7 +456,7 @@ paper and a pencil, is quite enlightening. Let \(s\)~be a stack of
               & \smashedrightarrow{\beta} &
   \fun{cat}([x\sb{2},\ldots,x\sb{n-1}],t,[x\sb{1},x\sb{0}])\\
               & \smash{\vdots}\\
-              & \smashedrightarrow{\beta} & \fun{cat}(\el,t,[x\sb{n-1},x\sb{n-2},\ldots,x\sb{0}])\\
+              & \xrightarrow{\beta} & \fun{cat}(\el,t,[x\sb{n-1},x\sb{n-2},\ldots,x\sb{0}])\\
               & \smashedrightarrow{\alpha} & \fbcode{CCCCCCC}.
 \end{array}
 \end{equation*}
@@ -466,7 +474,7 @@ to split rule~\clause{\alpha} into \(\alpha_0\) and \(\alpha_1\):
 \begin{array}{r@{\;}c@{\;}l}
 \fun{cat}(\el,t,\el) & \MyArrow{\Split}{\alpha\sb{0}} &
   \fbcode{CCCCCCC};\\
-\fun{cat}(\el,t,\cons{x}{u}) & \MyArrow{\Split}{\alpha\sb{1}} & 
+\fun{cat}(\el,t,\cons{x}{u}) & \MyArrow{\Split}{\alpha\sb{1}} &
   \fbcode{CCCCCCC};\\
 \fun{cat}(\cons{x}{s},t,u) & \MyArrow{\Split}{\beta} &
  \fun{cat}(s,t,\cons{x}{u}).
@@ -505,13 +513,13 @@ To test the correctness of this definition, we can try a small
 example:
 \begin{equation*}
 \begin{array}{r@{\;}c@{\;}l}
-\fun{cat}([1,2,3],[4,5],\el) 
+\fun{cat}([1,2,3],[4,5],\el)
   & \MyArrow{\Split}{\beta} & \fun{cat}([2,3],[4,5],[1])\\
   & \MyArrow{\Split}{\beta} & \fun{cat}([3],[4,5],[2,1])\\
   & \MyArrow{\Split}{\beta} & \fun{cat}(\el,[4,5],[3,2,1])\\
   & \MyArrow{\Split}{\alpha\sb{1}} &
     \fun{cat}(\el,[3,4,5],[2,1])\\
-  & \MyArrow{\Split}{\alpha\sb{1}} & 
+  & \MyArrow{\Split}{\alpha\sb{1}} &
     \fun{cat}(\el,[2,3,4,5],[1])\\
   & \MyArrow{\Split}{\alpha\sb{1}} &
     \fun{cat}(\el,[1,2,3,4,5],\el)\\
@@ -525,7 +533,7 @@ accumulator whose purpose is to reverse the first argument:
 \begin{array}{r@{\;}c@{\;}l}
 \fun{cat\(_0\)}(s,t) & \smashedrightarrow{\alpha} & \fun{cat}(s,t,\el).\\
 \fun{cat}(\el,t,\el) & \smashedrightarrow{\beta} & t;\\
-\fun{cat}(\el,t,\cons{x}{u}) & \smashedrightarrow{\gamma} & 
+\fun{cat}(\el,t,\cons{x}{u}) & \smashedrightarrow{\gamma} &
   \fun{cat}(\el,\cons{x}{t},u);\\
 \fun{cat}(\cons{x}{s},t,u) & \smashedrightarrow{\delta} &
   \fun{cat}(s,t,\cons{x}{u}).
@@ -542,7 +550,7 @@ The number of steps to rewrite \(\fun{cat\(_0\)}(s,t)\) into a value is
 greater than with \(\fun{cat}(s,t)\), as we guessed while writing the
 previous example. Indeed, assuming that \(s\)~contains \(n\)~items, we
 have
-\begin{itemize*} 
+\begin{itemize*}
 
   \item one step to obtain \(\fun{cat}(s,t,\el)\), by
   rule~\clause{\alpha};
@@ -580,7 +588,7 @@ that the length of a rule is~\(1\), hence \(\len{\alpha} = \len{\beta}
 of two rules is the sum of their lengths: \(\len{\alpha \cdot \delta}
 = \len{\alpha} + \len{\delta}\). Therefore,
 \begin{align*}
-\C{\fun{cat\(_0\)}}{n} 
+\C{\fun{cat\(_0\)}}{n}
   &= \len{\alpha\delta^n\gamma^n\beta}
    = \len{\alpha} + \len{\delta^n} + \len{\gamma^n} + \len{\beta}
    = 1 + \len{\delta} \cdot n + \len{\gamma} \cdot n + 1\\
@@ -598,12 +606,12 @@ Let us reconsider the definition~\eqref{def:fact} of
 For instance, we have
 \begin{equation*}
 \begin{array}{r@{\;}c@{\;}lc@{\;}l}
-\fun{fact}(3) & \xrightarrow{\beta} & 3 \cdot \fun{fact}(3-1) 
+\fun{fact}(3) & \xrightarrow{\beta} & 3 \cdot \fun{fact}(3-1)
               & = & 3 \cdot \fun{fact}(2)\\
-              & \xrightarrow{\smash[t]{\beta}} & 
-              3 \cdot (2 \cdot \fun{fact}(2-1)) 
+              & \xrightarrow{\smash[t]{\beta}} &
+              3 \cdot (2 \cdot \fun{fact}(2-1))
               & = & 3 \cdot (2 \cdot \fun{fact}(1))\\
-              & \xrightarrow{\smash[t]{\alpha}} & 
+              & \xrightarrow{\smash[t]{\alpha}} &
                 3 \cdot (2 \cdot (1)) & = & 6 = 3!
 \end{array}
 \end{equation*}
@@ -629,12 +637,12 @@ has the non\hyp{}empty context
 important, let us consider a slightly longer series of
 rewrites:\label{trace:fact_5}
 \begin{equation*}
-\begin{array}{r@{\;}c@{\;}l} 
+\begin{array}{r@{\;}c@{\;}l}
 \fun{fact}(5)
 & \smashedrightarrow{\beta} & 5 \cdot \fun{fact}(4)\\
 & \smashedrightarrow{\beta} & 5 \cdot (4 \cdot \fun{fact}(3))\\
 & \smashedrightarrow{\beta} & 5 \cdot (4 \cdot (3 \cdot \fun{fact}(2)))\\
-& \smashedrightarrow{\beta} & 5 \cdot (4 \cdot (3 \cdot (2 \cdot 
+& \smashedrightarrow{\beta} & 5 \cdot (4 \cdot (3 \cdot (2 \cdot
                               \fun{fact}(1))))\\
 & \smashedrightarrow{\alpha} & 5 \cdot (4 \cdot (3 \cdot (2 \cdot
 (1)))).
@@ -645,7 +653,7 @@ yields a longer expression. Let us focus now only on the shapes of
 these expressions:
 \begin{equation*}
 \setlength\fboxsep{0mm}
-\begin{array}{r@{\;}c@{\;}l} 
+\begin{array}{r@{\;}c@{\;}l}
 \fun{fact}(5)
 & \smashedrightarrow{\beta} & \fbox{\phantom{$5 \cdot \fun{fact}(4)$}}\\
 & \smashedrightarrow{\beta} & \fbox{\phantom{$5 \cdot (4 \cdot \fun{fact}(3))$}}\\
@@ -691,7 +699,7 @@ evaluated thusly:
 \begin{equation*}
 \begin{array}{r@{\;}c@{\;}lc@{\;}l}
 \fun{fact}_0(5)
-& \xrightarrow{\smash[t]{\alpha}} & \fun{fact}_0(5,1), 
+& \xrightarrow{\smash[t]{\alpha}} & \fun{fact}_0(5,1),
 && \text{since \(5 > 1\)},\\
 & \xrightarrow{\smash[t]{\gamma}} & \fun{fact}_0(5-1,1 \cdot 5)
 & = & \fun{fact}_0(4,5)\\
@@ -730,7 +738,7 @@ the purported equality~\eqref{eq:fact5}:
   &\eqn{\smash{\ref{mult_one}}} ((((1 \cdot 5) \cdot 4) \cdot 3) \cdot
   2) \cdot 1\\
   &\eqn{\smash{\ref{mult_assoc}}} (((1 \cdot 5) \cdot 4) \cdot 3)
-  \cdot (2 \cdot 1)\\ 
+  \cdot (2 \cdot 1)\\
   &\eqn{\smash{\ref{mult_assoc}}} ((1 \cdot 5) \cdot 4) \cdot (3 \cdot (2
     \cdot 1))\\
   &\eqn{\smash{\ref{mult_assoc}}} (1 \cdot 5) \cdot (4 \cdot (3 \cdot
@@ -750,7 +758,7 @@ of~\(1\):
 \fun{fact}_1(n) & \xrightarrow{\smash[t]{\alpha}} &
 \fun{fact}_1(n-1,n),\;\text{if \(n > 0\)}.
 & \fun{fact}_1(0,a) & \xrightarrow{\smash[t]{\beta}} & a;\\
-&&& \fun{fact}_1(n,a) & \xrightarrow{\smash[t]{\gamma}} & 
+&&& \fun{fact}_1(n,a) & \xrightarrow{\smash[t]{\gamma}} &
 \fun{fact}_1(n-1,a \cdot n).
 \end{array}
 \end{equation*}
@@ -784,7 +792,7 @@ that the memory needed to store the number~\(120\) is the same as for
 the number~\(5\). Then the shape of the previous rewrites:
 \begin{equation*}
 \setlength\fboxsep{0mm}
-\begin{array}{r@{\;}c@{\;}l} 
+\begin{array}{r@{\;}c@{\;}l}
 \fun{fact}_0(5)
 & \xrightarrow{\smash[t]{\alpha}} &
 \fbox{\phantom{$\fun{fact}_0(0,10)$}}\\

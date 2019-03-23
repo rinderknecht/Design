@@ -187,7 +187,7 @@ the length of~\(s\). Let
 of~\(t\). From the definition of \fun{pre\(_0\)/1}, we deduce
 \begin{equation*}
 \C{\fun{pre}_0}{0} = 1;\quad
-\C{\fun{pre}_0}{n+1} = 
+\C{\fun{pre}_0}{n+1} =
   1 + \C{\fun{pre}_0}{p} + \C{\fun{pre}_0}{n-p} + \C{\fun{cat}}{p},
 \index{pre0@$\C{\fun{pre}_0}{n}$}
 \end{equation*}
@@ -219,8 +219,8 @@ The maximum cost
 extremal recurrence
 \begin{equation}
 \W{\fun{pre}_0}{0} = 1;\quad
-\W{\fun{pre}_0}{k+1} = 
-  2 + \max_{0 \leqslant p \leqslant k}\{\W{\fun{pre}_0}{p} 
+\W{\fun{pre}_0}{k+1} =
+  2 + \max_{0 \leqslant p \leqslant k}\{\W{\fun{pre}_0}{p}
                                   + \W{\fun{pre}_0}{k-p} + p\}.
 \index{pre0@$\W{\fun{pre}_0}{n}$}
 \label{eq:pre0_max}
@@ -273,8 +273,8 @@ Dually, the minimum cost
 extremal recurrence
 \begin{equation*}
 \B{\fun{pre}_0}{0} = 1;\quad
-\B{\fun{pre}_0}{k+1} = 
-  2 + \min_{0 \leqslant p \leqslant k}\{\B{\fun{pre}_0}{p} 
+\B{\fun{pre}_0}{k+1} =
+  2 + \min_{0 \leqslant p \leqslant k}\{\B{\fun{pre}_0}{p}
                                   + \B{\fun{pre}_0}{k-p} + p\}.
 \end{equation*}
 Along the same line as before, but on the opposite direction, we may
@@ -341,7 +341,7 @@ cost incurred by the empty tree:
 \begin{equation*}
 \C{\fun{pre}_1}{0} = 3;\index{pre1@$\C{\fun{pre}_1}{n}$}
 \quad
-\C{\fun{pre}_1}{n} = 1 + (2n+1) + (6n - 2) = 8n,\; 
+\C{\fun{pre}_1}{n} = 1 + (2n+1) + (6n - 2) = 8n,\;
 \text{when \(n > 0\).}
 \end{equation*}
 
@@ -357,7 +357,7 @@ further?
 \begin{equation*}
 \fun{pre}_3(\fun{ext}()) \rightarrow \el;
 \quad
-\fun{pre}_3(\fun{int}(x,t_1,t_2)) \rightarrow 
+\fun{pre}_3(\fun{int}(x,t_1,t_2)) \rightarrow
   \cons{x}{\fbcode{CCCCCCC}\,}.
 \end{equation*}
 The way forth is to think in terms of forests\index{tree!forest},
@@ -494,7 +494,7 @@ back at \fun{pre\(_0\)/1}\index{pre0@\fun{pre\(_0\)/1}}, we can
 identify the source of the inefficiency in the fact that, in the worst
 case,
 \begin{equation*}
-\fun{pre}_0(t) \twoheadrightarrow 
+\fun{pre}_0(t) \twoheadrightarrow
 \cons{x_1}{\fun{cat}(\cons{x_2}{\fun{cat}(\dots
     \fun{cat}(\cons{x_n}{\fun{cat}(\el, \el)},\el) \dots)})}
 \index{cat@\fun{cat/2}}
@@ -551,7 +551,7 @@ program in \fig~\vref{fig:pre}.
 \\
 \fun{pre}(\fun{ext}(),s) & \xrightarrow{\smash{\iota}} & s;\\
 \fun{pre}(\fun{int}(x,t_1,t_2),s)
-  & \xrightarrow{\smash{\kappa}} 
+  & \xrightarrow{\smash{\kappa}}
   & \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,s))}.
 \end{array}}
 \end{equation*}
@@ -701,7 +701,7 @@ equivalently write\index{snd@\fun{snd/1}} the program in
 }
 \end{equation*}
 \caption{Version of \fun{npre/1} without inference rules\label{fig:npre_bis}}
-\end{figure} 
+\end{figure}
 \index{binary tree!preorder|)}
 
 \paragraph{Termination}
@@ -842,7 +842,7 @@ to rewrite the left\hyp{}hand side after letting \(t :=
 & \fun{cat}(\fun{pre}(\fun{int}(x,t_1,t_2),\el),s)\\
 & \xrightarrow{\smash{\kappa}}
 & \fun{cat}(\cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))},s)\\
-& \xrightarrow{\smash{\beta}} 
+& \xrightarrow{\smash{\beta}}
 & \cons{x}{\fun{cat}(\fun{pre}(t_1,\fun{pre}(t_2,\el)),s)}\\
 & \equiv_0
 & \cons{x}{\fun{cat}(\fun{cat}(\fun{pre}(t_1,\el),\fun{pre}(t_2,\el)),s)}\\
@@ -903,12 +903,12 @@ We can resume conclusively in \fig~\vref{fig:pre0_pre}.\hfill\(\Box\)
 & \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2))}\\
 & \xrightarrow{\smash{\theta}}
 & \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2,\el))}\\
-& \equiv 
+& \equiv
 & \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))}
 & (\pred{CatPre}{t_1,\fun{pre}(t_2,\el)})\\
 & \xleftarrow{\smash{\kappa}}
 & \fun{pre}(\fun{int}(x,t_1,t_2),\el)\\
-& \xleftarrow{\smash{\theta}} 
+& \xleftarrow{\smash{\theta}}
 & \fun{pre}(\fun{int}(x,t_1,t_2))\\
 & = & \fun{pre}(t). & \hfill\Box
 \end{array}}
@@ -1049,7 +1049,7 @@ yields the function defined in \fig~\vref{fig:in},
 \\
 \fun{in}(\fun{ext}(),s) & \xrightarrow{\smash{\pi}} & s;\\
 \fun{in}(\fun{int}(x,t_1,t_2),s)
-  & \xrightarrow{\smash{\rho}} 
+  & \xrightarrow{\smash{\rho}}
   & \fun{in}(t_1,\cons{x}{\fun{in}(t_2,s)}).
 \end{array}}
 \end{equation*}
@@ -1210,7 +1210,7 @@ compared with \(\Call{\fun{rev}(\fun{in}(t))} = \C{\fun{in}}{n} +
 \noindent Structural induction on the immediate subtrees requires that
 we establish
 \begin{itemize}
-  
+
   \item the basis
   \(\pred{InMir}{\fun{ext}()}\);\index{InMir@\predName{InMir}|(}
 
@@ -1235,7 +1235,7 @@ right\hyp{}hand side or we get stuck:
 \begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
 \fun{in}(\fun{mir}(t)) & = &
 \fun{in}(\fun{mir}(\fun{int}(x,t_1,t_2)))\\
-& \xrightarrow{\smash{\tau}} 
+& \xrightarrow{\smash{\tau}}
 & \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)))\\
 & \xrightarrow{\smash{\xi}}
 & \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),\el)\\
@@ -1243,7 +1243,7 @@ right\hyp{}hand side or we get stuck:
 & \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),\el)})\\
 & \Lla{\xi}
 & \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1))})\\
-& \equiv 
+& \equiv
 & \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rev}(\fun{in}(t_1))})
 & (\pred{InMir}{t_1})\\
 & \xrightarrow{\smash{\xi}}
@@ -1265,13 +1265,13 @@ we rewrite as follows:
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
 \fun{in}(\fun{mir}(t),s)
-& = 
+& =
 & \fun{in}(\fun{mir}(\fun{int}(x,t_1,t_2)),s)\\
-& \xrightarrow{\smash{\tau}} 
+& \xrightarrow{\smash{\tau}}
 & \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),s)\\
 & \Rra{\rho}
 & \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),s)})\\
-& \equiv 
+& \equiv
 & \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),s)})
 & (\pred{InMir}{t_1,s})\\
 & \equiv_0
@@ -1405,7 +1405,7 @@ function definition is given in \fig~\vref{fig:post}.
 \\
 \fun{post}(\fun{ext}(),s) & \xrightarrow{\smash{\mu}} & s;\\
 \fun{post}(\fun{int}(x,t_1,t_2),s)
-  & \xrightarrow{\smash{\nu}} 
+  & \xrightarrow{\smash{\nu}}
   & \fun{post}(t_1,\fun{post}(t_2,\cons{x}{s})).
 \end{array}}
 \end{equation*}
@@ -1491,7 +1491,7 @@ rewrites of the left\hyp{}hand side,
 \begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
 \fun{pre}(\fun{mir}(t),s)
 & = & \fun{pre}(\fun{mir}(\fun{int}(x,t_1,t_2)),s)\\
-& \xrightarrow{\smash{\tau}} 
+& \xrightarrow{\smash{\tau}}
 & \fun{pre}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),s)\\
 & \Rra{\kappa}
 & \cons{x}{\fun{pre}(\fun{mir}(t_2),\fun{pre}(\fun{mir}(t_1),s))}\\
@@ -1538,7 +1538,7 @@ rewrites of the left\hyp{}hand side,
 \end{equation*}
 \caption{Proof of \(\fun{pre}(\fun{mir}(t),s) \equiv \fun{rcat}(\fun{post}(t,\el),s)\)\label{fig:premir}}
 \end{figure}
-where 
+where
 \begin{itemize*}
 
   \item (\(\equiv_0\)) is \(\pred{PreMir}{t_1,s}\), an instance of the
@@ -1591,7 +1591,7 @@ expressions on both sides of the equivalence, until we reach
 \begin{equation*}
 \begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
           \fun{pre}(\fun{mir}(\fun{mir}(t)))
-& \equiv 
+& \equiv
 & \fun{rev}(\fun{post}(\fun{mir}(t)))
 & (\pred{PreMir}{\fun{mir}(t)})\\
   \fun{pre}(t)
@@ -1885,7 +1885,7 @@ to refine the definition of
 \quad
 \inferrule
   {\fun{deq}(q) \twoheadrightarrow \pair{q'}{\fun{int}(x,t_1,t_2)}}
-  {\fun{bf}_4(q) \twoheadrightarrow 
+  {\fun{bf}_4(q) \twoheadrightarrow
    \cons{x}{\fun{bf}_4(\fun{enq}(t_2,\fun{enq}(t_1,q')))}}\,.
 \end{gather*}}}
 \caption{Refinement of \fig~\vref{fig:bf1}\label{fig:bf3}}
@@ -1907,10 +1907,10 @@ shown in \fig~\vref{fig:bf}.
 \fun{bf}(\el,\el) & \xrightarrow{\smash{\xi}} & \el;\\
 \fun{bf}(\cons{t}{r},\el) & \xrightarrow{\smash{\pi}} &
   \fun{bf}(\el,\fun{rcat}(r,[t]));\\
-\fun{bf}(r,\cons{\fun{ext}()}{f}) 
+\fun{bf}(r,\cons{\fun{ext}()}{f})
   & \xrightarrow{\smash{\rho}} & \fun{bf}(r,f);\\
 \fun{bf}(r,\cons{\fun{int}(x,t_1,t_2)}{f})
-  & \xrightarrow{\smash{\sigma}} 
+  & \xrightarrow{\smash{\sigma}}
   & \cons{x}{\fun{bf}(\cons{t_2,t_1}{r},f)}.
 \end{array}}
 \end{equation*}
@@ -1951,7 +1951,7 @@ follows:
   \item rule \clause{\sigma} is used once per internal node, so
     \(n\)~times.
 
-\end{itemize*} 
+\end{itemize*}
 Gathering all these enumerations yields the formula
 \begin{equation*}
 \C{\fun{bf}}{n,h} = 4n + 3h + 3.\index{bf@$\C{\fun{bf}}{n,h}$}
@@ -2127,9 +2127,9 @@ Consider \fun{bfn\(_1\)/1}\index{bfn1@\fun{bfn\(_1\)/1}} and
   \enq{\fun{ext}()}{\fun{bfn}_2(i,q)};
 \\
 \inferrule
-  {\fun{bfn}_2(i+1,\enq{t_2}{\enq{t_1}{q}}) \twoheadrightarrow 
+  {\fun{bfn}_2(i+1,\enq{t_2}{\enq{t_1}{q}}) \twoheadrightarrow
    \deq{t'_2}{\deq{t'_1}{q'}}}
-  {\fun{bfn}_2(i,\deq{\fun{int}(x,t_1,t_2)}{q}) \twoheadrightarrow 
+  {\fun{bfn}_2(i,\deq{\fun{int}(x,t_1,t_2)}{q}) \twoheadrightarrow
    \enq{\fun{int}(i,t'_1,t'_2)}{q'}}.
 \end{gather*}}}
 \caption{Abstract breadth-first numbering\label{fig:bfn1}}
@@ -2579,11 +2579,11 @@ predetermined and cannot be changed during the traversal.
 Normally, the visit of a functional data structure starts always at
 the same location, for example, in the case of a stack, it is the top
 item and, in the case of a tree, the access point is the
-root. Sometimes, updating a data structure with an on\hyp{}line
-algorithm (see page~\pageref{par:online_vs_offline} and
-section~\ref{sec:online} \vpageref{sec:online}) requires to keep a
-direct access `inside' the data structure, usually where the last
-update was performed, or nearby, in view of a better amortised (see
+root. Sometimes, updating a data structure with an online algorithm
+(see page~\pageref{par:online_vs_offline} and section~\ref{sec:online}
+\vpageref{sec:online}) requires to keep a direct access `inside' the
+data structure, usually where the last update was performed, or
+nearby, in view of a better amortised (see
 page~\pageref{par:amortised_cost}) or average cost (see 2-way
 insertion in section~\ref{sec:2-way} \vpageref{sec:2-way}).
 
@@ -2644,7 +2644,7 @@ call. See \fig~\vref{fig:zip_move}
 \fun{up}(\pair{\fun{right}(x,t_1,p)}{t_2}) & \rightarrow &
 \pair{p}{\fun{int}(x,t_1,t_2)}.\\
 \\
-\fun{left}(\pair{p}{\fun{int}(x,t_1,t_2)}) & \rightarrow & 
+\fun{left}(\pair{p}{\fun{int}(x,t_1,t_2)}) & \rightarrow &
   \pair{\fun{left}(x,t_2,p)}{t_1}.\\
 \\
 \fun{right}(\pair{p}{\fun{int}(x,t_1,t_2)}) & \rightarrow &

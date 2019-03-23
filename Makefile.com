@@ -56,95 +56,95 @@ OUT_XML := ${OUT_XML:%=${XML_DIR}/%_out.xml}
 xml: ${OUT_XML}
 
 clean_xml:
-	\rm -f ${OUT_XML}
+> \rm -f ${OUT_XML}
 
 clean:: clean_xml
 
 ${XML_DIR}/cookbook1_out.xml: ${XML_DIR}/cookbook.xml ${XSLT_DIR}/empty.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/cookbook2_out.xml: ${XML_DIR}/cookbook.xml ${XSLT_DIR}/chapter.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/cookbook3_out.xml: ${XML_DIR}/cookbook.xml ${XSLT_DIR}/chapters.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/cookbook4_out.xml: ${XML_DIR}/cookbook.xml ${XSLT_DIR}/cookbook.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/cookbook5_out.xml: ${XML_DIR}/cookbook.xml ${XSLT_DIR}/cookbook1bis.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/cookbook6_out.xml: ${XML_DIR}/cookbook.xml ${XSLT_DIR}/cookbook1.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/cookbook7_out.xml: ${XML_DIR}/cookbook.xml ${XSLT_DIR}/cookbook2.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/cookbook8_out.xml: ${XML_DIR}/cookbook.xml ${XSLT_DIR}/cookbook3.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/toc_out.xml: ${XML_DIR}/toc.xml ${XSLT_DIR}/len0.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/sum_out.xml: ${XML_DIR}/sum.xml ${XSLT_DIR}/sum.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/toc_bis1_out.xml: ${XML_DIR}/toc_bis.xml ${XSLT_DIR}/last.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/toc_bis2_out.xml: ${XML_DIR}/toc_bis.xml ${XSLT_DIR}/penult.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/csv_out.xml: ${XML_DIR}/csv.xml ${XSLT_DIR}/csv1.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/persons1A_out.xml: ${XML_DIR}/persons1.xml ${XSLT_DIR}/shuffle1.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/persons2A_out.xml: ${XML_DIR}/persons2.xml ${XSLT_DIR}/shuffle1.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/persons3A_out.xml: ${XML_DIR}/persons3.xml ${XSLT_DIR}/shuffle1.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/persons1B_out.xml: ${XML_DIR}/persons1.xml ${XSLT_DIR}/shuffle2.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/persons2B_out.xml: ${XML_DIR}/persons2.xml ${XSLT_DIR}/shuffle2.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/persons3B_out.xml: ${XML_DIR}/persons3.xml ${XSLT_DIR}/shuffle2.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/numbers_out.xml: ${XML_DIR}/numbers.xml ${XSLT_DIR}/max1.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/numbers_bis_out.xml: ${XML_DIR}/numbers_bis.xml ${XSLT_DIR}/red.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/ordered_lists_out.xml: ${XML_DIR}/ordered_lists.xml ${XSLT_DIR}/merge1.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/toc_simple_out.xml: ${XML_DIR}/toc_simple.xml ${XSLT_DIR}/flip1.xsl
-	${call saxon}
+> ${call saxon}
 
 ${XML_DIR}/toc_chap_out.xml: ${XML_DIR}/toc_chap.xml ${XSLT_DIR}/flip2.xsl
-	${call saxon}
+> ${call saxon}
 
 # Text files
 #
 toc_deep_out.txt: ${XML_DIR}/toc_deep.xml ${XSLT_DIR}/count1.xsl
-	${call saxon}
+> ${call saxon}
 
 numbers_tree_out.txt: ${XML_DIR}/numbers_tree.xml ${XSLT_DIR}/sum2.xsl
-	${call saxon}
+> ${call saxon}
 
 toc_chap_out.txt: ${XML_DIR}/toc_chap.xml ${XSLT_DIR}/height1.xsl
-	${call saxon}
+> ${call saxon}
 
 num_out.txt: ${XML_DIR}/num.xml ${XSLT_DIR}/tmerge.xsl
-	${call saxon}
+> ${call saxon}
 
 OUT_TXT := toc_deep numbers_tree toc_chap num
 OUT_TXT := ${OUT_TXT:%=%_out.txt}
@@ -153,6 +153,6 @@ OUT_TXT := ${OUT_TXT:%=%_out.txt}
 txt: ${OUT_TXT}
 
 clean_txt:
-	\rm -f ${OUT_TXT}
+> \rm -f ${OUT_TXT}
 
 clean:: clean_txt

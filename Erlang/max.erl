@@ -3,7 +3,7 @@
 
 ceiling(X) when X > trunc(X) -> trunc(X) + 1;
 ceiling(X)                   -> trunc(X).
-     
+
 log2(X) -> math:log(X)/math:log(2).
 
 exp2(0) -> 1;
