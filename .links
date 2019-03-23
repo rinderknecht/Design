@@ -1,0 +1,6 @@
+../LaTeX-build/Makefile
+
+TeX/cpp.tex
+TeX/erlc.tex
+TeX/saxon.tex
+TeX/xmllint.tex
