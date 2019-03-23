@@ -75,12 +75,14 @@ all~\(t\),
 
 \end{itemize*}
 The former is almost within reach:
-\begin{equation*}
-\fun{rev}_0(\fun{cat}(\el,t)) \xrightarrow{\smash{\alpha}}
-\fun{rev}_0(t) \leftrightsquigarrow \fun{cat}(\fun{rev}_0(t),\el)
-\xleftarrow{\smash{\gamma}}
-\fun{cat}(\fun{rev}_0(t),\fun{rev}_0(\el)).
-\end{equation*}
+\begin{align*}
+  \fun{rev}_0(\fun{cat}(\el,t))
+  & \smashedrightarrow{\alpha}
+  \fun{rev}_0(t)\\
+  & \leftrightsquigarrow \fun{cat}(\fun{rev}_0(t),\el)\\
+  & \smashedleftarrow{\gamma}
+    \fun{cat}(\fun{rev}_0(t),\fun{rev}_0(\el)).
+\end{align*}
 The missing part is filled by showing that
 \((\leftrightsquigarrow)\)~is actually~\((\equiv)\).\par\vskip\baselineskip
 
@@ -88,14 +90,14 @@ Let \(\pred{CatNil}{s}\)\index{CatNil@\predName{CatNil}|(} be the
 property \(\fun{cat}(s,\el) \equiv s\)\index{cat@\fun{cat/2}}. In
 order to prove it by induction on the structure of~\(s\), we have to
 prove
-\begin{itemize*}
+\begin{itemize}
 
   \item the basis \(\pred{CatNil}{\el}\);
 
   \item the inductive step \(\forall s \in S.\pred{CatNil}{s}
     \Rightarrow \forall x \in T.\pred{CatNil}{\cons{x}{s}}\).
 
-\end{itemize*}
+\end{itemize}
 The former is easy: \(\fun{cat}(\el,\el) \xrightarrow{\smash{\alpha}}
 \el\)\index{cat@\fun{cat/2}}. The latter is not complicated either:
 \(\fun{cat}(\cons{x}{s},\el) \xrightarrow{\smash{\beta}}
@@ -103,17 +105,19 @@ The former is easy: \(\fun{cat}(\el,\el) \xrightarrow{\smash{\alpha}}
 is none other than the induction hypothesis
 \(\pred{CatNil}{s}\)\index{CatNil@\predName{CatNil}|)}.\hfill\(\Box\)
 
-Note that we could have proved instead \(\fun{cat}(s,\el)
-\twoheadrightarrow s\), for all values~\(s\). The difference is that
-\(\pred{CatNil}{s}\) holds even if~\(s\) is not a value, as all we
-have to do is to replace \(\fun{cat}(\cons{x}{s},\el)
-\xrightarrow{\smash{\beta}} \cons{x}{\fun{cat}(s,\el)}\) by the
-equivalence \(\fun{cat}(\cons{x}{s},\el) \Rra{\beta}
-\cons{x}{\fun{cat}(s,\el)}\). This principle will hold in all our
-proofs: we assume that variables denote values and, if not, we simply
-change \((\xrightarrow{\smash{\beta}})\) into \((\Rra{\beta})\), for
-all rules~\(\beta\) in the proof. Our assumption perhaps improves
-legibility.\par\vskip\baselineskip
+%% Note that we could have proved instead \(\fun{cat}(s,\el)
+%% \twoheadrightarrow s\), for all values~\(s\). The difference is that
+%% \(\pred{CatNil}{s}\) holds even if~\(s\) is not a value, as all we
+%% have to do is to replace \(\fun{cat}(\cons{x}{s},\el)
+%% \xrightarrow{\smash{\beta}} \cons{x}{\fun{cat}(s,\el)}\) by the
+%% equivalence \(\fun{cat}(\cons{x}{s},\el) \Rra{\beta}
+%% \cons{x}{\fun{cat}(s,\el)}\). This principle will hold in all our
+%% proofs: we assume that variables denote values and, if not, we simply
+%% change \((\xrightarrow{\smash{\beta}})\) into \((\Rra{\beta})\), for
+%% all rules~\(\beta\) in the proof. Our assumption perhaps improves
+%% legibility.\par\vskip\baselineskip
+
+\par\vskip\baselineskip
 
 \noindent Assuming
 \(\pred{CatRev}{s,t}\)\index{CatRev@\predName{CatRev}}, we must
@@ -128,7 +132,7 @@ establish \(\forall x \in T.\pred{CatRev}{\cons{x}{s},t}\):
 & \equiv
 & \fun{cat}(\fun{cat}(\fun{rev}_0(t),\fun{rev}_0(s)),[x])
 & (\predName{CatAssoc})\\
-& \equiv 
+& \equiv
 & \fun{cat}(\fun{rev}_0(\fun{cat}(s,t)),[x])
 & (\pred{CatRev}{s,t})\\
 & \xleftarrow{\smash{\delta}}
@@ -157,7 +161,7 @@ Let us resume the proof of
 & \fun{cat}(\fun{cat}(\el,[x]),s)\\
 & \xrightarrow{\smash{\alpha}}
 & \fun{cat}([x],s)\\
-& \xrightarrow{\smash{\beta}} 
+& \xrightarrow{\smash{\beta}}
 & \cons{x}{\fun{cat}(\el,s)}\\
 & \xrightarrow{\smash{\alpha}} &
 \cons{x}{s}.
@@ -176,7 +180,7 @@ definition, as we can clearly see in rule~\(\delta\) that the
 item~\(x\), which is the top of the input, is intended to be located
 at the bottom of the output. Unfortunately, this definition is
 computationally inefficient, that is, it leads to a great deal of
-rewrites relatively to the size of the input. 
+rewrites relatively to the size of the input.
 
 Let us assume that we also have an efficient definition for the stack
 reversal, named \fun{rev/1}\index{rev@\fun{rev/1}}, which depends upon
@@ -185,11 +189,13 @@ an auxiliary function
   and catenation}\index{stack!reversal!efficient $\sim$}
 (\emph{reverse and catenate}):
 \begin{equation}
-\fun{rev}(s) \xrightarrow{\smash{\epsilon}} \fun{rcat}(s,\el).\;\,
-\fun{rcat}(\el,t) \xrightarrow{\smash{\zeta}} t;\;\,
-\fun{rcat}(\cons{x}{s},t) \xrightarrow{\smash{\eta}} 
-                          \fun{rcat}(s,\cons{x}{t}).
-\label{def:rev}
+  \begin{array}{@{}r@{\;}l@{\;}l@{}}
+    \fun{rev}(s) & \smashedrightarrow{\epsilon} & \fun{rcat}(s,\el).\\
+    \fun{rcat}(\el,t) & \smashedrightarrow{\zeta} & t;\\
+    \fun{rcat}(\cons{x}{s},t) & \smashedrightarrow{\eta} &
+    \fun{rcat}(s,\cons{x}{t}).
+  \end{array}
+  \label{def:rev}
 \end{equation}
 An additional parameter introduced by \fun{rcat/2} accumulates partial
 results, thus called an \emph{accumulator}\index{functional
@@ -229,8 +235,9 @@ structural\index{stack!reversal!equivalence}\index{equivalence!proof
 The former is easy: \(\fun{rev}_0(\el) \xrightarrow{\smash{\gamma}}
 \el \xleftarrow{\smash{\zeta}} \fun{rcat}(\el,\el)
 \xleftarrow{\smash{\epsilon}}
-\fun{rev}(\el)\)\index{rev0@\fun{rev\(_0\)/1}}. For the latter, let us
-rewrite \(\fun{rev}_0(\cons{x}{s})\) and
+\fun{rev}(\el)\)\index{rev0@\fun{rev\(_0\)/1}}.
+
+For the latter, let us rewrite \(\fun{rev}_0(\cons{x}{s})\) and
 \(\fun{rev}(\cons{x}{s})\) so they converge:
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}lr@{}}
@@ -252,6 +259,8 @@ rewrite \(\fun{rev}_0(\cons{x}{s})\) and
 The missing part is filled by showing \((\leftrightsquigarrow)\) to
 be~\((\equiv)\) as follows.\index{rev@\fun{rev/1}|)}
 
+\par\vskip\baselineskip
+
 Let
 \(\pred{RevCat}{s,t}\)\index{RevCat@\predName{RevCat}}\label{RevCat}
 be the property \(\fun{rcat}(s,t) \equiv
@@ -265,11 +274,15 @@ Induction on the structure of~\(s\) requires the proofs of
     \Rightarrow \forall x \in T.\pred{RevCat}{\cons{x}{s},t}\).
 
 \end{itemize}
-First, \(\fun{rcat}(\el,t) \xrightarrow{\smash{\zeta}} t
-\xleftarrow{\smash{\alpha}} \fun{cat}(\el,t)
-\xleftarrow{\smash{\zeta}} \fun{cat}(\fun{rcat}(\el,\el),t)
-\xleftarrow{\smash{\epsilon}} \fun{cat}(\fun{rev}(\el),t)\). Next, let
-us assume \(\pred{RevCat}{s,t}\) and prove \(\forall x \in
+First, for the establishment of the basis, we have:
+\begin{align*}
+  \fun{rcat}(\el,t)
+  & \smashedrightarrow{\zeta} t\\
+  & \smashedleftarrow{\alpha} \fun{cat}(\el,t)\\
+  & \smashedleftarrow{\zeta} \fun{cat}(\fun{rcat}(\el,\el),t)\\
+  & \smashedleftarrow{\epsilon} \fun{cat}(\fun{rev}(\el),t).
+\end{align*}
+Next, let us assume \(\pred{RevCat}{s,t}\) and prove \(\forall x \in
 T.\pred{RevCat}{\cons{x}{s},t}\):
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{}r@{}}
@@ -315,13 +328,13 @@ of~\(s\) is~\(k\), and we already know \(\C{\fun{cat}}{k} = k +
 1\)\index{cat@$\C{\fun{cat}}{n}$} (page~\pageref{cost:cat}). We have
 \begin{equation*}
 \sum_{k=0}^{n-1}(\C{\fun{rev}_0}{k+1} - \C{\fun{rev}_0}{k}) =
-\C{\fun{rev}_0}{n} - \C{\fun{rev}_0}{0} = 
+\C{\fun{rev}_0}{n} - \C{\fun{rev}_0}{0} =
 \sum_{k=0}^{n-1}(k+2) = 2n + \sum_{k=0}^{n-1}{k}.
 \end{equation*}
 The remaining sum is a classic of algebra:
 \begin{equation*}
-2 \cdot \sum_{k=0}^{n-1}{k} = 
-\sum_{k=0}^{n-1}{k} + \sum_{k=0}^{n-1}{k} = 
+2 \cdot \sum_{k=0}^{n-1}{k} =
+\sum_{k=0}^{n-1}{k} + \sum_{k=0}^{n-1}{k} =
 \sum_{k=0}^{n-1}{k} + \sum_{k=0}^{n-1}(n-k-1) = n(n-1).
 \end{equation*}
 Consequently,
@@ -354,13 +367,12 @@ cost:\index{rev0@$\C{\fun{rev}_0}{n}$}
 \begin{align*}
 \C{\fun{rev}_0}{n}
   &:= \len{\T{\fun{rev}_0}{n}}
-    = \left\lvert\delta^n\gamma 
+    = \left\lvert\delta^n\gamma
         \prod_{k=0}^{n-1}{\beta^k\alpha}\right\lvert
     = \len{\delta^n\gamma} + \sum_{k=0}^{n-1}\len{\beta^k\alpha}\\
    &= (n+1) + \sum_{k=0}^{n-1}(k+1) = (n+1) + \sum_{k=1}^{n+1}k
     = \frac{1}{2}n^2 + \frac{3}{2}n + 1.
 \end{align*}
-
 The reason for this inefficiency can be seen in the fact that
 rule~\clause{\delta} produces a series of calls to
 \fun{cat/2}\index{cat@\fun{cat/2}} following the pattern
@@ -394,14 +406,23 @@ the associativity\index{stack!catenation!associativity} of
 \(\fun{cat}(\fun{cat}(s,t),u) \equiv
 \fun{cat}(s,\fun{cat}(t,u))\).
 
+\par\vskip\baselineskip
+
 Let \(\Call{f(x)}\) be the cost of the call \(f(x)\). Then
-\(\Call{\fun{cat}(\fun{cat}(s,t),u)} = (\fun{len}(s) + 1) +
-(\fun{len}(\fun{cat}(s,t)) + 1) = (\fun{len}(s) + 1) + (\fun{len}(s) +
-\fun{len}(t) + 1) = 2 \cdot \fun{len}(s) + \fun{len}(t) + 2\), using
-\(\pred{LenCat}{s,t} \colon \fun{len}(\fun{cat}(s,t)) = \fun{len}(s) +
-\fun{len}(t)\); whilst \(\Call{\fun{cat}(s,\fun{cat}(t,u))} =
-(\fun{len}(t) + 1) + (\fun{len}(s) + 1) = \fun{len}(s) + \fun{len}(t)
-+ 2\).
+\begin{align*}
+\Call{\fun{cat}(\fun{cat}(s,t),u)}
+  &= (\fun{len}(s) + 1) + (\fun{len}(\fun{cat}(s,t)) + 1)\\
+  &= (\fun{len}(s) + 1) + (\fun{len}(s) + \fun{len}(t) + 1) & (\pred{LenCat}{s,t})\\
+  &= 2 \cdot \fun{len}(s) + \fun{len}(t) + 2,
+\end{align*}
+assuming \(\pred{LenCat}{s,t} \colon \fun{len}(\fun{cat}(s,t)) =
+\fun{len}(s) + \fun{len}(t)\). On the other hand:
+\begin{align*}
+  \Call{\fun{cat}(s,\fun{cat}(t,u))}
+  &= (\fun{len}(t) + 1) + (\fun{len}(s) + 1)\\
+  &= \fun{len}(s) + \fun{len}(t) + 2.
+\end{align*}
+From which we conclude:
 \begin{equation}
 %\abovedisplayskip=4pt
 %\belowdisplayskip=4pt
@@ -415,8 +436,8 @@ suffices.
 Yet another way to determine the cost of \fun{rev\(_0\)/1} consists in
 first guessing that it is \emph{quadratic}\index{cost!quadratic
   $\sim$}, that is, \(\C{\fun{rev}_0}{n} = an^2 + bn +
-c\)\index{rev0@$\C{\fun{rev}_0}{n}$}, with \(a\), \(b\) and~\(c\) are
-unkowns.  Since there are three coefficients, we only need three
+c\)\index{rev0@$\C{\fun{rev}_0}{n}$}, where \(a\), \(b\) and~\(c\) are
+unknowns.  Since there are three coefficients, we only need three
 values of~\(\C{\fun{rev}_0}{n}\) to determine them, for instance
 \(n=0, 1, 2\). Making some traces, we find \(\C{\fun{rev}_0}{0} = 1\),
 \(\C{\fun{rev}_0}{1} = 3\) and \(\C{\fun{rev}_0}{2} = 6\), so we solve
@@ -435,15 +456,17 @@ try other values with the newly found formula, for instance
 \(\C{\fun{rev}_0}{4} = (4+1)(4+2)/2 = 15\), then compare with the cost
 of \(\fun{rev}_0([1,2,3,4])\)\index{rev0@$\C{\fun{rev}_0}{n}$}, for
 example. Here, the contents of the stack is irrelevant, only its
-length matters. After finding a formula for the cost using the
-empirical method above, it is necessary to prove it for all values
-of~\(n\). Since the initial equations are recurrent, the proof method
-of choice is induction.
+length matters.
+
+After finding a formula for the cost using the empirical method above,
+it is necessary to prove it for all values of~\(n\). Since the initial
+equations are recurrent, the proof method of choice is
+\emph{induction}.
 
 Let \(\pred{Quad}{n}\)\index{Quad@\predName{Quad}} be the property
 \(\C{\fun{rev}_0}{n} = (n^2 + 3n + 2)/2\). We already checked its
 validity for some small values, here, \(n = 0, 1, 2\). Let us suppose
-it valid for some value of~\(n\) (induction hypothesis) and let us
+it is valid for some value of~\(n\) (induction hypothesis) and let us
 prove \(\pred{Quad}{n+1}\). We already know \(\C{\fun{rev}_0}{n+1} =
 \C{\fun{rev}_0}{n} + n + 2\)\index{rev0@$\C{\fun{rev}_0}{n}$}. The
 induction hypothesis implies
@@ -469,7 +492,7 @@ so \(\C{\fun{rev}}{n} = n + 2\). The cost is
 %\newpage
 \paragraph{Exercises}
 
-\begin{enumerate*}
+\begin{enumerate}
 
   \item Prove \(\pred{LenRev}{s} \colon \fun{len}(\fun{rev}_0(s)) \equiv
   \fun{len}(s)\).
@@ -481,4 +504,4 @@ so \(\C{\fun{rev}}{n} = n + 2\). The cost is
   \fun{rev/1}\index{rev@\fun{rev/1}} in section~3.4.9 of the book of
   \cite{CousineauMauny_1998}?
 
-\end{enumerate*}
+\end{enumerate}

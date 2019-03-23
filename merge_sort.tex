@@ -439,7 +439,7 @@ Now, we can replace this closed form in equation~\eqref{eq:K_temp}
 \vpageref{eq:K_temp} so\index{K@$K(m,n)$}
 \begin{equation*}
 K(m,n) = (m + n)
-\binom{m+n}{n} - \binom{m+n}{n+1} - \binom{m+n}{m+1}. 
+\binom{m+n}{n} - \binom{m+n}{n+1} - \binom{m+n}{m+1}.
 \end{equation*}
 By definition, the average number of comparisons
 \(\OM{\fun{mrg}}{m,n}\)\index{mrg@$\OM{\fun{mrg}}{m,n}$} is the ratio
@@ -679,7 +679,7 @@ number of keys, thus obtaining stacks of lengths \(\floor{n/2}\) and
 \\
 \fun{cutr}(s,\cons{y}{t},\cons{a,b}{u})
                        & \rightarrow & \fun{cutr}(\cons{y}{s},t,u);\\
-\fun{cutr}(s,t,u)        & \rightarrow 
+\fun{cutr}(s,t,u)        & \rightarrow
                          & \fun{mrg}(\fun{tms}(s),\fun{tms}(t)).\\
 \\
 \fun{mrg}(\el,t)         & \rightarrow & t;\\
@@ -847,7 +847,7 @@ and~\(b\).\index{Low@\predName{Low}} Let \(m=2^p\). Using
 hypothesis \(\pred{Low}{i}\), we have
 \begin{equation}
 \tfrac{1}{2}m\lg m + (\tfrac{1}{2}i\lg i + ai + b) + i
-\leqslant 
+\leqslant
 \OB{\fun{tms}}{m} + \OB{\fun{tms}}{i} + i = \OB{\fun{tms}}{m+i}.
 \label{ineq:Btms_n_i}
 \end{equation}
@@ -1135,7 +1135,7 @@ Equation~\eqref{eq:worst_merge} \vpageref{eq:worst_merge} yields
 \(\OW{\fun{tms}}{n} = \OW{\fun{tms}}{\floor{n/2}} +
 \OW{\fun{tms}}{\ceiling{n/2}} + n - 1\) and
 \begin{equation*}
-\OW{\fun{tms}}{0} = \OW{\fun{tms}}{1} = 0;\; 
+\OW{\fun{tms}}{0} = \OW{\fun{tms}}{1} = 0;\;
 \OW{\fun{tms}}{2p} = 2\OW{\fun{tms}}{p} + 2p - 1,\;
 \OW{\fun{tms}}{2p+1} = \OW{\fun{tms}}{p} + \OW{\fun{tms}}{p+1} + 2p.
 \end{equation*}
@@ -1278,12 +1278,12 @@ equation~\eqref{eq:cost_tms} becomes
 \OM{\fun{tms}}{n} = \OM{\fun{tms}}{\floor{n/2}} +
 \OM{\fun{tms}}{\ceiling{n/2}} +
 \OM{\fun{mrg}}{\floor{n/2},\ceiling{n/2}},\index{mrg@\fun{mrg/2}}
-\end{equation*} 
+\end{equation*}
 which, with equation~\eqref{eq:Amrg}, in turn implies
 \begin{equation*}
 \OM{\fun{tms}}{n} = \OM{\fun{tms}}{\floor{n/2}} +
 \OM{\fun{tms}}{\ceiling{n/2}} + n -
-\frac{\floor{n/2}}{\ceiling{n/2}+1} 
+\frac{\floor{n/2}}{\ceiling{n/2}+1}
 - \frac{\ceiling{n/2}}{\floor{n/2}+1}.
 \end{equation*}
 If we proceed as we did for the extremal costs, we get
@@ -1366,23 +1366,23 @@ The other inductive step deals with the odd values of~\(n\). We assume
 %\belowdisplayskip=2pt
 (p\lg p + ap + b) + ((p+1)\lg(p+1) + a(p+1) + b) + 2p - 1 +
 \frac{2}{p+2} \leqslant \OM{\fun{tms}}{2p+1},
-\end{equation*} 
+\end{equation*}
 which may be simplified slightly into
 \begin{equation*}
 %\abovedisplayskip=0pt
 %\belowdisplayskip=2pt
 p\lg p + (p+1)\lg(p+1) + a(2p+1) + 2b + 2p - 1 + \frac{2}{p+2}
 \leqslant \OM{\fun{tms}}{2p+1}.
-\end{equation*} 
+\end{equation*}
 We want to prove \(\pred{H}{2p+1} \colon (2p+1)\lg(2p+1) +
-a(2p+1) + b \leqslant \M{}{2p+1}\), which is thus implied by 
+a(2p+1) + b \leqslant \M{}{2p+1}\), which is thus implied by
 \begin{equation}
 %\abovedisplayskip=0pt
 %\belowdisplayskip=2pt
   (2p+1)\lg(2p+1) \leqslant
   p\lg p + (p+1)\lg(p+1) + b + 2p - 1 + \frac{2}{p+2}.
 \label{ineq:Psi_temp}
-\end{equation} 
+\end{equation}
 Let \(\Psi(p) := (2p+1)\lg(2p+1) - (p+1)\lg(p+1) - p\lg p -
 2p + 1 - 2/(p+2)\). Then~\eqref{ineq:Psi_temp} is equivalent to
 \(\Psi(p) \leqslant b\). Furthermore,
@@ -1430,7 +1430,7 @@ This bound is not very good, but it was easy to obtain. We may recall
 the lower bound when \(n=2^p\), in~\eqref{ineq:M_join}
 \vpageref{ineq:M_join}: \(n\lg n - \alpha n + \alpha <
 \OM{\fun{tms}}{n}\), where \(\alpha \simeq 1.264499\). In fact,
-\cite{FlajoletGolin_1994} proved 
+\cite{FlajoletGolin_1994} proved
 \begin{equation}
 n\lg n - \alpha n < \OM{\fun{tms}}{n}.
 \label{ineq:best_lower_Atms}
@@ -1687,7 +1687,7 @@ the nodes from the root \(2^{e_r}+ \dots + 2^{e_0}\) down to \(2^{e_1}
 \end{figure}
 are shown the maximum\hyp{}cost trees for \(n\)~even and \(n+1\). The
 boxed expressions are not found in the opposite tree, therefore, the
-sum in each tree of the non\hyp{}boxed terms is identical. 
+sum in each tree of the non\hyp{}boxed terms is identical.
 \begin{itemize}
 
   \item \emph{If \(n\)~is even}, in \fig~\vref{fig:w2p}, this sum
@@ -1746,7 +1746,7 @@ sum in each tree of the non\hyp{}boxed terms is identical.
      \sum_{k=2}^{q}2^k + 2((q-1)+(r-q+1)) = \OW{\fun{bms}}{n} -
      \sum_{k=0}^{q-1}((k-1)2^{k}+1) - \sum_{k=2}^{q}2^k + 2r =
      \OW{\fun{bms}}{n} - (q-1)2^q - q + 2r + 1\), using
-     equation~\eqref{eq:worst_power} and \(\sum_{k=0}^{q-1}k2^k =  
+     equation~\eqref{eq:worst_power} and \(\sum_{k=0}^{q-1}k2^k =
      (q-2)2^{q}+2\). Indeed, let \(S_{q} :=
      \sum_{k=0}^{q-1}{k2^{k-1}}\). Then \(S_{q} + q2^{q-1} = \smash[t]{\sum_{k=1}^{q}{k2^{k-1}}} = \smash[t]{\sum_{k=0}^{q-1}{(k+1)2^{k}}}
 = \smash[t]{\sum_{k=0}^{q-1}{k2^{k}}} + \smash[t]{\sum_{k=0}^{q-1}{2^{k}}}
@@ -1865,7 +1865,7 @@ by
 \end{equation*}
 where \(c_p := \sum_{k \geqslant 0}1/(2^{k}+2^{-p})\). Let
 \begin{equation*}
-  \Psi(p,i) := p - \alpha + 1 - \frac{1}{i+1} + \frac{i}{2^p+1} - 
+  \Psi(p,i) := p - \alpha + 1 - \frac{1}{i+1} + \frac{i}{2^p+1} -
   \frac{1}{2^p}((2^p+i)\lg(2^p+i) - i\lg i - c_p).
 \end{equation*}
 Then the sufficient condition above is equivalent to \(a \leqslant
@@ -2015,7 +2015,7 @@ easier. The problem here is to differentiate~\(c_p\). We can work our
 way round with the bound \(c_p < 2\) from~\eqref{ineq:M_join}
 \vpageref{ineq:M_join} and define
 \begin{equation*}
-  \Phi(p,i) := p - \alpha + 1 - \frac{1}{i+1} + \frac{i}{2^p+1} - 
+  \Phi(p,i) := p - \alpha + 1 - \frac{1}{i+1} + \frac{i}{2^p+1} -
   \frac{1}{2^p}((2^p+i)\lg(2^p+i) - i\lg i - 2).
 \end{equation*}
 Now we have \(\Psi(p,i) < \Phi(p,i)\) and, instead of \(\Psi(p,i)
@@ -2023,14 +2023,14 @@ Now we have \(\Psi(p,i) < \Phi(p,i)\) and, instead of \(\Psi(p,i)
 \leqslant a'\) and cross our fingers. In \fig~\vref{fig:phi},
 \begin{figure}
 \centering
-\includegraphics[bb=71 565 400 725]{phi} 
+\includegraphics[bb=71 565 400 725]{phi}
 \caption{\(\Phi(p,1)\), \(\Phi(p,2)\) and \(\Phi(p,3)\)\label{fig:phi}}
 \end{figure}
 are outlined \(\Phi(p,1)\), \(\Phi(p,2)\) and \(\Phi(p,3)\). (The
 starting point for each curve is marked by a white disk.)
 Differentiating with respect to~\(p\) yields
 \begin{equation*}
-\frac{\partial\Phi}{\partial p}(p,i) = 
+\frac{\partial\Phi}{\partial p}(p,i) =
 \frac{i}{2^p}\ln\left(\frac{2^p}{i}+1\right)
 - \frac{\ln 2}{2^{p-1}} - \frac{i2^p\ln 2}{(2^p+1)^2}.
 \end{equation*}
@@ -2088,7 +2088,7 @@ searching for the maximum, we deduce: \(a'_{\min} = \max_{0 < i
 constant is \(b'_{\min} = -2a'_{\min} - 1 = 2\alpha - 3 \simeq
 -0.471\). In sum, we found, for \(n \geqslant 2\),
 \begin{equation}
-n\lg n - \alpha n + (2\alpha - 1) < \OM{\fun{bms}}{n} 
+n\lg n - \alpha n + (2\alpha - 1) < \OM{\fun{bms}}{n}
 < n\lg n - (\alpha - 1)n - (3 - 2\alpha).
 \label{ineq:bounds_Mbms}
 \end{equation}
@@ -2301,7 +2301,7 @@ In total, \(\C{\fun{bms}}{n} = \OC{\fun{bms}}{n} + 3n + 2\ceiling{\lg
 It is easy to improve upon \fun{bms/1} by directly building the second
 level of the merge tree\index{tree!merge $\sim$} \emph{without using
   \fun{mrg/2}}\index{mrg@\fun{mrg/2}}. Consider the program in
-\fig~\vref{fig:bms0}, 
+\fig~\vref{fig:bms0},
 \begin{figure}
 \begin{equation*}
 \boxed{%
@@ -2442,7 +2442,7 @@ leave aside the case when \(i=2^p\), because
 Equations~\eqref{eq:bot} and~\eqref{eq:2p}
 yield\index{bms@$\OW{\fun{bms}}{n}$}
 \begin{align*}
-\OW{\fun{bms}}{2^p+i} &= 
+\OW{\fun{bms}}{2^p+i} &=
 \OW{\fun{bms}}{2^p} + \OW{\fun{bms}}{i} + 2^p + i - 1\\
 & = \OW{\fun{tms}}{2^p} + \OW{\fun{bms}}{i} + 2^p + i - 1 \geqslant
 \OW{\fun{tms}}{2^p} + \OW{\fun{tms}}{i} + 2^p + i - 1,
@@ -2451,7 +2451,7 @@ the inequality being the instance \(\pred{W\(_L\)}{i}\) of the
 induction hypothesis. Consequently, if the inequality
 \begin{equation}
 \OW{\fun{tms}}{2^p} + \OW{\fun{tms}}{i} + 2^p + i - 1 \geqslant
-\OW{\fun{tms}}{2^p+i} 
+\OW{\fun{tms}}{2^p+i}
 \label{ineq:suff_cond}
 \end{equation}
 holds, the result \(\pred{W\(_L\)}{2^p+i}\) ensues. Let us try to
@@ -2647,7 +2647,7 @@ bits of~\(n\), that is to say, \(\C{\fun{exp2}}{n} = \floor{\lg n} +
 In sum, we established, for \(n \geqslant 2\),
 \begin{align*}
 n\lg n - \tfrac{3}{2}n + 2 &< \OM{\fun{tms}}{n} < n\lg n - n + 1,\\
-n\lg n - \alpha n + (2\alpha - 1) &< \OM{\fun{bms}}{n} 
+n\lg n - \alpha n + (2\alpha - 1) &< \OM{\fun{bms}}{n}
 < n\lg n - (\alpha - 1)n - (3 - 2\alpha),
 \end{align*}
 where \(\alpha \simeq 1.2645\), \(2\alpha - 1 \simeq 1.52899\) and \(3
@@ -2711,14 +2711,14 @@ make three cases: \((2p,2q)\), \((2p,2q+1)\) and \((2p+1,2q+1)\).
       \item \(\OM{\fun{tms}}{m} = \OM{\fun{tms}}{2p} =
         2\OM{\fun{tms}}{p} + 2p - 2 + 2/(p+1)\);
 
-      \item \(\OM{\fun{tms}}{n} = \OM{\fun{tms}}{2q} = 
+      \item \(\OM{\fun{tms}}{n} = \OM{\fun{tms}}{2q} =
         2\OM{\fun{tms}}{q} + 2q - 2 + 2/(q+1)\).
 
     \end{itemize}
     Then, the right\hyp{}hand side of \(\pred{T}{m,n}\) is
     \begin{equation*}
       r := 2\left(\OM{\fun{tms}}{p} + \OM{\fun{tms}}{q} + 2(p+q) - 2 +
-        \tfrac{1}{p+1} + \tfrac{1}{q+1} - \tfrac{p}{2q+1} - 
+        \tfrac{1}{p+1} + \tfrac{1}{q+1} - \tfrac{p}{2q+1} -
         \tfrac{q}{2p+1}\right).
     \end{equation*}
     The induction hypothesis \(\pred{T}{p,q}\) is
@@ -2815,7 +2815,7 @@ make three cases: \((2p,2q)\), \((2p,2q+1)\) and \((2p+1,2q+1)\).
     \begin{itemize}
 
       \item \(\OM{\fun{tms}}{p+(q+1)} \leqslant \OM{\fun{tms}}{p} +
-        \OM{\fun{tms}}{q+1} + p + q + 1 - \tfrac{p}{q+2} 
+        \OM{\fun{tms}}{q+1} + p + q + 1 - \tfrac{p}{q+2}
         - \tfrac{q+1}{p+1}\);
 
       \item \(\OM{\fun{tms}}{(p+1)+q} \leqslant \OM{\fun{tms}}{p+1} +
@@ -2927,17 +2927,17 @@ careful benchmarking.
 \index{merge sort!vs. insertion sort|)}
 \index{merge sort!bottom-up $\sim$|)}
 
-\section{On-line merge sort}
+\section{Online merge sort}
 \label{sec:online}
-\index{merge sort!on-line $\sim$|(}
+\index{merge sort!online $\sim$|(}
 
 Sorting algorithms can be distinguished depending on whether they
 operate on the whole stack of keys, or key by key. The former are said
 \emph{off\hyp{}line}, as keys are not sorted while they are coming in,
-and the latter are called \emph{on\hyp{}line}, as the sorting process
+and the latter are called \emph{online}, as the sorting process
 can be temporally interleaved with the input process. Bottom\hyp{}up
 merge sort is an off\hyp{}line algorithm, but it can be easily
-modified to become on\hyp{}line by remarking that balanced mergers
+modified to become online by remarking that balanced mergers
 can be repeated whenever a new key arrives, and the unbalanced
 mergers are performed only when the sorted stack is required.
 
@@ -2957,7 +2957,7 @@ data structures, just as the off\hyp{}line version. (Notice that his
 context is nevertheless different from ours as he relies on lazy
 evaluation and amortised analysis.)
 
-Our code is shown in \fig~\ref{fig:oms}\index{merge sort!on-line
+Our code is shown in \fig~\ref{fig:oms}\index{merge sort!online
   $\sim$!program}.
 \begin{figure}
 \begin{equation*}
@@ -2993,7 +2993,7 @@ Our code is shown in \fig~\ref{fig:oms}\index{merge sort!on-line
                          & \cons{x}{\fun{mrg}(s,t)}.
 \end{array}}
 \end{equation*}
-\caption{On-line merge sort with \fun{oms/1}\label{fig:oms}}
+\caption{Online merge sort with \fun{oms/1}\label{fig:oms}}
 \end{figure}
 We use \(\fun{zero}()\)\index{zero@\fun{zero/0}} to represent a
 \(0\)-bit in the binary notation of the number of currently sorted
@@ -3009,7 +3009,7 @@ in the stack, as the subsequent processing of key~\(5\) would yield
 \([\fun{zero}(),\fun{one}([4,5]),\fun{one}([3,6,7,9])]\).
 
 Note that the program in \fig~\vref{fig:oms} does not capture the
-normal use case of on\hyp{}line merge sort, as, in practice, the
+normal use case of online merge sort, as, in practice, the
 argument~\(s\) of the call \(\fun{oms}(s)\)\index{oms@\fun{oms/1}}
 would not be known in its entirety, so
 \fun{add/2}\index{add@\fun{add/2}} would only be called whenever a key
@@ -3035,7 +3035,7 @@ performed, as this is dual to adding~\(1\) to \((\Xi{011}\ldots
 \begin{equation*}
 \abovedisplayskip=2pt
 \belowdisplayskip=2pt
-\OC{\fun{add}}{2j} = 0,\qquad 
+\OC{\fun{add}}{2j} = 0,\qquad
 \OC{\fun{add}}{2j-1} = \sum_{i=0}^{\rho_{2j}}{\OC{\fun{mrg}}{2^i,2^i}},
 \end{equation*}
 where \(\rho_n\)~is the highest power of~\(2\) dividing~\(n\) (ruler
@@ -3064,7 +3064,7 @@ unbalanced mergers is
 \label{eq:cost_unb}
 \end{equation}
 Let \(\OC{\fun{oms}}{n}\)\index{oms@$\OC{\fun{oms}}{n}$} the number of
-comparisons to sort \(n\)~keys on\hyp{}line. We have
+comparisons to sort \(n\)~keys online. We have
 \begin{equation}
 \OC{\fun{oms}}{n} = \OC{\fun{sum}}{n} + \OC{\fun{unb}}{n}.
 \index{sum@$\OC{\fun{sum}}{n}$}
@@ -3073,7 +3073,7 @@ comparisons to sort \(n\)~keys on\hyp{}line. We have
 
 %\addcontentsline{toc}{subsection}{Cost}
 \paragraph{Minimum cost}
-\index{merge sort!on-line $\sim$!minimum cost|(}
+\index{merge sort!online $\sim$!minimum cost|(}
 
 Replacing~\(\Cost\) by~\(\Best\) in equation~\eqref{eq:sum_2p}, we
 obtain the equations for the minimum number of comparisons, allowing
@@ -3122,7 +3122,7 @@ Furthermore, \(x - 1 < \floor{x} \leqslant x\) and \(\floor{x} = x -
 \begin{align*}
 p(\lg p - \{\lg p\}) + 2p - 2^{\lg p - \{\lg p\} +
   1} + 2 < 2 \cdot T_p &\leqslant p\lg p + 2p,\\
-p\lg p + 2p + 2 - p \cdot \theta_L(\{\lg p\}) < 2 \cdot T_p 
+p\lg p + 2p + 2 - p \cdot \theta_L(\{\lg p\}) < 2 \cdot T_p
 &\leqslant p\lg p + 2p,
 \end{align*}
 with \(\theta_L(x) := x + 2^{1 - x}\). Since \(\max_{0 \leqslant x <
@@ -3160,11 +3160,11 @@ bits all set to~\(1\), for example, \((10110111)_2 \leqslant
 Trivially, \(0 < \OB{\fun{unb}}{n}\), so
 equation~\eqref{eq:ocost_online} entails \(\OB{\fun{oms}}{n}
 \sim n\lg n \sim 2 \cdot \OB{\fun{bms}}{n}\).
-\index{merge sort!on-line $\sim$!minimum cost|)}
+\index{merge sort!online $\sim$!minimum cost|)}
 \index{unb@$\OB{\fun{unb}}{n}$|)}
 
 \paragraph{Maximum cost}
-\index{merge sort!on-line $\sim$!maximum cost|(}
+\index{merge sort!online $\sim$!maximum cost|(}
 
 Replacing~\(\Cost\) by~\(\Worst\) in equation~\eqref{eq:sum_2p}
 \vpageref{eq:sum_2p}, we obtain equations for the maximum number of
@@ -3222,7 +3222,7 @@ and~\eqref{eq:cost_unb} and inequation~\eqref{ineq:OBunb} imply
 \end{equation*}
 Therefore, \(\OW{\fun{oms}}{n} \sim 2n\lg n \sim 2
 \cdot \OW{\fun{bms}}{n}\).
-\index{merge sort!on-line $\sim$!maximum cost|)}
+\index{merge sort!online $\sim$!maximum cost|)}
 
 \paragraph{Additional cost}
 
@@ -3262,7 +3262,7 @@ In total, we have \(\C{\fun{oms}}{n} - \OC{\fun{oms}}{n} = 3n +
 2\). Bounds~\eqref{ineq:bounds_Btms} \vpageref{ineq:bounds_Btms} imply
 \(\OB{\fun{bms}}{n} \sim \tfrac{1}{2}n\lg n\), thus \(\C{\fun{oms}}{n}
 \sim \OC{\fun{oms}}{n}\).  \index{merge sort|)} \index{merge
-  sort!on-line $\sim$|)}
+  sort!online $\sim$|)}
 
 \section*{Exercises}
 
@@ -3292,7 +3292,7 @@ In total, we have \(\C{\fun{oms}}{n} - \OC{\fun{oms}}{n} = 3n +
     \vpageref{eq:cost_tms}.)
 
   \item Find a counting argument on the table of \fig~\vref{fig:bits}
-    showing that 
+    showing that
     \begin{equation*}
       \sum_{k=1}^{p-1}{2^{\rho_k}}
       = \sum_{i=0}^{\ceiling{\lg p}-1}%
