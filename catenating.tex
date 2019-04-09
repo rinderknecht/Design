@@ -317,10 +317,12 @@ In the last rule, we observe that the second argument, matched by
 \(\cons{y}{t}\), is simply passed over to the recursive call, thus it
 is useless to distinguish \(y\)~and~\(t\) and we can try
 \begin{equation*}
-\fun{join}(\el,t) \rightarrow t;\quad
-\fun{join}(s,\el) \rightarrow s;\quad
-\fun{join}(\cons{x}{s},\underline{t}) \rightarrow
+\begin{array}{r@{\;}l@{\;}l}
+\fun{join}(\el,t) & \rightarrow & t;\\
+\fun{join}(s,\el) & \rightarrow & s;\\
+\fun{join}(\cons{x}{s},\underline{t}) & \rightarrow &
 \cons{x}{\fun{join}(s,\underline{t})}.
+\end{array}
 \end{equation*}
 (Can~\(t\) be empty?) Again, we must make sure that \(t\)~can not
 match an empty stack: it can not be empty because, otherwise, the
@@ -330,15 +332,18 @@ matched by the penultimate could be matched by the last, which leads
 us to consider whether the definition would still be correct if
 \(t\)~could be empty after all. Let us label the rules as follows:
 \begin{equation*}
-\fun{join}(\el,t) \xrightarrow{\smash{\alpha}} t;\quad
-\fun{join}(s,\el) \xrightarrow{\smash{\beta}} s;\quad
-\fun{join}(\cons{x}{s},t) \xrightarrow{\smash{\gamma}}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{join}(\el,t) & \smashedrightarrow{\alpha} & t;\\
+\fun{join}(s,\el) & \smashedrightarrow{\beta} & s;\\
+\fun{join}(\cons{x}{s},t) & \smashedrightarrow{\gamma} &
 \cons{x}{\fun{join}(s,t)}.
+\end{array}
 \end{equation*}
 Let \(s\)~be some stack containing \(n\)~items, which we write
-informally as \(s = [x_0, x_1, \dots, x_{n-1}]\). The subscript~\(i\)
-in~\(x_i\) is the \emph{position} of the item in the stack, the top
-being at position~\(0\). Then we would rewrite in one step
+informally as \(s = [x_0, x_1, \dots, x_{n-1}]\). (Informally because
+of the ellipsis.) The subscript~\(i\) in~\(x_i\) is the
+\emph{position} of the item in the stack, the top being at
+position~\(0\). Then we would rewrite in one step
 \begin{equation*}
 \fun{join}(s,\el) \smashedrightarrow{\beta} s.
 \end{equation*}
@@ -381,8 +386,11 @@ the first stack plus~\(1\); in particular, the length of the second
 argument is irrelevant. So let us settle for a new definition with a
 new name:
 \begin{equation*}
-\fun{cat}(\el,t) \xrightarrow{\alpha} t;\quad
-\fun{cat}(\cons{x}{s},t) \xrightarrow{\beta} \cons{x}{\fun{cat}(s,t)}.
+\begin{array}{r@{\;}l@{\;}l}
+\fun{cat}(\el,t) & \xrightarrow{\alpha} & t;\\
+\fun{cat}(\cons{x}{s},t) & \xrightarrow{\beta} &
+\cons{x}{\fun{cat}(s,t)}.
+\end{array}
 \end{equation*}
 Let us note that \(\fun{cat}(5,\el)\) fails again, as it does in the
 original version.
@@ -600,8 +608,10 @@ of two rules is the sum of their lengths: \(\len{\alpha \cdot \delta}
 Let us reconsider the definition~\eqref{def:fact} of
 \fun{fact/1}\index{fact@\textsf{fact/1}} \vpageref{def:fact}:
 \begin{equation*}
-\fun{fact}(0) \xrightarrow{\smash{\alpha}} 1;\qquad
-\fun{fact}(n) \xrightarrow{\smash{\beta}} n \cdot \fun{fact}(n-1).
+\begin{array}{r@{\;}l@{\;}l}
+\fun{fact}(0) & \smashedrightarrow{\alpha} & 1;\\
+\fun{fact}(n) & \smashedrightarrow{\beta} & n \cdot \fun{fact}(n-1).
+\end{array}
 \end{equation*}
 For instance, we have
 \begin{equation*}
@@ -674,10 +684,11 @@ likely to be proportional to~\(n\), since all the integers from
 A tail form version
 \fun{fact\(_0\)/1}\index{fact0@\textsf{fact\(_0\)/1}} would be
 \begin{equation*}
-\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\begin{array}{r@{\;}c@{\;}l}
 \fun{fact}_0(n) & \rightarrow & \fun{fact}_0(n,1),
-\;\text{if \(n \geqslant 1\)}. & \fun{fact}_0(1,a) & \rightarrow & a;\\
-&&& \fun{fact}_0(n,a) & \rightarrow & \fun{fact}_0(n-1,a \cdot n).
+\;\text{if \(n \geqslant 1\)}.\\
+\fun{fact}_0(1,a) & \rightarrow & a;\\
+\fun{fact}_0(n,a) & \rightarrow & \fun{fact}_0(n-1,a \cdot n).
 \end{array}
 \end{equation*}
 Here, in contrast with \fun{cat/3}, the operation applied to the
@@ -754,11 +765,11 @@ sets the initial call to \(\fun{fact}_1(n-1,n)\), instead of
 \(\fun{fact}_0(n,1)\), and stops when the number is~\(0\), instead
 of~\(1\):
 \begin{equation*}
-\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
-\fun{fact}_1(n) & \xrightarrow{\smash[t]{\alpha}} &
-\fun{fact}_1(n-1,n),\;\text{if \(n > 0\)}.
-& \fun{fact}_1(0,a) & \xrightarrow{\smash[t]{\beta}} & a;\\
-&&& \fun{fact}_1(n,a) & \xrightarrow{\smash[t]{\gamma}} &
+\begin{array}{r@{\;}c@{\;}l}
+\fun{fact}_1(n) & \smashedrightarrow{\alpha} &
+\fun{fact}_1(n-1,n),\;\text{if \(n > 0\)}.\\
+\fun{fact}_1(0,a) & \smashedrightarrow{\beta} & a;\\
+\fun{fact}_1(n,a) & \smashedrightarrow{\gamma} &
 \fun{fact}_1(n-1,a \cdot n).
 \end{array}
 \end{equation*}
@@ -850,27 +861,35 @@ about~\(s\). This additional information about the structure of~\(s\)
 is given by more precise patterns: \(s\)~can be empty or not, that is:
 \(s = \el\) or \(s=\cons{y}{t}\). We then have:
 \begin{equation*}
-\fun{last}(\cons{x}{\el}) \rightarrow \fbcode{CCCCCCC};\quad
-\fun{last}(\cons{x}{\cons{y}{t}}) \rightarrow \fbcode{CCCCCCC}.
+\begin{array}{r@{\;}c@{\;}l}
+\fun{last}(\cons{x}{\el}) & \rightarrow & \fbcode{CCCCCCC};\\
+\fun{last}(\cons{x}{\cons{y}{t}}) & \rightarrow & \fbcode{CCCCCCC}.
+\end{array}
 \end{equation*}
 The first pattern can be simplified as follows:
 \begin{equation*}
-\fun{last}([x]) \rightarrow \fbcode{CCCCCCC};\quad
-\fun{last}(\cons{x}{\cons{y}{t}}) \rightarrow \fbcode{CCCCCCC}.
+\begin{array}{r@{\;}c@{\;}l}
+\fun{last}([x]) & \rightarrow & \fbcode{CCCCCCC};\\
+\fun{last}(\cons{x}{\cons{y}{t}}) & \rightarrow & \fbcode{CCCCCCC}.
+\end{array}
 \end{equation*}
 The first right\hyp{}hand side is easy to guess:
 \begin{equation*}
-\fun{last}([x]) \rightarrow x;\quad
-\fun{last}(\cons{x}{\cons{y}{t}}) \rightarrow \fbcode{CCCCCCC}.
+\begin{array}{r@{\;}c@{\;}l}
+\fun{last}([x]) & \rightarrow & x;\\
+\fun{last}(\cons{x}{\cons{y}{t}}) & \rightarrow & \fbcode{CCCCCCC}.
+\end{array}
 \end{equation*}
 In the last rule, how do \(x\), \(y\)~and~\(t\) relate to the result?
 Can we reach it in one step? No, despite we know that \(x\)~is
 \emph{not} the result, we still don't know whether \(y\)~is, so we
 have to start over again, which means a recursive call is required:
 \begin{equation*}
-\fun{last}([x]) \rightarrow x;\quad
-\fun{last}(\cons{x}{\cons{y}{t}}) \rightarrow
-  \fun{last}(\fbcode{CCCC}).
+\begin{array}{r@{\;}c@{\;}l}
+\fun{last}([x]) & \rightarrow & x;\\
+\fun{last}(\cons{x}{\cons{y}{t}}) & \rightarrow &
+\fun{last}(\fbcode{CCCC}).
+\end{array}
 \end{equation*}
 Note how knowing that some specific part of the input is not useful to
 build the output is useful knowledge. We can not call recursively
@@ -878,8 +897,11 @@ build the output is useful knowledge. We can not call recursively
 fail, meaning that the answer was actually~\(y\). Therefore, we must
 call with \(\cons{y}{t}\) to give~\(y\) the chance to be the last:
 \begin{equation*}
-\fun{last}([x]) \rightarrow x;\quad
-\fun{last}(\cons{x}{\cons{y}{t}}) \rightarrow \fun{last}(\cons{y}{t}).
+\begin{array}{r@{\;}c@{\;}l}
+\fun{last}([x]) & \rightarrow & x;\\
+\fun{last}(\cons{x}{\cons{y}{t}}) & \rightarrow &
+\fun{last}(\cons{y}{t}).
+\end{array}
 \end{equation*}
 As we advocated previously, the next phase consists in testing this
 definition for correctness and completeness, using meaningful examples
@@ -893,8 +915,10 @@ are not used separately in the second right\hyp{}hand side. Therefore,
 it is worth trying to fold back and replace the pattern by a more
 general one, in this case: \(s = \cons{y}{t}\).
 \begin{equation*}
-\fun{last}([x]) \rightarrow x;\quad
-\fun{last}(\cons{x}{s}) \rightarrow \fun{last}(s).
+\begin{array}{r@{\;}c@{\;}l}
+\fun{last}([x]) & \rightarrow & x;\\
+\fun{last}(\cons{x}{s}) & \rightarrow & \fun{last}(s).
+\end{array}
 \end{equation*}
 This transformation is correct because the case where \(s\)~is empty
 has already been matched by the first pattern. Notice also that we
@@ -907,17 +931,21 @@ What if we had tried to find directly a definition in tail form? We
 might have recalled that such definitions often need an accumulator
 and we would have tried perhaps something along these lines:
 \begin{equation*}
-\fun{last}_0(s) \rightarrow \fun{last}_1(s,0).\qquad
-\fun{last}_1(\el,y) \rightarrow y;\quad
-\fun{last}_1(\cons{x}{s},y) \rightarrow \fun{last}_1(s,x).
+\begin{array}{r@{\;}c@{\;}l}
+\fun{last}_0(s) & \rightarrow & \fun{last}_1(s,0).\\
+\fun{last}_1(\el,y) & \rightarrow & y;\\
+\fun{last}_1(\cons{x}{s},y) & \rightarrow & \fun{last}_1(s,x).
+\end{array}
 \end{equation*}
 The first observation may be about the function name
 \fun{last\(_1\)}. Why not write the following, in accordance with the
 style up to now?
 \begin{equation*}
-\fun{last}_0(s) \rightarrow \fun{last}_0(s,0).\qquad
-\fun{last}_0(\el,y) \rightarrow y;\quad
-\fun{last}_0(\cons{x}{s},y) \rightarrow \fun{last}_0(s,x).
+\begin{array}{r@{\;}c@{\;}l}
+\fun{last}_0(s) & \rightarrow & \fun{last}_0(s,0).\\
+\fun{last}_0(\el,y) & \rightarrow & y;\\
+\fun{last}_0(\cons{x}{s},y) & \rightarrow & \fun{last}_0(s,x).
+\end{array}
 \end{equation*}
 There would be no confusion between \fun{last\(_0\)/1} and
 \fun{last\(_0\)/2} because, each taking a different number of
@@ -927,15 +955,21 @@ for only one function, is that this discipline enables the compiler to
 catch the error consisting in forgetting one argument. For instance,
 the program
 \begin{equation*}
-\fun{last}_0(s) \rightarrow \fun{last}_0(s,0).\qquad
-\fun{last}_0(\el,y) \rightarrow y;\quad
-\fun{last}_0(\cons{x}{s},y) \rightarrow \underline{\fun{last}_0(s)}.
+\begin{array}{r@{\;}c@{\;}l}
+\fun{last}_0(s) & \rightarrow & \fun{last}_0(s,0).\\
+\fun{last}_0(\el,y) & \rightarrow & y;\\
+\fun{last}_0(\cons{x}{s},y) & \rightarrow &
+\underline{\fun{last}_0(s)}.
+\end{array}
 \end{equation*}
 contains an error that goes unreported, while
 \begin{equation*}
-\fun{last}_0(s) \rightarrow \fun{last}_1(s,0).\qquad
-\fun{last}_1(\el,y) \rightarrow y;\quad
-\fun{last}_1(\cons{x}{s},y) \rightarrow \underline{\fun{last}_1(s)}.
+\begin{array}{r@{\;}c@{\;}l}
+\fun{last}_0(s) & \rightarrow & \fun{last}_1(s,0).\\
+\fun{last}_1(\el,y) & \rightarrow & y;\\
+\fun{last}_1(\cons{x}{s},y) & \rightarrow &
+\underline{\fun{last}_1(s)}.
+\end{array}
 \end{equation*}
 raises an error. However, for didactic purposes in this book, we will
 not always follow this recommendation of having unique function
@@ -961,11 +995,11 @@ that only non\hyp{}empty stacks are matched. We find here a case where
 more information on the structure of the input is needed and a
 variable is too general a pattern. We need instead
 \begin{equation*}
-\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
+\begin{array}{r@{\;}c@{\;}l}
 \fun{last}_0(\underline{\cons{x}{s}}) & \rightarrow &
-  \fun{last}_0(\underline{\cons{x}{s}},0). &
+  \fun{last}_0(\underline{\cons{x}{s}},0).\\
 \fun{last}_0(\el,y) & \rightarrow & y;\\
-&&& \fun{last}_0(\cons{x}{s},y) & \rightarrow & \fun{last}_0(s,x).
+\fun{last}_0(\cons{x}{s},y) & \rightarrow & \fun{last}_0(s,x).
 \end{array}
 \end{equation*}
 This emendation seems to go against an improvement we made earlier,
@@ -982,10 +1016,10 @@ this value is never used, because it is discarded immediately after in
 the second right\hyp{}hand side of \fun{last\(_0\)/2}. Indeed, we
 could write the equivalent definition:
 \begin{equation*}
-\begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
-\fun{last}_1(\cons{x}{s}) & \rightarrow & \fun{last}_1(\cons{x}{s},\underline{7}). &
+\begin{array}{r@{\;}c@{\;}l}
+\fun{last}_1(\cons{x}{s}) & \rightarrow & \fun{last}_1(\cons{x}{s},\underline{7}).\\
 \fun{last}_1(\el,y) & \rightarrow & y;\\
-&&&\fun{last}_1(\cons{x}{s},y) & \rightarrow & \fun{last}_1(s,x).
+\fun{last}_1(\cons{x}{s},y) & \rightarrow & \fun{last}_1(s,x).
 \end{array}
 \end{equation*}
 The initial value of the accumulator here does not even need to be an

@@ -20,7 +20,7 @@ following evaluations:\label{sfst_ex}
 \fun{sfst}(\el,3) & \twoheadrightarrow & \el;\\
 \fun{sfst}(\el,\el) & \twoheadrightarrow & \el;\\
 \fun{sfst}([3,\el],[5,2]) & \twoheadrightarrow & [3,\el];\\
-\fun{sfst}([\el,[1,2],4,\el,4],4) & \twoheadrightarrow & 
+\fun{sfst}([\el,[1,2],4,\el,4],4) & \twoheadrightarrow &
   [\el,[1,2],\el,4];\\
 \fun{sfst}([4,[1,2],\el,\el,4],\el)
  & \twoheadrightarrow & [4,[1,2],\el,4].
@@ -42,16 +42,20 @@ for using it? For the sake of the argument, let us follow this track
 and find out how where it leads. A stack can either be empty or not,
 so let us make two rules:
 \begin{equation*}
-\fun{mem}(\el,x) \rightarrow \fbcode{CCCCC}\,;\quad
-\fun{mem}(\cons{y}{s},x) \rightarrow \fbcode{CCCCC}\,.
+\begin{array}{r@{\;}c@{\;}l}
+\fun{mem}(\el,x) & \rightarrow & \fbcode{CCCCC}\,;\\
+\fun{mem}(\cons{y}{s},x) & \rightarrow & \fbcode{CCCCC}\,.
+\end{array}
 \end{equation*}
 Note that we introduced a variable~\(y\), distinct from
 variable~\(x\). \emph{Two different variables may or may not denote
   the same value, but two occurrences of the same variable always
   denote the same value.} Had we written instead
 \begin{equation*}
-\fun{mem}(\el,x) \rightarrow \fbcode{CCCCC}\,;\quad
-\fun{mem}(\cons{\underline{x}}{s},x) \rightarrow \fbcode{CCCCC}\,.
+\begin{array}{r@{\;}c@{\;}l}
+\fun{mem}(\el,x) & \rightarrow & \fbcode{CCCCC}\,;\\
+\fun{mem}(\cons{\underline{x}}{s},x) & \rightarrow & \fbcode{CCCCC}\,.
+\end{array}
 \end{equation*}
 one case would be missing, namely when the top of the stack is not the
 item sought for, for instance, \(\fun{mem}(3,[4])\) would fail due to
@@ -64,8 +68,10 @@ Since the original problem is silent on the matter, it is said to be
 zero would be a token of choice to denote the absence of the item in
 the stack:
 \begin{equation*}
-\fun{mem}(\el,x) \rightarrow 0;\quad
-\fun{mem}(\cons{y}{s},x) \rightarrow \fbcode{CCCCC}\,.
+\begin{array}{r@{\;}c@{\;}l}
+\fun{mem}(\el,x) & \rightarrow & 0;\\
+\fun{mem}(\cons{y}{s},x) & \rightarrow & \fbcode{CCCCC}\,.
+\end{array}
 \end{equation*}
 But this would be a mistake because there is no natural and necessary
 relationship between the concept of emptiness and the number
@@ -73,23 +79,29 @@ zero. Zero is best understood algebraically as the number noted~\(0\)
 such that \(0 + n = n + 0 = n\), for any number~\(n\). Then, let us
 try the empty stack:
 \begin{equation*}
-\fun{mem}(\el,x) \rightarrow \el;\quad
-\fun{mem}(\cons{y}{s},x) \rightarrow \fbcode{CCCCC}\,.
+\begin{array}{r@{\;}c@{\;}l}
+\fun{mem}(\el,x) & \rightarrow & \el;\\
+\fun{mem}(\cons{y}{s},x) & \rightarrow & \fbcode{CCCCC}\,.
+\end{array}
 \end{equation*}
 The next step is to find a way to actually compare the value of~\(x\)
 to the value of~\(y\). We can use the rule above about variables: two
 occurrences of the same variable mean that they hold the same
 value. Therefore
 \begin{equation*}
-\fun{mem}(\el,x) \rightarrow \el;\quad
-\fun{mem}(\cons{x}{s},x) \rightarrow \fbcode{CCCCC}\,.
+\begin{array}{r@{\;}c@{\;}l}
+\fun{mem}(\el,x) & \rightarrow & \el;\\
+\fun{mem}(\cons{x}{s},x) & \rightarrow & \fbcode{CCCCC}\,.
+\end{array}
 \end{equation*}
 was not so bad, after all? Indeed, but we know now that a case is
 missing, so let us add it at the end, where \(x \neq y\):
 \begin{equation*}
-\fun{mem}(\el,x) \rightarrow \el;\;\;
-\fun{mem}(\cons{x}{s},x) \rightarrow \fbcode{CCCCC};\;\:
-\underline{\fun{mem}(\cons{y}{s},x)} \rightarrow \fbcode{CCCCC}.
+\begin{array}{r@{\;}c@{\;}l}
+\fun{mem}(\el,x) & \rightarrow & \el;\\
+\fun{mem}(\cons{x}{s},x) & \rightarrow & \fbcode{CCCCC};\\
+\underline{\fun{mem}(\cons{y}{s},x)} & \rightarrow & \fbcode{CCCCC}.
+\end{array}
 \end{equation*}
 Now, what is the second right\hyp{}hand side? It is evaluated if the
 item we were looking for is present at the top of the stack. How do we
@@ -97,26 +109,33 @@ express that? We may think of ending with the item itself, the
 rationale being that if the result is the empty stack, then the item
 is not in the input stack, otherwise the result is the item itself:
 \begin{equation*}
-\fun{mem}(\el,x) \rightarrow \el;\quad
-\fun{mem}(\cons{x}{s},x) \rightarrow x;\quad
-\fun{mem}(\cons{y}{s},x) \rightarrow \fbcode{CCCCC}\,.
+\begin{array}{r@{\;}c@{\;}l}
+\fun{mem}(\el,x) & \rightarrow & \el;\\
+\fun{mem}(\cons{x}{s},x) & \rightarrow & x;\\
+\fun{mem}(\cons{y}{s},x) & \rightarrow & \fbcode{CCCCC}\,.
+\end{array}
 \end{equation*}
 The last right\hyp{}hand side is easier to guess since it deals with
 the case where the top of the stack (\(y\)) is not the item we seek
 (\(x\)), so a recursive call which ignores~\(y\) should come to mind:
 \begin{equation*}
-\fun{mem}(\el,x) \rightarrow \el;\quad
-\fun{mem}(\cons{x}{s},x) \rightarrow x;\quad
-\fun{mem}(\cons{y}{s},x) \rightarrow \fun{mem}(s,x).
+\begin{array}{r@{\;}c@{\;}l}
+\fun{mem}(\el,x) & \rightarrow & \el;\\
+\fun{mem}(\cons{x}{s},x) & \rightarrow & x;\\
+\fun{mem}(\cons{y}{s},x) & \rightarrow & \fun{mem}(s,x).
+\end{array}
 \end{equation*}
 
 Some tests would increase the confidence that this definition is
 correct\index{soundness} and complete\index{completeness} with respect
 to the specification. Let us label the rules first:
 \begin{equation*}
-\fun{mem}(\el,x)         \smashedrightarrow{\zeta} \el;\quad
-\fun{mem}(\cons{x}{s},x) \smashedrightarrow{\eta}   x;\quad
-\fun{mem}(\cons{y}{s},x) \smashedrightarrow{\theta} \fun{mem}(s,x).
+\begin{array}{r@{\;}c@{\;}l}
+\fun{mem}(\el,x)         & \smashedrightarrow{\zeta}  & \el;\\
+\fun{mem}(\cons{x}{s},x) & \smashedrightarrow{\eta}   & x;\\
+\fun{mem}(\cons{y}{s},x) & \smashedrightarrow{\theta} &
+\fun{mem}(s,x).
+\end{array}
 \end{equation*}
 Then we could try the following cases:
 \begin{equation*}
@@ -429,11 +448,11 @@ from~\(\iota\). The new \fun{sfst/2} is called
 \begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
 \fun{rcat}(\el,t)              & \xrightarrow{\smash{\zeta}} & t; &
 \fun{sfst}(\el,x,t,u)          & \xrightarrow{\smash{\mu}} & u;\\
-\fun{rcat}(\cons{x}{s},t)      & \xrightarrow{\smash{\eta}} 
-                               & \fun{rcat}(s,\cons{x}{t}). & 
+\fun{rcat}(\cons{x}{s},t)      & \xrightarrow{\smash{\eta}}
+                               & \fun{rcat}(s,\cons{x}{t}). &
 \fun{sfst}(\cons{x}{s},x,t,u)  & \xrightarrow{\smash{\nu}}
                                & \fun{rcat}(t,s);\\
-\fun{sfst}_0(s,x)              & \xrightarrow{\smash{\lambda}} 
+\fun{sfst}_0(s,x)              & \xrightarrow{\smash{\lambda}}
                                & \fun{sfst}(s,x,\el,s). &
 \fun{sfst}(\cons{y}{s},x,t,u)  & \xrightarrow{\smash{\xi}}
                                & \fun{sfst}(s,x,\cons{y}{t},u).
@@ -572,7 +591,7 @@ Consider \fig~\ref{fig:slst},
 \begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
   \fun{slst}(\el,x)           & \xrightarrow{\smash{\rho}} & \el;
 & \fun{slst}(\el,x,t)         & \xrightarrow{\smash{\upsilon}} & t;\\
-  \fun{slst}(\cons{x}{s},x)   & \xrightarrow{\smash{\sigma}} & 
+  \fun{slst}(\cons{x}{s},x)   & \xrightarrow{\smash{\sigma}} &
                                            \fun{slst}(s,x,s);
 & \fun{slst}(\cons{x}{s},x,t) & \xrightarrow{\smash{\phi}} &
                                            \cons{x}{\fun{slst}(t,x)};\\
@@ -610,7 +629,7 @@ previous~\(x\) was the last. Consider \fig~\vref{fig:slst_27071}.
 & \cons{2}{\fun{slst}([7,0,7,1],7)}\\
 & \xrightarrow{\smash{\sigma}}
 & \cons{2}{\fun{slst}([0,7,1],7,[0,7,1])}\\
-& \xrightarrow{\smash{\chi}} 
+& \xrightarrow{\smash{\chi}}
 & \cons{2}{\fun{slst}([7,1],7,[0,7,1])}\\
 & \xrightarrow{\smash{\phi}}
 & \cons{2,7}{\fun{slst}([0,7,1],7)}\\
@@ -618,7 +637,7 @@ previous~\(x\) was the last. Consider \fig~\vref{fig:slst_27071}.
 & \cons{2,7,0}{\fun{slst}([7,1],7)}\\
 & \xrightarrow{\smash{\sigma}}
 & \cons{2,7,0}{\fun{slst}([1],7,[1])}\\
-& \xrightarrow{\smash{\chi}} 
+& \xrightarrow{\smash{\chi}}
 & \cons{2,7,0}{\fun{slst}(\el,7,[1])}\\
 & \xrightarrow{\smash{\upsilon}}
 & \cons{2,7,0}{[1]} = [2,7,0,1].
@@ -635,7 +654,7 @@ of~\(x\) in~\(s\). The evaluation trace\index{functional
 \begin{equation*}
 \abovedisplayskip=0pt
 \belowdisplayskip=0pt
-\tau^{x_1} 
+\tau^{x_1}
 \cdot
 \prod_{k=2}^{p}(\sigma\chi^{x_k-x_{k-1}-1})(\phi\tau^{x_k-x_{k-1}-1})
 \cdot
@@ -662,7 +681,7 @@ in~\(2n\). The average cost\index{stack!skipping an item!average cost}
 determining the cost for every possible pair \((f,l)\), with \(0
 \leqslant f \leqslant l < n\):
 \begin{align*}
-\M{\fun{slst}}{n} 
+\M{\fun{slst}}{n}
   &= \frac{2}{n(n+1)} \sum_{f=0}^{n-1}\sum_{l=f}^{n-1}{\C{\fun{slst}}{n,f,l}}
    = \frac{2}{n(n+1)} \sum_{f=0}^{n-1}\sum_{l=f}^{n-1}{(n+l-f+1)}\\
   &= \frac{2}{n(n+1)} \sum_{f=0}^{n-1}\bigg(\!\!(n-f+1)(n-f)
@@ -685,7 +704,7 @@ first and the last:
 + &&&\;\;\vdots\notag\\
 + && \boxed{(n+1)^3} - n^3 &= 3n^2 + 3n + 1\notag
 \intertext{\rule{\linewidth}{0.4pt}}
-\Rightarrow 
+\Rightarrow
   &&\boxed{(n+1)^3} - \boxed{1^3}
   &= 3 \sum_{k=1}^{n}{k^2} + 3 \sum_{k=1}^{n}{k} + n\notag\\
   && n^3 + 3n^2 + 3n
@@ -702,7 +721,7 @@ first and the last:
 
   \item Show that \(\B{\fun{sfst}_0}{n} = 3\), \(\W{\fun{sfst}_0}{n} =
     2n+1\) and \(\M{\fun{sfst}_0}{n} = n+2\) (successful
-    search). 
+    search).
 
   \item Prove \fun{slst/2} = \fun{slst\(_0\)/2}.
 
