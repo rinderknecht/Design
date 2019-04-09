@@ -394,10 +394,11 @@ because the cost of \(\fun{cat}(s,t)\)\index{cat@\fun{cat/2}} is \(1 +
 \begin{equation}
 %\abovedisplayskip=4pt
 %\belowdisplayskip=4pt
-\fun{len}(\el) \xrightarrow{\smash{a}} 0;
-\qquad
-\fun{len}(\cons{x}{s}) \xrightarrow{\smash{b}} 1 + \fun{len}(s).
+\begin{array}{r@{\;}c@{\;}l}
+\fun{len}(\el) & \xrightarrow{\smash{a}} & 0;\\
+\fun{len}(\cons{x}{s}) & \xrightarrow{\smash{b}} & 1 + \fun{len}(s).
 \label{eq:len}
+\end{array}
 \end{equation}
 The problem is not calling \fun{cat/2}, but the fact that the calls
 are embedded in the most unfavourable configuration. Indeed, we proved
