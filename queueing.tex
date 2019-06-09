@@ -15,7 +15,7 @@ other:
 \begin{equation*}
 \begin{array}{@{}l@{}r@{\;}cc|c|c|c|c|c|cc@{\;}l@{}}
 \cline{4-9}
-& \text{Push, Pop (top)} 
+& \text{Push, Pop (top)}
 & \leftrightsquigarrow & & a & b & c & d & e &&&\\
 \cline{4-9}
 \end{array}
@@ -26,7 +26,7 @@ other end, called \emph{front}:
 \begin{equation*}
 \begin{array}{@{}l@{}r@{\;}cc|c|c|c|c|c|cc@{\;}l@{}}
 \cline{4-10}
-& \text{Enqueue (rear end)} 
+& \text{Enqueue (rear end)}
                 & \rightsquigarrow & & a & b & c & d & e &
 & \rightsquigarrow & \text{Dequeue (front end).}\\
 \cline{4-10}
@@ -79,11 +79,12 @@ stack~\(f\). Enqueueing is performed by the function
 Dequeueing requires the result to be a \emph{pair}\index{functional
   language!pair} made of the dequeued item and the new queue without
 it. Actually, the new queue is the first component of the pair, to fit
-how the operation is depicted in the figures as a rightwards arrow. We
-could denote the mathematical pair \((x,y)\) by \(\fun{pair}(x,y)\),
-but a more symbolic notation is handy: \(\pair{x}{y}\). The angle
-brackets allow us to avoid writing \(f((x,y))\) when we mean
-\(f(\pair{x}{y})\). Let us call \fun{deq/1}\index{deq@\fun{deq/1}} the
+how the operation is depicted in the figures as a rightwards arrow.
+%% We could denote the mathematical pair \((x,y)\) by
+%% \(\fun{pair}(x,y)\), but a more symbolic notation is handy:
+%% \(\pair{x}{y}\). The angle brackets allow us to avoid writing
+%% \(f((x,y))\) when we mean \(f(\pair{x}{y})\).
+Let us call \fun{deq/1}\index{deq@\fun{deq/1}} the
 dequeueing function:
 \begin{equation}
 \begin{array}{@{}r@{\;}l@{\;}l@{}}
@@ -243,7 +244,7 @@ maximising \(\A{e,k}\) for a given~\(e\):
 where \(\W{}{e,e}\) is the maximum cost when there are
 \(e\)~enqueueings and \({d=e}\) dequeueings. In other words, the worst
 case when \(e=d=7\) is the saw\hyp{}toothed Dyck path shown in
-\fig~\vref{fig:max_dyck}. 
+\fig~\vref{fig:max_dyck}.
 \begin{figure}
 \centering
 \includegraphics[bb=86 657 507 726,scale=0.7]{max_dyck}
@@ -328,16 +329,18 @@ the empty queue, \(\fun{nilq/0}\), and changing accordingly the
 definition of \fun{enq/2} in~\eqref{def:enq} \vpageref{def:enq} so it
 handles this case:
 \begin{equation*}
-\fun{enq}(x,\fun{nilq}()) \rightarrow \fun{q}([x],\el);
-\quad
-\fun{enq}(x,\fun{q}(r,f)) \rightarrow \fun{q}(\cons{x}{r},f).
+\begin{array}{r@{\;}l@{\;}l}
+\fun{enq}(x,\fun{nilq}()) & \rightarrow & \fun{q}([x],\el);\\
+\fun{enq}(x,\fun{q}(r,f)) & \rightarrow & \fun{q}(\cons{x}{r},f).
+\end{array}
 \end{equation*}
 We can improve this a little by pushing~\(x\) directly into the front
 stack:
 \begin{equation*}
-\fun{enq}(x,\fun{nilq}()) \rightarrow \fun{q}(\el,[x]);
-\quad
-\fun{enq}(x,\fun{q}(r,f)) \rightarrow \fun{q}(\cons{x}{r},f).
+\begin{array}{r@{\;}l@{\;}l}
+\fun{enq}(x,\fun{nilq}()) & \rightarrow & \fun{q}(\el,[x]);\\
+\fun{enq}(x,\fun{q}(r,f)) & \rightarrow & \fun{q}(\cons{x}{r},f).
+\end{array}
 \end{equation*}
 
 \paragraph{Exercises}
@@ -347,9 +350,9 @@ stack:
     to be dequeued from~\(q\):
     \begin{equation*}
       \begin{array}{r@{\;}l@{\;}l}
-        \fun{nxt}(\fun{q}(\cons{x}{r},\el)) & \rightarrow 
+        \fun{nxt}(\fun{q}(\cons{x}{r},\el)) & \rightarrow
         & \fun{nxt}(\fun{q}(\el,\fun{rcat}(r,[x])));\\
-        \fun{nxt}(\fun{q}(r,\cons{x}{f})) & \rightarrow & x.     
+        \fun{nxt}(\fun{q}(r,\cons{x}{f})) & \rightarrow & x.
         \index{q@\fun{q/2}}
       \end{array}
     \end{equation*}

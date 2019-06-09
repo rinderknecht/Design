@@ -49,8 +49,11 @@ we see that the former was designed with the result in mind, as if the
 arrows would reach a value, which is then decomposed in terms of the
 variables of the corresponding left\hyp{}hand side:
 \begin{equation*}
-\fun{rev}_0(\el) \rightarrow \el;\qquad
-\fun{rev}_0(\cons{x}{s}) \rightarrow \fun{cat}(\fun{rev}_0(s),[x]).
+\begin{array}{r@{\;}l@{\;}l}
+\fun{rev}_0(\el) & \rightarrow & \el;\\
+\fun{rev}_0(\cons{x}{s}) & \rightarrow &
+\fun{cat}(\fun{rev}_0(s),[x]).
+\end{array}
 \end{equation*}
 \index{rev0@\fun{rev\(_0\)/1}|)}By contrast,
 \fun{rev/1}\index{rev@\fun{rev/1}} relies on another function,
@@ -58,10 +61,12 @@ variables of the corresponding left\hyp{}hand side:
 as if each arrow covered a short distance, only contributing minimally
 to the final value:
 \begin{equation*}
-\fun{rev}(s) \xrightarrow{\smash{\epsilon}} \fun{rcat}(s,\el).\quad\;\;
-\fun{rcat}(\el,t) \xrightarrow{\smash{\zeta}} t;\quad\;\;
-\fun{rcat}(\cons{x}{s},t) \xrightarrow{\smash{\eta}} 
+\begin{array}{r@{\;}l@{\;}l}
+\fun{rev}(s) & \smashedrightarrow{\epsilon} & \fun{rcat}(s,\el).\\
+\fun{rcat}(\el,t) & \smashedrightarrow{\zeta} & t;\\
+\fun{rcat}(\cons{x}{s},t) & \smashedrightarrow{\eta} &
 \fun{rcat}(s,\cons{x}{t}).
+\end{array}
 \end{equation*}
 The first approach might be called \emph{big\hyp{}step
   design}\index{design!big-step $\sim$}, and the other
@@ -95,7 +100,7 @@ in the case of rule~\(\gamma\), the substructures of
 \begin{equation*}
 \boxed{%
 \begin{array}{r@{\;}l@{\;}l}
-\fun{flat}_0(\el)                   & \xrightarrow{\smash{\psi}} 
+\fun{flat}_0(\el)                   & \xrightarrow{\smash{\psi}}
                                     & \el;\\
 \fun{flat}_0(\cons{\el}{t})         & \xrightarrow{\smash{\omega}}
                                     & \fun{flat}_0(t);\\
@@ -116,7 +121,7 @@ to be rewritten next is underlined in case of ambiguity.
 \boxed{%
 \begin{array}{r@{\;}l@{\;}l}
 \fun{flat}_0([\el,[[1],2],3])
-& \xrightarrow{\smash{\omega}} 
+& \xrightarrow{\smash{\omega}}
 & \fun{flat}_0([[[1],2],3])\\
 & \xrightarrow{\smash{\gamma}}
 & \fun{cat}(\underline{\fun{flat}_0([[1],2])},\fun{flat}_0([3]))\\
@@ -214,7 +219,7 @@ minimum and maximum costs? We found that the minimum cost for
 \fun{cat}\hyp{}nodes make up the rightmost
 \emph{branch}\index{tree!branch} of the abstract syntax tree. (A
 branch is a series of nodes such that one is the parent of the next,
-from the root to a leaf.) 
+from the root to a leaf.)
 \begin{itemize}
 
   \item If \(\Omega \geqslant \Gamma\), the minimum configuration is
@@ -332,9 +337,9 @@ Simple algebra shows that\index{flat@$\C{\fun{flat}}{n,\Omega,\Gamma}$}
 \index{flat0@$\B{\fun{flat}_0}{n,\Omega,\Gamma}$}
 \begin{equation*}
 \C{\fun{flat}}{n,\Omega,\Gamma}
-\leqslant 
-\B{\fun{flat}_0}{n,\Omega,\Gamma} 
-\Leftrightarrow 
+\leqslant
+\B{\fun{flat}_0}{n,\Omega,\Gamma}
+\Leftrightarrow
 \begin{cases}
   L \leqslant 3\Gamma - \Omega,
                          & \text{if \(\Omega \geqslant \Gamma\)};\\
