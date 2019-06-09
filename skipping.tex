@@ -149,19 +149,19 @@ Then we could try the following cases:
 \end{equation*}
 The code seems to work: item~\(x\) is in stack~\(s\) if the result
 is~\(x\), otherwise it is~\(\el\). However, this function is not
-correct.\index{soundness} The hidden and flawed assumption is `items
-can not be stacks,' in spite of the counter\hyp{}examples given at the
-beginning for illustrating the expected behaviour of \fun{sfst/2}. In
-particular, an item can be the empty stack and this situation leads to
-an ambiguity with our definition of \fun{mem/2}:
+correct.\index{soundness} The hidden and flawed assumption is ``items
+can not be stacks'', in spite of the counter\hyp{}examples given at
+the beginning for illustrating the expected behaviour of
+\fun{sfst/2}. In particular, an item can be the empty stack and this
+situation leads to an ambiguity with our definition of \fun{mem/2}:
 \begin{equation*}
   \fun{mem}(\el,\el) \smashedrightarrow{\zeta} \el \xleftarrow{\smash{\eta}} \fun{mem}([\el],\el).
 \end{equation*}
 It is impossible to discriminate the two cases, the first one meaning
 absence of the item and the second presence, because they both end
 with the empty stack. In fact, we should have distinguished two data
-constructors to denote the outcomes `the item was found' and `the item
-was not found'. For example,
+constructors to denote the outcomes ``the item was found'' and ``the
+item was not found''. For example,
 \begin{equation*}
 \begin{array}{r@{\;}l@{\;}l}
 \fun{mem}(\el,x)         & \smashedrightarrow{\zeta}  & \fun{false}();\\
@@ -259,18 +259,22 @@ stack (up to \(\el\)) without finding~\(x\). Thus the result is simply
 the empty stack because the empty stack without~\(x\) is the empty
 stack:
 \begin{equation*}
-\fun{sfst}(\el,x)         \rightarrow \el;\quad
-\fun{sfst}(\cons{x}{s},x) \rightarrow s;\quad
-\fun{sfst}(\cons{y}{s},x) \rightarrow \cons{y}{\fun{sfst}(s,x)}.
+\begin{array}{r@{\;}l@{\;}l}
+\fun{sfst}(\el,x)         & \rightarrow & \el;\\
+\fun{sfst}(\cons{x}{s},x) & \rightarrow & s;\\
+\fun{sfst}(\cons{y}{s},x) & \rightarrow & \cons{y}{\fun{sfst}(s,x)}.
+\end{array}
 \end{equation*}
 
 Let us run some tests now and, in order avoid mistakes, it is handy to
 label the rules with some Greek letters:
 \begin{equation*}
-\fun{sfst}(\el,x)          \xrightarrow{\smash{\theta}} \el;\quad
-\fun{sfst}(\cons{x}{s},x)  \xrightarrow{\smash{\iota}}  s;\quad
-\fun{sfst}(\cons{y}{s},x)  \xrightarrow{\smash{\kappa}}
+\begin{array}{r@{\;}l@{\;}l}
+\fun{sfst}(\el,x)          & \smashedrightarrow{\theta} & \el;\\
+\fun{sfst}(\cons{x}{s},x)  & \smashedrightarrow{\iota}  & s;\\
+\fun{sfst}(\cons{y}{s},x)  & \smashedrightarrow{\kappa} &
 \cons{y}{\fun{sfst}(s,x)}.
+\end{array}
 \end{equation*}
 The item is absent in~\(\theta\), the item is found in~\(\iota\) and
 the search continues with~\(\kappa\). Note that equality is implicitly
@@ -468,10 +472,12 @@ refers to the original stack, so we can use it in a new rule~\(\mu\),
 the pendant of~\(\theta\). Note the shapes of the right\hyp{}hand
 sides: they are either a value~(\(\zeta\) and~\(\mu\)) or a function
 call whose arguments contain values. In other words, no function call
-has a context. This syntactic property of a definition is named
-\emph{tail form}\index{functional language!tail form}. Intuitively,
-the practical consequence of such a form is that terminating calls
-unfold until a value is reached and nothing else is left to be done:
+has a context.
+
+This syntactic property of a definition is named \emph{tail
+  form}\index{functional language!tail form}. Intuitively, the
+practical consequence of such a form is that terminating calls unfold
+until a value is reached and nothing else is left to be done:
 \emph{the value of the last call is the value of the first call}. This
 kind of definition enables the sharing in rule~\clause{\mu}, where
 \(u\) (the reference to the original stack) becomes the value, instead
@@ -486,9 +492,13 @@ precisely, there are two complementary cases: either \(x\)~is missing
 in~\(s\) or \(x\)~occurs in~\(s\). Let us assume that \(s\)~contains
 \(n\)~items and \(x\)~is absent in~\(s\). The evaluation trace
 \index{functional language!evaluation!trace} of the call
-\(\fun{sfst}_0(s,x)\) is \(\lambda\xi^n\mu\), so \(\C{\fun{sfst}_0}{n}
+\(\fun{sfst}_0(s,x)\) is \(\lambda\xi^n\mu\), so
+\begin{equation*}
+  \C{\fun{sfst}_0}{n}
 = \len{\lambda\xi^n\mu} = \len{\lambda} + n \len{\xi} + \len{\mu} = n
-+ 2\). Let us now assume that \(x\)~occurs at position \(k\) in~\(s\),
++ 2.
+\end{equation*}
+Let us now assume that \(x\)~occurs at position \(k\) in~\(s\),
 with the first item having position~\(0\). The evaluation trace is
 then \(\lambda \xi^{k}\nu\eta^k\zeta\), hence \(\C{\fun{sfst}_0}{n,k}
 = \len{\lambda \xi^{k}\nu\eta^k\zeta} = 2k + 3\). Clearly now,
@@ -714,7 +724,7 @@ first and the last:
 \end{align}
 
 \paragraph{Exercises}
-\begin{enumerate*}
+\begin{enumerate}
 
   \item Prove that \(\fun{sfst/2} = \fun{sfst\(_0\)/2}\).
     \index{sfst@\fun{sfst/2}}\index{sfst0@\fun{sfst\(_0\)/2}}
@@ -731,4 +741,4 @@ first and the last:
     \fun{slst\(_0\)/2}\index{slst@\fun{slst\(_0\)/2}} with that of
     \fun{slst/2}\index{slst@\fun{slst/2}}.
 
-\end{enumerate*}
+\end{enumerate}
