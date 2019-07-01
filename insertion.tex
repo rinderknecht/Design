@@ -50,16 +50,16 @@ and redefine~\fun{ins/2}\index{ins@\fun{ins/2}|(} as
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
   \fun{ins}(\cons{y}{s},x)
-& \xrightarrow{\smash{\kappa}}
+& \smashedrightarrow{\kappa}
 & \cons{y}{\fun{ins}(s,x)}, \,\text{if \(x \succ y\)};
-& \fun{isrt}(\el) 
-& \xrightarrow{\smash{\mu}}
+& \fun{isrt}(\el)
+& \smashedrightarrow{\mu}
 & \el;\\
   \fun{ins}(s,x)
-& \xrightarrow{\smash{\lambda}}
+& \smashedrightarrow{\lambda}
 & \cons{x}{s}.
 & \fun{isrt}(\cons{x}{s})
-& \xrightarrow{\smash{\nu}} 
+& \smashedrightarrow{\nu}
 & \fun{ins}(\fun{isrt}(s),x).
 \end{array}
 \end{equation*}
@@ -118,7 +118,7 @@ costs.\index{isrt@$\C{\fun{isrt}}{n}$|)}
 
 \addcontentsline{toc}{subsection}{Cost}
 \paragraph{Minimum cost}
-\index{insertion sort!straight $\sim$!minimum cost} 
+\index{insertion sort!straight $\sim$!minimum cost}
 
 The best case does not exert rule~\(\kappa\), which is recursive,
 whilst \(\lambda\)~rewrites to a value. In other words, in
@@ -127,7 +127,7 @@ sorted stack \(\fun{isrt}(s)\)\index{isrt@\fun{isrt/1}} would be lower
 than or equal to the top of the stack. This rule also inserts the keys
 in reverse order:
 \begin{equation}
-\fun{isrt}([x_1,\dots,x_n]) \twoheadrightarrow 
+\fun{isrt}([x_1,\dots,x_n]) \twoheadrightarrow
 \fun{ins}(\fun{ins}(\dots(\fun{ins}(\el,x_n)\dots),x_2),x_1).
 \label{inv_isrt}
 \end{equation}
@@ -142,7 +142,7 @@ are increasing, but may be repeated. Then \(\B{\fun{ins}}{n} =
 \end{equation*}
 
 \paragraph{Maximum cost}
-\index{insertion sort!straight $\sim$!maximum cost} 
+\index{insertion sort!straight $\sim$!maximum cost}
 
 The worst case must exert rule~\(\kappa\) as much as possible, which
 implies that \emph{the worst case happens when the input is a stack
@@ -447,7 +447,7 @@ inference system.
     holds. An application of \TirName{Push} with the latter premise
     implies \(\cons{\overline{x}}{\overline{t}} \approx
     \cons{\overline{x}}{\overline{s}}\), that is, \(t \approx s\).
- 
+
   \item If \(\Delta\) ends with \TirName{Trans}, then the induction
     hypothesis applies to its prem\-ises and we deduce \(u \approx s\)
     and \(t \approx u\), which can be premises for \TirName{Trans}
@@ -756,14 +756,14 @@ Let us recall the definition of sorting by straight insertion:
   \fun{ins}(\cons{y}{s},x)
 & \xrightarrow{\smash{\kappa}}
 & \cons{y}{\fun{ins}(s,x)}, \,\text{if \(y \succ x\)};
-& \fun{isrt}(\el) 
+& \fun{isrt}(\el)
 & \xrightarrow{\smash{\mu}}
 & \el;\\
   \fun{ins}(s,x)
 & \xrightarrow{\smash{\lambda}}
 & \cons{x}{s}.
 & \fun{isrt}(\cons{x}{s})
-& \xrightarrow{\smash{\nu}} 
+& \xrightarrow{\smash{\nu}}
 & \fun{ins}(\fun{isrt}(s),x).
 \end{array}
 \end{equation*}
@@ -837,7 +837,7 @@ the right stack (suffix). The function
 \begin{array}{r@{\;}l@{\;}ll}
 \fun{i2w}(s)         & \xrightarrow{\smash{\xi}}
                      & \fun{i2w}(s,\el,\el).\\
-\fun{i2w}(\el,\el,u) & \xrightarrow{\smash{\pi}} 
+\fun{i2w}(\el,\el,u) & \xrightarrow{\smash{\pi}}
                      & u;\\
 \fun{i2w}(\el,\cons{y}{t},u)
                      & \xrightarrow{\smash{\rho}}
@@ -991,7 +991,7 @@ note \(\W{x_1 \prec x_2}{2p+1}\) the former cost and \(\W{x_2 \prec
     as a partial evaluation with~\(p=3\) suggests:
     \begin{equation*}
       \!\begin{array}{@{}r@{\;}c@{\;}l@{}}
-        \fun{i2w}([x_0,x_1,x_2,x_3,x_4,x_5,x_6]) 
+        \fun{i2w}([x_0,x_1,x_2,x_3,x_4,x_5,x_6])
         & \xrightarrow{\smash{\xi}}
         & \fun{i2w}(\el,\el,[x_0,x_1,x_2,x_3,x_4,x_5,x_6])\\
         & \xrightarrow{\smash{\upsilon}}
@@ -1172,7 +1172,7 @@ C_{p,q} := \sum_{k=1}^{p}\len{\tau^k\upsilon} +
 = (p+q+1) + \frac{1}{2}p(p+1) + \frac{1}{2}q(q+1).
 \end{equation*}
 There are \(p+q+1\) insertion loci, so the average cost of one
-insertion in the configuration \((p,q)\) is 
+insertion in the configuration \((p,q)\) is
 \begin{equation}
 \M{}{p,q} := \frac{C_{p,q}}{p+q+1}
            = 1 + \frac{p^2 + q^2 + p + q}{2p + 2q + 2}.
@@ -1376,14 +1376,14 @@ definition is displayed in \fig~\vref{fig:i2wb}.
 & \xrightarrow{\smash{\xi}} & \fun{i2wb}(s,\el,\el,0).\\
 \fun{i2wb}(\el,\el,u,d)
 & \xrightarrow{\smash{\pi}} & u;\\
-\fun{i2wb}(\el,\cons{y}{t},u,d)        
+\fun{i2wb}(\el,\cons{y}{t},u,d)
 & \xrightarrow{\smash{\rho}} & \fun{i2wb}(\el,t,\cons{y}{u},d);\\
 \fun{i2wb}(\cons{x}{s},t,\cons{z}{u},0)
 & \xrightarrow{\smash{\sigma}} &
 \fun{i2wb}(s,t,\cons{z}{\fun{iup}(u,x)},1),
 & \text{if \(x \succ z\)};\\
 \fun{i2wb}(\cons{x}{s},\cons{y}{t},u,0)
-& \xrightarrow{\smash{\tau}} & 
+& \xrightarrow{\smash{\tau}} &
 \fun{i2wb}(s,\fun{idn}(t,x),\cons{y}{u},1),
 & \text{if \(y \succ x\)};\\
 \fun{i2wb}(\cons{x}{s},t,u,0)
@@ -1396,7 +1396,7 @@ definition is displayed in \fig~\vref{fig:i2wb}.
 & \xrightarrow{\smash{\chi}}
 & \fun{i2wb}(s,\cons{y}{\fun{idn}(t,x)},u,0),
 & \text{if \(y \succ x\)};\\
-\fun{i2wb}(\cons{x}{s},t,u,1) & \xrightarrow{\smash{\psi}} & 
+\fun{i2wb}(\cons{x}{s},t,u,1) & \xrightarrow{\smash{\psi}} &
 \fun{i2wb}(s,\cons{x}{t},u,0).
 \end{array}}
 \end{equation*}
@@ -1472,7 +1472,7 @@ characterise the worst case.
 
 Let us consider the average cost when \(n=2p\). Then\index{i2wb@$\M{\fun{i2wb}}{n}$}
 \begin{equation*}
-\M{\fun{i2wb}}{2p} = 
+\M{\fun{i2wb}}{2p} =
   1 + \sum_{k=0}^{2p-1}{\M{}{k}} + \M{\curvearrowright}{p},
 \end{equation*}
 where \(\M{}{k}\)~is the average cost of inserting a key into a
@@ -1481,7 +1481,7 @@ simulated stack of \(k\)~keys and
 the cost of reversing \(p\)~keys from left to right. The variable~\(p\)
 in~\(\M{\curvearrowright}{p}\) is correct since there are
 \(\floor{n/2}\)~keys in the left stack after all insertions are
-over. Clearly, 
+over. Clearly,
 \begin{equation*}
 \M{\curvearrowright}{p} = p + 1.
 \end{equation*}
@@ -1523,7 +1523,7 @@ We can now replace our sum by harmonic numbers in
 equation~\eqref{eq:i2wb_2p}:
 \begin{equation*}
 \M{\fun{i2wb}}{2p}
-  = \frac{1}{2}{p^2} + \frac{13}{4}{p} - \frac{1}{4}{H_{2p}} 
+  = \frac{1}{2}{p^2} + \frac{13}{4}{p} - \frac{1}{4}{H_{2p}}
     + \frac{1}{8}{H_p} + 2.
 \end{equation*}
 The remaining case is to find \(\M{\fun{i2wb}}{2p+1}\), which, by the
@@ -1536,7 +1536,7 @@ Let us reuse previous calculations:
 \begin{equation*}
 \M{\fun{i2wb}}{2p+1}
    = \M{\fun{i2wb}}{2p} + \M{}{2p}
-   = \frac{1}{2}{p^2} + \frac{15}{4}{p} - \frac{1}{4}{H_{2p+1}} 
+   = \frac{1}{2}{p^2} + \frac{15}{4}{p} - \frac{1}{4}{H_{2p+1}}
      + \frac{1}{8}{H_p} + \frac{13}{4}.
 \end{equation*}
 We have \(1 + x < e^x\), for all real \(x \neq 0\). In particular,
@@ -1565,7 +1565,7 @@ Setting \(n=2p\) and \(n=2p+1\) leads to the respective bounds
 \end{align*}
 where \(\varphi(n) := 8 \cdot \M{\fun{i2wb}}{n} - n^2 - 13n - 10 + \ln
 2\). We retain the minimum of the lower bounds and the maximum of the
-upper bounds of~\(\varphi(n)\) so, 
+upper bounds of~\(\varphi(n)\) so,
 \begin{equation*}
 \ln(n+1) - 2\ln n < \varphi(n) < -2\ln(n+1) + \ln n + 7.
 \end{equation*}
