@@ -500,14 +500,17 @@ in~\(s\) or \(x\)~occurs in~\(s\). Let us assume that \(s\)~contains
 \end{equation*}
 Let us now assume that \(x\)~occurs at position \(k\) in~\(s\),
 with the first item having position~\(0\). The evaluation trace is
-then \(\lambda \xi^{k}\nu\eta^k\zeta\), hence \(\C{\fun{sfst}_0}{n,k}
-= \len{\lambda \xi^{k}\nu\eta^k\zeta} = 2k + 3\). Clearly now,
-\begin{gather*}
-\B{\fun{sfst}_0}{0} = 2,\quad
-\B{\fun{sfst}_0}{n} = \min_{0 \leqslant k < n}\{\C{\fun{sfst}_0}{n}, \C{\fun{sfst}_0}{n,k}\}
+then \(\lambda \xi^{k}\nu\eta^k\zeta\), hence
+\begin{equation*}
+  \C{\fun{sfst}_0}{n,k} = \len{\lambda \xi^{k}\nu\eta^k\zeta} = 2k + 3.
+\end{equation*}
+Clearly now,
+\begin{align*}
+\B{\fun{sfst}_0}{0} & = 2,\\
+\B{\fun{sfst}_0}{n} & = \min_{0 \leqslant k < n}\{\C{\fun{sfst}_0}{n}, \C{\fun{sfst}_0}{n,k}\}
                     = \min_{0 \leqslant k < n}\{n+2,2k+3\} = 3,\\
-\W{\fun{sfst}_0}{n} = \max_{0 \leqslant k < n}\{n+2,2k+3\} = 2n+1,
-\end{gather*}
+\W{\fun{sfst}_0}{n} & = \max_{0 \leqslant k < n}\{n+2,2k+3\} = 2n+1,
+\end{align*}
 where the minimum cost occurs when the item is the top of the stack;
 the maximum cost happens when the sought item is last in the stack (at
 the bottom).
