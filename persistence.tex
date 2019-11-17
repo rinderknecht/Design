@@ -97,7 +97,7 @@ definitions:
 & \fun{pop}(\cons{\cons{x}{s}}{h}) & \rightarrow &
                                      \cons{s,\cons{x}{s}}{h}.\\
 \fun{push}(x,\cons{s}{h}) & \rightarrow &
-\cons{\cons{x}{s},s}{h}. & 
+\cons{\cons{x}{s},s}{h}. &
 \fun{top}(\cons{\cons{x}{s}}{h}) & \rightarrow & x.
 \end{array}
 \label{eq:push_pop_persistence}
@@ -386,7 +386,7 @@ the call~\eqref{ex:history} on page~\pageref{ex:history} and saves
                       & \cons{x}{\fun{lst}_4(0,n-1,h)};\\
 \fun{lst}_4(k,n,\ufun{push}(x,h)) & \rightarrow
                       & \fun{lst}_4(k-1,n-1,h);\\
-\fun{lst}_4(k,n,\ufun{pop}(h)) & \rightarrow 
+\fun{lst}_4(k,n,\ufun{pop}(h)) & \rightarrow
                       & \fun{lst}_4(k+1,n+1,h).
 \end{array}}
 \end{equation*}
@@ -504,7 +504,7 @@ following canvas:
 \fun{chg}(0,u,n,h,m) & \rightarrow & \fbcode{CCCCCCC}\,;\\
 \fun{chg}(k,u,n,\ufun{pop}(h),m) & \rightarrow
                                  & \fun{chg}(k-1,u,n+1,h,m);\\
-\fun{chg}(k,u,n,\ufun{push}(x,h),m) & \rightarrow 
+\fun{chg}(k,u,n,\ufun{push}(x,h),m) & \rightarrow
                    & \fun{chg}(k-1,u,n-1,h,m),\qquad \text{if \(m < n\)};\\
 \fun{chg}(k,u,n,\ufun{push}(x,h),m) & \rightarrow
                                     & \fun{chg}(k-1,u,n-1,h,n-1).
@@ -526,7 +526,7 @@ original history. This same dilemma was encountered when we compared
 \fun{sfst\(_0\)/2}\index{sfst0@\fun{sfst\(_0\)/2}} in
 section~\ref{sec:skipping} on page~\pageref{sec:skipping}. Let us opt
 for a big\hyp{}step design in \fig~\ref{fig:chg}.
-\begin{figure}[b]
+\begin{figure}[t]
 \centering
 \framebox[\columnwidth]{\vbox{%
 \begin{gather*}
@@ -534,7 +534,7 @@ for a big\hyp{}step design in \fig~\ref{fig:chg}.
 \;\;
 \inferrule
   {\fun{chg}(k-1,u,n+1,h,m) \twoheadrightarrow \pair{n'}{h'}}
-  {\fun{chg}(k,u,n,\ufun{pop}(h),m) \twoheadrightarrow 
+  {\fun{chg}(k,u,n,\ufun{pop}(h),m) \twoheadrightarrow
                                     \pair{n'}{\ufun{pop}(h')}}
 \\
 \inferrule
@@ -545,7 +545,7 @@ for a big\hyp{}step design in \fig~\ref{fig:chg}.
 \\
 \inferrule
   {\fun{chg}(k-1,u,n-1,h,n-1) \twoheadrightarrow \pair{n'}{h'}}
-  {\fun{chg}(k,u,n,\ufun{push}(x,h),m) \twoheadrightarrow 
+  {\fun{chg}(k,u,n,\ufun{push}(x,h),m) \twoheadrightarrow
                                \pair{n'}{\ufun{push}(x,h')}}
 \end{gather*}
 }}

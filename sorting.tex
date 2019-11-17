@@ -82,7 +82,7 @@ n \leqslant k(n+1-k) \leqslant \left(\frac{n+1}{2}\right)^2.
 Multiplying the sides by varying~\(k\) over the discrete interval
 \([1..n]\) yields
 \begin{gather*}
-n^n = \prod_{k=1}^{n}{n} \leqslant n!^2 
+n^n = \prod_{k=1}^{n}{n} \leqslant n!^2
 \leqslant
 \prod_{k=1}^{n}{\left(\!\frac{n+1}{2}\!\right)^2} \!\!=
 \left(\!\frac{n+1}{2}\!\right)^{2n}
@@ -256,7 +256,7 @@ Resuming our previous derivation,
 \C{\fun{perm}}{n}
   &= \frac{1}{2}{nn!} + n! + \frac{7}{2}\sum_{k=1}^{n-1}{k!}
      + 2(n! - 1) + 2n - \frac{5}{2}\\
-  &= \frac{1}{2}{nn!} + 3n! 
+  &= \frac{1}{2}{nn!} + 3n!
      + 2n - \frac{9}{2} + \frac{7}{2}\sum_{k=1}^{n-1}{k!},\quad
      \text{with \(n > 0\)}.
 \end{align*}
@@ -342,7 +342,7 @@ of two permutations\index{permutation} \(\pi_a\)~and~\(\pi_b\):
 \pi_b \circ \pi_a :=
 \begin{pmatrix}
               1 &               2 & \dots & n\\
-\pi_b(\pi_a(1)) & \pi_b(\pi_a(2)) & \dots & \pi_b(\pi_a(n)) 
+\pi_b(\pi_a(1)) & \pi_b(\pi_a(2)) & \dots & \pi_b(\pi_a(n))
 \end{pmatrix}.
 \end{equation*}
 Then \(\pi_s~\circ~\pi_1 = \mathcal{I}\), where the \emph{identity
@@ -473,7 +473,7 @@ we examine is that of the best worst case, so called the
 \emph{minimax}\index{cost!minimax}\index{sorting!minimax|(}. \Fig~\vref{fig:cmp_tree}
 features the tree of all possible comparisons \index{tree!comparison
   $\sim$|see{sorting}} for sorting three numbers.
-\begin{figure}[b]
+\begin{figure}[t]
 \centering
 \includegraphics[bb=71 636 327 723]{cmp_tree}
 \caption{A comparison tree for sorting three keys
@@ -485,27 +485,27 @@ permutations\index{permutation|)} of \((a_1,a_2,a_3)\). The
 \emph{internal nodes}\index{binary tree!internal node} are comparisons
 between two keys \(a_i\)~and~\(a_j\), noted \(a_i?a_j\). Note that
 leaves, in this setting, are internal nodes with two external nodes as
-children. If \(a_i < a_j\), then this property holds everywhere in the
-left subtree,
-\begin{wrapfigure}[9]{r}[0pt]{0pt}
-% [9] vertical lines
+children.
+\begin{wrapfigure}[8]{r}[0pt]{0pt}
+% [8] vertical lines
 % {r} mandatory right placement
 % [0pt] of margin overhang
 \centering
 \includegraphics[bb=71 638 217 723]{red_cmp}
 \caption{Useless \(a_1 > a_3\)\label{fig:red_cmp}}
 \end{wrapfigure}
-otherwise \(a_i >
-a_j\) holds in the right subtree. This tree is one possible amongst
-many: it corresponds to an algorithm which starts by comparing
-\(a_1\)~and~\(a_2\) and there are, of course, many other
-strategies. But it does not contain redundant comparisons: if a path
-from the root to a leaf includes \(a_i < a_j\) and \(a_j < a_k\), we
-do not expect the useless \(a_i < a_k\). \Fig~\vref{fig:red_cmp} shows
-an excerpt of a comparison tree with such a useless comparison. The
-special external node~\(\bot\) corresponds to no permutation because
-the comparison \(a_1 < a_3\) cannot fail as it is implied by
-transitivity of the previous comparisons on the path from the root.
+If \(a_i < a_j\), then this property holds everywhere in the left
+subtree, otherwise \(a_i > a_j\) holds in the right subtree. This tree
+is one possible amongst many: it corresponds to an algorithm which
+starts by comparing \(a_1\)~and~\(a_2\) and there are, of course, many
+other strategies. But it does not contain redundant comparisons: if a
+path from the root to a leaf includes \(a_i < a_j\) and \(a_j < a_k\),
+we do not expect the useless \(a_i < a_k\). \Fig~\vref{fig:red_cmp}
+shows an excerpt of a comparison tree with such a useless
+comparison. The special external node~\(\bot\) corresponds to no
+permutation because the comparison \(a_1 < a_3\) cannot fail as it is
+implied by transitivity of the previous comparisons on the path from
+the root.
 \begin{center}
   \emph{A comparison tree for \(n\)~keys without redundancy has
     \(n!\)~external nodes.}
