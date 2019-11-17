@@ -357,14 +357,26 @@ the other extreme, when \(\Omega = 0\). Considering an example like
 are no empty stacks, the length of each stack is lower than or equal
 to the number of non\hyp{}stack items in it and its embeddings (it is
 equal if there is no further embedded stack). Therefore, summing up
-all these inequalities, the result \(\Omega = 0 \Rightarrow L
-\leqslant C\) ensues, where \(C\)~is the cost of rewriting the calls
+all these inequalities, the following inequality ensues:
+\begin{equation}
+  \Omega = 0 \Rightarrow C - L \geqslant 0, \label{eq:CL}
+\end{equation}
+where \(C\)~is the cost of rewriting the calls
 to~\fun{cat/2}\index{cat@\fun{cat/2}}
 in~\fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}}. Because
-\(\C{\fun{flat}}{n,\Omega,\Gamma} = (1 + n + \Omega + \Gamma) + L\)
-and \(\C{\smash{\fun{flat}_0}}{n,\Omega,\Gamma} = (1 + n + \Omega +
-\Gamma) + (C + \Gamma)\), the consequence is that, if there are no
-empty stacks, \fun{flat/1}\index{flat@\fun{flat/1}} is faster.
+\(\C{\smash{\fun{flat}_0}}{n,\Omega,\Gamma} = (1 + n + \Omega +
+\Gamma) + (C + \Gamma)\) and \(\C{\fun{flat}}{n,\Omega,\Gamma} = (1 +
+n + \Omega + \Gamma) + L\),
+\begin{equation*}
+  \C{\smash{\fun{flat}_0}}{n,\Omega,\Gamma} -
+  \C{\fun{flat}}{n,\Omega,\Gamma} =
+  (C - L) + \Gamma.
+\end{equation*}
+From equation~\eqref{eq:CL}, we deduce that, in the absence of empty
+stacks, we have the inequality
+\(\C{\smash{\fun{flat}_0}}{n,\Omega,\Gamma} -
+\C{\fun{flat}}{n,\Omega,\Gamma} \geqslant L\), that is,
+\fun{flat/1}\index{flat@\fun{flat/1}} is faster.
 
 
 \mypar{Termination}
@@ -391,55 +403,94 @@ proper subterm order on its first argument. Assuming now that
 \fun{cat/2} terminates, let us prove the termination of
 \fun{flat\(_0\)/1}. Because the recursive calls of \fun{flat\(_0\)/1}
 contain only (stack) constructors, we can try to order their arguments
-\citep{ArtsGiesl_1996}. Again, the same order works: \(\cons{y}{t}
-\succ t\) (rule~\(\delta\) and rule~\(\omega\) when \(y=\el\));
-\(\cons{\cons{x}{s}}{t} \succ t\) and \(\cons{\cons{x}{s}}{t} \succ
-\cons{x}{s}\) (rule~\(\gamma\)). Termination ensues.\hfill\(\Box\)
+\citep{ArtsGiesl_1996}. Again, the same order works:
+\begin{itemize*}
+
+  \item \(\cons{y}{t} \succ t\) by rule~\(\delta\) and rule~\(\omega\)
+    when \(y=\el\),
+
+  \item \(\cons{\cons{x}{s}}{t} \succ t\) and
+
+  \item \(\cons{\cons{x}{s}}{t} \succ \cons{x}{s}\) by
+    rule~\(\gamma\).
+
+\end{itemize*}
+Termination ensues.\hfill\(\Box\)
 
 Let us further recall the definition of
 \fun{flat/1}\index{flat@\fun{flat/1}} in \fig~\ref{fig:flat} and
 prove its termination. Here, the order we used for \fun{flat\(_0\)/1}
-fails: \(\cons{\cons{x}{s}}{t} \nsucc \cons{x,s}{t} =
-\cons{x}{\cons{s}{t}}\). We could try the more general \emph{proper
-  subterm order}\index{induction!proper subterm order}, that is, the
-strict inclusion of a term into another, but, despite \(\cons{x}{s}
-\succ x\), we have \(t \nsucc \cons{s}{t}\). One way out is to define
-a \emph{measure}\index{termination!measure} on the stacks
+fails:
+\begin{equation*}
+  \cons{\cons{x}{s}}{t} \nsucc \cons{x,s}{t} =
+  \cons{x}{\cons{s}{t}}.
+\end{equation*}
+We could try the more general \emph{proper subterm
+  order}\index{induction!proper subterm order}, that is, the strict
+inclusion of a term into another, but, despite \(\cons{x}{s} \succ
+x\), we have \(t \nsucc \cons{s}{t}\). One way out is to define a
+\emph{measure}\index{termination!measure} on the stacks
 \citep{Giesl_1995a}.\index{flat0@\fun{flat$_0$/1}|)}
 
 A measure \(\measure{\cdot}\) is a map from terms to a
 well\hyp{}ordered set (\(A,\succ\)), which is \emph{monotone} with
-respect to rewriting: \(x \rightarrow y \Rightarrow \measure{x} \succ
-\measure{y}\). Actually, we will only consider \emph{dependency pairs}
+respect to rewriting:
+\begin{equation*}
+  x \rightarrow y \Rightarrow \measure{x} \succ \measure{y}.
+\end{equation*}
+Actually, we will only consider \emph{dependency pairs}
 \citep{ArtsGiesl_2000}\index{termination!dependency pair}, that is,
 pairs of calls whose first component is the left\hyp{}hand side of a
 rule and the second components are the calls in the righ\hyp{}hand
 side of same rule. This is easier than working with \(x\)~and~\(y\) in
 \(x \rightarrow y\), as only subterms of~\(y\) are considered. The
-pairs are\index{flat@\fun{flat/1}} \((\fun{flat}(\cons{\el}{t}),
-\fun{flat}(t))_\omega\), \((\fun{flat}(\cons{\cons{x}{s}}{t}),
-\fun{flat}(\cons{x,s}{t}))_\gamma\) and \((\fun{flat}(\cons{y}{t}),
-\fun{flat}(t))_\delta\), with \(y \not\in S\). We can actually drop
-the function names, as all the pairs involve
+pairs are\index{flat@\fun{flat/1}}:
+\begin{itemize*}
+
+  \item \((\fun{flat}(\cons{\el}{t}),
+    \fun{flat}(t))_\omega\),
+
+  \item \((\fun{flat}(\cons{\cons{x}{s}}{t}),
+    \fun{flat}(\cons{x,s}{t}))_\gamma\) and
+
+  \item \((\fun{flat}(\cons{y}{t}), \fun{flat}(t))_\delta\), with \(y
+    \not\in S\).
+\end{itemize*}
+We can actually drop the function names, as all the pairs involve
 \fun{flat/1}\index{flat@\fun{flat/1}}. A common class of measures are
 monotone embeddings into (\(\mathbb{N},>\)), so let us seek a measure
 satisfying
-\begin{equation*}
-\measure{\cons{\cons{x}{s}}{t}} > \measure{\cons{x,s}{t}};\quad
-\measure{\cons{y}{t}} > \measure{t},
-\;\text{if \(y \not\in S\) or \(y=\el\)}.
-\end{equation*}
+\begin{itemize*}
+
+  \item \(\measure{\cons{\cons{x}{s}}{t}} > \measure{\cons{x,s}{t}}\);
+
+  \item \(\measure{\cons{y}{t}} > \measure{t}\), if \(y \not\in S\) or
+    \(y=\el\).
+
+\end{itemize*}
 For instance, let us set the following \emph{polynomial
   measure}\index{termination!polynomial measure}:
-\begin{equation*}
-\measure{\cons{x}{s}} := 1 + 2\cdot\measure{x} + \measure{s};\quad
-\measure{y} := 0,\;\text{if \(y \not\in S\) or \(y=\el\)}.
-\end{equation*}
-We have \(\measure{\cons{\cons{x}{s}}{t}} = 3 + 4\cdot\measure{x} +
-2\cdot\measure{s} + \measure{t}\) and, for the other stack,
-\(\measure{\cons{x,s}{t}} = 2 + 2\cdot\measure{x} + 2\cdot\measure{s}
-+ \measure{t}\). Because \(\measure{x} \in \mathbb{N}\), for
-all~\(x\), we have \(\measure{\cons{\cons{x}{s}}{t}} >
+\begin{itemize*}
+
+  \item \(\measure{\cons{x}{s}} := 1 + 2\cdot\measure{x} +
+    \measure{s}\);
+
+  \item \(\measure{y} := 0\), if \(y \not\in S\) or \(y=\el\).
+
+\end{itemize*}
+We have, for each stack,
+\begin{itemize*}
+
+  \item \(\measure{\cons{\cons{x}{s}}{t}} = 3 + 4\cdot\measure{x} +
+    2\cdot\measure{s} + \measure{t}\),
+
+  \item \(\measure{\cons{x,s}{t}} = 2 + 2\cdot\measure{x} +
+    2\cdot\measure{s} + \measure{t}\).
+
+\end{itemize*}
+Therefore \(\measure{\cons{\cons{x}{s}}{t}} = \measure{\cons{x,s}{t}}
++ 1 + 2\cdot\measure{x}\). Because \(\measure{x} \in \mathbb{N}\),
+for all~\(x\), we have \(\measure{\cons{\cons{x}{s}}{t}} >
 \measure{\cons{x,s}{t}}\). The second inequality yields faster:
 \(\measure{\cons{y}{t}} = 1 + \measure{t} > \measure{t}\). This
 entails the termination of

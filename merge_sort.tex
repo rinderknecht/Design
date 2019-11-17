@@ -1214,9 +1214,11 @@ Let \(n := (b_{m-1}\dots b_0)_2\), then \(2^{m-1} \leqslant n
 \leqslant 2^m - 1\) and \(2^{m-1} < 2^{m-1} + 1 \leqslant n + 1
 \leqslant 2^m\), so \(m-1 < \lg(n+1) \leqslant m\), that is, \(m =
 \ceiling{\lg(n+1)}\), which, with equation~\eqref{eq:e_r}
-\vpageref{eq:e_r}, proves \(1 + \floor{\lg n} =
-\ceiling{\lg(n+1)}\). As a consequence, equation~\eqref{eq:tms_n_tmp}
-can be rewritten as
+\vpageref{eq:e_r}, proves
+\begin{equation*}
+  1 + \floor{\lg n} = \ceiling{\lg(n+1)}.
+\end{equation*}
+As a consequence, equation~\eqref{eq:tms_n_tmp} can be rewritten as
 \begin{equation}
 %\abovedisplayskip=4pt
 %\belowdisplayskip=4pt
@@ -1894,7 +1896,7 @@ ax^3 + bx^2 + cx + d = 0, \; \text{with \(a \neq 0\)}.
 A classic result about the nature of the roots is as follows. Let the
 \emph{discriminant}\index{discriminant|(} of the cubic be \(\Delta :=
 18abcd - 4b^3d + b^2c^2 - 4ac^3 - 27a^2d^2\).
-\begin{itemize*}
+\begin{enumerate}
 
   \item If \(\Delta > 0\), the equation has three distinct real roots;
 
@@ -1904,7 +1906,7 @@ A classic result about the nature of the roots is as follows. Let the
   \item if \(\Delta < 0\), the equation has one real root and two
     nonreal complex conjugate roots.
 
-\end{itemize*}
+\end{enumerate}
 Let us resume now our discussion. Let the cubic polynomial
 \begin{equation*}
 \Delta(x) \!:= (4\ln 2)x^3 - (9 - 2\ln 2)(3 + 2\ln 2)x^2 + 12(9 - 2\ln
@@ -1914,28 +1916,36 @@ Then the discriminant of \(K_p(i) = 0\) is \(\Delta(2^{p+1}) \cdot
 \ln^2 2\). The discriminant of \(\Delta(x) = 0 \) is negative, thus
 \(\Delta(x)\) has one real root~\(x_0 \simeq 8.64872\). Because the
 coefficient of~\(x^3\) is positive, \(\Delta(x)\) is negative if \(x <
-x_0\) and positive if \(x > x_0\). Since \(p \geqslant 3\) implies
-\(2^{p+1} > x_0\), the discriminant\index{discriminant|)} of \(K_p(i)
-= 0\) is positive, which means that \(K_p(i)\) has three distinct real
-roots if \(p \geqslant 3\), and so does \(\partial^2\Psi/\partial
-i^2\). Otherwise, \(K_p(i)\) has one real root if \(0 \leqslant p
-\leqslant 2\). Before we study these two cases in detail, we need a
-small reminder about cubic polynomials. Let \(\rho_0\), \(\rho_1\)
-and~\(\rho_2\) be the roots of \(P(x) = ax^3 + bx^2 + cx + d\). So
-\(P(x) = a(x-\rho_0)(x-\rho_1)(x-\rho_2) = ax^3 -
-a(\rho_0+\rho_1+\rho_2)x^2 + a(\rho_0\rho_1 + \rho_0\rho_2 + \rho_1
-\rho_2)x - a(\rho_0\rho_1\rho_2)\), so \(\rho_0\rho_1\rho_2 = -d/a\).
-\begin{itemize}
+x_0\) and positive if \(x > x_0\).
+\begin{enumerate}
 
-\item Let \(p \in \{0,1,2\}\). We just found that \(K_p(i)\) has one
-  real root, say~\(\rho_0\), and two nonreal conjugate roots,
-  say~\(\rho_1\) and \(\rho_2=\overline{\rho_1}\). Then
-  \(\rho_0\rho_1\rho_2 = \rho_0 \len{\rho_1}^2 = -1\), so \(\rho_0 <
-  0\). Since the coefficient of~\(x^3\) is positive, this entails that
-  \(K_p(i) > 0\) if \(i > 0\), which is true for
-  \(\partial^2\Psi/\partial i^2\) as well: \(i > 0 \) implies
-  \(\partial^2\Psi/\partial i^2 > 0\), therefore
-  \(\partial\Psi/\partial i\) increases. Since
+  \item Since \(p \geqslant 3\) implies \(2^{p+1} > x_0\), the
+    discriminant\index{discriminant|)} of \(K_p(i) = 0\) is positive,
+    which means that \(K_p(i)\) has three distinct real roots if \(p
+    \geqslant 3\), and so does \(\partial^2\Psi/\partial
+    i^2\).
+
+  \item Otherwise, \(K_p(i)\) has one real root if \(0 \leqslant p
+    \leqslant 2\).
+
+\end{enumerate}
+Before we study these two cases in detail, we need a small reminder
+about cubic polynomials. Let \(\rho_0\), \(\rho_1\) and~\(\rho_2\) be
+the roots of \(P(x) = ax^3 + bx^2 + cx + d\). So \(P(x) =
+a(x-\rho_0)(x-\rho_1)(x-\rho_2) = ax^3 - a(\rho_0+\rho_1+\rho_2)x^2 +
+a(\rho_0\rho_1 + \rho_0\rho_2 + \rho_1 \rho_2)x -
+a(\rho_0\rho_1\rho_2)\), so \(\rho_0\rho_1\rho_2 = -d/a\).
+\begin{enumerate}
+
+  \item Let \(p \in \{0,1,2\}\). We just found that \(K_p(i)\) has one
+    real root, say~\(\rho_0\), and two nonreal conjugate roots,
+    say~\(\rho_1\) and \(\rho_2=\overline{\rho_1}\). Then
+    \(\rho_0\rho_1\rho_2 = \rho_0 \len{\rho_1}^2 = -1\), so \(\rho_0 <
+    0\). Since the coefficient of~\(x^3\) is positive, this entails
+    that \(K_p(i) > 0\) if \(i > 0\), which is true for
+    \(\partial^2\Psi/\partial i^2\) as well: \(i > 0 \) implies
+    \(\partial^2\Psi/\partial i^2 > 0\), therefore
+    \(\partial\Psi/\partial i\) increases. Since
   \begin{equation*}
     \frac{\partial\Psi}{\partial i}(p,i) \xrightarrow[i\to 0^{+}]{}
     -\infty < 0, \;\text{and}\; \left.\frac{\partial\Psi}{\partial
@@ -1965,7 +1975,7 @@ a(\rho_0+\rho_1+\rho_2)x^2 + a(\rho_0\rho_1 + \rho_0\rho_2 + \rho_1
   which of \(i=1\) or \(i=2^p\) minimises \(\Psi(p,i)\): actually, we
   have \(\Psi(p,1) \geqslant \Psi(p,2^p)\), so we conclude \(\min_{0 <
     i \leqslant 2^p}\Psi(p,i) = \Psi(p,2^p)\).
-\end{itemize}
+\end{enumerate}
 In any case, we need to minimise \(\Psi(p,2^p)\). We have:
 \begin{equation*}
 \Psi(p,2^p) = - \frac{1}{2^p+1} - \sum_{k=0}^{p}\frac{1}{2^k+1}.
@@ -1993,19 +2003,18 @@ in \(\OM{\fun{bms}}{n} \leqslant n\lg n + a'n + b'\), for \(n
 \geqslant 2\). The difference with the lower bound is that the
 inequations are reversed: \(a'\geqslant \Psi(p,i)\) and \(b' \geqslant
 -2a' - 1\). We revisit the two cases above:
-\begin{itemize}
+\begin{enumerate}
 
-  \item If \(0 \leqslant p \leqslant 2\), then \(\max_{0 < i
-    \leqslant 2^p}\Psi(p,i) = \Psi(p,1)\). We easily check that
-  \(\max_{0 \leqslant p \leqslant 2}\Psi(p,1) = \Psi(0,1) = 1 -
-  \alpha\).
+  \item If \(0 \leqslant p \leqslant 2\), then \(\max_{0 < i \leqslant
+    2^p}\Psi(p,i) = \Psi(p,1)\). We easily check that \(\max_{0
+    \leqslant p \leqslant 2}\Psi(p,1) = \Psi(0,1) = 1 - \alpha\).
 
-\item If \(p \geqslant 3\), we need to express \(i_p\)~as a function
-  of~\(p\), but it is hard to solve the equation
-  \(\left.\partial\Psi/\partial i\right|_{i=i_p} = 0\), even
-  approximately.
+  \item If \(p \geqslant 3\), we need to express \(i_p\)~as a function
+    of~\(p\), but it is hard to solve the equation
+    \(\left.\partial\Psi/\partial i\right|_{i=i_p} = 0\), even
+    approximately.
 
-\end{itemize}
+\end{enumerate}
 Before giving up, we could try to differentiate~\(\Psi\) with respect
 to~\(p\), instead of~\(i\). Indeed, \((p,i,\Psi(p,i))\) defines a
 surface in space, and by privileging \(p\)~over~\(i\), we are slicing
@@ -2063,15 +2072,15 @@ When \(x \geqslant 1\) varies, the sign of
 \(\left.\partial^2\Psi(p,x)/\partial x^2\right|_{p=\lg i}\), so we can
 reuse the previous discussion on the roots of \(K_p(i)\), while taking
 care to replace~\(i\) by~\(x\), and~\(2^p\) by~\(i\):
-\begin{itemize}
+\begin{enumerate}
 
-\item If \(i \in \{1,2,3,4\}\), then \(\partial\varphi(x,i)/\partial x
-  > 0\) when \(x > 0\).
+  \item If \(i \in \{1,2,3,4\}\), then \(\partial\varphi(x,i)/\partial
+    x > 0\) when \(x > 0\).
 
-\item If \(i \geqslant 5\), then \(\partial\varphi(x,i)/\partial x >
-  0\) when \(x \geqslant 1\).
+  \item If \(i \geqslant 5\), then \(\partial\varphi(x,i)/\partial x >
+    0\) when \(x \geqslant 1\).
 
-\end{itemize}
+\end{enumerate}
 In both cases, \(\varphi(x,i)\) increases when \(x \geqslant 1\),
 which, with the facts that \(\lim_{x\to 0^{+}}\varphi(x,i) = -\infty <
 0\) and \(\lim_{x\to\infty}\varphi(x,i) = +\infty > 0\), entails that
@@ -2119,20 +2128,28 @@ because the whole process can easily be depicted as a
 tree\index{tree!merge $\sim$|(}. It is time to provide a program whose
 traces conform to these merge trees. In \fig~\vref{fig:bms} is shown
 the definitions of the main sorting function
-\fun{bms/1}\index{bms@\fun{bms/1}} and several auxiliaries. The call
-\(\fun{solo}(s)\)\index{solo@\fun{solo/1}} is a stack containing
-singletons with all the keys of~\(s\) in the same order. In other
-words, it is the leaves of the merge tree. The call
-\(\fun{all}(u)\)\index{all@\fun{all/1}} is a stack containing stacks
-which are the result of merging adjacent stacks in~\(u\). In other
-words, it is the level just above~\(u\) in the merge tree. The call
-\(\fun{all}(\fun{solo}(s))\) is the sorted stack corresponding to the
-stack of singletons~\(\fun{solo}(s)\). In other words, starting with
-the leaves, it keeps building levels up by calling
-\fun{mrg/2}\index{mrg@\fun{mrg/2}} until the root of the merge tree is
-reached. What is beautiful about this program is that there is no need
-for two distinct phases, first building the perfect merge trees and
-then performing the unbalanced mergers with the roots of these: it is
+\fun{bms/1}\index{bms@\fun{bms/1}} and several auxiliaries.
+\begin{itemize}
+
+  \item The call \(\fun{solo}(s)\)\index{solo@\fun{solo/1}} is a stack
+    containing singletons with all the keys of~\(s\) in the same
+    order. In other words, it is the leaves of the merge tree.
+
+  \item The call \(\fun{all}(u)\)\index{all@\fun{all/1}} is a stack
+    containing stacks which are the result of merging adjacent stacks
+    in~\(u\). In other words, it is the level just above~\(u\) in the
+    merge tree.
+
+  \item The call \(\fun{all}(\fun{solo}(s))\) is the sorted stack
+    corresponding to the stack of singletons~\(\fun{solo}(s)\). In
+    other words, starting with the leaves, it keeps building levels up
+    by calling \fun{mrg/2}\index{mrg@\fun{mrg/2}} until the root of
+    the merge tree is reached.
+
+\end{itemize}
+What is beautiful about this program is that there is no need for two
+distinct phases, first building the perfect merge trees and then
+performing the unbalanced mergers with the roots of these: it is
 possible to achieve the same effect by interleaving rightwards and
 upwards constructions.\index{tree!merge $\sim$|)}
 \begin{figure}
@@ -2578,11 +2595,11 @@ i - p - 2,
 then \(\pred{W\(_U\)}{2^p+i}\) would ensue. Using
 equation~\eqref{eq:top}, we deduce
 \index{bms@$\OW{\fun{bms}}{n}$}\index{tms@$\OW{\fun{tms}}{n}$}
-\begin{equation*}
-\OW{\fun{tms}}{i} = i\ceiling{\lg i} - 2^{\ceiling{\lg i}} + 1,\;\;
-\OW{\fun{tms}}{2^p} = (p-1)2^p + 1,\;\,
-\OW{\fun{tms}}{2^p+i} = \OW{\fun{tms}}{2^p} + (p+1)i.
-\end{equation*}
+\begin{align*}
+\OW{\fun{tms}}{i} &= i\ceiling{\lg i} - 2^{\ceiling{\lg i}} + 1,\\
+\OW{\fun{tms}}{2^p} &= (p-1)2^p + 1,\\
+\OW{\fun{tms}}{2^p+i} &= \OW{\fun{tms}}{2^p} + (p+1)i.
+\end{align*}
 The unproven inequality becomes \(\OW{\fun{tms}}{i} + i - \ceiling{\lg
   i} \leqslant (p+1)i - p\), or
 \begin{equation}
@@ -2896,15 +2913,24 @@ Hence, \((n+2)\lg n + 1.236n + 1.529 < (n^2 + 13n - \ln 2n + 10)/8\)
 implies \(\M{\fun{bms\(_0\)}}{n} < \M{\fun{i2wb}}{n}\), and also
 \((n^2 + 13n - \ln 2n + 17)/8 < (n+2)\lg n + 0.152n + 0.69\) implies
 \(\M{\fun{i2wb}}{n} < \M{\fun{bms\(_0\)}}{n}\). With the help of a
-computer algebra system, we find that \(\M{\fun{bms\(_0\)}}{n} <
-\M{\fun{i2wb}}{n}\) if \(n \geqslant 43\), and \(\M{\fun{i2wb}}{n} <
-\M{\fun{bms\(_0\)}}{n}\) if \(3 \leqslant n \leqslant 29\). For the
-case \(n=2\), we find: \(\M{\fun{i2wb}}{2} = 11/2 > 5 =
+computer algebra system, we find that
+\begin{enumerate}
+
+  \item \(\M{\fun{i2wb}}{n} < \M{\fun{bms\(_0\)}}{n}\) if \(3
+    \leqslant n \leqslant 29\),
+
+  \item \(\M{\fun{bms\(_0\)}}{n} < \M{\fun{i2wb}}{n}\) if \(43
+    \leqslant n\).
+
+\end{enumerate}
+For the case \(n=2\), we find: \(\M{\fun{i2wb}}{2} = 11/2 > 5 =
 \M{\fun{bms\(_0\)}}{2}\). If we set aside this peculiar case, we may
 conclude that insertion sort is faster, in average, for stacks of less
 than \(30\)~keys, and the opposite is true for stacks of at
-least~\(43\) keys. In\hyp{}between, we don't know, but we can compute
-efficiently the average costs and use dichotomy on the interval from
+least~\(43\) keys.
+
+In\hyp{}between, we do not know, but we can compute efficiently the
+average costs and use dichotomy on the interval from
 \(30\)~to~\(43\). By using the \Erlang program above, we quickly find
 that insertion sort is first beaten by bottom\hyp{}up merge sort at
 \(n=36\). This suggests to drop \fun{duo/1} in favour of a function
