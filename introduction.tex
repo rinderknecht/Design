@@ -20,7 +20,7 @@ for example
 The rules~\(\alpha\), \(\beta\)~and~\(\gamma\) make up a simple
 \emph{string\hyp{}rewriting system}\index{rewrite system}. Rules
 \(\alpha\)~and~\(\beta\) can be conceived as ``A black bead absorbs
-the white bead next to it.'' The goal of this game is to end up with
+a white bead next to it.'' The goal of this game is to end up with
 as few beads as possible, so our example may lead to the
 \emph{rewrites}
 \begin{equation*}
@@ -56,18 +56,18 @@ form. Furthermore, notice how the parity of the number of black beads
 is invariant through each rule and how there is no rewrite rule for
 two adjacent white beads. Therefore, if there are \(2p\) initial black
 beads, then composing rules \(\alpha\)~and~\(\beta\) lead to an
-all\hyp{}black string, like \(\bullet \bullet \bullet \, \bullet\)
-above, which can be reduced by applying rule~\(\gamma\) to contiguous
-pairs of beads into an all\hyp{}white string made of
-\(p\)~beads. Otherwise, the same all\hyp{}black string can be reduced
-by applying alternatively \(\gamma\)~and~\(\beta\) on the left end or
+all\hyp{}black string, like \(\bullet \bullet \bullet \, \bullet\),
+which can be reduced by applying rule~\(\gamma\) to contiguous pairs
+of beads into an all\hyp{}white string made of \(p\)~beads. Otherwise,
+the same all\hyp{}black string can be reduced by applying
+alternatively \(\gamma\)~and~\(\beta\) on the left end or
 \(\gamma\)~and~\(\alpha\) on the right end,
 yielding~\(\circ\). Similarly, if there is an initial odd number of
 black beads, we always end up with one black bead. It suffices to
 consider the rewrites \(\circ \circ \xleftarrow{\smash{\gamma}}
 \bullet \bullet \circ \xrightarrow{\smash{\alpha}} \bullet \bullet
 \xrightarrow{\smash{\gamma}} \circ\) to see that normal forms are not
-unique. Systems where normal forms are unique are said
+unique. Systems where normal forms are unique are called
 \emph{confluent}\index{rewrite system!confluence}.
 
 If we add the rule \(\circ\; \circ \xrightarrow{\smash{\delta}}
@@ -75,21 +75,22 @@ If we add the rule \(\circ\; \circ \xrightarrow{\smash{\delta}}
 depends on the original parity of the black beads as before, and any
 strategy is successful. To see why, let us consider first that two
 non\hyp{}overlapping parts of a string can be rewritten in parallel,
-so they are not of concern. The interesting cases occur when two
-applications of rules (maybe of the same rule) lead to different
-strings because they overlap. For instance, \(\circ \, \circ
-\xleftarrow{\smash{\gamma}} \bullet \bullet \circ
-\xrightarrow{\smash{\alpha}} \bullet \, \bullet\). The important point
-is that \(\circ \, \circ\) and \(\bullet \, \bullet\) can be rewritten
-into~\(\circ\) at the next step by \(\delta\)~and~\(\gamma\),
-respectively.
+that is to say, the order in which they are applied is irrelevant.
+The interesting cases occur when two applications of rules (maybe of
+the same rule) lead to different strings because they overlap. For
+instance, \(\circ \, \circ \xleftarrow{\smash{\gamma}} \bullet \bullet
+\circ \xrightarrow{\smash{\alpha}} \bullet \, \bullet\). The important
+point is that \(\circ \, \circ\) and \(\bullet \, \bullet\) can be
+rewritten into~\(\circ\) at the next step by
+\(\delta\)~and~\(\gamma\), respectively.
 
 In general, what matters is that all pairs of strings resulting from
 the application of overlapping rules, called \emph{critical
-  pairs}\index{rewrite system!critical pair}, can be rewritten to the
+pairs}\index{rewrite system!critical pair}, can be rewritten to the
 same string, to wit, they are \emph{joinable}. In our example, all
-interactions occur on substrings made of three beads, so we must
-examine in \fig~\vref{fig:bullets}
+interactions occur on substrings consisting of three beads (because
+the left\hyp{}hand sides of the rules are made of exactly two beads),
+so we must examine in \fig~\vref{fig:bullets}
 \begin{figure}[b]
 \centering
 \includegraphics{bullets}
@@ -101,17 +102,18 @@ eight cases, which we can order as if counting in binary from
 in one step at most.
 
 In general, it is not necessary for critical pairs to be joinable in
-one rewrite just after the divergence, but, more generally, to be
-joinable. This property is called \emph{local
-  confluence}\index{rewrite system!confluence!local $\sim$}. Together
+one rewrite just after the divergence, but to be joinable after any
+number of rewrites. This property is called \emph{local
+confluence}\index{rewrite system!confluence!local $\sim$}. Together
 with termination, it implies that \emph{every} string has exactly one
 normal form, which is a strong property entailing confluence.
 
 The system we defined is \emph{ground}\index{rewrite system!ground
   $\sim$}, that is, it involves no variables. Variables allow a finite
-system to denote an infinite number of ground rules or, simply, to
-reduce the size of rewrite systems. For instance, the previous example
-is equivalent to
+system to denote an infinite number of ground rules if the elements
+making up the strings are infinite, but also to reduce the size of a
+finite ground system. For instance, the previous example is equivalent
+to
 \begin{equation*}
 \bullet \; \circ \xrightarrow{\smash{\alpha}} \bullet
 \qquad\qquad
@@ -119,23 +121,20 @@ is equivalent to
 \qquad\qquad
 \bullet \; \bullet \xrightarrow{\smash{\gamma}} \circ
 \end{equation*}
-If we accept multiple occurrences of a variable on the left\hyp{}hand
-side of a rule, a so\hyp{}called \emph{non left\hyp{}linear
-  rule}\index{rewrite system!linear $\sim$}, we can further decrease
-the size of the system as follows:
+where \(x \in \{\circ, \bullet\}\).If we accept multiple occurrences
+of a variable on the left\hyp{}hand side of a rule, a so\hyp{}called
+\emph{non left\hyp{}linear rule}\index{rewrite system!linear $\sim$},
+we can further decrease the size of the system as follows:
 \begin{equation*}
 x  \; x \xrightarrow{\smash{\gamma+\delta}} \circ\qquad\qquad
 x  \; y \xrightarrow{\smash{\alpha+\beta}} \bullet
 \end{equation*}
-Notice that there is now an \emph{implicit order over the rules}: the
+There is now an \emph{implicit order over the rules}, which is the
+order of writing (from left to right, top to bottom): the
 rule \(\gamma+\delta\) must be examined first for a match with a part
 of the current string, because it is included in the second (set
-\(x=y\) in \(\alpha+\beta\)). In general, the order in which the rules
-are written on the page is their logical order. Moreover, let us
-remark that the system does not specify that \(x\)~must either
-be~\(\circ\) or~\(\bullet\). Generally speaking, this means that the
-\emph{type} of the variables has to be defined elsewhere or inferred
-from the variable uses.
+\(x=y\) in \(\alpha+\beta\) and we obtain the same left\hyp{}hand side
+as~\(\gamma+\delta\)).
 
 \paragraph{Term-rewriting}
 
@@ -154,18 +153,18 @@ n     \rightarrow (n,1).
 where rules are separated by a semi\hyp{}colon and the last one is
 ended by a period. Arithmetic operators \((-)\)~and~\((\cdot)\) are
 defined outside the system, and \(m\)~and~\(n\) are variables denoting
-natural numbers. Would the rules not be ordered as they are actually
-laid out, the second rule would match any pair. Instead, it can be
-assumed that \(n \neq 0\) in the second one. We can easily see that
-all compositions of rewrites starting with a natural number~\(n\) end
-with the \emph{factorial}\index{factorial} of~\(n\), that is, \(1
-\cdot 2 \cdot 3 \dots \cdot n\), or simply~\(n!\):
+natural numbers. Would the rules not be ordered as they are laid out,
+the second rule would match any pair. Instead, it can be assumed that
+\(n \neq 0\) in the second rule. We can easily see that all
+compositions of rewrites starting with a natural number~\(n\) end with
+the \emph{factorial}\index{factorial} of~\(n\), that is, \(1 \cdot 2
+\cdot 3 \dots \cdot n\), or simply~\(n!\):
 \begin{equation*}
 n \rightarrow (n,1) \rightarrow \dots \rightarrow (0,n!) \rightarrow
 n!, \quad \text{for \(n \in \mathbb{N}\)}.
 \end{equation*}
 Let us note \((\xrightarrow{\smash{n}})\) the composition of
-\((\rightarrow)\) repeated \(n-1\)~times:
+\((\rightarrow)\) repeated \(n\)~times:
 \begin{equation*}
   (\xrightarrow{\smash{1}})   := (\rightarrow);\qquad
   (\xrightarrow{\smash{n+1}}) :=
@@ -192,7 +191,8 @@ the tuples are then called \emph{arguments}, for example
 \(\fun{d}(n)\) is the second argument of the call \(\fun{c}(1,
 \fun{d}(n))\). It is possible for a function call to hold no
 arguments, like \(\fun{d}()\). For a given system, we restrict the
-left\hyp{}hand sides of rules to be calls to the same function.
+left\hyp{}hand sides of rules to be calls to the same function being
+defined.
 
 \section{Trees for depicting terms}\index{term|see{tree}}
 \label{def:tree}
@@ -249,17 +249,15 @@ variables \(x\)~and~\(y\) are set in italics to differentiate them
 from function names \fun{x}~and~\fun{y}, set in
 \textsf{sans\hyp{}serif}. For example \(\fun{d}((), \fun{e}([1]))\)
 can be interpreted as a tree of root~\fun{d} and whose first immediate
-subtree is the representation of the empty tuple \(()\) and second
-immediate subtree corresponds to \(\fun{e}([1])\). \Fig~\ref{fig:tree}
-represents the tree corresponding to
-\(\fun{f}((\fun{g}(0),(x,1)),(),\fun{g}(y))\). Note that tuples,
-except the empty tuple, are not represented in the tree, since they
-encode the structure, which is already visible. The number of
-arguments of a function is called \emph{arity}\index{functional
-  language!arity}. Functions with the same name but different arities
-are permitted; for instance, we could have both \(\fun{c}(\fun{a}())\)
-and \(\fun{c}(\fun{a}(x),0)\). This is called
-\emph{overloading}\index{functional language!overloading}. To
+subtree is the representation of the empty tuple \(()\), and the
+second immediate subtree corresponds to
+\(\fun{e}([1])\). \Fig~\ref{fig:tree} represents the tree
+corresponding to \(\fun{f}((\fun{g}(0),(x,1)),(),\fun{g}(y))\). The
+number of arguments of a function is called
+\emph{arity}\index{functional language!arity}. Functions with the same
+name but different arities are permitted; for instance, we could have
+both \(\fun{c}(\fun{a}())\) and \(\fun{c}(\fun{a}(x),0)\). This is
+called \emph{overloading}\index{functional language!overloading}. To
 distinguish the different uses, the arity of the function should be
 indicated after a slash, for example \fun{c/1} and \fun{c/2}.
 
@@ -272,12 +270,10 @@ on the rules, as we did in previous examples. Another restriction we
 impose is for normal forms to be \emph{values}\index{functional
   language!value}, to wit, they do not contain any function call which
 can be further reduced. These two constraints define a \emph{purely
-  functional language}
-\citep{Hughes_1989,Hinsen_2009}\index{functional language}. Notice
-that we do not require by construction that a system terminates,
-although that is a desirable property. Not doing so enables more
-expressivity, at the expense of some more work to prove termination
-case by case.
+functional language} \citep{Hughes_1989,Hinsen_2009}\index{functional
+  language}. Notice that we do not require by construction that a
+system terminates. Not doing so enables more expressivity, at the
+expense of some more work to prove termination case by case.
 
 We would like to further constrain the computation of function calls
 by imposing that arguments are rewritten before the call is. This
@@ -316,7 +312,7 @@ system
 \label{def:fact}
 \end{equation}
 Thus \(\fun{fact}(n) \twoheadrightarrow n!\) and the system details
-how to reduce step by step \(\fun{fact}(n)\) into its value.
+how to reduce step by step \(\fun{fact}(n)\) to its value.
 
 Most functional languages allow \emph{higher-order
   function}\index{functional language!higher-order functions}
@@ -333,18 +329,18 @@ program, where \(n \in \mathbb{N}\):
 Note that these two definitions are not recursive, yet
 \fun{fact\(_1\)/1}\index{fact1@\textsf{fact$_1$/1}} computes the
 factorial\index{factorial}.\index{factorial|)} An adequate theoretical
-framework to understand higher\hyp{}order functions is
+framework to understand higher\hyp{}order functions is the
 \emph{\(\lambda\)-calculus}\hspace*{-2.1pt}
 \citep{HindleySeldin_2008,VanLeeuwen_1990b}.
-\index{lambda-calculus@$\lambda$-calculus} In fact,
+\index{lambda-calculus@$\lambda$-calculus} In fact, the
 \(\lambda\)-calculus features prominently in the semantics of
-programming languages, even not functional ones
-\citep{Winskel_1993,Reynolds_1998,Pierce_2002,FriedmanWand_2008,TurbakGifford_2008}. We
-prefer to work with rewrite systems because they offer native pattern
-matching, whilst in
+programming languages, whether they are functional or not
+\citep{Winskel_1993,Reynolds_1998,Pierce_2002,FriedmanWand_2008,TurbakGifford_2008}. Here,
+we prefer to work with rewrite systems because they offer native
+pattern matching, whilst in the
 \(\lambda\)-calculus\index{lambda-calculus@$\lambda$-calculus} we
 would have to encode it as a cascade of conditionals, which have
-themselves to be encoded.
+themselves to be encoded by means of more elementary constructs.
 
 In the following, we show how to express linear data structures in a
 purely functional language and how to run our programs on a computer.
@@ -362,16 +358,16 @@ Let us consider the abstract program\index{cat@\fun{cat/2}|(}
 It defines the function \fun{cat/2}\index{cat@\fun{cat/2}|)} that
 catenates \index{stack!catenation} two \emph{stacks}. Functions
 \fun{nil/0} and \fun{cons/2} are \emph{data
-  constructors}\index{functional language!data constructor}, that is,
+constructors}\index{functional language!data constructor}, that is,
 functions that are \emph{not} defined by any system: their irreducible
-calls model data, so they are values and are allowed in patterns. The
-function call \(\fun{nil}()\) denotes the empty stack and
-\(\fun{cons}(x,s)\) is the stack obtained by putting the item~\(x\) on
-top of the stack~\(s\), an action commonly referred as
+calls model data, so they are values and are allowed in patterns as
+arguments. The function call \(\fun{nil}()\) denotes the empty stack,
+and \(\fun{cons}(x,s)\) is the stack obtained by putting the
+item~\(x\) on top of the stack~\(s\), an action commonly referred as
 \textsl{pushing~\(x\) on~\(s\)}. A non\hyp{}empty stack can be thought
 of as a finite series of items that can only be accessed sequentially
 from the top, as suggested by the analogy with a stack of material
-objects.
+objects, like cubes or plates.
 
 Let~\(T\) be the set of all possible terms and \(S \subseteq T\) be
 the set of all stacks. Formally, \(S\)~can by defined by
@@ -442,19 +438,19 @@ Depending on the context, we may use the arborescent depiction of
 terms to bring to the fore certain aspects of a computation. For
 example, it may be interesting to show how parts of the output (the
 right\hyp{}hand side) are actually \emph{shared}\index{sharing} with
-the input (the left\hyp{}hand side), in other words, how much of the
-data remains invariant through a given rule. This concept supposes
-that terms reside in some sort of space and that they can be referred
-to from different other terms. This abstract space serves as a model
-of a computer \emph{memory}\index{memory}. Consider for instance in
+the input (the left\hyp{}hand side), or how much of the data remains
+invariant through a given rule. The former notion supposes that terms
+reside in some sort of space and that they can be referred to from
+other terms. That abstract space serves as a model of a computer
+\emph{memory}\index{memory}. Consider for instance in
 \fig~\vref{fig:cat_dag} the same definition of~\fun{cat/2} as given
 in~\eqref{def:cat}. The arrows on certain edges denote some data
 sharing. When trees are used to visualise terms, they are called
 \emph{abstract syntax trees}\index{tree!abstract syntax $\sim$}. When
 some trees share subtrees, the whole forest is called a \emph{directed
-  acyclic graph}.\index{directed acyclic graph}
-\index{tree|see{directed acyclic graph}}
-\begin{figure}%[h]
+acyclic graph}.\index{directed acyclic graph} \index{tree|see{directed
+    acyclic graph}}
+\begin{figure}[H]
 \centering
 \includegraphics[bb=73 654 300 720]{cat_dag}
 \caption{Definition of \fun{cat/2} with directed acyclic graphs
@@ -546,10 +542,10 @@ given size. Some care is necessary, as there must be a finite number
 of such inputs. For instance, to assess the mean cost of sorting
 algorithms based on comparisons, it is usual to assume that the input
 is a series of \(n\)~\emph{distinct
-  keys}\index{sorting!key!uniqueness} and that the sum of the costs is
+keys}\index{sorting!key!uniqueness} and that the sum of the costs is
 taken over all its \emph{permutations}\index{permutation}, thus
 divided by~\(n!\), the number of permutations of size~\(n\). The
-uniqueness constraints actually allows the analysis to equivalently,
+uniqueness constraint actually allows the analysis to equivalently,
 and more simply, consider the permutations of \((1,2,\dots,n)\). Some
 sorting algorithms, like \emph{merge sort}
 \cite[\S{}5.2.4]{Knuth_1998} \cite[\S{}2.3]{CLRS_2009} or
@@ -558,10 +554,10 @@ sorting algorithms, like \emph{merge sort}
 \emph{asymptotically equivalent} to their maximum cost, that is, for
 increasingly large numbers of keys, the ratio of the two costs become
 arbitrarily close to~\(1\)\index{cost!asymptotic $\sim$}. Some others,
-like \emph{Hoare's sort}, also known as \emph{quicksort}
-\cite[\S{}5.2.2]{Knuth_1998} \cite[\S{}7]{CLRS_2009}, have the growth
-rate of their average cost being of a lower magnitude than the maximum
-cost, on an asymptotic scale \cite[\S{}9]{GrahamKnuthPatashnik_1994}.
+like \emph{Quicksort} \cite[\S{}5.2.2]{Knuth_1998}
+\cite[\S{}7]{CLRS_2009}, have the growth rate of their average cost
+being of a lower magnitude than the maximum cost, on an asymptotic
+scale \cite[\S{}9]{GrahamKnuthPatashnik_1994}.
 
 \paragraph{Online versus off-line}
 \label{par:online_vs_offline}
@@ -572,7 +568,7 @@ said \emph{off\hyp{}line}\index{off-line algorithm}, as keys are not
 sorted while they are coming in, and the latter are called
 \emph{online}\index{online algorithm}, as the sorting process can be
 temporally interleaved with the input process. For example, insertion
-sort is an online algorithm, whereas Hoare's sort is not because it is
+sort is an online algorithm, whereas Quicksort is not because it is
 an instance of the divide\hyp{}and\hyp{}conquer strategy that splits
 the whole data set. This distinction is pertinent in other contexts,
 as with algorithms that are intrinsically \emph{sequential}, instead
@@ -700,7 +696,7 @@ the previous example consists in determining the average number of
 Let us notice that \(\fun{cat}([1], [2,3,4]) \twoheadrightarrow
 [1,2,3,4] \twoheadleftarrow \fun{cat}([1,2],
 [3,4])\)\index{cat@\fun{cat/2}|(}. It is enlightening to create
-\emph{equivalence classes} of terms that are joinable. Theses classes
+\emph{equivalence classes} of terms that are joinable. These classes
 then define an equivalence relationship~\((\equiv)\)
 \index{equivalence@$a \equiv b$|see{equivalence of expressions}}
 \index{equivalence!$\sim$ of expressions} as follows:
@@ -786,12 +782,12 @@ recursion called \emph{primitive recursion}
 \citep{Robinson_1947,Robinson_1948}\index{termination!primitive
   recursion}.
 
-Unfortunately, many useful functions do not fit easily in this
-framework and, as a consequence, most functional languages leave to
-the programmers the responsibility to check the termination of their
-programs. For theoretical reasons, it is not possible to provide a
-general criterion for termination, but many standard rules exists that
-cover many usages.
+Unfortunately, many useful functions do not fit, easily or at all, in
+this framework and, as a consequence, most functional languages leave
+to the programmers the responsibility to check the termination of
+their programs. For theoretical reasons, it is not possible to provide
+a general criterion for termination, but some rules exist that cover
+many usages.
 
 Consider the following example where \(m,n \in \mathbb{N}\):
 \begin{equation*}
@@ -895,8 +891,8 @@ of~\(s\), so we must establish
 \end{itemize}
 The base case is direct:
 \begin{equation*}
-  \fun{cat}(\el,\fun{cat}(s,t))
-\xrightarrow{\smash{\alpha}} \fun{cat}(s,t)
+  \fun{cat}(\el,\fun{cat}(t,u))
+\xrightarrow{\smash{\alpha}} \fun{cat}(t,u)
 \xleftarrow{\smash{\alpha}}
 \fun{cat}(\fun{cat}(\el,t),u).
 \index{cat@\fun{cat/2}}
@@ -1041,7 +1037,7 @@ The field \texttt{head} models the first item of a stack and
 is a recursive class). The constructor just initialises
 these. Importantly, both are declared \texttt{final} to express that
 we do not expect reassignments after the first instantiation. Just as
-in the functional language, every time a new stack is needed, instead
+in our functional language, every time a new stack is needed, instead
 of modifying another with a side\hyp{}effect, a new one is created,
 perhaps reusing others as constant components.
 
