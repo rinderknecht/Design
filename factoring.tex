@@ -17,7 +17,7 @@ word~\(u\) followed by the letters of word~\(v\), for instance, if
 \(u=\word{back}\) and \(v=\word{up}\), then \(u \cdot v =
 \word{backup}\). This operation is associative: \((u \cdot v) \cdot w
 = u \cdot (v \cdot w)\). As a shorthand, the operator may be omitted:
-\((uv)w = u(vw)\). Catenation on words behave like a
+\((uv)w = u(vw)\). Concatenation on words behave like a
 non\hyp{}commutative product, so it has a neutral element
 \(\varepsilon\), called the \emph{empty word}: \(u \cdot \varepsilon =
 \varepsilon \cdot u = u\).
@@ -43,10 +43,10 @@ to translate words and operations on them into terms of the
 language. A letter is translated into a constant data constructor; for
 example, \word{a} becomes \(\fun{a}()\). A word of more than one
 letter is mapped to a stack of mapped letters, such as \word{hi} in
-\([\fun{h}(),\fun{i}()]\). The catenation of a letter and a word is
+\([\fun{h}(),\fun{i}()]\). The concatenation of a letter and a word is
 translated as a push, like \(\word{a} \cdot \word{bed}\) becomes
-\([\fun{a}(),\fun{b}(),\fun{e}(),\fun{d}()]\). The catenation of two
-words is associated to stack catenation, so \(\word{ab} \cdot
+\([\fun{a}(),\fun{b}(),\fun{e}(),\fun{d}()]\). The concatenation of two
+words is associated to stack concatenation, so \(\word{ab} \cdot
 \word{cd}\) leads to\index{cat@\fun{cat/2}}
 \(\fun{cat}([\fun{a}(),\fun{b}()],[\fun{c}(),\fun{d}()])\).
 
@@ -129,7 +129,7 @@ where \(\ind{p}{i} \neq \ind{t}{j}\) (the letters
 
 \Fig~\vref{fig:loc0}
 \begin{figure}[t]
-\centering 
+\centering
 \includegraphics[bb=71 548 253 721]{loc0}
 \caption{Na\"{\i}ve factoring with \fun{loc\(_0\)/2}
 \label{fig:loc0}}
@@ -264,7 +264,7 @@ prove this property by \emph{induction on the length of the
       \(\fun{pre}(p_0,t_0,p_0',t_0',j) \rightarrow
       \fun{pre}(p_1,t_1,p_1',t_1',k)\) implies \(t_1' \succcurlyeq
       t_1\). This rewrite can only be by means of~\(\tau\)
-      or~\(\upsilon\). 
+      or~\(\upsilon\).
       \begin{itemize}
 
       \item If~\(\tau\), the induction hypothesis on the
@@ -569,12 +569,12 @@ y\). Therefore \(\Border{q}{y} \cdot a \prefeq y\), since \({q > 0}\),
 and \(\Border{}{ya} = \Border{q}{y} \cdot a\). This reasoning
 establishes that
 \begin{equation*}
-\Border{}{ya} = 
+\Border{}{ya} =
 \left\{
   \begin{aligned}
    & \Border{q}{y} \cdot a,
    && \text{if \(\Border{q}{y} \cdot a \prefeq y\)};\\
-   & \varepsilon, 
+   & \varepsilon,
    && \text{otherwise;}
   \end{aligned}
 \right.
@@ -585,7 +585,7 @@ because it does not contain an embedded call like
 \(\Border{}{\Border{}{y} \cdot a}\). We can now take the lengths of
 each sides of the equations, leading to
 \begin{equation*}
-\wlen{\Border{}{ya}} = 
+\wlen{\Border{}{ya}} =
 \left\{
   \begin{aligned}
    & \wlen{\Border{q}{y} \cdot a} = 1 + \wlen{\Border{q}{y}},
@@ -624,7 +624,7 @@ induction hypothesis. Let us suppose \(y \prefeq x\) and prove now
 \(\pred{P}{q+1}\):
 \begin{equation*}
   \MPfailure{x}{q+1}{\wlen{y}}
-= \MPfailure{x}{q}{\MPfailure{x}{}{\wlen{y}}} 
+= \MPfailure{x}{q}{\MPfailure{x}{}{\wlen{y}}}
 = \MPfailure{x}{q}{\wlen{\Border{}{y}}}
 \doteq \wlen{\Border{q}{\Border{}{y}}}
 = \wlen{\Border{q+1}{y}},
@@ -742,7 +742,7 @@ memorisation). In this instance, the evaluation of
 \begin{gather*}
 \fun{fail}(p,0) \rightarrow -1;
 \quad
-\fun{fail}(\cons{\pair{a}{k}}{p},i) \rightarrow 
+\fun{fail}(\cons{\pair{a}{k}}{p},i) \rightarrow
 \fun{fp}(p,a,k,i-1).
 \\
 \inferrule*{}{\fun{fp}(p,a,-1,i) \rightarrow 0;}\quad
@@ -818,7 +818,7 @@ where \(x=\word{abacabac}\). If \(x=\word{ababaca}\), then
 \index{word factoring!Morris-Pratt preprocessing!definition|)}
 
 %\addcontentsline{toc}{subsection}{Cost}
-\paragraph{Minimum cost} 
+\paragraph{Minimum cost}
 \index{word factoring!Morris-Pratt preprocessing!minimum cost|(}
 
 It is clear from the definition~\eqref{eq:Border} \vpageref{eq:Border}
@@ -838,7 +838,7 @@ of~\(\Border{}{y}\), whilst a negative comparison requires two:
 \(\Border{}{\Border{}{y} \cdot a}\). Therefore, the first idea may be
 to assume that only positive comparisons occur:
 \begin{equation*}
-\Border{}{x} \!\eqn{n-2}\! 
+\Border{}{x} \!\eqn{n-2}\!
 \Border{}{\ind{x}{0,n-2}} \cdot \ind{x}{n-1}
 \!\eqn{n-1}\!\! \dots
 \eqn{0}\! \Border{}{\ind{x}{0}} \cdot \ind{x}{1,n-1}
@@ -993,7 +993,7 @@ letter of the pattern (fourth rule of \fun{mp/5}).\index{word
 
 
 \addcontentsline{toc}{subsection}{Cost}
-\paragraph{Minimum cost} 
+\paragraph{Minimum cost}
 \index{word factoring!Morris-Pratt!minimum cost|(}
 
 Let
@@ -1155,7 +1155,7 @@ failure occurs at state~\(i\) on the letter~\(a\), we follow the back
 edge to state \(\MPfailure{x}{}{i}\), but, if the normal transition
 is~\(a\) again, we follow another back edge etc. until there is a
 transition different from~\(a\) or we have to shift the pattern. The
-improvement proposed by Knuth consists in replacing 
+improvement proposed by Knuth consists in replacing
 \begin{figure}[b]
 \centering
 \includegraphics[bb=82 646 388 720]{kmp_abac}

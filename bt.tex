@@ -176,7 +176,7 @@ traversal. A simple program is
 \label{eq:pre0}
 \index{pre0@\fun{pre\(_0\)/1}}
 \end{equation}
-We used the catenation\index{stack!catenation} on stacks provided by
+We used the concatenation\index{stack!concatenation} on stacks provided by
 \fun{cat/2}\index{cat@\fun{cat/2}}, defined in~\eqref{def:cat}
 \vpageref{def:cat}, to order the values of the subtrees. We know that
 the cost of \fun{cat/2} is linear in the size of its first argument:
@@ -252,9 +252,9 @@ What does a binary tree maximising the cost of
 \fun{pre\(_0\)/1}\index{pre0@\fun{pre\(_0\)/1}} look like? The toll
 \(k+3\) in~\eqref{eq:max_pre0_rec} is a consequence of taking the
 maximum cost of \fun{cat/2}\index{cat@\fun{cat/2}} at each node, which
-means that all the internal nodes being catenated come from the left
+means that all the internal nodes being concatenated come from the left
 subtrees, the left subtree of the left subtree etc. so these nodes are
-catenated again and again while going up (that is, returning from the
+concatenated again and again while going up (that is, returning from the
 recursive calls), leading to a quadratic cost. The shape of such a
 tree is shown in \fig~\vref{fig:max_pre0}.
 \begin{figure}[b]
@@ -509,7 +509,7 @@ and we found that it leads to a quadratic cost.  Whilst the use of
 \fun{cat/2}\index{cat@\fun{cat/2}} in itself is not the issue, but
 rather the accumulation of calls to \fun{cat/2}\index{cat@\fun{cat/2}}
 as their first argument, let us nevertheless seek out a definition not
-relying on catenation at all. This means that we want to build the
+relying on concatenation at all. This means that we want to build the
 preorder stack by using exclusively pushes. Therefore, we must add an
 auxiliary parameter, originally set to the empty stack, on which the
 contents of the nodes are pushed in the proper order: \(\fun{pre}(t)
@@ -872,7 +872,7 @@ where
   \twoheadrightarrow s'\);\index{pre@\fun{pre/2}}
 
   \item (\(\equiv_1\)) is an application of the lemma on the
-  associativity of stack catenation\index{stack!catenation}
+  associativity of stack concatenation\index{stack!concatenation}
   (page~\pageref{proof:assoc_cat}), namely
   \index{pre@\fun{pre/2}}\index{CatAssoc@\predName{CatAssoc}}
   \(\pred{CatAssoc}{\fun{pre}(t_1,\el),\fun{pre}(t_2,\el),s}\);
@@ -1763,7 +1763,7 @@ level~\(i\).
     calls;
 
   \item the cost of \(\fun{cat}(r,\fun{loc}_1(f'))\) is the length of
-    the level~\(r\), plus one, thus the cumulative cost of catenation
+    the level~\(r\), plus one, thus the cumulative cost of concatenation
     is \(\sum_{i=0}^{h}\C{\fun{cat}}{l_i} = n + h + 1\);
 
   \item rule~\clause{\epsilon} is used once per extended level, that
@@ -1917,7 +1917,7 @@ shown in \fig~\vref{fig:bf}.
 \caption{Refinement of \fig~\vref{fig:bf3}\label{fig:bf}}
 \end{figure}
 Recall that \fun{rcat/2}\index{rcat@\fun{rcat/2}} (\emph{reverse and
-  catenate}) is defined in equation~\eqref{def:rev}
+  concatenate}) is defined in equation~\eqref{def:rev}
 \vpageref{def:rev}. Note that
 \(\fun{bf}_4(\fun{enq}(t,\fun{q}(\el,\el)))\)\index{bf4@\fun{bf\(_4\)/1}}
 has been optimised in \(\fun{bf}(\el,[t])\)\index{bf@\fun{bf/2}} in
@@ -2780,7 +2780,7 @@ cutting out the first rise and that unique return (which must be the
 last fall) yields another Dyck word. For instance, \(\fun{rrfrrfff} =
 \fun{r} \cdot \fun{rfrrff} \cdot \fun{f}\). Such words are called
 \emph{prime}, because any Dyck word can be uniquely decomposed as the
-catenation of such words (whence the reference to prime factorisation
+concatenation of such words (whence the reference to prime factorisation
 in elementary number theory): for all non\hyp{}empty Dyck words~\(d\),
 there exists \({n > 0}\) unique prime Dyck words~\(p_i\) such that \(d
 = p_1 \cdot p_2 \cdots p_n\). This naturally yields the \emph{arch

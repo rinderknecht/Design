@@ -186,8 +186,8 @@ Let us assume that we also have an efficient definition for the stack
 reversal, named \fun{rev/1}\index{rev@\fun{rev/1}}, which depends upon
 an auxiliary function
 \fun{rcat/2}\index{rcat@\fun{rcat/2}|(}\index{stack!reversal!$\sim$
-  and catenation}\index{stack!reversal!efficient $\sim$}
-(\emph{reverse and catenate}):
+  and concatenation}\index{stack!reversal!efficient $\sim$}
+(\emph{reverse and (con)catenate}):
 \begin{equation}
   \begin{array}{@{}r@{\;}l@{\;}l@{}}
     \fun{rev}(s) & \smashedrightarrow{\epsilon} & \fun{rcat}(s,\el).\\
@@ -402,7 +402,7 @@ because the cost of \(\fun{cat}(s,t)\)\index{cat@\fun{cat/2}} is \(1 +
 \end{equation}
 The problem is not calling \fun{cat/2}, but the fact that the calls
 are embedded in the most unfavourable configuration. Indeed, we proved
-the associativity\index{stack!catenation!associativity} of
+the associativity\index{stack!concatenation!associativity} of
 \fun{cat/2}\index{cat@\fun{cat/2}} \vpageref{proof:assoc_cat}, to wit,
 \(\fun{cat}(\fun{cat}(s,t),u) \equiv
 \fun{cat}(s,\fun{cat}(t,u))\).
