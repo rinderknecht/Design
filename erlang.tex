@@ -124,7 +124,7 @@ pre2b0(S) -> \textbf{case} pre2b1(S) \textbf{of}
              \textbf{end}.
 
 pre2b1([ext|S]) -> \{ext,S\};
-pre2b1([X|S])   -> 
+pre2b1([X|S])   ->
   \textbf{case} pre2b1(S) \textbf{of}
     \{T1,S1\} -> \textbf{case} pre2b1(S1) \textbf{of}
                  \{T2,S2\} -> \{\{int,X,T1,T2\},S2\}
@@ -359,8 +359,8 @@ rely on too detailed a description. The adequate model is the
 seen in the introduction. These allow us to draw conclusions about
 memory usage which hold up in proportion of a constant.
 
-\paragraph{Catenation of stacks}
-\index{memory!catenation of stacks|(}
+\paragraph{Concatenation of stacks}
+\index{memory!concatenation of stacks|(}
 
 Definition in \fig~\vref{def:cat} is
 \begin{equation*}
@@ -368,7 +368,7 @@ Definition in \fig~\vref{def:cat} is
 \fun{cat}(\cons{x}{s},t) \xrightarrow{\smash{\beta}}
                                  \cons{x}{\fun{cat}(s,t)}.
 \end{equation*}
-The relevant measure of memory usage here is the number of cons\hyp{}nodes\index{cons-node} created by rule~\clause{\beta}. Clearly, the call \(\fun{cat}(s,t)\) yields \(n\)~such nodes, where \(n\)~is the length of stack~\(s\).\index{memory!catenation of stacks|)}
+The relevant measure of memory usage here is the number of cons\hyp{}nodes\index{cons-node} created by rule~\clause{\beta}. Clearly, the call \(\fun{cat}(s,t)\) yields \(n\)~such nodes, where \(n\)~is the length of stack~\(s\).\index{memory!concatenation of stacks|)}
 
 \paragraph{Reversal of stacks}
 \index{memory!reversal of stacks|(}
@@ -394,7 +394,7 @@ The alternative definition~\eqref{def:rev} of the reversal,
 \begin{equation*}
 \fun{rev}(s) \xrightarrow{\smash{\epsilon}} \fun{rcat}(s,\el).\quad\;\;
 \fun{rcat}(\el,t) \xrightarrow{\smash{\zeta}} t;\quad\;\;
-\fun{rcat}(\cons{x}{s},t) \xrightarrow{\smash{\eta}} 
+\fun{rcat}(\cons{x}{s},t) \xrightarrow{\smash{\eta}}
                           \fun{rcat}(s,\cons{x}{t}).
 \end{equation*}
 Clearly, the total number of pushes is~\(n\), the length of the input
@@ -652,7 +652,7 @@ lay out the following equalities:
   &\eqn{\smash{\ref{add_comm}}}  ((2 + 1) + 3) + 4\\
   &\eqn{\smash{\ref{add_comm}}}  ((1 + 2) + 3) + 4\\
   &\eqn{\smash{\ref{add_assoc}}} (1 + 2) + (3 + 4)\\
-  &\eqn{\smash{\ref{add_assoc}}} 1 + (2 + (3 + 4)).\hfill\Box 
+  &\eqn{\smash{\ref{add_assoc}}} 1 + (2 + (3 + 4)).\hfill\Box
 \end{align*}
 This seems a bit heavy for such a small program. Is there a way to
 rewrite further \erlcode{sum0/1} so that less hypotheses are needed
@@ -720,7 +720,7 @@ Let us rename \erlcode{sum0/1} as \fun{sum\(_0\)/1} in
 \begin{equation*}
 \boxed{%
 \begin{array}{@{}r@{\;}l@{\;}l@{}}
-\fun{sum}_0(\cons{n}{t}) & \xrightarrow{\smash{\gamma}} 
+\fun{sum}_0(\cons{n}{t}) & \xrightarrow{\smash{\gamma}}
                          & \fun{sum}_0(n,t).\\
       \fun{sum}_0(n,\el) & \xrightarrow{\smash{\delta}} & n;\\
 \fun{sum}_0(n,\cons{m}{s}) & \xrightarrow{\smash{\epsilon}}
@@ -729,7 +729,7 @@ Let us rename \erlcode{sum0/1} as \fun{sum\(_0\)/1} in
 \end{equation*}
 \caption{Summing integers in a stack with \fun{sum\(_0\)/1}
 \label{fig:sum0}}
-\end{figure} 
+\end{figure}
 Consider the abstract syntax trees of the rewritten
 expressions in \fig~\ref{fig:sum0_1234}.
 \begin{figure}
@@ -866,7 +866,7 @@ tms(          T) -> T.
 \begin{array}{@{}r@{\;}l@{\;}ll@{}}
 \fun{i2w}(s)         & \xrightarrow{\smash{\xi}}
                      & \fun{i2w}(s,\el,\el).\\
-\fun{i2w}(\el,\el,u) & \xrightarrow{\smash{\pi}} 
+\fun{i2w}(\el,\el,u) & \xrightarrow{\smash{\pi}}
                      & u;\\
 \fun{i2w}(\el,\cons{y}{t},u)
                      & \xrightarrow{\smash{\rho}}
@@ -1053,7 +1053,7 @@ The poppings, from right to left, are presented in
 \begin{figure}
 \centering
 \includegraphics{sum375_stack_pop}
-\caption{Control stack while computing \(\fun{sum}([3,7,5])\) 
+\caption{Control stack while computing \(\fun{sum}([3,7,5])\)
 (phase 2/2)
 \label{fig:sum375_stack_pop}}
 \end{figure}
@@ -1067,24 +1067,24 @@ reference to a value, although we shall refer to either as values.
   \item While the control stack contains at least two objects, pop out
     the value, but without losing it, so another tree becomes the top;
     \begin{enumerate}
-      
+
     \item if the root of the top tree is a node \fun{sum}, then
       pop it and push instead the value;
-      
+
     \item else, the node \fun{sum} in the tree has an incoming edge:
       \begin{enumerate}
-        
+
       \item change its destination so it reaches the value and discard
         the node \fun{sum};
-        
+
       \item evaluate the patched top tree and iterate.
-        
+
       \end{enumerate}
-      
+
     \end{enumerate}
-    
+
   \item The only item remaining in the control stack is the result.
-    
+
 \end{enumerate}
 Actually, we allowed integers to be stored in the control stack, so we could replace any tree which consists solely of a reference to such kind of value in the heap by a copy of the value.  We can see in \fig~\ref{fig:sum375_stack_push} that the control stack grows at every step until a value is reached.  \index{memory!heap|)} \index{memory!control stack|)}
 
@@ -1110,7 +1110,7 @@ sharing the subtrees denoted by variables (including aliases)
 occurring both in the pattern and the right\hyp{}hand side. The second
 phase consists in popping the accumulated roots in order to resume
 suspended call contexts and, in the end, only the final result remains
-in the control stack. 
+in the control stack.
 
 In the case of \fun{sum\(_0\)/1}, we notice that we already found the
 result after the first phase:~\(15\). Therefore, in this case, the
@@ -1841,7 +1841,7 @@ flat(    [Y|T],A)  -> flat(T,[\{k1,Y\}|A]).
 \textbf{appk(V,        []) -> V;}
 appk(V,[\{k1,Y\}|A]) -> appk([Y|V],A).
 \end{alltt}
-If we compare this version with 
+If we compare this version with
 \begin{verbatim}
 flat_tf(T)        -> flat(T,[]).
 flat(       [],A) -> rev(A);
@@ -2254,7 +2254,7 @@ of the control stack, not efficiency.
 
 \paragraph{Exercise}
 
-Consider the variation 
+Consider the variation
 {\small
 \begin{verbatim}
 isrt0(L)                            -> isrt0(    L,   [],   []).
@@ -2387,7 +2387,7 @@ Let us set aside for a moment the issue of the convergence and let us
 work out a closed form for \(f(x)\). We have \(xf(x) = \sum_{k >
   0}{F_{k-1}x^k}\) and \(x^2f(x) = \sum_{k>1}{F_{k-2}x^k}\), therefore
 \begin{equation*}
-f(x) - xf(x) - x^2f(x) = F_0 + F_1x - F_0x 
+f(x) - xf(x) - x^2f(x) = F_0 + F_1x - F_0x
                          + \sum_{k>1}{(F_k - F_{k-1} - F_{k-2})x^k}
                        = x.
 \end{equation*}
@@ -2464,7 +2464,7 @@ all~\(n>0\). \index{induction!example|)} Now that we derived a closed
 form for~\(F_n\), let us study its asymptotic behaviour. This is
 straightforward if we start by noticing that \(\hat\phi <
 1\), therefore \(\hat\phi^n \rightarrow 0\), as \(n\)~gets large and,
-because~\(\phi > 1\), 
+because~\(\phi > 1\),
 \begin{equation*}
 F_n \sim \frac{1}{\sqrt{5}}\phi^n,\,\; \text{implying}
 \,\; \C{\fun{fib}}{n} \sim \frac{2}{\sqrt{5}}\phi^n.
@@ -2903,7 +2903,7 @@ values amongst the user\hyp{}defined atoms~\erlcode{lt} (\emph{lower
 isrtf(   [],  \_, \_)   \(\MyArrow{\dblarrow}{\beta}\) [];
 isrtf([X|S],Cmp,\textbf{Eq})   \(\MyArrow{\dblarrow}{\gamma}\) ins(isrtf(S,Cmp,\textbf{Eq}),X,Cmp,\textbf{Eq}).
 ins(T=[Y|S],X,Cmp,\textbf{Eq}) \(\MyArrow{\dblarrow}{\delta\sb{0}}\) \textbf{case} Cmp(X,Y) \textbf{of}
-                            gt \(\smashedrightarrow{\zeta}\) [Y|ins(S,X,Cmp,\textbf{Eq})]; 
+                            gt \(\smashedrightarrow{\zeta}\) [Y|ins(S,X,Cmp,\textbf{Eq})];
                             lt \(\smashedrightarrow{\eta}\) [X|T];
                             eq \(\smashedrightarrow{\theta}\) \textbf{Eq(X,T)}\hfill% \emph{New case}
                           \textbf{end};
@@ -3293,7 +3293,7 @@ preferable to the former. Another interesting equation is
 first clauses of the definitions of \erlcode{foldl/3} and
 \erlcode{foldr/3} imply that, for all \(F\)~and~\(A\),
 \begin{equation*}
-\erlcode{foldl(\(F\),\(A\),[])} \equiv A 
+\erlcode{foldl(\(F\),\(A\),[])} \equiv A
 \equiv \erlcode{foldr(\(F\),\(A\),[])}.
 \end{equation*}
 For non\hyp{}empty stacks, this equation means:
@@ -3541,8 +3541,8 @@ language, whilst being totally precise. If now the need arises to show
 how this definition can be programmed, this is when functional
 languages can shine. An update would be directly written in \Erlang as
 \begin{alltt}
-update(M,\{X1,Y\}) -> \textbf{fun}(X2) -> \textbf{case} X2 \textbf{of} X1 -> Y; 
-                                           \_ -> M(X2) 
+update(M,\{X1,Y\}) -> \textbf{fun}(X2) -> \textbf{case} X2 \textbf{of} X1 -> Y;
+                                           \_ -> M(X2)
                                \textbf{end}
                     \textbf{end}.
 \end{alltt}
@@ -3750,7 +3750,7 @@ outside the scope of the module, it would be omitted in the
 called from within the module it is defined. How could we avoid this
 as well? This is where anonymous functions comes handy:
 \begin{alltt}
-len0(S) -> 
+len0(S) ->
   Len = fun(   [],N) -> N;
            ([\_|S],N) -> \textbf{Len}(S,N+1)\hfill% \emph{Does not compile}
         end,
@@ -3835,7 +3835,7 @@ with names, but, in \Erlang, variables and function names are two
 distinct syntactic categories, so there is no contradiction in terms.)
 Here it is again:
 \begin{alltt}
-len0(S) -> 
+len0(S) ->
   Len = fun(   [],N) -> N;
            ([\_|S],N) -> Len(S,N+1)\hfill% \emph{Unfortunately invalid}
         end,
@@ -4039,11 +4039,11 @@ be shown to work in imperative languages, like \Clang:
   \textbf{return} n? n * ((\textbf{int} (*)(fp,\textbf{int}))f)(f,n-1) : 1; \}
 
 \textbf{int} read(\textbf{int} dec, \textbf{char} arg[]) \{
-  \textbf{return} ('0' <= *arg && *arg <= '9')? 
+  \textbf{return} ('0' <= *arg && *arg <= '9')?
          read(10*dec+(*arg - '0'),arg+1) : dec; \}
 
 \textbf{int main}(\textbf{int} argc, \textbf{char}** argv) \{
-  \textbf{if} (argc == 2) 
+  \textbf{if} (argc == 2)
      printf("%u\textbackslash{n}",fact(&fact,read(0,argv[1])));
   \textbf{else} printf("Only one integer allowed.\textbackslash{n}");
   \textbf{return} 0;
@@ -4082,7 +4082,7 @@ appk(V,[{k1,Y}|A]) -> appk([Y|V],A).
 tuples.) The driving idea consists in adding a stack~\erlcode{A} which
 accumulates the variables of all the call contexts, each occurrence
 being uniquely tagged, and an auxiliary function \erlcode{appk/2} then
-reconstructs the contexts. 
+reconstructs the contexts.
 
 The idea behind continuation\hyp{}passing style is to not separate the
 variables of the contexts and their reconstruction. Instead, what is
@@ -4191,7 +4191,7 @@ flat0\_k([Y=[\_|\_]|T],K) ->
 \end{alltt}
 We have to prepare the future call to \erlcode{cat/2}, which must also
 be transformed in continuation\hyp{}passing style. What must be
-catenated are the values of \erlcode{flat0(Y)} and
+concatenated are the values of \erlcode{flat0(Y)} and
 \erlcode{flat0(T)}. The former will be bound by the
 parameter~\erlcode{V} and the latter by~\erlcode{W}, therefore:
 \begin{alltt}
@@ -4361,7 +4361,7 @@ with a solution based on continuations \citep{DanvyGoldberg_2001}:
 pal(S)               -> pal(S,S,\textbf{fun(\_) -> true end}).
 pal(    S,     [],K) -> K(S);\hfill% \emph{Even length}
 pal([\_|S],    [\_],K) -> K(S);\hfill% \emph{Odd length}
-pal([X|S],[\_,\_|T],K) -> 
+pal([X|S],[\_,\_|T],K) ->
 \hfill{}pal(S,T,\textbf{fun}([Y|U]) -> X == Y \textbf{andalso} K(U) \textbf{end}).
 \end{alltt}
 We reuse here an idea we saw in \fig~\vref{fig:tms}: duplicating the
@@ -4397,7 +4397,7 @@ The difference is that \erlcode{pal0/3}, instead of constructing a
 continuation holding the items of the first half and preparing a test,
 explicitly reverses the first half and compares it to second half by
 means of \erlcode{eq/2}. The cost of \erlcode{pal/1} and
-\erlcode{pal0/1} is the same. 
+\erlcode{pal0/1} is the same.
 
 The minimum cost is \(\B{\fun{pal}}{n} = \B{\fun{pal0}}{n} =
 \floor{n/2} + 2\), if \erlcode{S}~is not a palindrome and a difference

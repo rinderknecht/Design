@@ -26,7 +26,7 @@ expect a lexicographic order\index{induction!lexicographic order}
 (definition~\eqref{def:lexico}, page~\pageref{def:lexico}):
 \begin{equation*}
 \fun{cut}(s_0,k_0) \succ \fun{cut}(s_1,k_1)
-:\Leftrightarrow 
+:\Leftrightarrow
 \text{\(s_0 \succ s_1\) or (\(s_0 = s_1\) and \(k_0 > k_1\))}.
 \end{equation*}
 Using the proper subterm order\index{induction!proper subterm order}
@@ -46,7 +46,7 @@ function~\fun{push/2}\index{push@\fun{push/2}}:
 \begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
 \fun{cut}(s,0) & \rightarrow & \pair{\el}{s};
 & \fun{push}(x,\pair{t}{u}) & \rightarrow & \pair{\cons{x}{t}}{u}.\\
-\fun{cut}(\cons{x}{s},k) & \rightarrow 
+\fun{cut}(\cons{x}{s},k) & \rightarrow
 & \fun{push}(x,\fun{cut}(s,k-1)).
 \end{array}
 \end{equation*}
@@ -127,7 +127,7 @@ about a function by \emph{induction on the structure of the proof}. As
 we have done previously, structural induction can be applied to stacks
 considered as a data type (objects). Since, in the case of
 \fun{cut/2}, derivations are stacks in themselves, so can induction be
-applied to their structure (as meta\hyp{}objects). 
+applied to their structure (as meta\hyp{}objects).
 
 Let us illustrate this elegant inductive technique with a proof of the
 \emph{soundness}\index{soundness} of
@@ -145,7 +145,7 @@ program with respect to its
 logical description of the expected properties of the output of a
 program, given some assumptions on its input. In the case of
 \(\fun{cut}(s,k)\), we already mentioned what to expect: the value
-must be a pair \(\pair{t}{u}\) such that the catenation of
+must be a pair \(\pair{t}{u}\) such that the concatenation of
 \(t\)~and~\(u\) is~\(s\) and the length of~\(t\) is~\(k\).
 
 Formally, let \(\pred{CorCut}{s,k}\)\index{CorCut@\predName{CorCut}|(}

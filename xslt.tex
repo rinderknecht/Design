@@ -26,7 +26,7 @@ systematically stripped of their use of pattern matching so they
 become easily translatable into \XSLT, which lacks that feature. At
 the same time, new exercises on unranked trees, that is, trees where
 internal nodes can have a variable number of children, are worked out
-directly in \XSLT, aiming at a transfer of skills from \Erlang. 
+directly in \XSLT, aiming at a transfer of skills from \Erlang.
 
 The purpose of this chapter is not to present as many features of
 \XSLT as possible, but to think recursively in \XSLT, which can be
@@ -174,7 +174,7 @@ want to send an email to several recipients, we would write:
   <from>Me</from>
   <subject>Homeworks</subject>
   <to>You</to>
-  \textbf{<to>Me</to>} 
+  \textbf{<to>Me</to>}
   <body>
   A <definition>deadline</definition> is a due date for a
 <emphasis>homework</emphasis>.
@@ -284,8 +284,8 @@ corrected, is
 The sequence \verb|&lt;| is called a \emph{predefined named entity}.
 Such entities always
 \begin{enumerate*}
- 
-  \item start with an ampersand (\verb|&|), 
+
+  \item start with an ampersand (\verb|&|),
 
   \item continue with a predefined name (here, \texttt{lt}),
 
@@ -345,7 +345,7 @@ following components:
   \item the root element name,
 
   \item the opening character \verb|[|,
-  
+
   \item the \emph{named character entity} declarations,
 
   \item the closing \verb|]>|.
@@ -530,7 +530,7 @@ labels). The problem is that the writer is then in charge of checking
 whether
 \begin{itemize*}
 
-  \item a given label is unique throughout the whole document, 
+  \item a given label is unique throughout the whole document,
         including external entities,
 
   \item every reference corresponds to an existing label (linking).
@@ -631,7 +631,7 @@ in natural language (for example, in English) the namespace. Consider
 the namespace \texttt{course} in the following:
 \begin{alltt}
 <?xml version="1.0"?>
-<\textbf{course:short} 
+<\textbf{course:short}
   \textbf{xmlns:course}="http://konkuk.ac.kr/~rinderkn/Mirror/XML">
  <\textbf{course:}date>26 August 2006</\textbf{course:}date>
  <\textbf{course:}title>Some XML-centric languages</\textbf{course:}title>
@@ -747,7 +747,7 @@ rebind a prefix namespace (the following examples are found at
 \begin{alltt}
 <?xml version="1.1"?>
 <x xmlns:n1="http://www.w3.org">
-  <n1:a/> <!-- valid; the prefix n1 is bound to                    
+  <n1:a/> <!-- valid; the prefix n1 is bound to
                http://www.w3.org -->
     <x \textbf{xmlns:n1=""}>
       <n1:a/> <!-- invalid; the prefix n1 is not bound here -->
@@ -871,7 +871,7 @@ browser the following document: \XMLinUnchecked{h.html}
 \emph{Lists} are a common way to typeset closely related sentences,
 like enumerations. There are three kinds of lists:
 \begin{enumerate*}
- 
+
   \item unordered lists;
 
   \item ordered lists;
@@ -1142,7 +1142,7 @@ elements.
 \begin{verbatim}
 <!ELEMENT para (#PCDATA | emphasis | ref)+>
 \end{verbatim}
-where \texttt{emphasis} and~\texttt{ref} are elements. 
+where \texttt{emphasis} and~\texttt{ref} are elements.
 \end{enumerate*}
 The definition of a content model is akin to \emph{regular
   expressions}. Such an expression can be made up by combining the
@@ -1330,7 +1330,7 @@ chapters:
 is that the \emph{selection} (via the attribute \texttt{select})
 gathered all the \texttt{chapter} nodes in a linear structure called a
 \emph{sequence}, the templates have been applied to all of the nodes
-in it, then each of the results has been serialised, catenated to the
+in it, then each of the results has been serialised, concatenated to the
 others and, finally, a newline character has been added. The reason
 why we had newlines after each `\texttt{A chapter}' before is because
 each of these texts constituted a singleton sequence. In order to
@@ -1358,12 +1358,12 @@ sequence is itself a sequence, it is replaced by its contents, if
 any. For instance, \texttt{(1,(),(2,(3)),4)} is actually evaluated in
 \texttt{(1,2,3,4)}. In particular, a singleton sequence is the same as
 the unique item it contains: \texttt{((5))} is~\texttt{5}. Second, no
-cost is incurred when catenating two sequences (in contrast with the
-linear cost in the length of the first stack when catenating two
+cost is incurred when concatenating two sequences (in contrast with the
+linear cost in the length of the first stack when concatenating two
 stacks), so the previous evaluation costs~\(0\). The reason is that
-catenation of sequences, being frequently needed, is a built\hyp{}in
-operation. Therefore, in \XSLT, catenation is the primary operation,
-not pushing, as it is the case with stacks. 
+concatenation of sequences, being frequently needed, is a built\hyp{}in
+operation. Therefore, in \XSLT, concatenation is the primary operation,
+not pushing, as it is the case with stacks.
 
 Just like in \Erlang, sequences can contain any kind of items, not
 just integers. We will use sequences to hold \XML elements and
@@ -1636,7 +1636,7 @@ in a \texttt{title} attribute, instead of a text node:
 \XMLinUnchecked{toc3.xml}
 \noindent Of course, the \DTD \texttt{boot\_att.dtd} has to be
 changed: \DTDin{book_att.dtd}
-\noindent To solve this problem, we must modify a previous \XSLT 
+\noindent To solve this problem, we must modify a previous \XSLT
 transformation, not think from the abstract functional language.
 First, we should modify the call to the template so as to select the
 chapters where they are now:
@@ -1727,7 +1727,7 @@ Required item type of value of parameter $n is xs:integer;
 supplied value has item type xs:double
 \end{verbatim}
 and the wrong result \texttt{18135233274}, which is just the
-catenation of the contents of the text nodes of the \texttt{num}
+concatenation of the contents of the text nodes of the \texttt{num}
 elements. What happened? From the message, one thing is clear: the
 problem has to do with the type system, that is why we did not
 anticipate it from the untyped \fun{sum\(_0\)/2}. It is also clear
@@ -1937,7 +1937,7 @@ languages, like \Clang, and thus saves memory.
 
 Last, but not least, note how the output is constructed by recreating
 an \XML document; in particular, the juxtaposition of elements denotes
-the catenation of the singleton sequences they are (for instance, the
+the concatenation of the singleton sequences they are (for instance, the
 two aforementioned \texttt{xsl:sequence} are written one after the
 other).
 
@@ -2002,8 +2002,8 @@ Implicitly, if the test fails, the value of the conditional
 translation of \(\fun{tl}(t)\), which is the \XSLT variable
 \texttt{tail}. The translation of \(\fun{hd}(t)\) is simply the
 singleton sequence \texttt{<xsl:sequence
-  select="\$items[1]"/>}. Instead of pushing on a stack, we catenate
-two sequences and this catenation is simply textual juxtaposition:
+  select="\$items[1]"/>}. Instead of pushing on a stack, we concatenate
+two sequences and this concatenation is simply textual juxtaposition:
 \begin{verbatim}
     <xsl:if test="not(empty($tail))">
       <xsl:sequence select="$items[1]"/>
@@ -2100,7 +2100,7 @@ first. In the end, we have
       <xsl:otherwise>
         <xsl:sequence select="$items[1]"/>
         <xsl:call-template name="cutp">
-          <xsl:with-param name="items" select="$tail" 
+          <xsl:with-param name="items" select="$tail"
                                        as="item()*"/>
         </xsl:call-template>
       </xsl:otherwise>
@@ -2134,7 +2134,7 @@ straightforward definition of \fun{rev\(_0\)}:
 \end{equation*}
 We saw that this definition yielded a quadratic cost and therefore
 should not be used for reversing stacks. In \XSLT, the cost is linear
-because catenation has cost zero. We would then write the following
+because concatenation has cost zero. We would then write the following
 translation:
 \begin{verbatim}
   <xsl:template name="rev" as="item()*">
@@ -2181,7 +2181,7 @@ side and not have that declaration.
 Given the previous table of contents, we now would like to obtain
 \begin{verbatim}
 <!DOCTYPE html
-  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"  
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xml:lang="en" lang="en">
@@ -2255,7 +2255,7 @@ node (\texttt{book}).' Second, we meet a new \XSLT element,
 \texttt{xsl:value-of}, whose purpose is to create a text node from the
 selected items. If we select elements, like here the unique
 \texttt{title} element, its \emph{descendant} text nodes (there is
-only one child here) are catenated in document order and put in a new
+only one child here) are concatenated in document order and put in a new
 text node. Therefore, \texttt{<xsl:sequence select="title/text()"/>}
 has the same result as \texttt{<xsl:value-of select="title"/>},
 although in the later case a new text node has been created (instead
@@ -2305,7 +2305,7 @@ The second noteworthy excerpt is the selection of the
 `The \texttt{title} attribute of the first element of the sequence
 \texttt{\$chap}.' Here, we cannot substitute the element
 \texttt{xsl:sequence}, as with the text node before. Indeed, if we try
-\texttt{<xsl:sequence select="\$chap[1]/@title"/>}, the result is 
+\texttt{<xsl:sequence select="\$chap[1]/@title"/>}, the result is
 \begin{verbatim}
        ...
          <li title="Instances and schemas"></li>
@@ -2669,7 +2669,7 @@ would write
 \fun{shuffle}(\el,t) \rightarrow t;\quad
 \fun{shuffle}(\cons{x}{s},t) \rightarrow \cons{x}{\fun{shuffle}(t,s)}.
 \end{equation*}
-This is actually almost the same definition as that of \fun{cat/1} (catenation):
+This is actually almost the same definition as that of \fun{cat/1} (concatenation):
 \begin{equation*}
 \fun{cat}(\el,t) \rightarrow t;\quad
 \fun{cat}(\cons{x}{s},t) \rightarrow \cons{x}{\fun{cat}(\underline{s},\underline{t})}.
@@ -2718,7 +2718,7 @@ number:
 \begin{alltt}
   <xsl:template match="numbers" as="xs:integer?">
     <xsl:call-template name="max">
-      <xsl:with-param name="int" 
+      <xsl:with-param name="int"
                       select="num[position()>1]/text()"/>
       <xsl:with-param name="cur" select="\textbf{num[1]/text()}"/>
     </xsl:call-template>
@@ -2733,7 +2733,7 @@ run\hyp{}time will be performed. In the case of \texttt{cur}, if the
 cast fails, the empty sequence will result; otherwise, an integer
 (that is, a sequence containing a single integer). In the case of
 \texttt{int}, a cast is attempted for each element in the sequence and
-the resulting sequences are catenated.
+the resulting sequences are concatenated.
 
 There are several ways to solve this problem. We could make the
 following cases:
@@ -2907,9 +2907,9 @@ changes
 ...
   <xsl:template match="lists" as="xs:integer*">
     <xsl:call-template name="merge">
-      <xsl:with-param name="seq1" select="list[1]/item" 
+      <xsl:with-param name="seq1" select="list[1]/item"
                                   as="xs:integer*"/>
-      <xsl:with-param name="seq2" select="list[2]/item" 
+      <xsl:with-param name="seq2" select="list[2]/item"
                                   as="xs:integer*"/>
     </xsl:call-template>
   </xsl:template>
@@ -3031,9 +3031,9 @@ in question:
                           select="\$sections[position()>1]"/>
           \textbf{<xsl:with-param name="current" as="xs:integer">
             <xsl:call-template name="count">
-              <xsl:with-param name="sections" 
+              <xsl:with-param name="sections"
                               select="\$sections[1]/section"/>
-              <xsl:with-param name="current" 
+              <xsl:with-param name="current"
                               select="\$current + 1"/>
             </xsl:call-template>
           </xsl:with-param>}
@@ -3432,9 +3432,9 @@ is still the same:
 \noindent The expected result (without numbering) is then
 \begin{verbatim}
 <!DOCTYPE html
-  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+<html xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns="http://www.w3.org/1999/xhtml"
       xml:lang="en" lang="en">
   <head>
@@ -3533,9 +3533,9 @@ Now, let us add a number between square brackets after the \XHTML
 so:
 \begin{alltt}
 <!DOCTYPE html
-  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+<html xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns="http://www.w3.org/1999/xhtml"
       xml:lang="en" lang="en">
   <head>
@@ -3584,7 +3584,7 @@ change lies in the template matching chapters and sections:
 \begin{alltt}
  <xsl:template match="section|chapter" as="element(xhtml:li)">
     <li xmlns="http://www.w3.org/1999/xhtml">
-      \textbf{<xsl:value-of select="('[',position(),'] ',@title)" 
+      \textbf{<xsl:value-of select="('[',position(),'] ',@title)"
                     separator=""/>}
       <xsl:if test="not(empty(section))">
         <ul><xsl:apply-templates select="section"/></ul>
@@ -3606,9 +3606,9 @@ numbers:
 number the chapters with Arabic numbers, like the sections:
 \begin{verbatim}
 <!DOCTYPE html
-  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+<html xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns="http://www.w3.org/1999/xhtml"
       xml:lang="en" lang="en">
   <head><meta http-equiv="Content-Type"
@@ -3655,7 +3655,7 @@ The idea is to add a parameter \texttt{prefix} to the template
 matching chapters and sections, which receives the prefix numbering of
 the parent. For instance, when matching the section entitled
 `Declarations vs. definitions', the parameter value is the sequence
-\texttt{(1,'.',2,'.')}, so we simply catenate the position of the
+\texttt{(1,'.',2,'.')}, so we simply concatenate the position of the
 section amongst its siblings, that is, \texttt{1}. Then we create a
 text node to format \texttt{[1.2.1]}. Here is the change:
 \begin{verbatim}

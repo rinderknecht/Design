@@ -1,31 +1,27 @@
-\section{Catenating}
+\section{Concatenating}
 
 \begin{quote}
 \small[\textsl{This slow restart may be skipped by impatient readers.}]
 \end{quote}
 In the introduction, we did not explain the design of \fun{cat/2}, the
-function which catenates its two stack arguments. Let us start from
+function which concatenates its two stack arguments. Let us start from
 scratch and proceed slowly.
 
 Consider writing a function \fun{join/2} doing the same thing as
 \fun{cat/2}. First, the requirement should be expressed in English as
 a function which takes two stacks and computes a stack containing all
 the items of the first stack followed by all the items of the second
-one, while retaining the relative order of the items. In other words,
-all function calls \(\fun{join}(s,t)\) are rewritten into a stack
-containing all the items of~\(s\) followed by all the items
-of~\(t\). A requirement would be incomplete without some examples. For
-instance,
+one, while retaining the relative order of the items. A requirement
+would be incomplete without some examples. For instance,
 \begin{equation*}
 \fun{join}([3,5],[2]) \twoheadrightarrow [3,5,2].
 \end{equation*}
-Nevertheless, if this is still seem a bit vague, we should try some
-extreme cases, that is, special configurations of the arguments, in
-order to understand more precisely what is expected from this
-function. Both arguments being stacks, a hint comes naturally to mind
-because it is well known that stacks must either be empty or
-non\hyp{}empty. This simple observation leads to consider four
-distinct cases: both stacks are empty; the first is empty and the
+We should try some extreme cases, that is, special configurations of
+the arguments, in order to understand more precisely what is expected
+from this function. Both arguments being stacks, a hint comes
+naturally to mind because it is well known that stacks must either be
+empty or non\hyp{}empty. This simple observation leads to consider
+four distinct cases: both stacks are empty; the first is empty and the
 second is not; the first is not empty and the second is; both are not
 empty:
 \begin{equation*}
@@ -72,9 +68,9 @@ made of items of other stacks (the arguments), so, in the absence of
 any items to ``put'' in the result, the final stack ``remains'' empty.
 
 It should be evident enough that the second and third rules are
-symmetric, because when appending a non\hyp{}empty stack to the right
-of an empty stack is the same as appending it to the left: the result
-is always the non\hyp{}empty stack in question.
+symmetric, because appending a non\hyp{}empty stack to the right of an
+empty stack is the same as appending it to the left: the result is
+always the non\hyp{}empty stack in question.
 \begin{equation*}
 \begin{array}{r@{\;}l@{\;}l}
 \fun{join}(\el,\el) & \rightarrow & \el;\\
@@ -134,7 +130,7 @@ right\hyp{}hand side \(\cons{x}{\cons{s}{\cons{y}{t}}}\) is actually
 \erlcode{[3|[\textbf{5}|[2|[]]]]} in that \erlcode{[5]} is
 not~\erlcode{5}.
 
-How can \(s\)~and~\(\cons{y}{t}\) be catenated? Of course, this is
+How can \(s\)~and~\(\cons{y}{t}\) be concatenated? Of course, this is
 exactly the purpose of the function \fun{join/2} currently being
 defined. Therefore, what we need here is a \emph{recursive call}
 (underlined below):
@@ -1033,5 +1029,6 @@ Take for example the polymorphic identity: \(\fun{id}(x) \rightarrow
 x\). It is trivially in tail form. In passing, being in tail form has
 nothing to do, in general, with recursion, despite the widespread and
 unfortunate locution ``tail\hyp{}recursive function''. A recursive
-definition may be in tail form, but a definition in tail form may not
+definition may only feature tail calls (at least one recursive,
+directly or indirectly), but a definition with only tail calls may not
 be recursive, like \fun{id/1}.

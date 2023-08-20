@@ -18,7 +18,7 @@ variables and \Xlet and~\Xrec are keywords:
 
 \noindent
 \begin{tabular}{rll}
-    $\bullet$ 
+    $\bullet$
   & \emph{global definition}
   & \phrase{$\Xlet \,\, x = e$}\\
     $\bullet$
@@ -61,7 +61,7 @@ An expression \(e\)~is recursively defined by the following cases:
   & $\Xfun \,\, x \rightarrow e$\\
     $\bullet$
   & \emph{call} (or \emph{application})
-  & $e_1 \,\, e_2$ \\ 
+  & $e_1 \,\, e_2$ \\
     $\bullet$
   & \emph{arithmetic operator}
   & \lpar\texttt{+}\rpar \ \lpar\texttt{-}\rpar \ \lpar\texttt{/}\rpar
@@ -153,7 +153,7 @@ proves very handy.
   & $x$\\
     $\Xfun \,\, x \rightarrow e$
   & \includegraphics[bb=72 697 93 721]{fun_tree}\\
-    $e_1 \,\, e_2$ 
+    $e_1 \,\, e_2$
   & \includegraphics[bb=72 695 101 720]{app_tree}\\
 \bottomrule
 \end{tabular}
@@ -194,7 +194,7 @@ to. For instance, in
 \textbf{let} x = 0 \textbf{in}
   \textbf{let} id = \textbf{fun} x \(\rightarrow\) x \textbf{in}
   \textbf{let} y = id x \textbf{in}
-  \textbf{let} x = (\textbf{fun} x \(\rightarrow\) \textbf{fun} y \(\rightarrow\) x + y) 1 2 
+  \textbf{let} x = (\textbf{fun} x \(\rightarrow\) \textbf{fun} y \(\rightarrow\) x + y) 1 2
 \textbf{in} x+1
 \end{alltt}
 the variable~\texttt{x} in the expression \texttt{x+1} denotes the
@@ -316,7 +316,7 @@ environment~\(\rho\), yielding the value~\(v\), as follows:
 
 \begin{tabular}{@{}rll@{}}
     $\bullet$
-  & $x$ 
+  & $x$
   & Look up the \emph{first} value bound to~\(x\) in~\(\rho\).\\[2mm]
     $\bullet$
   & $\Xfun \,\, x \rightarrow e$
@@ -336,7 +336,7 @@ environment~\(\rho\), yielding the value~\(v\), as follows:
     $\bullet$
   & $\Xlet \,\, x = e_1 \,\, \Xin \,\, e_2$
   & Evaluate $e_1$ into $v_1$ in $\rho$;\\
-  & 
+  &
   & evaluate $e_2$ into $v$ in $(x \mapsto v_1) \oplus \rho$.\\[2mm]
     $\bullet$
   & $e_1 \,\, e_2$
@@ -360,7 +360,7 @@ The environment is initially empty: \(\rho = \{\}\). Let us evaluate
 \textbf{let} x = 0 \textbf{in}
   \textbf{let} id = \textbf{fun} x \(\rightarrow\) x \textbf{in}
   \textbf{let} y = id x \textbf{in}
-  \textbf{let} x = (\textbf{fun} x \(\rightarrow\) \textbf{fun} y \(\rightarrow\) x + y) 1 2 
+  \textbf{let} x = (\textbf{fun} x \(\rightarrow\) \textbf{fun} y \(\rightarrow\) x + y) 1 2
 \textbf{in} x+1
 \end{alltt}
 \begin{itemize}
@@ -397,7 +397,7 @@ The environment is initially empty: \(\rho = \{\}\). Let us evaluate
       \item We create the binding $\ident{y} \mapsto 0$, we add it to
         the current environment and we evaluate the elided
         subexpression with the new environment.
- 
+
     \end{itemize}
 
   \item The evaluation of \texttt{\textbf{let} x = (\textbf{fun} x \(\rightarrow\)
@@ -540,7 +540,7 @@ Let us add the following expressions:
 
 \bigskip
 
-\begin{tabular}{rll} 
+\begin{tabular}{rll}
     $\bullet$
   & \emph{Boolean constants}
   & \Xtrue{} or \Xfalse\\
@@ -623,12 +623,12 @@ e$, we define the equivalent constructs:
     \begin{tabular}{rll}
       $\bullet$
       & \phrase{$\Xlet \,\,
-        \textrm{[}\Xrec\textrm{]} \,\, f 
+        \textrm{[}\Xrec\textrm{]} \,\, f
         = \Xfun \,\, \ipat{p}_1 \; \ipat{p}_2 \; \ldots \; \ipat{p}_n \rightarrow e$}
       & (new expression)\\
         $\bullet$
       & \phrase{$\Xlet \,\,
-        \textrm{[}\Xrec\textrm{]} \,\, f 
+        \textrm{[}\Xrec\textrm{]} \,\, f
         \,\, \ipat{p}_1 \; \ipat{p}_2 \; \ldots \; \ipat{p}_n = e$}
       & (new sentence)
     \end{tabular}
@@ -717,7 +717,7 @@ the values as well, which are now defined by
   & \emph{closure}
   & $\langle\Xfun \,\, x \rightarrow e, \rho\rangle$, where~$\rho$ is
     an environment.\\
-  & 
+  &
   & For the operators: $\langle\lpar{\texttt{+}}\rpar, \rho\rangle$
     etc.\\
     $\bullet$
@@ -1170,7 +1170,7 @@ type \(\alpha\)~\texttt{mylist}). For instance:
 By default, the \OCaml system predefines a
 type \(\alpha\)~\texttt{list}, whose constructor for the empty list
 is~\texttt{[]}, and those of the non\hyp{}empty list is~\texttt{::},
-used in infix position. The function catenating two lists is also
+used in infix position. The function concatenating two lists is also
 predefined and noted~\texttt{(@)}. Note that it is \emph{not} a
 constructor. Here are equivalent lists:
 \begin{alltt}
@@ -1187,7 +1187,7 @@ functions on lists. For example, the reversal of a list:
 \end{alltt}
 or, more efficiently, using an accumulator:
 \begin{alltt}
-\textbf{let} reverse l = 
+\textbf{let} reverse l =
   \textbf{let rec} rev\_aux acc l = \textbf{match} l \textbf{with}
                             [] \(\rightarrow\) acc
                           | h::t \(\rightarrow\) rev\_aux (h::acc) t
@@ -1211,7 +1211,7 @@ the following manner.
     $e$ \textbf{with} $m$}', or if any pending function call was
     embedded in such a way.
     \begin{itemize*}
- 
+
       \item If the evaluation of~\(e\) results in a normal value, that
         value is the value of the \textsf{\textbf{try}} block, without
         considering the patterns in~\(m\);
@@ -1228,7 +1228,7 @@ the following manner.
         no part of the type of functions, because this would be deemed
         cumbersome in the presence of higher\hyp{}order functions,
         like \textsf{List.map}.)
-    
+
     \end{itemize*}
 
   \item It is possible to observe an exception, that is, to match it
@@ -1244,7 +1244,7 @@ Let us consider an example, the linear search in a list:
   \textbf{match} l \textbf{with}
     (h,v)::t \(\rightarrow\) \textbf{if} h = key \textbf{then} v \textbf{else} find key t
   |       [] \(\rightarrow\) raise Not_found
-  
+
 \textbf{let} k = \textbf{try}
           find "Louis" [("Georges",14); ("Louis",5)]
         \textbf{with} Not_found \(\rightarrow\) 10

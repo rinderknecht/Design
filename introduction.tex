@@ -356,7 +356,7 @@ Let us consider the abstract program\index{cat@\fun{cat/2}|(}
                                 \fun{cons}(x,\fun{cat}(s,t)).
 \end{equation*}
 It defines the function \fun{cat/2}\index{cat@\fun{cat/2}|)} that
-catenates \index{stack!catenation} two \emph{stacks}. Functions
+concatenates \index{stack!concatenation} two \emph{stacks}. Functions
 \fun{nil/0} and \fun{cons/2} are \emph{data
 constructors}\index{functional language!data constructor}, that is,
 functions that are \emph{not} defined by any system: their irreducible
@@ -418,10 +418,10 @@ becomes a bit more legible:
 \fun{cat}(        \el,t) \xrightarrow{\smash{\alpha}} t;\qquad
 \fun{cat}(\cons{x}{s},t) \xrightarrow{\smash{\beta}}
 \cons{x}{\fun{cat}(s,t)}.
-\label{def:cat}\index{stack!catenation!definition}
+\label{def:cat}\index{stack!concatenation!definition}
 \end{equation}
 Finally, let us illustrate it with the following
-evaluation:\index{stack!catenation!example}
+evaluation:\index{stack!concatenation!example}
 \begin{equation*}
 \fun{cat}([1,2],[3,4])
 \!\xrightarrow{\smash{\beta}}\!
@@ -494,7 +494,7 @@ function call, assuming that the arguments are values. In other words,
 it is the number of calls needed to compute the value. To gain some
 generality, we need to relate the cost to a measure of the size of the
 input. In the case of stacks, this is the number of items it
-contains. For instance, let us recall the catenation of two stacks in
+contains. For instance, let us recall the concatenation of two stacks in
 definition~\eqref{def:cat}\index{cat@\fun{cat/2}}:
 \begin{equation*}
 \fun{cat}(        \el,t) \xrightarrow{\smash{\alpha}} t;\qquad
@@ -512,7 +512,7 @@ equations
 \C{\fun{cat}}{n+1} \eqn{\smash{\beta}} 1 + \C{\fun{cat}}{n}.
 \end{equation*}
 which together yield \(\C{\fun{cat}}{n} = n +
-1\).\label{cost:cat}\index{stack!catenation!cost}
+1\).\label{cost:cat}\index{stack!concatenation!cost}
 
 
 \mypar{Extremal costs}
@@ -606,7 +606,12 @@ from~\(0\) to~\(n\) in binary by updating an array containing bits
 \cite[\S{}17.1]{CLRS_2009}. In the worst case, an increment leads to
 inverting all the bits. The number~\(m\) of bits of~\(n\) can be found
 by setting \(n := \sum_{i=0}^{m-1}{b_i2^i}\), where the~\(b_i\) are
-the bits and \(b_{m-1}=1\). Then
+the bits and \(b_{m-1}=1\). By definition of~\(b_{m-1}\), the lower
+bound for~\(n\) is \(2^{m-1}\). The upper bound is attained when all
+the bits are~\(1\), that is, \(2^{m-1} + 2^{m-2} + \ldots +
+2^0}\). Let us call~\(S_{m-1}\) that sum. By simplifying the
+  expression \(S_{m-1} = 2 S_{m-1} - S_{m-1}\), we obtain \(S_{m-1} =
+  2^m - 1\). Gathering the bounds, we thus have:
 \begin{equation}
 2^{m-1} \leqslant n < 2^m \Rightarrow m - 1 \leqslant \lg n
 < m \Rightarrow m = \floor{\lg n} + 1,
@@ -792,9 +797,9 @@ many usages.
 Consider the following example where \(m,n \in \mathbb{N}\):
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{}}
-\fun{ack}(0,n)     & \xrightarrow{\smash{\theta}} & n+1;\\
-\fun{ack}(m+1,0)   & \xrightarrow{\smash{\iota}}  & \fun{ack}(m,1);\\
-\fun{ack}(m+1,n+1) & \xrightarrow{\smash{\kappa}}
+\fun{ack}(0,n)     & \xrightarrow{\smash{\alpha}} & n+1;\\
+\fun{ack}(m+1,0)   & \xrightarrow{\smash{\beta}}  & \fun{ack}(m,1);\\
+\fun{ack}(m+1,n+1) & \xrightarrow{\smash{\gamma}}
                    & \fun{ack}(m,\fun{ack}(m+1,n)).
 \end{array}
 \end{equation*}
@@ -829,7 +834,7 @@ any infinite descending chain. Here, a lexicographic order on \((m,n)
 \end{equation*}
 Clearly, \(\fun{ack}(0,0)\) is the minimum element. Second, we must
 prove that \fun{ack/2} rewrites to smaller calls. We are only
-concerned with rules \(\iota\)~and~\(\kappa\). With the former, we
+concerned with rules \(\beta\)~and~\(\gamma\). With the former, we
 have \(\fun{ack}(m+1,0) \succ \fun{ack}(m,1)\). With the latter, we
 have
 \begin{equation*}
@@ -850,16 +855,16 @@ analysed some famously involved recursive functions.
 \paragraph{Associativity}
 \label{proof:assoc_cat}
 
-Let us recall the definition~\eqref{def:cat} of the catenation of two
+Let us recall the definition~\eqref{def:cat} of the concatenation of two
 stacks:
 \begin{equation*}
 \fun{cat}(        \el,t) \xrightarrow{\smash{\alpha}} t;\qquad
 \fun{cat}(\cons{x}{s},t) \xrightarrow{\smash{\beta}}
 \cons{x}{\fun{cat}(s,t)}.
-\index{stack!catenation!definition}
+\index{stack!concatenation!definition}
 \end{equation*}
 and let us prove the
-associativity\index{stack!catenation!associativity}
+associativity\index{stack!concatenation!associativity}
 \index{induction!example} of \fun{cat/2}\index{cat@\fun{cat/2}}, which
 we express formally as
 \begin{equation*}
@@ -877,7 +882,8 @@ we wish to prove until we either find the same term (equality), or we
 use the induction hypothesis (equivalence). We want to be free to
 choose a rewrite amongst those possible for a term, and this freedom
 is entailed by the termination and the confluence of the rewrite
-system defining the functions, which we assume here.
+system defining the functions, which we always assume when proving
+properties of such functions.
 
 We apply the well\hyp{}founded induction principle to the structure
 of~\(s\), so we must establish
@@ -938,7 +944,7 @@ function calls. We briefly introduce here \Erlang, a functional
 language that contains a pure core \citep{Armstrong_2007}. A
 \emph{module} is a collection of function definitions. The syntax of
 \Erlang is very close to our formalism and our previous rewrite
-systems become\index{stack!catenation!$\sim$ in
+systems become\index{stack!concatenation!$\sim$ in
   \Erlang}\index{factorial}
 \begin{verbatim}
 -module(mix).
@@ -1041,11 +1047,11 @@ in our functional language, every time a new stack is needed, instead
 of modifying another with a side\hyp{}effect, a new one is created,
 perhaps reusing others as constant components.
 
-\paragraph{Catenation of stacks}
+\paragraph{Concatenation of stacks}
 
-As an illustration\index{stack!catenation!$\sim$ in \Java|(}, let us
+As an illustration\index{stack!concatenation!$\sim$ in \Java|(}, let us
 recall definition~\eqref{def:cat} \vpageref{def:cat}
-\index{cat@\fun{cat/2}|(} for catenating two stacks:
+\index{cat@\fun{cat/2}|(} for concatenating two stacks:
 \begin{equation*}
 \fun{cat}(        \el,t) \xrightarrow{\smash{\alpha}} t;\qquad
 \fun{cat}(\cons{x}{s},t) \xrightarrow{\smash{\beta}}
@@ -1081,5 +1087,5 @@ left\hyp{}hand side of rule~\(\beta\), hence \(\cons{x}{s}\) is
   \return tail.cat(t).push(head);
 \}
 \end{alltt}
-\index{stack!catenation!$\sim$ in \Java|)}
+\index{stack!concatenation!$\sim$ in \Java|)}
 \index{Java@\Java|)}
