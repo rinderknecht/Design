@@ -1,4 +1,5 @@
 -module(max).
+-compile(nowarn_export_all).
 -compile(export_all).
 
 ceiling(X) when X > trunc(X) -> trunc(X) + 1;

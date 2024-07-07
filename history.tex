@@ -8,8 +8,8 @@
 \begin{document}
 
 \TeXtoEPS
-\pstree[levelsep=17pt,treesep=14pt,nodesepA=-1pt,nodesepB=2pt,arrows=->]{\TR{\(\circ\)}}{
-  \pstree[nodesep=2pt,levelsep=20pt,treesep=14pt,arrows=-]{\TR{\texttt{|}}}{
+%\pstree[levelsep=17pt,treesep=14pt,nodesepA=-1pt,nodesepB=2pt,arrows=->]{\TR{\(\circ\)}}{
+\pstree[nodesep=2pt,levelsep=20pt,treesep=14pt,arrows=-]{\TR{\texttt{|}}}{
     \begin{skiplevels}{1}
       \pstree{\TR{\rnode[rb]{root_d_from}{\texttt{|}}}}{
         \TR{\(4\)}
@@ -46,7 +46,7 @@
       }
     }
   }
-}
+%}
 %
 \ncline[nodesep=2pt]{->}{root_b_from}{root_a_to}
 \ncline[nodesep=2pt]{->}{root_c_from}{root_b_l_to}

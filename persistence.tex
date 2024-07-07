@@ -28,7 +28,8 @@ consecutively repeated items. For example, we might have \(\fun{red}([4,1,2,2,2,
 % {r} mandatory right placement (better because of a list)
 \centering
 \includegraphics[bb=71 672 203 726]{red}
-\caption{Reducing\label{fig:red}}
+\caption{Reducing}
+\label{fig:red}
 \end{wrapfigure}
 A
 directed acyclic graph of the second rule is depicted in
@@ -75,10 +76,10 @@ one obtained from its predecessor by a push or a pop, like the history
 \([[4,2,1],[2,1],[3,2,1],[2,1],[1],\el]\), where the initial stack was
 empty; next, \(1\)~was pushed, followed by~\(2\) and~\(3\); then
 \(3\)~was popped and \(4\)~pushed instead. This way, the \emph{last
-  version} is the top of history, like \([4,2,1]\) in our
+version} is the top of history, like \([4,2,1]\) in our
 example. Furthermore, we want two successive versions to share as much
 structure as possible. (We speak of `version' instead of `state',
-because the latter applies when values are not persistent.)  These
+because the latter applies when values can be not persistent.) These
 requirements are at the heart of \emph{revision control} software,
 used by programmers to keep track of the evolution of their source
 code.
@@ -93,10 +94,10 @@ stack, deal with a history of stacks. Consider the following
 definitions:
 \begin{equation}
 \begin{array}{@{}r@{\;}c@{\;}l@{\quad}r@{\;}c@{\;}l@{}}
-\fun{push}(x,\el) & \rightarrow & [[x],\el];
-& \fun{pop}(\cons{\cons{x}{s}}{h}) & \rightarrow &
-                                     \cons{s,\cons{x}{s}}{h}.\\
-\fun{push}(x,\cons{s}{h}) & \rightarrow &
+\fun{push}(x,\el) & \smashedrightarrow{\alpha} & [[x],\el];
+& \fun{pop}(\cons{\cons{x}{s}}{h}) & \smashedrightarrow{\gamma} &
+                                     (x, \cons{s,\cons{x}{s}}{h}).\\
+\fun{push}(x,\cons{s}{h}) & \smashedrightarrow{\beta} &
 \cons{\cons{x}{s},s}{h}. &
 \fun{top}(\cons{\cons{x}{s}}{h}) & \rightarrow & x.
 \end{array}
@@ -107,16 +108,16 @@ The corresponding directed acyclic graphs are found in
 \begin{figure}
 \centering
 \includegraphics[bb=70 639 294 723]{push_pop_dag}
-\caption{DAGs of \fun{push/2} and \fun{pop/1} with maximum sharing
-\label{fig:push_pop_dag}}
+\caption{DAGs of \fun{push/2} and \fun{pop/1} with maximum sharing}
+\label{fig:push_pop_dag}
 \end{figure}
 History \([[4,2,1],[2,1],[3,2,1],[2,1],[1],\el]\) is displayed in
 \fig~\ref{fig:history}
 \begin{figure}[!b]
 \centering
 \includegraphics[bb=70 575 247 723]{history}
-\caption{History \([[4,2,1],[2,1],[3,2,1],[2,1],[1],\el]\)
-\label{fig:history}}
+\caption{History \([[4,2,1],[2,1],[3,2,1],[2,1],[1],\el]\)}
+\label{fig:history}
 \end{figure}
 as a directed acyclic graph as well. It is obtained as the evaluation
 of
@@ -174,7 +175,8 @@ consider a graphical representation of updates in
 \qquad
 \subfloat[$\protect\fun{pop}()$]{%
   \includegraphics[bb=71 662 130 721,scale=0.8]{pop}}
-\caption{Stack updates\label{fig:push_pop1}}
+\caption{Stack updates}
+\label{fig:push_pop1}
 \end{figure}
 This is the same model we used in section~\ref{sec:queueing} where we
 studied queueing (see in particular \fig~\vref{fig:enq_deq}), except
@@ -185,8 +187,8 @@ instance the history in \fig~\vref{fig:history1}.
 \centering
 \includegraphics[bb=69 577 300 726,scale=0.9]{history1}
 \caption{$[\ufun{pop}(), \ufun{pop}(), \ufun{push}(4),\ufun{push}(3),
-      \ufun{pop}(), \ufun{push}(2), \ufun{push}(1)]$
-\label{fig:history1}}
+      \ufun{pop}(), \ufun{push}(2), \ufun{push}(1)]$}
+\label{fig:history1}
 \end{figure}
 It is clear that \emph{a valid history is a line which never
   crosses the absissa axis.}
@@ -205,8 +207,8 @@ This thought experiment is depicted in \fig~\ref{fig:topmost}.
 \begin{figure}
 \centering
 \includegraphics[bb=69 577 300 726,scale=0.9]{topmost}
-\caption{Finding the top of the last version
-\label{fig:topmost}}
+\caption{Finding the top of the last version}
+\label{fig:topmost}
 \end{figure}
 Notice that we do not need to determine the length of the last
 version: the difference of length with the current version, while
@@ -228,8 +230,8 @@ Their definitions are found in \fig~\vref{fig:pop_top}.
 \fun{top}_0(k,\cons{\ufun{pop}()}{h})   & \rightarrow            & \fun{top}_0(k+1,h).
 \end{array}}
 \end{equation*}
-\caption{The top and the rest of an history of updates
-\label{fig:pop_top}}
+\caption{The top and the rest of an history of updates}
+\label{fig:pop_top}
 \end{figure}
 An ancillary function \fun{top\(_0\)/2}\index{top0@\fun{top\(_0\)/2}}
 keeps track of the difference between the lengths of the last and
@@ -279,7 +281,8 @@ allocate only as much as the computed version actually contains.
 % {r} mandatory right placement
 \centering
 \includegraphics[bb=71 644 257 721]{lst1}
-\caption{Last version \label{fig:lst1}}
+\caption{Last version}
+\label{fig:lst1}
 \end{wrapfigure}
 \hspace*{-5.6pt} We can achieve this memory optimality with
 \fun{lst\(_1\)/1} in \fig~\ref{fig:lst1} by retaining features of both
@@ -297,7 +300,8 @@ for instance, in \fig~\vref{fig:back2zero},
 \begin{figure}[b]
 \centering
 \includegraphics[bb=69 606 300 726,scale=0.9]{back2zero}
-\caption{Last version $[3]$ found in four steps\label{fig:back2zero}}
+\caption{Last version $[3]$ found in four steps}
+\label{fig:back2zero}
 \end{figure}
 it is useless to go past \(\ufun{push}(3)\)\index{push@\fun{push/1}}
 to find the last version to be~\([3]\). But, in order to detect
@@ -347,7 +351,8 @@ is~\(\el\), as planned, in \fig~\ref{fig:ver_no_pair}.
                       & \fun{lst}_3(k+1,n+1,h).
 \end{array}}
 \end{equation*}
-\caption{Querying a version without pairs\label{fig:ver_no_pair}}
+\caption{Querying a version without pairs}
+\label{fig:ver_no_pair}
 \end{figure}
 
 One may wonder why bother pairing~\(n\) and~\(h\) just to separate
@@ -390,7 +395,8 @@ the call~\eqref{ex:history} on page~\pageref{ex:history} and saves
                       & \fun{lst}_4(k+1,n+1,h).
 \end{array}}
 \end{equation*}
-\caption{Querying a version without a stack\label{fig:ver}}
+\caption{Querying a version without a stack}
+\label{fig:ver}
 \end{figure}
 
 There is now a minimum and maximum cost. The worst case is when the
@@ -432,8 +438,8 @@ Let us consider the history in \fig~\vref{fig:history2}.
 \centering
 \includegraphics[bb=69 578 272 726,scale=0.9]{history2}%[]
 \caption{$\ufun{pop}(\ufun{push}(4,\ufun{push}(3,
-          \ufun{pop}(\ufun{push}(2,\ufun{push}(1,\el))))))$
-\label{fig:history2}}
+          \ufun{pop}(\ufun{push}(2,\ufun{push}(1,\el))))))$}
+\label{fig:history2}
 \end{figure}
 Let \(\fun{chg}(k,u,\pair{n}{h})\)\index{chg@\fun{chg/3}} be the
 changed history, where \(k\)~is the index of the update we want to
@@ -549,7 +555,8 @@ for a big\hyp{}step design in \fig~\ref{fig:chg}.
                                \pair{n'}{\ufun{push}(x,h')}}
 \end{gather*}
 }}
-\caption{Changing a past version (big-step design)\label{fig:chg}}
+\caption{Changing a past version (big-step design)}
+\label{fig:chg}
 \end{figure}
 Notice how the length~\(n'\) of the new history is simply passed down
 the inference rules. It can simply be made out:

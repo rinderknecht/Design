@@ -9,7 +9,8 @@ algorithms and measures.
 \begin{figure}
 \centering
 \includegraphics{bt_shape}
-\caption{A binary tree\label{fig:bt_shape}}
+\caption{A binary tree}
+\label{fig:bt_shape}
 \end{figure}
 Nodes are of two kinds: internal\index{binary tree!internal node|(}
 (\(\circ\) and \(\bullet\)) or external\index{binary tree!external
@@ -29,7 +30,8 @@ children are two external nodes; they are depicted as black discs.
 % [0pt] of margin overhang
 \centering
 \includegraphics[bb=71 648 177 723]{leaf_tree}
-\caption{A leaf tree\label{fig:leaf_tree}}
+\caption{A leaf tree}
+\label{fig:leaf_tree}
 \end{wrapfigure}
 Internal nodes are usually associated with some kind of information,
 whilst external nodes are not, like the one shown in
@@ -41,7 +43,8 @@ whilst external nodes are not, like the one shown in
 \qquad
 \subfloat[Pruned binary tree\label{fig:bt_ex2}]{
 \includegraphics[bb=67 645 169 721]{bt_ex2}}
-\caption{Two representations of a binary tree\label{fig:bt_ex}}
+\caption{Two representations of a binary tree}
+\label{fig:bt_ex}
 \end{figure}
 this is the default representation we use in the present
 book. Sometimes, in order to draw more attention to the internal
@@ -264,8 +267,8 @@ tree is shown in \fig~\vref{fig:max_pre0}.
 \qquad
 \subfloat[Minimum\label{fig:min_pre0}]{
   \includegraphics{min_pre0}}
-\caption{Extremal trees for \(\C{\fun{pre}_0}{n}\)
-\label{fig:tree_stack}}
+\caption{Extremal trees for \(\C{\fun{pre}_0}{n}\)}
+\label{fig:tree_stack}
 \end{figure}
 
 Dually, the minimum cost
@@ -317,7 +320,8 @@ shows that new version of the preorder traversal, named
   \cons{x,\fun{pre}_2(t_1)}{\fun{pre}_2(t_2)}.
 \end{array}}
 \end{equation*}
-\caption{Preorder traversal using \fun{flat/1}\label{fig:pre1}}
+\caption{Preorder traversal using \fun{flat/1}}
+\label{fig:pre1}
 \end{figure}
 The cost of \(\fun{pre}_2(t)\)\index{pre2@\fun{pre\(_2\)/1}} is now
 reduced to \(2n+1\) (see theorem~\ref{thm:int_ext}
@@ -379,7 +383,8 @@ trees. See \fig~\vref{fig:pre3}.
   \cons{x}{\fun{pre}_4(\cons{t_1,t_2}{f})}.
 \end{array}}
 \end{equation*}
-\caption{Efficient preorder traversal with a forest\label{fig:pre3}}
+\caption{Efficient preorder traversal with a forest}
+\label{fig:pre3}
 \end{figure}
 Empty trees in the forest are skipped in rule~\clause{\gamma}. In
 rule~\clause{\delta}, the subtrees \(t_1\) and~\(t_2\) are now simply
@@ -398,8 +403,8 @@ expected order. An example is given in \fig~\vref{fig:pre3_abcde},
 \includegraphics[bb=71 650 374 710]{pre3_abcde_0} %[... ... ... 723]
 \includegraphics[bb=71 668 306 721]{pre3_abcde_1}
 \includegraphics{pre3_abcde_2}
-\caption{A preorder traversal with \fun{pre\(_4\)/1}
-\label{fig:pre3_abcde}}
+\caption{A preorder traversal with \fun{pre\(_4\)/1}}
+\label{fig:pre3_abcde}
 \end{figure}
 where the forest is the argument of \fun{pre\(_4\)/1} and the circle
 nodes are the current value of~\(x\) in rule~\(\delta\) of
@@ -447,7 +452,8 @@ the cost by not visiting the external nodes, as shown in
   & \rightarrow & \cons{x}{\fun{pre}_6(\cons{t_1,t_2}{f})}.
 \end{array}}
 \end{equation*}
-\caption{Lengthy definition of a preorder traversal\label{fig:pre5}}
+\caption{Lengthy definition of a preorder traversal}
+\label{fig:pre5}
 \end{figure}
 We then have
 \begin{equation*}
@@ -526,7 +532,8 @@ wonder what the interpretation of this accumulator\index{functional
   \includegraphics[bb=71 672 183 721]{in_tree}}
 \subfloat[Postorder with \fun{post/1}\label{fig:post_tree}]{
   \includegraphics[bb=71 672 183 721]{post_tree}}
-\caption{Efficient classic traversals\label{fig:classic_walks}}
+\caption{Efficient classic traversals}
+\label{fig:classic_walks}
 \end{figure}
 The arrows evince the traversal in the tree and connect different
 stages of the preorder stack: a downwards arrow points to the argument
@@ -555,7 +562,8 @@ program in \fig~\vref{fig:pre}.
   & \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,s))}.
 \end{array}}
 \end{equation*}
-\caption{Cost and memory efficient preorder\label{fig:pre}}
+\caption{Cost and memory efficient preorder}
+\label{fig:pre}
 \end{figure}
 We now understand that, given \(\fun{pre}(t,s)\), the nodes in the
 stack~\(s\) are the nodes that follow, in preorder, the nodes in the
@@ -591,8 +599,8 @@ form\index{functional language!tail form}, but not \fun{pre/2}.
 \subfloat[Inorder\label{fig:inorder}]{\includegraphics{inorder}}
 \;
 \subfloat[Level order\label{fig:lorder}]{\includegraphics{lorder}}
-\caption{Classic numberings of a pruned binary tree
-\label{fig:orders}}
+\caption{Classic numberings of a pruned binary tree}
+\label{fig:orders}
 \end{figure}
 shows a binary tree whose internal nodes have been replaced by their
 rank in preorder, with the smallest number, \(0\), at the root. In
@@ -603,7 +611,8 @@ complete example is shown in \fig~\vref{fig:bt_ex3},
 \begin{figure}[b]
 \centering
 \includegraphics{bt_ex3}
-\caption{Preorder numbers as exponents\label{fig:bt_ex3}}
+\caption{Preorder numbers as exponents}
+\label{fig:bt_ex3}
 \end{figure}
 where the preorder numbers are exponents to the internal nodes. Note
 how these numbers increase along downwards paths.
@@ -619,7 +628,8 @@ former is shown on internal nodes in \fig~\vref{fig:prenum1}.
 \qquad
 \subfloat[Numbers and tree\label{fig:prenum0}]{%
 \includegraphics[bb=71 668 217 721]{prenum0}}
-\caption{Preorder numbering in two phases\label{fig:prenum}}
+\caption{Preorder numbering in two phases}
+\label{fig:prenum}
 \end{figure}
 A number on the left side of a node indexes it, for example node~\(x\)
 is indexed with~\(i\): these numbers descend in the tree. A number on
@@ -664,7 +674,8 @@ The function
    \pair{k}{\fun{int}(i,t'_1,t'_2)}}\,.
 \end{gather*}
 }}
-\caption{Preorder numbering\label{fig:npre}}
+\caption{Preorder numbering}
+\label{fig:npre}
 \end{figure}
 implements this algorithm. We use an auxiliary function
 \fun{npre/2}\index{npre@\fun{npre/2}} such that \(\fun{npre}(i,t)
@@ -700,7 +711,8 @@ equivalently write\index{snd@\fun{snd/1}} the program in
 \end{array}
 }
 \end{equation*}
-\caption{Version of \fun{npre/1} without inference rules\label{fig:npre_bis}}
+\caption{Version of \fun{npre/1} without inference rules}
+\label{fig:npre_bis}
 \end{figure}
 \index{binary tree!preorder|)}
 
@@ -860,7 +872,8 @@ to rewrite the left\hyp{}hand side after letting \(t :=
 \end{equation*}
 \caption{Proof of \(\pred{CatPre}{t} \colon
   \fun{cat}(\fun{pre}(t,\el),s) \equiv
-  \fun{pre}(t,s)\)\label{fig:CatPre}}
+  \fun{pre}(t,s)\)}
+\label{fig:CatPre}
 \end{figure}
 where
 \begin{itemize*}
@@ -914,7 +927,8 @@ We can resume conclusively in \fig~\vref{fig:pre0_pre}.\hfill\(\Box\)
 \end{array}}
 \end{equation*}
 \caption{Proof of \(\pred{Pre}{t} \colon \fun{pre}_0(t) \equiv
-  \fun{pre}(t)\) \label{fig:pre0_pre}}
+  \fun{pre}(t)\)}
+\label{fig:pre0_pre}
 \end{figure}
 
 \paragraph{Flattening revisited}
@@ -934,7 +948,8 @@ cons\hyp{}nodes.
 \begin{figure}
 \centering
 \includegraphics[bb=71 643 186 721]{stacks}
-\caption{Embedded stacks as a leaf tree\label{fig:stacks}}
+\caption{Embedded stacks as a leaf tree}
+\label{fig:stacks}
 \end{figure}
 
 The first step consists in defining inductively the set of the binary
@@ -965,7 +980,8 @@ function, \fun{lpre/1}\index{lpre@\fun{lpre/1}}, is shown in
   & \rightarrow & \fun{lpre}(t_1,\fun{lpre}(t_2,s)).
 \end{array}}
 \end{equation*}
-\caption{Preorder on binary leaf trees\label{fig:lpre}}
+\caption{Preorder on binary leaf trees}
+\label{fig:lpre}
 \end{figure}
 The final step is the translation of \fun{lpre/1} and \fun{lpre/2}
 into \fun{flat\(_2\)/1} and \fun{flat\(_2\)/2}, respectively, in
@@ -1011,7 +1027,8 @@ square brackets.) When \(S=1\), that is, the stack is flat, then
 \fun{flat}_2(x,s) & \rightarrow & \cons{x}{s}.
 \end{array}}
 \end{equation*}
-\caption{Flattening like \fun{lpre/1}\label{fig:flat2}}
+\caption{Flattening like \fun{lpre/1}}
+\label{fig:flat2}
 \end{figure}
 \index{stack!flattening|)}
 
@@ -1053,7 +1070,8 @@ yields the function defined in \fig~\vref{fig:in},
   & \fun{in}(t_1,\cons{x}{\fun{in}(t_2,s)}).
 \end{array}}
 \end{equation*}
-\caption{Inorder traversal\label{fig:in}}
+\caption{Inorder traversal}
+\label{fig:in}
 \end{figure}
 whose cost is the same as for preorder: \(\C{\fun{in}}{n} =
 \C{\fun{pre}}{n} = 2n + 2\).\index{in@$\C{\fun{in}}{n}$}
@@ -1085,7 +1103,8 @@ be a function computing the inorder numbering of a given tree in
    \pair{k}{\fun{int}(j,t'_1,t'_2)}}\,.
 \end{gather*}
 }}
-\caption{Inorder numbering\label{fig:nin}}
+\caption{Inorder numbering}
+\label{fig:nin}
 \end{figure}
 where~\(j\), at the root, is the smallest number greater than any
 number in~\(t_1\).
@@ -1115,7 +1134,8 @@ In \fig~\vref{fig:rot},
 \begin{figure}[b]
 \centering
 \includegraphics[bb=71 627 374 715]{rot}
-\caption{Composing right\hyp{}rotations, top\hyp{}down\label{fig:rot}}
+\caption{Composing right\hyp{}rotations, top\hyp{}down}
+\label{fig:rot}
 \end{figure}
 we show how a binary tree becomes a right\hyp{}leaning,
 degenerate\index{binary tree!degenerate $\sim$} tree, isomorphic to a
@@ -1136,7 +1156,8 @@ is given in \fig~\vref{fig:in1}.
   & \xrightarrow{\smash{\gamma}} & \cons{y}{\fun{in}_1(t_3)}.
 \end{array}}
 \end{equation*}
-\caption{Inorder traversal by right rotations\label{fig:in1}}
+\caption{Inorder traversal by right rotations}
+\label{fig:in1}
 \end{figure}
 Note how, in rule~\(\gamma\), we push the root~\(y\) in the result as
 soon as we can, which would not be possible had we used left rotations
@@ -1180,7 +1201,8 @@ example is given in \fig~\vref{fig:mirror}.
 \subfloat[\(t\)]{\includegraphics[bb=77 660 163 723]{bt_ex2}}
 \qquad
 \subfloat[\(\protect\fun{mir}(t)\)]{\includegraphics[bb=74 660 160 723]{bt_ex4}}
-\caption{Mirroring a binary tree\label{fig:mirror}}
+\caption{Mirroring a binary tree}
+\label{fig:mirror}
 \end{figure}
 It is easy to define this function:
 \begin{equation*}
@@ -1409,7 +1431,8 @@ function definition is given in \fig~\vref{fig:post}.
   & \fun{post}(t_1,\fun{post}(t_2,\cons{x}{s})).
 \end{array}}
 \end{equation*}
-\caption{Postorder traversal\label{fig:post}}
+\caption{Postorder traversal}
+\label{fig:post}
 \end{figure}
 The meaning of the stack~\(s\) in the call
 \(\fun{post}(t,s)\)\index{post@\fun{post/2}}\index{post@\fun{post/1}}
@@ -1443,7 +1466,8 @@ numbers increase along upwards paths. \Fig~\vref{fig:npost}\index{npost@\fun{npo
    \pair{k+1}{\fun{int}(k,t'_1,t'_2)}}\,.
 \end{gather*}
 }}
-\caption{Postorder numbering\label{fig:npost}}
+\caption{Postorder numbering}
+\label{fig:npost}
 \end{figure}
 shows the program to number a binary tree in postorder. The root is
 numbered with the number coming up from the right subtree, following
@@ -1536,7 +1560,9 @@ rewrites of the left\hyp{}hand side,
 \end{array}
 }
 \end{equation*}
-\caption{Proof of \(\fun{pre}(\fun{mir}(t),s) \equiv \fun{rcat}(\fun{post}(t,\el),s)\)\label{fig:premir}}
+\caption{Proof of \(\fun{pre}(\fun{mir}(t),s) \equiv
+  \fun{rcat}(\fun{post}(t,\el),s)\)}
+\label{fig:premir}
 \end{figure}
 where
 \begin{itemize*}
@@ -1681,7 +1707,8 @@ partially defined in \fig~\vref{fig:lo0}.
 \begin{figure}[t]
 \centering
 \includegraphics[bb=108 682 395 721]{lo0}
-\caption{Level order \fun{bf\(_0\)/1}\label{fig:lo0}}
+\caption{Level order \fun{bf\(_0\)/1}}
+\label{fig:lo0}
 \end{figure}
 If we imagine that we cut off the root of a binary tree, we obtain the
 immediate subtrees. If, in turn, we cut down these trees, we obtain
@@ -1695,7 +1722,8 @@ The cutting function is \fun{def/1}\index{def@\fun{def/1}}
 \belowdisplayskip=0pt
 \centering
 \includegraphics[bb=71 660 324 721]{def}
-\caption{Deforestation\label{fig:def}}
+\caption{Deforestation}
+\label{fig:def}
 \end{figure}
 such that \(\fun{def}(f)\), where \(f\)~represents a forest, evaluates
 in a pair \(\pair{r}{f'}\), where \(r\)~are the roots in preorder of
@@ -1798,7 +1826,8 @@ minimum when the binary tree is \emph{perfect}\index{binary
 % [0pt] of margin overhang
 \centering
 \includegraphics[bb=62 653 115 721]{zigzag}
-\caption{\label{fig:zigzag}}
+\caption{}
+\label{fig:zigzag}
 \end{wrapfigure}
 The maximum cost is obtained by maximising the height\index{binary
   tree!height}, while keeping the size constant. This happens for
@@ -1822,7 +1851,8 @@ algorithm at work on the same example found in
 \includegraphics[bb=70 655 385 723]{lo_abcde_0}
 \bigskip
 \includegraphics[bb=70 690 388 723]{lo_abcde_1}
-\caption{A level-order traversal with a queue\label{fig:lo_abcde}}
+\caption{A level-order traversal with a queue}
+\label{fig:lo_abcde}
 \end{figure}
 Keep in mind that trees are dequeued on the right side of the forest
 and enqueued on the left. (Some authors prefer the other way.) The
@@ -1850,7 +1880,8 @@ level\hyp{}order traversal in \fig~\ref{fig:bf1}.
   & \rightarrow & \cons{x}{\fun{bf}_2(\enq{t_2}{\enq{t_1}{q}})}.
 \end{array}}
 \end{equation*}
-\caption{Abstract level-order traversal with a queue\label{fig:bf1}}
+\caption{Abstract level-order traversal with a queue}
+\label{fig:bf1}
 \end{figure}
 The difference in data structure (accumulator) has already been
 mentioned: \fun{pre\(_4\)/1}\index{pre4@\fun{pre\(_4\)/1}} uses a
@@ -1888,7 +1919,8 @@ to refine the definition of
   {\fun{bf}_4(q) \twoheadrightarrow
    \cons{x}{\fun{bf}_4(\fun{enq}(t_2,\fun{enq}(t_1,q')))}}\,.
 \end{gather*}}}
-\caption{Refinement of \fig~\vref{fig:bf1}\label{fig:bf3}}
+\caption{Refinement of \fig~\vref{fig:bf1}}
+\label{fig:bf3}
 \end{figure}
 
 We can specialise the program further, so we save some memory by not
@@ -1914,7 +1946,8 @@ shown in \fig~\vref{fig:bf}.
   & \cons{x}{\fun{bf}(\cons{t_2,t_1}{r},f)}.
 \end{array}}
 \end{equation*}
-\caption{Refinement of \fig~\vref{fig:bf3}\label{fig:bf}}
+\caption{Refinement of \fig~\vref{fig:bf3}}
+\label{fig:bf}
 \end{figure}
 Recall that \fun{rcat/2}\index{rcat@\fun{rcat/2}} (\emph{reverse and
   concatenate}) is defined in equation~\eqref{def:rev}
@@ -2132,7 +2165,8 @@ Consider \fun{bfn\(_1\)/1}\index{bfn1@\fun{bfn\(_1\)/1}} and
   {\fun{bfn}_2(i,\deq{\fun{int}(x,t_1,t_2)}{q}) \twoheadrightarrow
    \enq{\fun{int}(i,t'_1,t'_2)}{q'}}.
 \end{gather*}}}
-\caption{Abstract breadth-first numbering\label{fig:bfn1}}
+\caption{Abstract breadth-first numbering}
+\label{fig:bfn1}
 \end{figure}
 and compare them with the definitions in \fig~\vref{fig:bf1}. In
 particular, notice how, in contrast with
@@ -2150,7 +2184,8 @@ In \fig~\vref{fig:bf2_ex}
 \includegraphics[bb=70 674 275 721]{bf2_abcd_4}
 \includegraphics[bb=69 691 276 721]{bf2_abcd_5}
 \includegraphics[bb=71 690 276 721]{bf2_abcd_6}
-\caption{Example of breadth-first numbering\label{fig:bf2_ex}}
+\caption{Example of breadth-first numbering}
+\label{fig:bf2_ex}
 \end{figure}
 is shown an example, where the numbers on the left represent the
 values of~\(i\) (the first argument of
@@ -2176,7 +2211,8 @@ in \fig~\vref{fig:bfn3},
 \begin{figure}[t]
 \centering
 \includegraphics{bfn3}
-\caption{Refinement of \fig~\vref{fig:bfn1}\label{fig:bfn3}}
+\caption{Refinement of \fig~\vref{fig:bfn1}}
+\label{fig:bfn3}
 \end{figure}
 which could be contrasted with \fig~\vref{fig:bf3}.
 \index{binary tree!breadth numbering|)}
@@ -2217,7 +2253,8 @@ If the tree~\(t\) is perfect, we also know its height~\(h\):
 \begin{figure}
 \centering
 \includegraphics{per}
-\caption{Abstract checking of perfection\label{fig:per}}
+\caption{Abstract checking of perfection}
+\label{fig:per}
 \end{figure}
 Note that the rules are ordered, so the last one may only apply when
 the previous ones have not been matched. A refinement without
@@ -2225,7 +2262,8 @@ inference rules is shown in \fig~\vref{fig:per0},
 \begin{figure}
 \centering
 \includegraphics[bb=71 604 251 721]{per0}
-\caption{Refinement of \fig~\ref{fig:per}\label{fig:per0}}
+\caption{Refinement of \fig~\ref{fig:per}}
+\label{fig:per0}
 \end{figure}
 where \(\fun{per}_0(t_1)\) is evaluated before
 \(\fun{per}_0(t_2)\)\index{per0@\fun{per\(_0\)/1}} since
@@ -2241,7 +2279,8 @@ where \(\fun{per}_0(t_1)\) is evaluated before
 % [0pt] of margin overhang
 \centering
 \includegraphics{complete}
-\caption{\label{fig:complete}}
+\caption{}
+\label{fig:complete}
 \end{wrapfigure}
 
 \paragraph{Completeness}
@@ -2270,7 +2309,8 @@ rule applies either if \(t=\fun{ext}()\) or
 \begin{figure}[H]
 \centering
 \includegraphics{comp}
-\caption{Checking completeness\label{fig:comp}}
+\caption{Checking completeness}
+\label{fig:comp}
 \end{figure}
 
 \paragraph{Balance}
@@ -2278,7 +2318,8 @@ rule applies either if \(t=\fun{ext}()\) or
 \begin{wrapfigure}[7]{r}[0pt]{0pt}
 \centering
 \includegraphics[bb=71 653 153 721]{bal}
-\caption{\label{fig:bal}}
+\caption{}
+\label{fig:bal}
 \end{wrapfigure}
 The last interesting kind of binary trees is the \emph{balanced
   trees}.\index{binary tree!balanced $\sim$} There are two sorts of
@@ -2310,7 +2351,8 @@ perfect tree is balanced (\(h_1 = h_2\)).
 \begin{figure}[h]
 \centering
 \includegraphics{balance}
-\caption{Checking balance\label{fig:balance}}
+\caption{Checking balance}
+\label{fig:balance}
 \end{figure}
 
 \section{Tree encodings}
@@ -2342,7 +2384,8 @@ The encoding function
   & \fun{epost}(t_1,\fun{epost}(t_2,\cons{x}{s})).
 \end{array}}
 \end{equation*}
-\caption{Postorder encoding\label{fig:epost}}
+\caption{Postorder encoding}
+\label{fig:epost}
 \end{figure}
 is a simple modification of \fun{post/1}\index{post@\fun{post/1}} in
 \fig~\vref{fig:post}. For example, the tree in
@@ -2376,7 +2419,8 @@ The definition of \fun{post2b/1}\index{post2b@\fun{post2b/1}}
 \fun{post2b}(\cons{t_2,t_1}{f},\cons{x}{s}) & \rightarrow & \fun{post2b}(\cons{\fun{int}(x,t_1,t_2)}{f},s).
 \end{array}}
 \end{equation*}
-\caption{Postorder decoding\label{fig:post2b}}
+\caption{Postorder decoding}
+\label{fig:post2b}
 \end{figure}
 Variable~\(f\) stands for \emph{forest}\index{tree!forest}, which is
 how stacks of trees are usually called in computing science. Note that
@@ -2408,7 +2452,8 @@ Considering preorder now, the encoding function
   & \cons{x}{\fun{epre}(t_1,\fun{epre}(t_2,s))}.
 \end{array}}
 \end{equation*}
-\caption{Preorder encoding\label{fig:epre}}
+\caption{Preorder encoding}
+\label{fig:epre}
 \end{figure}
 is a simple modification of \fun{pre/1}\index{pre@\fun{pre/1}} in
 \fig~\vref{fig:pre}. The cost is as simple as for a postorder
@@ -2478,7 +2523,7 @@ the stack \(s := \fun{epre}(t)\),
 \begin{equation*}
 \abovedisplayskip=7pt
 \belowdisplayskip=7pt
-\fun{pre2b}(s) \equiv \fun{mir}(\fun{post2b}(\fun{rev}(s))),
+\fun{pre2b}(s) \equiv \fun{mir}(\fun{post2b}(\fun{rev}(s))).
 \end{equation*}
 We obtain \fun{pre2b/1}\index{pre2b@\fun{pre2b/1}}\index{binary
   tree!preorder!decoding} by modifying
@@ -2495,7 +2540,8 @@ We obtain \fun{pre2b/1}\index{pre2b@\fun{pre2b/1}}\index{binary
 \fun{pre2b}(\cons{\fun{int}(x,t_1,t_2)}{f},s).
 \end{array}}
 \end{equation*}
-\caption{Preorder decoding\label{fig:pre2b}}
+\caption{Preorder decoding}
+\label{fig:pre2b}
 \end{figure}
 The difference between \fun{pre2b/2}\index{pre2b@\fun{pre2b/2}} and
 \fun{post2b/2}\index{post2b@\fun{post2b/2}} lies in their last
@@ -2535,7 +2581,8 @@ of the encoding. The definition is displayed in
    \fun{pre2b}_1(s_1) \twoheadrightarrow \pair{t_2}{s_2}}
   {\fun{pre2b}_1(\cons{x}{s}) \twoheadrightarrow \pair{\fun{int}(x,t_1,t_2)}{s_2}}.
 \end{gather*}}}
-\caption{Another preorder decoding\label{fig:pre2b0}}
+\caption{Another preorder decoding}
+\label{fig:pre2b0}
 \end{figure}
 Notice the absence of any adventitious concept, contrary to
 \fun{pre2b/1}\index{pre2b@\fun{pre2b/1}}, which relies on the
@@ -2590,7 +2637,8 @@ insertion in section~\ref{sec:2-way} \vpageref{sec:2-way}).
 \begin{wrapfigure}[7]{r}[0pt]{0pt}
 \centering
 \includegraphics[bb=64 663 118 721]{binzip}
-\caption{\label{fig:binzip}}
+\caption{}
+\label{fig:binzip}
 \end{wrapfigure}
 Let us call the current node the \emph{slider}\index{binary
   tree!slider}, also called the \emph{focus}. A
@@ -2656,7 +2704,8 @@ call. See \fig~\vref{fig:zip_move}
   \pair{\fun{left}(x,t_2,p)}{t_1}.
 \end{array}}
 \end{equation*}
-\caption{Basic steps in a binary tree\label{fig:zip_move}}
+\caption{Basic steps in a binary tree}
+\label{fig:zip_move}
 \end{figure}
 for the program. Beyond random traversals of a binary tree, this
 technique, which is an instance of \emph{Huet's zipper}
@@ -2705,7 +2754,8 @@ We show a preorder traversal following this design in
 \fun{pre}_8(s,\cons{\fun{int}(x,t_1,\fun{ext}())}{f},t_2).
 \end{array}}
 \end{equation*}
-\caption{Preorder in tail form\label{fig:pre_tail}}
+\caption{Preorder in tail form}
+\label{fig:pre_tail}
 \end{figure}
 where, in \(\fun{pre}_8(s,f,t)\), the stack~\(s\) is expected to
 collect the visited nodes in preorder, the stack~\(f\) (forest) is the
@@ -2743,7 +2793,8 @@ segments shown in \fig~\vref{fig:rise_fall},
 \subfloat[Fall\label{fig:fall}]{%
   \includegraphics[bb=69 662 132 721,scale=0.75]{dequeue}
 }
-\caption{Basic steps in a grid\label{fig:rise_fall}}
+\caption{Basic steps in a grid}
+\label{fig:rise_fall}
 \end{figure}
 such that it remains above the abscissa axis or reaches it. Consider
 again the example given in \fig~\vref{fig:dyck_path}, without taking
@@ -2813,8 +2864,8 @@ shown in \fig~\ref{fig:dyck_quad}
 \begin{figure}
 \centering
 \includegraphics[bb=86 616 502 725,scale=0.8]{dyck_quad}
-\caption{Quadratic decomposition of a Dyck path
-\label{fig:dyck_quad}}
+\caption{Quadratic decomposition of a Dyck path}
+\label{fig:dyck_quad}
 \end{figure}
 admits the quadratic decomposition \(\fun{r} \cdot \fun{rfrf} \cdot
 \fun{f} \cdot \fun{rrrffrff}\). This decomposition is unique because
@@ -2890,7 +2941,8 @@ function \fun{dpre/1}\index{dpre@\fun{dpre/1}} (\emph{Dyck path as
   & \cons{\fun{r}(x)}{\fun{dpre}(t_1,\cons{\fun{f}()}{\fun{dpre}(t_2,s)})}.
 \end{array}}
 \end{equation*}
-\caption{Mapping in preorder a binary tree to a Dyck path\label{fig:dpre}}
+\caption{Mapping in preorder a binary tree to a Dyck path}
+\label{fig:dpre}
 \end{figure}
 If the size of the binary tree is~\(n\), then \(\C{\fun{dpre}}{n} =
 2n+2\)\index{dpre@$\C{\fun{dpre}}{n}$} and the length of the Dyck path
@@ -2940,7 +2992,8 @@ tree to the Dyck\index{Dyck path} path, as shown in
   & \fun{dpost}(t_1,\cons{\fun{r}()}{\fun{dpost}(t_2,\cons{\fun{f}(x)}{s})}).
 \end{array}}
 \end{equation*}
-\caption{Mapping in postorder a binary tree to a Dyck path\label{fig:dpost}}
+\caption{Mapping in postorder a binary tree to a Dyck path}
+\label{fig:dpost}
 \end{figure}
 Note that we push \(\fun{r}()\) and \(\fun{f}(x)\) in the same rule,
 so we do not have to remove the first rise at the end. (We use a
@@ -2969,7 +3022,8 @@ and shown in \fig~\vref{fig:d2b}.
 \fun{d2b}(\cons{t_2,t_1}{f},\cons{\fun{f}(x)}{s}) & \rightarrow & \fun{d2b}(\cons{\fun{int}(x,t_1,t_2)}{f},s).
 \end{array}}
 \end{equation*}
-\caption{Mapping a Dyck path to a binary tree in postorder\label{fig:d2b}}
+\caption{Mapping a Dyck path to a binary tree in postorder}
+\label{fig:d2b}
 \end{figure}
 The cost is \(\C{\fun{d2b}}{n} = 2n +
 2\).\index{d2b@$\C{\fun{d2b}}{n}$}
@@ -2978,9 +3032,10 @@ Whether we choose a preorder or a postorder mapping, as a consequence
 of the established bijections, we know that there are as many binary
 trees of size~\(n\) as Dyck paths of length~\(2n\). We already know,
 from chapter~\ref{chap:Catalan}, and equation~\eqref{eq:Cn}
-\vpageref{eq:Cn}, that there are \(C_n = \frac{1}{n+1}\binom{2n}{n}
-\sim \frac{4^n}{n\sqrt{\pi n}}\) of such paths.
-
+\vpageref{eq:Cn}, that there are \(C_n\) paths:
+\begin{equation*}
+  C_n = \frac{1}{n+1}\binom{2n}{n} \sim \frac{4^n}{n\sqrt{\pi n}}.
+\end{equation*}
 Other encodings of binary trees can be found
 in \cite[2.3.3]{Knuth_1997} and \cite[5.11]{SedgewickFlajolet_1996}.
 

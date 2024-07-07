@@ -152,8 +152,8 @@ Let us depict updates as in \fig~\vref{fig:enq_deq}.
 \subfloat[Dequeue\label{fig:dequeue}]{%
   \includegraphics[bb=69 662 132 721,scale=0.75]{dequeue}
 }
-\caption{Graphical representations of operations on
-  queues\label{fig:enq_deq}}
+\caption{Graphical representations of operations on queues}
+\label{fig:enq_deq}
 \end{figure}
 Textually, we represent an enqueueing as an opening parenthesis and a
 dequeueing as a closing parenthesis. For example,
@@ -161,19 +161,20 @@ dequeueing as a closing parenthesis. For example,
 \begin{figure}
 \centering
 \includegraphics[bb=75 570 508 727,scale=0.7]{dyck_path}
-\caption{Dyck path modelling queue operations (cost \(24\))
-\label{fig:dyck_path}}
+\caption{Dyck path modelling queue operations (cost \(24\))}
+\label{fig:dyck_path}
 \end{figure}
-as a Dyck path\index{Dyck path}. For a broken line to qualify
-as a Dyck path of length~\(n\), it has to start at the origin
-\((0,0)\) and end at coordinates \((n,0)\). In terms of a \emph{Dyck
-  language}, an enqueueing is called a \emph{rise}\index{Dyck
-  path!rise} and a dequeueing is called a \emph{fall}\index{Dyck
-  path!fall}. A rise followed by a fall, that is, \texttt{()}, is
-called a \emph{peak}\index{Dyck path!peak}. For instance, in
-\fig~\ref{fig:dyck_path}, there are four peaks. The number near each
-rise or fall is the cost incurred by the corresponding operation. The
-abscissa axis bears the ordinal of each operation.
+as a Dyck path\index{Dyck path}. For a broken line to qualify as a
+Dyck path of length~\(n\), it has to start at the origin \((0,0)\),
+stay above the abscissa axis, and end at coordinates \((n,0)\). In
+terms of a \emph{Dyck language}, an enqueueing is called a
+\emph{rise}\index{Dyck path!rise} and a dequeueing is called a
+\emph{fall}\index{Dyck path!fall}. A rise followed by a fall, that is,
+\texttt{()}, is called a \emph{peak}\index{Dyck path!peak}. For
+instance, in \fig~\ref{fig:dyck_path}, there are four peaks. The
+number near each rise or fall is the cost incurred by the
+corresponding operation. The abscissa axis bears the ordinal of each
+operation.
 
 When \(e=d\), the line is a Dyck path of length \(n=2e=2d\). In order
 to deduce the total cost in this case, we must find a
@@ -184,8 +185,8 @@ whose cost is the same but easy to find. \Fig~\ref{fig:dyck_eq}
 \begin{figure}[!b]
 \centering
 \includegraphics[bb=75 570 508 727,scale=0.7]{dyck_eq}
-\caption{Dyck path equivalent to \fig~\ref{fig:dyck_path}
-\label{fig:dyck_eq}}
+\caption{Dyck path equivalent to \fig~\ref{fig:dyck_path}}
+\label{fig:dyck_eq}
 \end{figure}
 shows how the previous path is mapped to an equivalent path only made
 of a series of isosceles triangles whose bases belong to the abscissa
@@ -213,8 +214,8 @@ For instance, \fig~\vref{fig:rescheduling}
 \qquad
 \subfloat[Last one]{%
   \includegraphics[bb=13 645 180 782,scale=0.75]{mount3}}
-\caption{Rescheduling of \fig~\ref{fig:dyck_path} into
-  \fig~\ref{fig:dyck_eq}\label{fig:rescheduling}}
+\caption{Rescheduling of \fig~\ref{fig:dyck_path} into \fig~\ref{fig:dyck_eq}}
+\label{fig:rescheduling}
 \end{figure}
 displays the rescheduling of \fig~\vref{fig:dyck_path}. Note that two
 different paths can be rescheduled into the same path. What makes
@@ -248,8 +249,8 @@ case when \(e=d=7\) is the saw\hyp{}toothed Dyck path shown in
 \begin{figure}
 \centering
 \includegraphics[bb=86 657 507 726,scale=0.7]{max_dyck}
-\caption{Worst case when \(e=d=7\) (cost \(28\))
-\label{fig:max_dyck}}
+\caption{Worst case when \(e=d=7\) (cost \(28\))}
+\label{fig:max_dyck}
 \end{figure}
 Importantly, there are no other Dyck paths whose rescheduling lead to
 this worst case and the reason is that the reverse transformation from
@@ -266,7 +267,8 @@ given in \fig~\ref{fig:meander1},
 \begin{figure}[t]
 \centering
 \includegraphics[bb=75 570 480 727,scale=0.82]{meander1}
-\caption{Dyck meander modelling queue operations (total cost~\(21\))\label{fig:meander1}}
+\caption{Dyck meander modelling queue operations (total cost~\(21\))}
+\label{fig:meander1}
 \end{figure}
 where the last operation is a dequeueing. The dotted line delineates
 the result of applying the rescheduling we used on Dyck paths. Here,
@@ -276,8 +278,8 @@ Another possibility is shown in \fig~\ref{fig:meander2},
 \begin{figure}[t]
 \centering
 \includegraphics[bb=75 570 480 727,scale=0.82]{meander2}
-\caption{Dyck meander modelling queue operations (total cost
-  \(23\))\label{fig:meander2}}
+\caption{Dyck meander modelling queue operations (total cost \(23\))}
+\label{fig:meander2}
 \end{figure}
 where the last operation is left unchanged. The difference between the
 two examples lies in the fact that the original last dequeueing has,

@@ -88,8 +88,9 @@ Let us consider a short example in \fig~\vref{fig:isrt_312}.
 & [1,2,3].
 \end{array}}
 \end{equation*}
-\caption{\(\fun{isrt}([3,1,2]) \twoheadrightarrow [1,2,3]\)
-\label{fig:isrt_312}\index{insertion sort!straight $\sim$!example}}
+\caption{\(\fun{isrt}([3,1,2]) \twoheadrightarrow [1,2,3]\)}
+\label{fig:isrt_312}
+\index{insertion sort!straight $\sim$!example}
 \end{figure}
 \index{isrt@\fun{isrt/1}|)}
 \index{ins@\fun{ins/2}|)}
@@ -388,8 +389,8 @@ using it becomes a \emph{binary tree}\index{tree!binary
 \qquad
 \subfloat[Pruned tree\label{fig:312eq231}]{
   \includegraphics[bb=70 670 131 723]{312eq231}}
-\caption{Proof tree of \({[}3,1,2{]} \protect\approx {[}2,3,1{]}\)
-\label{fig:proof_trees}}
+\caption{Proof tree of \({[}3,1,2{]} \protect\approx {[}2,3,1{]}\)}
+\label{fig:proof_trees}
 \end{figure}
 As an exception to the convention about tree layouts, proof
 trees\index{tree!proof $\sim$} have their root at the bottom of the
@@ -855,8 +856,8 @@ the right stack (suffix). The function
                      & \fun{i2w}(s,t,\cons{x}{u}).
 \end{array}}
 \end{equation*}
-\caption{Sorting with 2-way insertion \fun{i2w/1}
-\label{fig:i2w_def}}
+\caption{Sorting with 2-way insertion \fun{i2w/1}}
+\label{fig:i2w_def}
 \end{figure}
 Rule~\(\xi\) introduces the two stacks used for insertion. Rules
 \(\pi\)~and~\(\rho\) could be replaced by \(\fun{i2w}(\el,t,u)
@@ -873,8 +874,8 @@ stack after there are no more keys to sort. Rule~\(\pi\) is used once.
 \begin{figure}[h]
 \centering
 \includegraphics[bb=71 523 257 721]{i2w2314}
-\caption{\(\fun{i2w}([2,3,1,4]) \twoheadrightarrow [1,2,3,4]\)
-\label{fig:i2w2314}}
+\caption{\(\fun{i2w}([2,3,1,4]) \twoheadrightarrow [1,2,3,4]\)}
+\label{fig:i2w2314}
 \end{figure}
 
 \mypar{Extremal costs}
@@ -967,8 +968,8 @@ keys? To guess what happens, let us insert~\(x_4\) assuming either
     \begin{figure}
       \centering
       \includegraphics[bb=71 671 185 716]{a3a0a1a2a4}
-      \caption{Worst case for \fun{i2w/1} if \(n=5\) (\(x_1 \prec x_2\))
-               \label{fig:spiral}}
+      \caption{Worst case for \fun{i2w/1} if \(n=5\) (\(x_1 \prec x_2\))}
+      \label{fig:spiral}
     \end{figure}
 
 \end{itemize}
@@ -1130,8 +1131,8 @@ insertions are illustrated by the \emph{evaluation
 \begin{figure}[t]
 \centering
 \includegraphics{2way_unbal}
-\caption{Sorting \([a,b,c]\) (first argument of \fun{i2w/3} hidden)
-\label{fig:2way_unbal}}
+\caption{Sorting \([a,b,c]\) (first argument of \fun{i2w/3} hidden)}
+\label{fig:2way_unbal}
 \end{figure}
 where the keys \(a\), \(b\) and~\(c\) are inserted in this order in a
 stack originally empty, with all possible total orders. Note how all
@@ -1259,7 +1260,8 @@ quadratic.\index{insertion sort!2-way $\sim$!average
       \end{array}}
     \end{equation*}
     \caption{Variation \fun{i2w\(_1\)/1} on \fun{i2w/1} (see
-      (\(\leadsto\)))\label{fig:i2w1}}
+      (\(\leadsto\)))}
+    \label{fig:i2w1}
     \end{figure}
     Prove that the average cost satisfies now the equation
     \index{i2w1@\fun{i2w\(_1\)/1}} \index{i2w1@\fun{i2w\(_1\)/3}}
@@ -1309,7 +1311,8 @@ quadratic.\index{insertion sort!2-way $\sim$!average
       \end{array}}
     \end{equation*}
     \caption{Variation \fun{i2w\(_2\)/1} on \fun{i2w/1} (see
-      (\(\leadsto\)))\label{fig:i2w2}}
+      (\(\leadsto\)))}
+    \label{fig:i2w2}
     \end{figure}
 
 \end{enumerate}
@@ -1400,14 +1403,15 @@ definition is displayed in \fig~\vref{fig:i2wb}.
 \fun{i2wb}(s,\cons{x}{t},u,0).
 \end{array}}
 \end{equation*}
-\caption{Balanced 2-way insertion \label{fig:i2wb}}
+\caption{Balanced 2-way insertion}
+\label{fig:i2wb}
 \end{figure}
 In \fig~\vref{fig:2way_bal}
 \begin{figure}
 \centering
 \includegraphics{2way_bal}
-\caption{Sorting \([a,b,c]\) by balanced 2-way insertions
-\label{fig:2way_bal}}
+\caption{Sorting \([a,b,c]\) by balanced 2-way insertions}
+\label{fig:2way_bal}
 \end{figure}
 are shown all the possible traces\index{tree!evaluation $\sim$} and
 outcomes of sorting \([a,b,c]\). Note that the tree is not
@@ -1436,8 +1440,8 @@ visualised by means of oriented edges revealing a whirlpool in
 \begin{figure}[b]
 \centering
 \includegraphics[bb=71 671 185 716]{a1a3a4a2a0}
-\caption{Best case for \fun{i2wb/1} if \(n=5\)
-\label{fig:whirlpool}}
+\caption{Best case for \fun{i2wb/1} if \(n=5\)}
+\label{fig:whirlpool}
 \end{figure}
 to be contrasted with the spiral in \fig~\vref{fig:spiral} for
 \fun{i2w/1}.

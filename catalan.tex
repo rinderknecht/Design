@@ -32,7 +32,8 @@ different ways.
 % [0pt] of margin overhang
 \centering
 \includegraphics[bb=71 646 160 712]{catalan_tree}
-\caption{Catalan tree of height~4\label{fig:catalan_tree}}
+\caption{Catalan tree of height~4}
+\label{fig:catalan_tree}
 \end{wrapfigure}
 Catalan trees are a special kind of graph, that is, an object made of
 \emph{nodes} (also called \emph{vertices}) connected by \emph{edges},
@@ -84,7 +85,8 @@ measure of size in this chapter.
 \subfloat[Catalan tree\label{fig:ctree}]{%
 \includegraphics[bb=65 663 127 721]{ctree}
 }
-\caption{Bijection\label{fig:bijection}}
+\caption{Bijection}
+\label{fig:bijection}
 \end{wrapfigure}
 In most textbooks \cite[\S~5.1 \&~5.2]{SedgewickFlajolet_1996} is
 shown how to find the number of Catalan trees with \(n\)~edges by
@@ -113,7 +115,8 @@ diagonal, or touch it. We want to show that \emph{there exists a
 \begin{wrapfigure}[7]{r}[0pt]{0pt}
 \centering
 \includegraphics[bb=71 661 128 720]{ctree_pre}
-\caption{\label{fig:ctree_pre}}
+\caption{}
+\label{fig:ctree_pre}
 \end{wrapfigure}
 To understand that bijection, we need first to present a particular
 kind of \emph{traversal}\index{tree!traversal}, or
@@ -137,8 +140,8 @@ which a node is visited first is shown instead of a black disk
 % [0pt] of margin overhang
 \centering
 \includegraphics[bb=71 591 186 721]{reflection}
-\caption{Reflection of a prefix w.r.t. \(y = x - 1\)
-\label{fig:reflection}}
+\caption{Reflection of a prefix w.r.t. \(y = x - 1\)}
+\label{fig:reflection}
 \end{wrapfigure}
 The first part of the bijection is an injection from Catalan trees
 with \(n\)~edges to Dyck paths of length~\(2n\). By traversing the
@@ -226,7 +229,7 @@ level~\(0\).
 \subfloat[Catalan tree\label{fig:ctree_deg}]{%
 \includegraphics[bb=65 663 127 721]{ctree_deg}
 }
-\caption{Degree-based bijection\label{fig:degree_based_bijection}}
+\caption{Degree-based bijection}\label{fig:degree_based_bijection}
 \end{figure}
 %%\end{wrapfigure}
 The first step of our method for finding the average path length
@@ -303,7 +306,7 @@ falls. Finally, imitating the derivation of equation~\eqref{eq:Cn},
 the number \(\mathcal{R}_n(r)\) of trees with \(n\)~edges and root of
 degree~\(r\) is
 \begin{equation*}
-\mathcal{R}_n(r) = \binom{2n-r-1}{n-1} - \binom{2n-r-1}{n} 
+\mathcal{R}_n(r) = \binom{2n-r-1}{n-1} - \binom{2n-r-1}{n}
                  = \frac{r}{2n-r} \binom{2n-r}{n}.
 \end{equation*}
 
@@ -324,7 +327,8 @@ In \fig~\ref{fig:level_deg}
 \subfloat[\(n+l\) edges, root of degree~\(2l+d\)\label{fig:lifted_node}]{%
 \includegraphics[bb=71 663 295 721]{lifted_node}
 }
-\caption{Bijection\label{fig:bij_root_level}}
+\caption{Bijection}
+\label{fig:bij_root_level}
 \end{figure}
 is shown the general pattern of a Catalan tree with node (\(\bullet\))
 of level~\(d\) and degree~\(d\). The double edges denote a set of
@@ -579,7 +583,8 @@ Consider the Dyck path in~\Fig~\ref{fig:h},
 \begin{figure}
 \centering
 \includegraphics{h}
-\caption{A Dyck path of length~\(2n\) and height~\(h\)\label{fig:h}}
+\caption{A Dyck path of length~\(2n\) and height~\(h\)}
+\label{fig:h}
 \end{figure}
 in bijection with a tree with~\(n=8\) edges and height~\(h=3\). Let us
 find the last (rightmost) point on the path where it reaches its full
@@ -594,8 +599,8 @@ between paths. See \fig~\ref{fig:h_prime}.
 \begin{figure}
 \centering
 \includegraphics{h_prime}
-\caption{Dyck path in bijection with \fig~\ref{fig:h}
-\label{fig:h_prime}}
+\caption{Dyck path in bijection with \fig~\ref{fig:h}}
+\label{fig:h_prime}
 \end{figure}
 
 The point is that every rise to level~\(l\) in \fig~\ref{fig:h},
@@ -619,4 +624,3 @@ If \(\Expected{H_n}\) is the average height of a Catalan tree with
 \begin{equation*}
 \Expected{H_n} \sim 2\frac{\Expected{P_n}}{n+1} \sim \sqrt{\pi n}.
 \end{equation*}
-

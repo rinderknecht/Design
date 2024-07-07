@@ -1,4 +1,5 @@
 -module(mean).
+-compile(nowarn_export_all).
 -compile(export_all).
 -compile({no_auto_import,[floor/1]}).
 

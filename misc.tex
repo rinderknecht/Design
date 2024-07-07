@@ -1,7 +1,7 @@
 %%-*-latex-*-
 
 % ------------------------------------------------------------------------
-% 
+%
 \begin{slide}
 \titre{Subset construction (continued)}
 
@@ -25,7 +25,7 @@ so \[\dbinom{n}{k} = n \dots\]
 \end{slide}
 
 % ------------------------------------------------------------------------
-% 
+%
 \begin{slide}
 \titre{Subset construction (continued)}
 
@@ -46,7 +46,7 @@ combination, not three.
 \end{slide}
 
 % ------------------------------------------------------------------------
-% 
+%
 \begin{slide}
 \titre{Subset construction (continued)}
 
@@ -79,7 +79,7 @@ etc. Formally, it is
 
 
 % ------------------------------------------------------------------------
-% 
+%
 \begin{slide}
 \titre{Recognition of tokens / Transition diagrams and double-buffering}
 
@@ -130,7 +130,7 @@ access to the primary buffer).
 \end{slide}
 
 % ------------------------------------------------------------------------
-% 
+%
 \begin{slide}
 \titre{Recognition of tokens / Transition diagrams and double-buffering
 (continued)}
@@ -173,7 +173,7 @@ c@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}ccl}
 \end{center}
 When the lexer reads the next available character, it is \textbf{not}
 immediately removed from the secondary buffer: instead, the
-pointer \(\upharpoonright\) is shifted to the right of one position. 
+pointer \(\upharpoonright\) is shifted to the right of one position.
 
 If the pointer was already at the last position, then some characters
 from the primary buffer are input into the secondary buffer.
@@ -185,7 +185,7 @@ file, until \eof is found (and read).
 
 
 % ------------------------------------------------------------------------
-% 
+%
 \begin{slide}
 \titre{Recognition of tokens / Transition diagrams and double-buffering
 (continued)}
@@ -193,7 +193,7 @@ file, until \eof is found (and read).
 There are two special features in the secondary buffer, compared to the
 primary buffer:
 \begin{enumerate}
-  
+
   \item we use a new pointer, noted \(\upharpoonleft\), to mark the
   current character when the current state is initial;
 
@@ -238,7 +238,7 @@ c@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}ccl}
 \end{slide}
 
 % ------------------------------------------------------------------------
-% 
+%
 \begin{slide}
 \titre{Recognition of tokens / Transition diagrams and double-buffering
 (continued)}
@@ -292,14 +292,14 @@ c@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}ccl}
 \end{slide}
 
 % ------------------------------------------------------------------------
-% 
+%
 \begin{slide}
 \titre{Recognition of tokens / Transition diagrams and double-buffering
   (continued)}
 
 \raggedslides[0pt]
 
-We are now at state \(2\) and the next character is \exc{1}. 
+We are now at state \(2\) and the next character is \exc{1}.
 
 The only way to continue is to go to state \(4\), using the special
 label \other.
@@ -346,7 +346,7 @@ c@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}c@{\,}@{\,}ccl}
 
 
 % ------------------------------------------------------------------------
-% 
+%
 \begin{slide}
 \titre{Recognition of tokens / Transition diagrams and double-buffering
 (continued)}
@@ -411,7 +411,7 @@ input.
 \end{slide}
 
 % ------------------------------------------------------------------------
-% 
+%
 \begin{slide}
 \titre{Recognition of tokens / Transition diagrams and double-buffering
 (continued)}
@@ -452,9 +452,8 @@ map programs to programs whose language is of the same level of
 abstraction.
 
 Usually, a language is considered more \myblue{abstract} than another
-if its underlying concepts (or ``its paradigms'') include the other
-ones or if they are ``more distant'' from the underlying machine model
+if its underlying concepts (or `its paradigms') include the other
+ones or if they are `more distant' from the underlying machine model
 (including control stacks, registers, memory etc.).
 
 So this notion of abstraction is relative.
-
