@@ -87,8 +87,9 @@ The function \fun{mrg/2}\index{mrg@\fun{mrg/2}} (\emph{merge}) in
                          & \cons{x}{\fun{mrg}(s,t)}.
 \end{array}}
 \end{equation*}
-\caption{Merging two stacks\label{fig:mrg}
-\index{merge sort!merging!program}}
+\caption{Merging two stacks}
+\label{fig:mrg}
+\index{merge sort!merging!program}
 \end{figure}
 implements this scheme. Rule~\(\iota\) is not necessary but is
 retained because it allows the cost to be symmetric, just as
@@ -125,8 +126,10 @@ than \(\C{\fun{cat}}{m,n}\). \Fig~\vref{fig:mrg_247} shows a
 \end{array}}
 \end{equation*}
 \caption{\(\fun{mrg}([3,4,7],[1,2,5,6]) \twoheadrightarrow
-  [1,2,3,4,5,6,7]\)\label{fig:mrg_247} \index{merge
-    sort!merging!example}\index{functional language!evaluation!trace}}
+  [1,2,3,4,5,6,7]\)}
+\label{fig:mrg_247}
+\index{merge sort!merging!example}
+\index{functional language!evaluation!trace}
 \end{figure}
 trace for \fun{mrg/2}. Rules \(\kappa\)~and~\(\lambda\) involve a
 comparison, while \(\theta\)~and~\(\iota\) do not and end the
@@ -213,8 +216,8 @@ of two stacks of lengths \(m\)~and~\(n\). Consider
 \centering
 \includegraphics[bb=66 648 350 725]{mean_mrg1}
 \caption{All possible mergers with \(m=3\) (\(\circ\)) and \(n=2\)
-  (\(\bullet\))
-\label{fig:mean_mrg1}}
+  (\(\bullet\))}
+\label{fig:mean_mrg1}
 \end{figure}
 with \(m=3\) white nodes and \(n=2\) black nodes which are interleaved
 in all possible manners. Note how the figure is structured. The first
@@ -280,7 +283,8 @@ number of nodes \emph{without} incoming edges, circled in
 \begin{figure}[b]
 \centering
 \includegraphics[bb=66 625 252 730]{mean_mrg2}
-\caption{Counting vertically\label{fig:mean_mrg2}}
+\caption{Counting vertically}
+\label{fig:mean_mrg2}
 \end{figure}
 This figure has been obtained by moving the third column of
 \fig~\vref{fig:mean_mrg1} below the second column and by removing the
@@ -334,8 +338,8 @@ definition, we can fill a table traditionally known as \emph{Pascal's
 \begin{figure}
 \centering
 \includegraphics{pascal}
-\caption{The corner of Pascal's triangle (in boldface type)
-\label{fig:pascal_triangle}}
+\caption{The corner of Pascal's triangle (in boldface type)}
+\label{fig:pascal_triangle}
 \end{figure}
 Note how we set the convention \(\binom{r}{k} = 0\) if \(k >
 r\). Pascal's triangle features many interesting properties relative
@@ -540,8 +544,8 @@ splitting strategy. For now, let us consider in
 \begin{figure}
 \centering
 \includegraphics{bot_up1}
-\caption{Sorting \([7,3,5,1,6,8,4,2]\)
-\label{fig:bot_up1}}
+\caption{Sorting \([7,3,5,1,6,8,4,2]\)}
+\label{fig:bot_up1}
 \end{figure}
 all the mergers and their relative order to sort the stack \([7, 3, 5,
   1, 6, 8, 4, 2]\). We name this structure a \emph{merge
@@ -690,7 +694,8 @@ number of keys, thus obtaining stacks of lengths \(\floor{n/2}\) and
 \fun{mrg}(\cons{x}{s},t) & \rightarrow & \cons{x}{\fun{mrg}(s,t)}.
 \end{array}}
 \end{equation*}
-\caption{Top-down merge sort with \fun{tms/1}\label{fig:tms}}
+\caption{Top-down merge sort with \fun{tms/1}}
+\label{fig:tms}
 \end{figure}
 Note that the call \(\fun{cutr}(s,t,u)\)\index{cutr@\fun{cutr/3}}
 reverses the first half of~\(t\) on top of~\(s\) if~\(s=t\). The
@@ -751,7 +756,8 @@ The minimum number of comparisons satisfies
 % 0pt of margin overhang
 \centering
 \includegraphics[bb=71 435 149 721]{bits}
-\caption{\label{fig:bits}}
+\caption{}
+\label{fig:bits}
 %\caption{Binary numbers from \(1\) to \(n\)\label{fig:bits}}
 \end{wrapfigure}
 We have \(\OB{\fun{tms}}{n} = \OB{\fun{tms}}{\floor{n/2}} +
@@ -826,7 +832,8 @@ decomposition of \(\OB{\fun{tms}}{2^p+i}\), where \(0 < i \leqslant
 \centering
 \includegraphics[bb=71 595 210 721]{Btms_table}
 \caption{$\protect\OB{\fun{tms}}{2^p+i} = \protect\OB{\fun{tms}}{2^p}
-  + \protect\OB{\fun{tms}}{i} + i$\label{fig:Btms_table}}
+  + \protect\OB{\fun{tms}}{i} + i$}
+\label{fig:Btms_table}
 \end{figure}
 which is the same as the table in \fig~\ref{fig:bits}, where
 \(n=2^p+i\). (Keep in mind that \(\OB{\fun{tms}}{n}\) is the sum of
@@ -1504,8 +1511,8 @@ top-down and bottom-up merge sort can be easily seen in the
 \qquad
 \subfloat[Top-down\label{fig:top_down}]{%
 \includegraphics{top_down}}
-\caption{Comparing merge sorts on \([6,3,2,4,1,5]\)
-\label{fig:top_vs_bot}}
+\caption{Comparing merge sorts on \([6,3,2,4,1,5]\)}
+\label{fig:top_vs_bot}
 \end{figure}
 In all generality,
 \begin{equation}
@@ -1664,8 +1671,8 @@ In all generality, let us set \(n := 2^{e_r} + \dots + 2^{e_1} +
 \begin{wrapfigure}[9]{r}[0pt]{0pt}
 \centering
 \includegraphics[bb=71 631 202 707]{msort_gen}
-\caption{\(\sum_{j=0}^{r}2^{e_j}\) keys
-\label{fig:msort_gen}}
+\caption{\(\sum_{j=0}^{r}2^{e_j}\) keys}
+\label{fig:msort_gen}
 \end{wrapfigure}
 equation~\eqref{eq:e_r} on page~\pageref{eq:e_r}. Let us consider in
 \fig~\ref{fig:msort_gen} the tree\index{tree!merge $\sim$|(} of all
@@ -1684,8 +1691,8 @@ the nodes from the root \(2^{e_r}+ \dots + 2^{e_0}\) down to \(2^{e_1}
 \subfloat[The sum of the nodes is \(\protect\OW{\protect\fun{bms}}{n+1}\)
 \label{fig:w2p_succ}]%
 {\includegraphics[bb=71 604 214 721]{w2p_succ}}
-\caption{Maximum-cost trees for \(n\)~even and \(n+1\)
-\label{fig:Wn_even}}
+\caption{Maximum-cost trees for \(n\)~even and \(n+1\)}
+\label{fig:Wn_even}
 \end{figure}
 are shown the maximum\hyp{}cost trees for \(n\)~even and \(n+1\). The
 boxed expressions are not found in the opposite tree, therefore, the
@@ -1740,8 +1747,8 @@ sum in each tree of the non\hyp{}boxed terms is identical.
 \subfloat[The sum of the nodes is \(\protect\OW{\protect\fun{bms}}{n+1}\)
 \label{fig:w2p1_succ}]{%
 \includegraphics[bb=56 602 194 721]{w2p1_succ}}
-\caption{Maximum-cost trees for \(n\)~odd and \(n+1\)
-\label{fig:Wn_odd}}
+\caption{Maximum-cost trees for \(n\)~odd and \(n+1\)}
+\label{fig:Wn_odd}
 \end{figure}
      where the non\hyp{}boxed expressions sum
      \(\OW{\fun{bms}}{n} - \sum_{k=0}^{q-1}\OW{\fun{bms}}{2^k} -
@@ -2033,7 +2040,8 @@ Now we have \(\Psi(p,i) < \Phi(p,i)\) and, instead of \(\Psi(p,i)
 \begin{figure}
 \centering
 \includegraphics[bb=71 565 400 725]{phi}
-\caption{\(\Phi(p,1)\), \(\Phi(p,2)\) and \(\Phi(p,3)\)\label{fig:phi}}
+\caption{\(\Phi(p,1)\), \(\Phi(p,2)\) and \(\Phi(p,3)\)}
+\label{fig:phi}
 \end{figure}
 are outlined \(\Phi(p,1)\), \(\Phi(p,2)\) and \(\Phi(p,3)\). (The
 starting point for each curve is marked by a white disk.)
@@ -2179,7 +2187,8 @@ upwards constructions.\index{tree!merge $\sim$|)}
                          & \cons{x}{\fun{mrg}(s,t)}.
 \end{array}}
 \end{equation*}
-\caption{Sorting by bottom-up mergers with \fun{bms/1}\label{fig:bms}}
+\caption{Sorting by bottom-up mergers with \fun{bms/1}}
+\label{fig:bms}
 \end{figure}
 
 
@@ -2345,8 +2354,8 @@ level of the merge tree\index{tree!merge $\sim$} \emph{without using
 \fun{mrg}(\cons{x}{s},t) & \rightarrow & \cons{x}{\fun{mrg}(s,t)}.
 \end{array}}
 \end{equation*}
-\caption{Faster bottom\hyp{}up merge sort with
-  \fun{bms\(_0\)/1}\label{fig:bms0}}
+\caption{Faster bottom\hyp{}up merge sort with \fun{bms\(_0\)/1}}
+\label{fig:bms0}
 \end{figure}
 where \fun{solo/1}\index{solo@\fun{solo/1}} has been replaced
 by~\fun{duo/1}\index{duo@\fun{duo/1}}. The number of comparisons is
@@ -3019,7 +3028,8 @@ Our code is shown in \fig~\ref{fig:oms}\index{merge sort!online
                          & \cons{x}{\fun{mrg}(s,t)}.
 \end{array}}
 \end{equation*}
-\caption{Online merge sort with \fun{oms/1}\label{fig:oms}}
+\caption{Online merge sort with \fun{oms/1}}
+\label{fig:oms}
 \end{figure}
 We use \(\fun{zero}()\)\index{zero@\fun{zero/0}} to represent a
 \(0\)-bit in the binary notation of the number of currently sorted

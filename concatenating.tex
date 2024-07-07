@@ -65,7 +65,7 @@ Perhaps we might wonder whether this case should be dropped. In other
 words, is it a meaningful case? Yes, because the English description
 of the behaviour of \fun{join/2} mandates the result be always a stack
 made of items of other stacks (the arguments), so, in the absence of
-any items to ``put'' in the result, the final stack ``remains'' empty.
+any items to `put' in the result, the final stack `remains' empty.
 
 It should be evident enough that the second and third rules are
 symmetric, because appending a non\hyp{}empty stack to the right of an
@@ -167,9 +167,9 @@ words, we must also check that the definition enables rewriting into a
 value any input we deem acceptable.
 
 How do we check that the last definition of \fun{join/2} is correct
-and complete? If the concept of ``expected result'' is not formally
+and complete? If the concept of `expected result' is not formally
 defined, typically by means of mathematics, we resort to \emph{code
-  review} and \emph{testing}. One important aspect of the reviewing
+review} and \emph{testing}. One important aspect of the reviewing
 process consists in verifying again the left\hyp{}hand sides of the
 definition and see if all possible inputs are accepted or not. In case
 some inputs are not matched by the patterns, we must justify that fact
@@ -639,7 +639,7 @@ underlined text in
 \fun{fact}(n) \xrightarrow{\smash[t]{\beta}} n \cdot \underline{\fun{fact}(n-1)}
 \end{equation*}
 has the non\hyp{}empty context
-``\erlcode{\(n\)~*~\textvisiblespace}''. To understand why this is
+`\erlcode{\(n\)~*~\textvisiblespace}'. To understand why this is
 important, let us consider a slightly longer series of
 rewrites:\label{trace:fact_5}
 \begin{equation*}
@@ -1028,7 +1028,7 @@ form often require an accumulator: in general, they do not.
 Take for example the polymorphic identity: \(\fun{id}(x) \rightarrow
 x\). It is trivially in tail form. In passing, being in tail form has
 nothing to do, in general, with recursion, despite the widespread and
-unfortunate locution ``tail\hyp{}recursive function''. A recursive
+unfortunate locution `tail\hyp{}recursive function'. A recursive
 definition may only feature tail calls (at least one recursive,
 directly or indirectly), but a definition with only tail calls may not
 be recursive, like \fun{id/1}.

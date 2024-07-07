@@ -19,8 +19,8 @@ for example
 \end{equation*}
 The rules~\(\alpha\), \(\beta\)~and~\(\gamma\) make up a simple
 \emph{string\hyp{}rewriting system}\index{rewrite system}. Rules
-\(\alpha\)~and~\(\beta\) can be conceived as ``A black bead absorbs
-a white bead next to it.'' The goal of this game is to end up with
+\(\alpha\)~and~\(\beta\) can be conceived as `A black bead absorbs
+a white bead next to it.' The goal of this game is to end up with
 as few beads as possible, so our example may lead to the
 \emph{rewrites}
 \begin{equation*}
@@ -94,7 +94,8 @@ so we must examine in \fig~\vref{fig:bullets}
 \begin{figure}[b]
 \centering
 \includegraphics{bullets}
-\caption{The critical pairs are all joinable\label{fig:bullets}}
+\caption{The critical pairs are all joinable}
+\label{fig:bullets}
 \end{figure}
 eight cases, which we can order as if counting in binary from
 \(0\)~to~\(7\), (\(\circ\))~being interpreted as~\(0\) and
@@ -171,8 +172,8 @@ Let us note \((\xrightarrow{\smash{n}})\) the composition of
      (\rightarrow) \circ (\xrightarrow{\smash{n}}),
 \quad \text{with \(n > 0\)}.
 \end{equation*}
-The symbol ``\(:=\)'' is the definitional equality, meaning: ``is, by
-definition,''. The \emph{transitive closure}\index{transitive
+The symbol `\(:=\)' is the definitional equality, meaning: `is, by
+definition,'. The \emph{transitive closure}\index{transitive
   closure} \label{transitive_closure} of \((\rightarrow)\) is defined
 as \((\twoheadrightarrow) := \bigcup_{i >
   0}{(\xrightarrow{\smash{i}})}\). In the present case, the
@@ -205,7 +206,8 @@ defined.
 % [0pt] of margin overhang
 \centering
 \includegraphics[bb=65 645 192 710]{tree_for_term}% [...720]
-\caption{Shape of a tree\label{fig:tree_for_term}}
+\caption{Shape of a tree}
+\label{fig:tree_for_term}
 \end{wrapfigure}
 The topological understanding of a function call or a tuple is the
 finite \emph{tree}\index{tree}. A tree is a hierarchical layout of
@@ -236,7 +238,7 @@ group of trees is a \emph{forest}\index{tree!forest}.
 % [0pt] of margin overhang
 \centering
 \includegraphics[bb=71 652 123 710]{tree}% normal is [.. .. .. 715]
-\caption{\label{fig:tree}}
+\caption{}\label{fig:tree}
 \end{wrapfigure}
 Trees can be used to depict terms as follows. A function call is a
 tree whose root is the function name and the children are the trees
@@ -294,7 +296,7 @@ than call-by-value, see the purely functional language \Haskell
 \citep{DoetsVanEijck_2004}.) Also it allows us to restrict the shape
 of the left\hyp{}hand sides, called \emph{patterns}\index{functional
   language!pattern}, to one, outermost function call. For instance, we
-can then disallow for being useless a rule like
+can then disallow a rule like
 \begin{equation*}
 \fun{plus}(x,\fun{plus}(y,z)) \rightarrow
 \fun{plus}(\fun{plus}(x,y),z).
@@ -453,8 +455,8 @@ acyclic graph}.\index{directed acyclic graph} \index{tree|see{directed
 \begin{figure}[H]
 \centering
 \includegraphics[bb=73 654 300 720]{cat_dag}
-\caption{Definition of \fun{cat/2} with directed acyclic graphs
-\label{fig:cat_dag}}
+\caption{Definition of \fun{cat/2} with directed acyclic graphs}
+\label{fig:cat_dag}
 \end{figure}
 
 \section{Analysis of algorithms}
@@ -989,7 +991,7 @@ with structural induction and functional programming, leads to trusted
 mathematics and computer science.
 
 Of course, the programs discussed in this book are extremely short and
-the topic at hand thus resorts to ``programming in the small'', but,
+the topic at hand thus resorts to `programming in the small', but,
 from the vantage point of software engineering, these functional
 programs can then be considered as \emph{formal specifications} of the
 \Java programs, and inductive proofs may be thought as instances of
@@ -1020,7 +1022,7 @@ method. The argument \texttt{item} of \texttt{push} is declared
 \final{} because we want it to be constant in the body of the method,
 following the functional paradigm. The empty stack~\(\el\) is mapped
 to an extension \texttt{EStack} of \texttt{Stack}, capturing the
-relationship ``An empty stack is a stack.'' The class \texttt{EStack}
+relationship `An empty stack is a stack.' The class \texttt{EStack}
 contains no data.
 \begin{alltt}
 // EStack.java
@@ -1049,7 +1051,7 @@ perhaps reusing others as constant components.
 
 \paragraph{Concatenation of stacks}
 
-As an illustration\index{stack!concatenation!$\sim$ in \Java|(}, let us
+As an example\index{stack!concatenation!$\sim$ in \Java|(}, let us
 recall definition~\eqref{def:cat} \vpageref{def:cat}
 \index{cat@\fun{cat/2}|(} for concatenating two stacks:
 \begin{equation*}

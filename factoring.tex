@@ -114,7 +114,8 @@ of this procedure is summed up in \fig~\vref{fig:naive},
 \centering
 \includegraphics[bb=75 621 352 715]{naive}
 \caption{Na\"{\i}vely matching pattern~\(p\) against text~\(t\)
-(failure in grey)\label{fig:naive}}
+  (failure in grey)}
+\label{fig:naive}
 \end{figure}
 where \(\ind{p}{i} \neq \ind{t}{j}\) (the letters
 \word{a}~and~\word{b} are not relevant in themselves).
@@ -131,8 +132,8 @@ where \(\ind{p}{i} \neq \ind{t}{j}\) (the letters
 \begin{figure}[t]
 \centering
 \includegraphics[bb=71 548 253 721]{loc0}
-\caption{Na\"{\i}ve factoring with \fun{loc\(_0\)/2}
-\label{fig:loc0}}
+\caption{Na\"{\i}ve factoring with \fun{loc\(_0\)/2}}
+\label{fig:loc0}
 \end{figure}
 shows an abstract program implementing this scheme. The call
 \(\fun{loc}_0(p,t)\)\index{loc0@\fun{loc\(_0\)/2}} evaluates in
@@ -178,8 +179,8 @@ in \fig~\ref{fig:loc1}.
 \fun{pre}_1(p,t,p',\cons{a}{t'},j) & \rightarrow & \fun{loc}_1(p',t',j+1).
 \end{array}}
 \end{equation*}
-\caption{Refinement of \fig~\vref{fig:loc0}
-\label{fig:loc1}}
+\caption{Refinement of \fig~\vref{fig:loc0}}
+\label{fig:loc1}
 \end{figure}
 
 Further examination reveals that we can merge
@@ -208,8 +209,8 @@ the original, so each step must be cautiously checked.
                          & \fun{pre}(p',t',p',t',j+1).
 \end{array}}
 \end{equation*}
-\caption{Refinement of \fig~\vref{fig:loc1}
-\label{fig:loc}}
+\caption{Refinement of \fig~\vref{fig:loc1}}
+\label{fig:loc}
 \end{figure}
 
 \paragraph{Termination}
@@ -432,8 +433,8 @@ is depicted in \fig~\vref{fig:mp}.
 \begin{figure}[b]
 \centering
 \includegraphics[bb=74 621 367 717]{mp}
-\caption{Morris-Pratt algorithm (failure in grey)
-\label{fig:mp}}
+\caption{Morris-Pratt algorithm (failure in grey)}
+\label{fig:mp}
 \end{figure}
 Notice that, contrary to na\"{\i}ve factoring, letters in the text are
 compared in a strictly increasing order (never having to
@@ -442,8 +443,8 @@ in the end,
 \begin{figure}[t]
 \centering
 \includegraphics{mp_ex}
-\caption{Morris\hyp{}Pratt algorithm at work (no match found)
-\label{fig:mp_ex}}
+\caption{Morris\hyp{}Pratt algorithm at work (no match found)}
+\label{fig:mp_ex}
 \end{figure}
 \(p\)~is not found to be a factor of~\(t\). As usual, letters on a
 grey background correspond to mismatches. It is clear that
@@ -466,8 +467,8 @@ prefix of~\(y\) or else \(\Border{q}{y} = \varepsilon\). For example,
 \caption{\(\Border{}{y \cdot \word{a}}
    = \Border{}{\Border{}{y} \cdot \word{a}}
    = \Border{}{\Border{2}{y} \cdot \word{a}}
-   = \Border{3}{y} \cdot \word{a}\).
-\label{fig:max_B}}
+   = \Border{3}{y} \cdot \word{a}\).}
+\label{fig:max_B}
 \end{figure}
 
 \par\vskip\baselineskip
@@ -533,8 +534,8 @@ borders for the prefixes of the word \word{abacabac}.
 \begin{figure}
 \centering
 \includegraphics{mp_fail}
-\caption{Failure function of \word{abacabac}
-\label{fig:mp_fail}}
+\caption{Failure function of \word{abacabac}}
+\label{fig:mp_fail}
 \end{figure}
 In \fig~\vref{fig:mp}, the length of the maximum border is~\(k\), so
 \(k=\MPfailure{p}{}{i}\) and \(\smash{\Ind{p}{\MPfailure{p}{}{i}}}\)
@@ -708,8 +709,8 @@ The function call
 \fun{fp}(x,a,k) \rightarrow \fun{fp}(x,a,\fun{fail}_0(x,k)).
 \end{gather*}
 }}
-\caption{The failure function \(\MPfailureName\) as \fun{fail\(_0\)/2}
-\label{fig:fail0}}
+\caption{The failure function \(\MPfailureName\) as \fun{fail\(_0\)/2}}
+\label{fig:fail0}
 \end{figure}
 The function \fun{fp/3}\index{fp@\fun{fp/3}} (\emph{fixed point})
 computes \(\MPfailure{x}{q}{i-1}\), starting with
@@ -757,7 +758,8 @@ memorisation). In this instance, the evaluation of
 \fun{suf}(\cons{a}{p},i) \rightarrow \fun{suf}(p,i-1).
 \end{gather*}
 }}
-\caption{The failure function with memoisation\label{fig:fail}}
+\caption{The failure function with memoisation}
+\label{fig:fail}
 \end{figure}
 Here, we work with the memo~\(p\), which is a reversed prefix, instead
 of~\(x\), so we need to know its length~\(i\) in order to know how
@@ -786,8 +788,8 @@ length~\(m\). Its definition is shown in \fig~\vref{fig:pp},
   & \fun{pp}(x,\cons{\pair{a}{\fun{fail}(p,i)}}{p},i+1).
 \end{array}}
 \end{equation*}
-\caption{Preprocessing of a pattern~\(y\) by \fun{pp/1}
-\label{fig:pp}}
+\caption{Preprocessing of a pattern~\(y\) by \fun{pp/1}}
+\label{fig:pp}
 \end{figure}
 where \fun{rev/1}\index{rev@\fun{rev/1}} is the reversal function
 (definition~\eqref{def:rev} \vpageref{def:rev}), and
@@ -988,7 +990,8 @@ letter of the pattern (fourth rule of \fun{mp/5}).\index{word
                          & \fun{mp}(\fun{suf}(p',k),t,p',k,j).
 \end{array}
 \end{gather*}}}
-\caption{Morris-Pratt algorithm (search phase)\label{fig:mp_def}}
+\caption{Morris-Pratt algorithm (search phase)}
+\label{fig:mp_def}
 \end{figure}
 
 
@@ -1080,8 +1083,8 @@ of the pattern has been found).
 % [0pt] of margin overhang
 \centering
 \includegraphics[bb=71 360 238 723]{metaprog}
-\caption{Factoring \word{abacabac} %in~\(t\) with a metaprogram
-\label{fig:metaprog}}
+\caption{Factoring \word{abacabac}} %in~\(t\) with a metaprogram
+\label{fig:metaprog}
 \end{wrapfigure}
 There is a graphical way to represent the contents of the table in
 \fig~\vref{fig:mp_fail} called \emph{deterministic finite automaton}
@@ -1091,8 +1094,8 @@ There is a graphical way to represent the contents of the table in
 \begin{figure}[b]
 \centering
 \includegraphics[bb=80 651 390 710]{abacabac}
-\caption{Morris-Pratt automaton for the pattern \word{abacabac}
-\label{fig:abacabac}}
+\caption{Morris-Pratt automaton for the pattern \word{abacabac}}
+\label{fig:abacabac}
 \end{figure}
 We will here only describe informally automata; for a full treatment,
 see \cite{VanLeeuwen_1990c, HopcroftMotwaniUllman_2003,
@@ -1159,8 +1162,8 @@ improvement proposed by Knuth consists in replacing
 \begin{figure}[b]
 \centering
 \includegraphics[bb=82 646 388 720]{kmp_abac}
-\caption{Knuth-Morris-Pratt automaton for the pattern \word{abacabac}
-\label{fig:kmp_abac}}
+\caption{Knuth-Morris-Pratt automaton for the pattern \word{abacabac}}
+\label{fig:kmp_abac}
 \end{figure}
 all these successive failure transitions by only one. For example, the
 automaton in \fig~\ref{fig:kmp_abac} is Knuth's optimisation of the

@@ -2,7 +2,6 @@
 
 \documentclass[11pt]{article}
 
-\usepackage{pst-infixplot}
 \usepackage{pst-plot,pst-eps}
 
 \begin{document}
@@ -14,8 +13,7 @@
 \psgrid[griddots=0,gridwidth=0.1pt,subgriddiv=2,gridlabels=0]
 \psline[linewidth=0.5pt](0,0)(4.25,4.25)
 \psline[linewidth=1.5pt,linestyle=dotted](-0.15,1.35)(2.25,3.75)
-%\psline[linewidth=1.5pt,linestyle=dotted](2.25,3.25)(3.15,4.15)
-%\psline[linewidth=1.5pt,linestyle=dotted](-0.15,0.85)(1.65,2.65)
+
 \uput[0]{0}(-0.4,-0.25){\small \(0\)}
 \uput[0]{0}(3.7,-0.3){\small \(n\)}
 \uput[0]{0}(-0.5,4.2){\small \(n\)}
@@ -29,13 +27,7 @@
 \psdot*[dotsize=4pt](4,4)
 
 % Boundaries
-%\psline[doubleline=true,linestyle=solid](-0.25,2.75)(1.25,4.25)
-%\psline[doubleline=true,linestyle=solid](0.25,-0.25)(4.75,4.25)
-%\psdot[dotsize=4pt,dotstyle=square](0,3)
-%\psdot[dotsize=4pt,dotstyle=square](0.5,0)
 \uput[0]{0}(-0.5,1.7){\small \(h\)}
-%\uput[0]{0}(-0.5,1.2){\small \(l\)}
-%\uput[0]{0}(3.2,4.2){\small \(h-1\)}
 \uput[0]{0}(0.25,-0.25){\small \(1\)}
 \uput[0]{0}(0.08,0.75){\small \(a\)}
 \uput[0]{0}(1.4,2.25){\small \(b\)}
@@ -47,4 +39,3 @@
 \endTeXtoEPS
 
 \end{document}
- 

@@ -1,4 +1,5 @@
 -module(a).
+-compile(nowarn_export_all).
 -compile(export_all).
 
 fail0(_,0) -> -1;
@@ -11,7 +12,7 @@ fp0(_,_,-1) -> -1;
 fp0(X,A, K) -> case nth(X,K) of
                 A -> K;
                 _ -> fp0(X,A,fail0(X,K))
-              end.    
+              end.
 
 fail(        _,0) -> -1;
 fail([{A,K}|X],I) -> fp(X,A,K,I-1).
@@ -198,7 +199,7 @@ lst3(K,N,     [pop|H]) -> lst3(K+1,N+1,H).
 % --> {3,{push,4,{pop,{push,3,{push,2,{push,1,[]}}}}}}
 
 push4(X,{N,H}) -> {N+1,{push,X,H}}.
-pop4({N,H}) -> {N-1,{pop,H}}.    
+pop4({N,H}) -> {N-1,{pop,H}}.
 
 ver4(K,{N,H}) -> ver4(K,N,H).
 ver4(0,N,H) -> lst4(0,N,H);
@@ -226,7 +227,3 @@ rep({push,X},{pop,H},M) -> {2,{push,X,H}};
 rep(pop,{push,Y,H},M) -> {-2,{pop,H}}.
 
 chg(K,U,{N,H}) -> {D,H_}=chg(K,U,N,H,N), {N+D,H_}.
-                  
-    
-    
-    

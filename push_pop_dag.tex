@@ -18,15 +18,16 @@
   }
 }
 \raisebox{-3pt}{\(\xrightarrow{\smash{\beta}}\)}\hspace*{-4pt}
-\pstree[levelsep=17pt,treesep=14pt,nodesepA=-1pt,nodesepB=2pt,arrows=->]{\TR{\(\circ\)}}{
-  \pstree[nodesepA=2pt,arrows=-]{\TR{\rnode[br]{push_to_xsh}{\texttt{|}}}}{
+%\pstree[levelsep=17pt,treesep=14pt,nodesepA=-1pt,nodesepB=2pt,arrows=->]{\TR{\(\circ\)}}{
+\pstree[levelsep=17pt,treesep=14pt,nodesepA=2pt,nodesepB=2pt,arrows=-]
+   {\TR{\rnode[br]{push_to_xsh}{\texttt{|}}}}{
     \pstree{\TR{\rnode[bl]{push_to_x}{\rnode[br]{push_to_s}{\texttt{|}}}}}{
       \Tn
       \Tn
     }
     \Tn
   }
-}
+%}
 %
 \qquad\qquad
 %
@@ -40,8 +41,8 @@
   }
 }
 \hspace*{4pt}\raisebox{-3pt}{\(\xrightarrow{\smash{\gamma}}\)}
-\pstree[levelsep=17pt,treesep=14pt,nodesepA=-1pt,nodesepB=2pt,arrows=->]{\TR{\(\circ\)}}{
-  \pstree[nodesepA=2pt,arrows=-]%
+%\pstree[levelsep=17pt,treesep=14pt,nodesepA=-1pt,nodesepB=2pt,arrows=->]{\TR{\(\circ\)}}{
+\pstree[levelsep=17pt,treesep=14pt,nodesepA=2pt,nodesepB=2pt,arrows=-]
     {\TR{\rnode[b]{pop_to_x}%
         {\(\pair{\textvisiblespace\,}{\textvisiblespace}\)}}}{
     \Tn
@@ -50,14 +51,14 @@
       \Tn
     }
   }
-}
+%}
 
 \nccurve[angleA=-130,angleB=-90,ncurvA=1.8,ncurvB=1,nodesep=2pt]{->}{push_to_x}{push_x}
 \nccurve[angleA=-45,angleB=-60,ncurvA=2,ncurvB=1,nodesep=2pt]{->}{push_to_s}{push_s}
-\nccurve[angleA=-45,angleB=-10,ncurvA=2,ncurvB=1,nodesep=2pt]{->}{push_to_xsh}{push_sh}
+\nccurve[angleA=-45,angleB=-25,ncurvA=2,ncurvB=1,nodesep=2pt]{->}{push_to_xsh}{push_sh}
 %
-\nccurve[angleA=-125,angleB=-90,ncurvA=1.8,ncurvB=0.8,nodesep=2pt]{->}{pop_to_x}{pop_x}
-\nccurve[angleA=-125,angleB=-90,ncurvA=1.8,ncurvB=1,nodesepA=3pt,nodesepB=2pt]{->}{pop_to_s}{pop_s}
+\nccurve[angleA=-125,angleB=-45,ncurvA=1.8,ncurvB=0.8,nodesep=2pt]{->}{pop_to_x}{pop_x}
+\nccurve[angleA=-125,angleB=-45,ncurvA=1.8,ncurvB=1,nodesepA=3pt,nodesepB=2pt]{->}{pop_to_s}{pop_s}
 \nccurve[angleA=-45,angleB=-20,ncurvA=2,ncurvB=1,nodesep=2pt]{->}{pop_to_xsh}{pop_xsh}
 \endTeXtoEPS
 

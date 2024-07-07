@@ -149,8 +149,8 @@ Then we could try the following cases:
 \end{equation*}
 The code seems to work: item~\(x\) is in stack~\(s\) if the result
 is~\(x\), otherwise it is~\(\el\). However, this function is not
-correct.\index{soundness} The hidden and flawed assumption is ``items
-can not be stacks'', in spite of the counter\hyp{}examples given at
+correct.\index{soundness} The hidden and flawed assumption is `items
+can not be stacks', in spite of the counter\hyp{}examples given at
 the beginning for illustrating the expected behaviour of
 \fun{sfst/2}. In particular, an item can be the empty stack and this
 situation leads to an ambiguity with our definition of \fun{mem/2}:
@@ -160,8 +160,8 @@ situation leads to an ambiguity with our definition of \fun{mem/2}:
 It is impossible to discriminate the two cases, the first one meaning
 absence of the item and the second presence, because they both end
 with the empty stack. In fact, we should have distinguished two data
-constructors to denote the outcomes ``the item was found'' and ``the
-item was not found''. For example,
+constructors to denote the outcomes `the item was found' and `the
+item was not found'. For example,
 \begin{equation*}
 \begin{array}{r@{\;}l@{\;}l}
 \fun{mem}(\el,x)         & \smashedrightarrow{\zeta}  & \fun{false}();\\
@@ -421,8 +421,8 @@ Notice that rule~\(\kappa\) implies the creation of a
 \begin{figure}
 \centering
 \includegraphics[bb=71 664 345 721]{sfst_dag}
-\caption{Directed acyclic graphs for \fun{sfst/2}
-\label{fig:sfst_dag}}
+\caption{Directed acyclic graphs for \fun{sfst/2}}
+\label{fig:sfst_dag}
 \end{figure}
 Hence, whilst the contents of the new stack is shared with the
 original stack, \(j\)~nodes are newly allocated if~\(x\) occurs at
@@ -462,8 +462,8 @@ from~\(\iota\). The new \fun{sfst/2} is called
                                & \fun{sfst}(s,x,\cons{y}{t},u).
 \end{array}}
 \end{equation*}
-\caption{Skipping the first occurrence with maximum sharing
-\label{fig:sfst0}}
+\caption{Skipping the first occurrence with maximum sharing}
+\label{fig:sfst0}
 \end{figure}
 Of course, whilst in~\(\iota\) we just referenced~\(s\), the
 construction corresponding to the now missing context of~\(\kappa\)
@@ -530,8 +530,8 @@ maintain the order of these items in \fig~\vref{fig:sfst1}\index{sfst1@\fun{sfst
                                 & \fun{sfst}_2(s,x,\fun{cat}(t,[y]),u).
 \end{array}}
 \end{equation*}
-\caption{Skipping the first occurrence (bad design)
-\label{fig:sfst1}}
+\caption{Skipping the first occurrence (bad design)}
+\label{fig:sfst1}
 \end{figure}
 but using stack concatenation instead of pushing. The problem is that
 the last rule of \fun{sfst\(_2\)/4}\index{sfst@\fun{sfst\(_2\)/4}}
@@ -614,8 +614,8 @@ Consider \fig~\ref{fig:slst},
                                            \fun{slst}(s,x,t).
 \end{array}}
 \end{equation*}
-\caption{Skipping the last occurrence with \fun{slst/2}
-\label{fig:slst}\index{stack!skipping an item!last occurrence}}
+\caption{Skipping the last occurrence with \fun{slst/2}}
+\label{fig:slst}\index{stack!skipping an item!last occurrence}
 \end{figure}
 where, with a linear search\index{linear search} (rules
 \(\rho\)~and~\(\tau\)), we find the first occurrence of~\(x\)
@@ -656,8 +656,8 @@ previous~\(x\) was the last. Consider \fig~\vref{fig:slst_27071}.
 & \cons{2,7,0}{[1]} = [2,7,0,1].
 \end{array}}
 \end{equation*}
-\caption{\(\fun{slst}([2,7,0,7,1],7) \twoheadrightarrow
-  [2,7,0,1]\)\label{fig:slst_27071}\index{stack!skipping an item!example}}
+\caption{\(\fun{slst}([2,7,0,7,1],7) \twoheadrightarrow [2,7,0,1]\)}
+\label{fig:slst_27071}\index{stack!skipping an item!example}
 \end{figure}
 If the item is missing, the linear search fails as usual with a cost
 of \(\len{\tau^n\rho} = n + 1\). Otherwise, let us name \( 0 \leqslant
