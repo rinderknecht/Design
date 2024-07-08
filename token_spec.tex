@@ -4,7 +4,8 @@
 \begin{figure}[b]
 \centering
 \includegraphics[bb=71 640 368 721]{lexer_parser}
-\caption{Lexer and parser\label{fig:lexer_parser}}
+\caption{Lexer and parser}
+\label{fig:lexer_parser}
 \end{figure}
 shows that the lexical analyser is the first phase of a compiler. Its
 main task is to read the input characters and produce a sequence of
@@ -51,7 +52,7 @@ the only one of its own token, as displayed in
 \begin{tabular}{@{}>{\bfseries\sffamily}l|>{\tt}c|l@{}}
 \toprule
   \multicolumn{1}{c}{\textsc{Token}}
-& \multicolumn{1}{c}{\textsc{Sample lexemes}} 
+& \multicolumn{1}{c}{\textsc{Sample lexemes}}
 & \multicolumn{1}{c}{\textsc{Informal pattern}}\\
 \midrule
 id       & pi count D2 \dots & letter followed by letters and digits\\
@@ -62,7 +63,8 @@ num      & 3.14 4 .2E2 \ldots  & numeric constant\\
 literal  & "message" ""  \ldots & characters between \texttt{"} and \texttt{"} except \texttt{"}\\
 \bottomrule
 \end{tabular}
-\caption{Examples of tokens and lexemes\label{fig:tokens_lexemes}}
+\caption{Examples of tokens and lexemes}
+\label{fig:tokens_lexemes}
 \end{figure}
 
 Regular expressions are an important notation for specifying
@@ -117,7 +119,8 @@ of~\(s\).\\
   of \texttt{banana}.\\
 \bottomrule
 \end{tabulary}
-\caption{Formal language glossary\label{fig:table}}
+\caption{Formal language glossary}
+\label{fig:table}
 \end{figure}
 
 The term \emph{language} denotes any set of strings over some fixed
@@ -167,7 +170,8 @@ the language under consideration.
 v\\
 \bottomrule
 \end{tabular}
-\caption{Formal definitions of \fig~\vref{fig:table}\label{fig:table_formal}}
+\caption{Formal definitions of \fig~\vref{fig:table}}
+\label{fig:table_formal}
 \end{figure}
 
 \paragraph{Operations on languages}
@@ -195,7 +199,8 @@ languages.
 & L^{+} = \bigcup_{i=1}^{\infty}{L^{i}}\\
 \bottomrule
 \end{tabular}
-\caption{Operations on formal languages\label{fig:operations}}
+\caption{Operations on formal languages}
+\label{fig:operations}
 \end{figure}
 \(L^{*}\) means `zero or more concatenations of~\(L\)', and
 \(L^{+}\)~means `at least one concatenation of~\(L\).' Clearly,
@@ -215,7 +220,7 @@ languages.
 These two ways of considering \(L\)~and~\(D\) and the operations on
 languages allow us to create new languages from other languages
 defined by their alphabet. Here are some examples of new languages
-created from~\(L\) and~\(D\): 
+created from~\(L\) and~\(D\):
 \begin{itemize*}
 
   \item \(L \cup D\) is the language of letters and digits;

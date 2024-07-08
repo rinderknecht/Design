@@ -1,5 +1,5 @@
 \section{Deterministic finite automata}
- 
+
 Transition diagrams are useful graphical representations of instances
 of the mathematical concept of \emph{deterministic finite automaton}
 (\emph{DFA}). Formally, a DFA \(\mathcal{D}\) is a 5-tuple
@@ -37,7 +37,8 @@ by~\(\mathcal{D}\). For example, consider the DFA in
 \centering
 \includegraphics[bb=48 644 218 730,scale=0.93]{trie_then}
 \caption{A trie recognising \textsf{they}, \textsf{then},
-  \textsf{this} and \textsf{thus} \label{fig:trie_then}}
+  \textsf{this} and \textsf{thus}}
+\label{fig:trie_then}
 \end{figure}
 The word \textsf{then} is recognised because there is a sequence of
 states \((q_0, q_1, q_2, q_4, q_5)\) connected by edges which
@@ -82,7 +83,7 @@ in our last example:
 &= \delta (\hat{\delta}(q_0, \textsf{th}), \textsf{e})
 = \delta (q_2, \textsf{e})
 = q_4,\\
-   \hat{\delta}(q_0, \textsf{then}) 
+   \hat{\delta}(q_0, \textsf{then})
 &= \delta (\hat{\delta}(q_0, \textsf{the}), \textsf{n})
 = \delta (q_4, \textsf{n})
 = q_5 \in F.
@@ -90,7 +91,7 @@ in our last example:
 \end{equation*}
 
 \subsection*{Transition diagrams}
- 
+
 We can also redefine transition diagrams in terms of the concept of
 DFA. A transition diagram for a DFA \(\mathcal{D} = (Q, \Sigma,
 \delta, q_0, F)\) is a graph defined as follows:
@@ -117,7 +118,7 @@ Here is a transition diagram for the language over alphabet \(\{0,
 string~\(01\):
 \begin{center}
 \includegraphics[bb=48 710 185 760]{dfa_01}
-\end{center} 
+\end{center}
 
 \subsection*{Transition table}
 
@@ -225,30 +226,30 @@ computing step by step \(\hat{\delta}(q_0,\verb+110101+)\), from the
 shortest prefix to the longest, which is the word \verb+110101+
 itself:
 \begin{align*}
-  \hat{\delta} (q_0, \varepsilon) 
+  \hat{\delta} (q_0, \varepsilon)
 &= q_0,\\
-   \hat{\delta} (q_0, \texttt{1}) 
+   \hat{\delta} (q_0, \texttt{1})
 &= \delta (\hat{\delta} (q_0, \varepsilon), \texttt{1})
 = \delta (q_0, \texttt{1})
 = q_1,\\
-   \hat{\delta} (q_0, \texttt{11}) 
-&= \delta (\hat{\delta} (q_0, \texttt{1}), \texttt{1}) 
-= \delta (q_1, \texttt{1}) 
+   \hat{\delta} (q_0, \texttt{11})
+&= \delta (\hat{\delta} (q_0, \texttt{1}), \texttt{1})
+= \delta (q_1, \texttt{1})
 = q_0,\\
-   \hat{\delta} (q_0, \texttt{110}) 
-&= \delta (\hat{\delta} (q_0, \texttt{11}), \texttt{0}) 
-= \delta (q_0, \texttt{0}) 
+   \hat{\delta} (q_0, \texttt{110})
+&= \delta (\hat{\delta} (q_0, \texttt{11}), \texttt{0})
+= \delta (q_0, \texttt{0})
 = q_2,\\
-   \hat{\delta} (q_0, \texttt{1101}) 
-&= \delta (\hat{\delta} (q_0, \texttt{110}), \texttt{1}) 
-= \delta (q_2, \texttt{1}) 
+   \hat{\delta} (q_0, \texttt{1101})
+&= \delta (\hat{\delta} (q_0, \texttt{110}), \texttt{1})
+= \delta (q_2, \texttt{1})
 = q_3,\\
-   \hat{\delta} (q_0, \texttt{11010}) 
-&= \delta (\hat{\delta} (q_0, \texttt{1101}), \texttt{0}) 
-= \delta (q_3, \texttt{0}) 
+   \hat{\delta} (q_0, \texttt{11010})
+&= \delta (\hat{\delta} (q_0, \texttt{1101}), \texttt{0})
+= \delta (q_3, \texttt{0})
 = q_1,\\
-   \hat{\delta} (q_0, \texttt{110101}) 
-&= \delta (\hat{\delta} (q_0, \texttt{11010}), \texttt{1}) 
-= \delta (q_1, \texttt{1}) 
+   \hat{\delta} (q_0, \texttt{110101})
+&= \delta (\hat{\delta} (q_0, \texttt{11010}), \texttt{1})
+= \delta (q_1, \texttt{1})
 = q_0 \in F.
 \end{align*}

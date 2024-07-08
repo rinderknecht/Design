@@ -44,7 +44,7 @@ lines:
 \}
 
 // EmptyStack.java
-\public \class EmptyStack \extends Exception \{\} 
+\public \class EmptyStack \extends Exception \{\}
 \end{alltt}
 This encoding has several defaults. Firstly, it is incorrect if the
 top of a stack (\texttt{head}) is a \texttt{null} reference. This can
@@ -119,7 +119,7 @@ consists in using an accumulator as follows:
 \fun{rev}(s) \xrightarrow{\smash{\epsilon}}
              \fun{rcat}(s,\el).\quad\;\;
 \fun{rcat}(\el,t) \xrightarrow{\smash{\zeta}} t;\quad\;\;
-\fun{rcat}(\cons{x}{s},t) \xrightarrow{\smash{\eta}} 
+\fun{rcat}(\cons{x}{s},t) \xrightarrow{\smash{\eta}}
                           \fun{rcat}(s,\cons{x}{t}).
 \end{equation*}
 Function \fun{rev/1} is defined with one rule which does not
@@ -233,7 +233,7 @@ class definitions as follows:
 \hfill\extends Comparable<? \super Item>> \{
   ...
 \}
-\public \class EStack<Item \extends Comparable<? \super Item>> 
+\public \class EStack<Item \extends Comparable<? \super Item>>
        \extends Stack<Item> \{
   ...
 \}
@@ -259,14 +259,14 @@ Insertion sort was defined in section~\vref{sec:straight_ins} as
   \fun{ins}(\cons{y}{s},x)
 & \xrightarrow{\smash{\kappa}}
 & \cons{y}{\fun{ins}(s,x)}, \,\text{if \(x \succ y\)};
-& \fun{isrt}(\el) 
+& \fun{isrt}(\el)
 & \xrightarrow{\smash{\mu}}
 & \el;\\
   \fun{ins}(s,x)
 & \xrightarrow{\smash{\lambda}}
 & \cons{x}{s}.
 & \fun{isrt}(\cons{x}{s})
-& \xrightarrow{\smash{\nu}} 
+& \xrightarrow{\smash{\nu}}
 & \fun{ins}(\fun{isrt}(s),x).
 \end{array}
 \end{equation*}
@@ -281,7 +281,7 @@ introducing a conditional. Easy things first:
   \public \abstractX Stack<Item> isrt();
 \}
 // EStack.java
-\public \class EStack<Item \extends Comparable<? \super Item>> 
+\public \class EStack<Item \extends Comparable<? \super Item>>
        \extends Stack<Item> \{
   ...
   \public EStack<Item> isrt() \{ \return \this; \}
@@ -322,7 +322,7 @@ partake to the conditional. We can now translate to \Java:
   \protectedX \abstractX NStack<Item> ins(\final Item x);
 \}
 // EStack.java
-\public \class EStack<Item \extends Comparable<? \super Item>> 
+\public \class EStack<Item \extends Comparable<? \super Item>>
        \extends Stack<Item> \{
   ...
   \protectedX NStack<Item> ins(\final Item x) \{\return push(x);\}
@@ -332,7 +332,7 @@ partake to the conditional. We can now translate to \Java:
        \extends Stack<Item> \{
   ...
   \protectedX NStack<Item> ins(\final Item x) \{
-    \return head.compareTo(x) < 0 ? 
+    \return head.compareTo(x) < 0 ?
            tail.ins(x).push(head) : push(x); \}
 \}
 \end{alltt}
@@ -380,7 +380,7 @@ by specifying the length of the prefix:
 \begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
 \fun{cut}(s,0) & \rightarrow & \pair{\el}{s};
 & \fun{push}(x,\pair{t}{u}) & \rightarrow & \pair{\cons{x}{t}}{u}.\\
-\fun{cut}(\cons{x}{s},k) & \rightarrow 
+\fun{cut}(\cons{x}{s},k) & \rightarrow
 & \fun{push}(x,\fun{cut}(s,k-1)).
 \end{array}
 \end{equation*}
@@ -420,7 +420,7 @@ perform the single dispatch or, in terms of the type system, it
 supports \emph{subtype polymorphism} \citep{Pierce_2002}.
 \begin{alltt}
 // EStack.java
-\public \class EStack<Item \extends Comparable<? \super Item>> 
+\public \class EStack<Item \extends Comparable<? \super Item>>
        \extends Stack<Item> \{
   ...
   \public Pair<Stack<Item>,Stack<Item>> cut(\final int k) \{
@@ -545,7 +545,7 @@ single dispatch:\index{merge sort!merging!$\sim$ in \Java|(}
                                    \final Stack<Item> s);
 \}
 // EStack.java
-\public \class EStack<Item \extends Comparable<? \super Item>> 
+\public \class EStack<Item \extends Comparable<? \super Item>>
        \extends Stack<Item> \{
   ...
   \public Stack<Item> mrg(\final Stack<Item> t) \{ \return t; \}
@@ -688,7 +688,7 @@ can now translate the refined program:\index{merge sort!top-down
   \protectedX \abstractX Stack<Item> tms0(\final Item x);
 \}
 // EStack.java
-\public \class EStack<Item \extends Comparable<? \super Item>> 
+\public \class EStack<Item \extends Comparable<? \super Item>>
        \extends Stack<Item> \{
   ...
   \public Stack<Item> tms() \{ \return \this; \}
@@ -723,7 +723,7 @@ the parameter we are going to distinguish when translating
 \begin{array}{@{}r@{\;}l@{\;}l@{}}
 \fun{cutr}(s,\cons{y}{t},\cons{a,b}{u})
                        & \rightarrow & \fun{cutr}(\cons{y}{s},t,u);\\
-\fun{cutr}(s,t,u)      & \rightarrow 
+\fun{cutr}(s,t,u)      & \rightarrow
                        & \fun{mrg}(\fun{tms}(s),\fun{tms}(t)).
 \end{array}
 \end{equation*}
@@ -742,7 +742,7 @@ the second contains at least one. The result is shown in
 \begin{array}{@{}r@{\;}l@{\;}l@{}}
 \fun{cutr}(s,t,\el)     & \rightarrow
                         & \fun{mrg}(\fun{tms}(s),\fun{tms}(t));\\
-\fun{cutr}(s,t,\cons{a}{u}) 
+\fun{cutr}(s,t,\cons{a}{u})
                         & \rightarrow & \fun{cutr}_0(s,t,u).\\
 \\
 \fun{cutr}_0(s,t,\el)   & \rightarrow
@@ -751,12 +751,13 @@ the second contains at least one. The result is shown in
                         & \rightarrow & \fun{cutr}_1(s,t,u).\\
 \\
 \fun{cutr}_1(s,\el,u)   & \rightarrow & \fun{tms}(s);\\
-\fun{cutr}_1(s,\cons{y}{t},u) 
-                        & \rightarrow 
+\fun{cutr}_1(s,\cons{y}{t},u)
+                        & \rightarrow
                         & \fun{cutr}(\cons{y}{s},t,u).
 \end{array}}
 \end{equation*}
-\caption{Cutting and merging top-down\label{fig:cutr}}
+\caption{Cutting and merging top-down}
+\label{fig:cutr}
 \end{figure}
 Note how \(\fun{cutr}_1(s,\el,u) \rightarrow
 \fun{mrg}(\fun{tms}(s),\fun{tms}(\el))\) was simplified using the
@@ -777,7 +778,7 @@ s\). The translation is now direct:\index{merge sort!top-down
 \}
 
 // EStack.java
-\public \class EStack<Item \extends Comparable<? \super Item>> 
+\public \class EStack<Item \extends Comparable<? \super Item>>
        \extends Stack<Item> \{
   ...
   \public Stack<Item> cutr(\final Stack<Item> s,
@@ -790,7 +791,7 @@ s\). The translation is now direct:\index{merge sort!top-down
 
   \protectedX Stack<Item> cutr1(\final Stack<Item> s,
                               \final Stack<Item> u) \{
-    \return s.tms(); 
+    \return s.tms();
   \}
 \}
 

@@ -98,7 +98,8 @@ Let us reconsider the NFA given by its transition table in
                 & q_1 & \varnothing  & \{q_2\}\\
     \#          & q_2 & \varnothing  & \varnothing
 \end{array}\)
-\caption{Initial NFA table\label{fig:initial_nfa_table}}
+\caption{Initial NFA table}
+\label{fig:initial_nfa_table}
 \end{figure}
 and let us create an equivalent DFA. Firstly, we form all the subsets
 of the sets of the NFA and put them in the first column in
@@ -153,13 +154,13 @@ Thirdly, we form the subsets as follows:
 \rightarrow & \{q_0\} & \delta_N(q_0, 0) & \delta_N(q_0, 1)\\
             & \{q_1\} & \delta_N(q_1, 0) & \delta_N(q_1, 1)\\
          \# & \{q_2\} & \delta_N(q_2, 0) & \delta_N(q_2, 1)\\
-            & \{q_0, q_1\} & \delta_N(q_0,0) \cup \delta_N(q_1,0) 
+            & \{q_0, q_1\} & \delta_N(q_0,0) \cup \delta_N(q_1,0)
                            & \delta_N(q_0,1) \cup \delta_N(q_1,1)\\
-         \# & \{q_0, q_2\} & \delta_N(q_0,0) \cup \delta_N(q_2,0) 
+         \# & \{q_0, q_2\} & \delta_N(q_0,0) \cup \delta_N(q_2,0)
                            & \delta_N(q_0,1) \cup \delta_N(q_2,1)\\
-         \# & \{q_1, q_2\} & \delta_N(q_1,0) \cup \delta_N(q_2,0) 
+         \# & \{q_1, q_2\} & \delta_N(q_1,0) \cup \delta_N(q_2,0)
                            & \delta_N(q_1,1) \cup \delta_N(q_2,1)\\
-         \# & \{q_0, q_1, q_2\} 
+         \# & \{q_0, q_1, q_2\}
             & \delta_N(q_0,0) \cup \delta_N(q_1,0) \cup \delta_N(q_2,0)
             & \delta_N(q_0,1) \cup \delta_N(q_1,1) \cup \delta_N(q_2,1)
 \end{array}
@@ -180,15 +181,16 @@ Finally, we compute those subsets and obtain the table in
          \# & \{q_1, q_2\} & \varnothing & \{q_2\}\\
          \# & \{q_0, q_1, q_2\} & \{q_0, q_1\} & \{q_0,q_2\}
 \end{array}\)
-\caption{First DFA obtained\label{fig:first_dfa_table}}
+\caption{First DFA obtained}
+\label{fig:first_dfa_table}
 \end{figure}
 The transition diagram of the DFA~\(\mathcal{D}\) is showed in
 \fig~\vref{fig:dfa_from_nfa}
 \begin{figure}[b]
 \centering
 \includegraphics[bb=42 628 291 758]{dfa_from_nfa}
-\caption{Transition diagram of \fig~\vref{fig:first_dfa_table}
-\label{fig:dfa_from_nfa}}
+\caption{Transition diagram of \fig~\vref{fig:first_dfa_table}}
+\label{fig:dfa_from_nfa}
 \end{figure}
 where states with out-going edges which have no end are final
 states. If we look carefully at the transition diagram, we see that

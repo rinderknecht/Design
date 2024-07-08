@@ -15,7 +15,8 @@ decimal numbers by means of the \eNFA.
 \begin{figure}
 \centering
 \includegraphics[bb=49 660 288 758]{enfa_num}
-\caption{Signed natural and decimal numbers\label{fig:enfa_num}}
+\caption{Signed natural and decimal numbers}
+\label{fig:enfa_num}
 \end{figure}
 This is not the simplest \eNFA we can imagine for these numbers, but
 note the utility of the \(\epsilon\)-transition between~\(q_0\)
@@ -74,7 +75,7 @@ algorithm even in presence of cycles in the automaton. Therefore, let
 where the \eNFA is \(\mathcal{E} = (Q_E, \Sigma, \delta_E, q_0,
 F_E)\). Now we define \(\eDFS\) as follows:
 \begin{align}
-   \eDFS (q, Q) 
+   \eDFS (q, Q)
 &= \varnothing,
 & \text{if} \; q \in Q; \label{eDFS_1}\\
   \eDFS (q, Q)
@@ -105,13 +106,13 @@ Consider, as a more difficult example, the following
   &= \{q_0\} \cup \biggl( \{q_1\} \cup
      \bigcup_{p \in \delta_E(q_1,\epsilon)}{\eDFS (p, \{q_0, q_1\})}\biggr)
      \quad \text{by eq.~\ref{eDFS_2}}\\
-  &\mathrel{\phantom{=}} \phantom{\{q_0\}}{} 
-     \cup \biggl( \{q_4\} \cup 
+  &\mathrel{\phantom{=}} \phantom{\{q_0\}}{}
+     \cup \biggl( \{q_4\} \cup
      \bigcup_{p \in \delta_E(q_4,\epsilon)}{\eDFS (p, \{q_0, q_4\})} \biggr)
      \quad \text{by eq.~\ref{eDFS_2}}\\
   &= \{q_0\} \cup \biggl( \{q_1\} \cup
      \bigcup_{p \in \{q_2\}}{\eDFS (p, \{q_0, q_1\})}\biggr)\\
-  &\mathrel{\phantom{=}} \phantom{\{q_0\}}{} 
+  &\mathrel{\phantom{=}} \phantom{\{q_0\}}{}
      \cup \biggl( \{q_4\} \cup \bigcup_{p \in \varnothing}{\eDFS (p,
      \{q_0, q_4\})} \biggr)\\
   &= \{q_0\} \cup (\{q_1\} \cup \eDFS (q_2, \{q_0, q_1\}))
@@ -155,7 +156,7 @@ where the sub-\eNFA~\(\mathcal{E'}\) contains only
 \(\epsilon\)-transitions and all its~\(Q'\) states are accessible
 from~\(q_3\).
 \begin{align*}
-   \eClose (q_0) 
+   \eClose (q_0)
 &= \eDFS (q_0, \varnothing)\\
 &= \{q_0\} \cup \eDFS (q_1, \{q_0\}) \cup \eDFS (q_2, \{q_0\})\\
 &= \{q_0\} \cup (\{q_1\} \cup \eDFS (q3, \{q_0, q_1\}))\\
@@ -174,7 +175,7 @@ is to change the definitions of~\(\eClose\) and
 create a function \(\eDFSset\) which is similar to \(\eDFS\), except
 that it applies to set of states instead of one state:
 \begin{align*}
-   \eClose (q) 
+   \eClose (q)
 &= \eDFS (q, \varnothing),
 && \text{if} \; q \in Q_E;\\
    \eCloseSet (Q)
@@ -198,10 +199,10 @@ compute the \emph{currently reached states}. Then let us redefine
 \end{align*}
 Contrast with the first definition
 \begin{align*}
-   \eDFS (q, Q') 
+   \eDFS (q, Q')
 &= \varnothing,
 & \text{if} \; q \in Q'; \tag{1} \label{empty}\\
-  \eDFS (q, Q') 
+  \eDFS (q, Q')
 &= \{q\} \quad \cup \bigcup_{p \in \delta_E(q,\epsilon)}{\eDFS (p, Q'
     \cup \{q\})},
 & \text{if} \; q \not\in Q'. \tag{2} \label{parallel}
@@ -226,7 +227,7 @@ traverse them sequentially so we can use the information collected
 
 Coming back to our example \vpageref{enfa_closure}, we find
 \begin{align*}
-   \eClose (q_0) 
+   \eClose (q_0)
 &= \eDFS (q_0, \varnothing)
 && q_0 \in Q_E\\
 &= \eDFSset (\{q_1, q_2\}, \{q_0\})
@@ -348,18 +349,18 @@ transition table is
 \multicolumn{2}{c||}{\mathcal{E}} & + & - & 0, \ldots, 9 & \mathtt{.} &
 \epsilon\\
 \hhline{==::=====}
-\rightarrow & q_0 & \{q_1\} & \{q_1\} & \varnothing & \varnothing 
+\rightarrow & q_0 & \{q_1\} & \{q_1\} & \varnothing & \varnothing
                   & \{q_1\}\\
-            & q_1 & \varnothing  & \varnothing & \{q_1, q_4\} 
+            & q_1 & \varnothing  & \varnothing & \{q_1, q_4\}
                   & \{q_2\} & \varnothing\\
             & q_2 & \varnothing  & \varnothing & \{q_3\} & \varnothing
                   & \varnothing\\
             & q_3 & \varnothing & \varnothing & \{q_3\} & \varnothing
                   & \{q_5\}\\
-            & q_4 & \varnothing & \varnothing & \varnothing  
+            & q_4 & \varnothing & \varnothing & \varnothing
                   & \varnothing & \{q_3\}\\
-         \# & q_5 & \varnothing & \varnothing & \varnothing 
-                  & \varnothing & \varnothing 
+         \# & q_5 & \varnothing & \varnothing & \varnothing
+                  & \varnothing & \varnothing
 \end{array}
 \end{equation*}
 By applying the subset construction to this \eNFA, we get the table
@@ -367,13 +368,13 @@ By applying the subset construction to this \eNFA, we get the table
 \begin{array}{r@{}l||c|c|c|c}
 \multicolumn{2}{c||}{\mathcal{D}} & + & - & 0, \ldots, 9 & \mathtt{.}\\
 \hhline{==::====}
-\rightarrow 
-   & \{q_0,q_1\} 
+\rightarrow
+   & \{q_0,q_1\}
              & \{q_1\} & \{q_1\} & \{q_1, q_3, q_4, q_5\} & \{q_2\}\\
-   & \{q_1\} & \varnothing  & \varnothing & \{q_1, q_3, q_4, q_5\} 
+   & \{q_1\} & \varnothing  & \varnothing & \{q_1, q_3, q_4, q_5\}
              & \{q_2\}\\
-\# & \{q_1, q_3, q_4, q_5\} 
-             & \varnothing  & \varnothing & \{q_1, q_3, q_4, q_5\} 
+\# & \{q_1, q_3, q_4, q_5\}
+             & \varnothing  & \varnothing & \{q_1, q_3, q_4, q_5\}
              & \{q_2\}\\
    & \{q_2\} & \varnothing & \varnothing & \{q_3, q_5\} & \varnothing\\
 \# & \{q_3, q_5\}
@@ -386,7 +387,7 @@ sets:
 \begin{array}{r@{}l||c|c|c|c}
 \multicolumn{2}{c||}{\mathcal{D}} & + & - & 0, \ldots, 9 & \mathtt{.}\\
 \hhline{==::====}
-\rightarrow 
+\rightarrow
    & A & B & B & C & D\\
    & B &   &   & C & D\\
 \# & C &   &   & C & D\\
@@ -399,6 +400,6 @@ The transition diagram of~\(\mathcal{D}\) is shown in
 \begin{figure}[H]
 \centering
 \includegraphics[bb=49 610 208 758]{dfa_from_enfa_num}
-\caption{Determinisation of the \eNFA in \fig~\vref{fig:enfa_num}
-\label{fig:nfa_num}}
+\caption{Determinisation of the \eNFA in \fig~\vref{fig:enfa_num}}
+\label{fig:nfa_num}
 \end{figure}

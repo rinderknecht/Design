@@ -29,7 +29,7 @@ the language denoted by~\(r\). Then
    \item assume \(r\)~and~\(s\) denote the languages \(L(r)\)~and
      \(L(s)\); \(a\)~denotes a letter. Then \label{regexp_rec}
    \begin{enumerate*}
-    
+
      \item \(r\) \disj \(s\) is a regular expression
      denoting \(L(r) \cup L(s)\);
 
@@ -115,7 +115,7 @@ s\). In \fig~\vref{fig:laws},
   \lparen\(s\) \disj \(t\)\rparen \(r\) = \(sr\) \disj \(tr\)
 &\\
 \hline
-  \(\epsilon r = r\) 
+  \(\epsilon r = r\)
 & \(\epsilon\) is the identity element\\
   \(r \epsilon = r\)
 & for the concatenation\\
@@ -129,7 +129,8 @@ s\). In \fig~\vref{fig:laws},
 & are closely linked\\
 \bottomrule
 \end{tabular}
-\caption{Algebraic laws on regular languages\label{fig:laws}}
+\caption{Algebraic laws on regular languages}
+\label{fig:laws}
 \end{figure}
 we show useful algebraic laws on regular languages.
 
@@ -168,13 +169,13 @@ or \texttt{1.894E-4}.}
   \disj \exc{3} \disj \exc{4} \disj \exc{5} \disj \exc{6} \disj
   \exc{7} \disj \exc{8} \disj \exc{9}}\\
 \term{digits} & \rightarrow \text{\term{digit} \term{digit}\kleene}\\
-\term{optional\_fraction} & \rightarrow \text{\exc{.} \term{digits}
+\term{opt\_fraction} & \rightarrow \text{\exc{.} \term{digits}
   \disj} \, \epsilon\\
-\term{optional\_exponent} & \rightarrow \text{\lparen\exc{E} \lparen
+\term{opt\_exponent} & \rightarrow \text{\lparen\exc{E} \lparen
   \exc{+} \disj \exc{-} \disj} \, \epsilon \, \text{\rparen{}
   \term{digits}\rparen{} \disj} \, \epsilon\\
-\term{num} & \rightarrow \text{\term{digits} \term{optional\_fraction}
-  \term{optional\_exponent}}
+\term{num} & \rightarrow \text{\term{digits} \term{opt\_fraction}
+  \term{opt\_exponent}}
 \end{align*}
 Certain constructs occur so frequently in regular expressions that it
 is convenient to introduce notational shorthands for them:
@@ -190,12 +191,12 @@ is convenient to introduce notational shorthands for them:
   \disj \exc{3} \disj \exc{4} \disj \exc{5} \disj \exc{6} \disj
   \exc{7} \disj \exc{8} \disj \exc{9}}\\
 \term{digits} & \rightarrow \text{\term{digit}\plus}\\
-\term{optional\_fraction} & \rightarrow \text{\lparen\exc{.}
+\term{opt\_fraction} & \rightarrow \text{\lparen\exc{.}
   \term{digits}\rparen\opt}\\
-\term{optional\_exponent} & \rightarrow \text{\lparen\exc{E} \lparen
+\term{opt\_exponent} & \rightarrow \text{\lparen\exc{E} \lparen
   \exc{+} \disj \exc{-}\rparen\opt{} \term{digits}\rparen\opt}\\
-\term{num} & \rightarrow \text{\term{digits} \term{optional\_fraction}
-  \term{optional\_exponent}}
+\term{num} & \rightarrow \text{\term{digits} \term{opt\_fraction}
+  \term{opt\_exponent}}
 \end{align*}
 
  \item It is also possible to write:

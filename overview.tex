@@ -16,7 +16,8 @@ of tools, as shown in \fig~\vref{fig:compilation_chain}.
 \begin{figure}
 \centering
 \includegraphics[bb=71 587 405 721]{compilation_chain}
-\caption{Compilation chain\label{fig:compilation_chain}}
+\caption{Compilation chain}
+\label{fig:compilation_chain}
 \end{figure}
 Let us consider the example of the \emph{C language}. A widely used
  open\hyp{}source compiler is GNU GCC. In reality, GCC includes a
@@ -41,7 +42,7 @@ Let us consider the example of the \emph{C language}. A widely used
 There are two parts to compilation: \emph{analysis} and
 \emph{synthesis}.
 \begin{enumerate*}
- 
+
   \item The analysis part breaks up the source program into
   constituent pieces of an intermediary representation of the
   program.
@@ -111,7 +112,8 @@ by a \emph{parse tree} such as in \fig~\vref{fig:parse_tree_eg}.
 \begin{figure}
 \centering
 \includegraphics[bb=71 603 338 721]{parse_tree_eg}
-\caption{Parse tree of \texttt{position := initial + rate * 60}\label{fig:parse_tree_eg}}
+\caption{Parse tree of \texttt{position := initial + rate * 60}}
+\label{fig:parse_tree_eg}
 \end{figure}
 In the expression \texttt{initial + rate * 60}, the phrase
 \texttt{rate * 60} is a logical unit because the usual conventions of
@@ -130,7 +132,7 @@ by a set of cases as follows:
   \item if \emph{expression}\(_1\) and \emph{expression}\(_2\) are
   expressions, then so are
    \begin{enumerate*}
- 
+
      \item \emph{expression}\(_1\) \verb|+|
        \emph{expression}\(_2\), \label{rule_add_is_expr}
 
@@ -222,7 +224,7 @@ analyse expressions or statements, like matching parentheses in
 expressions, or matching braces in block statements: a nesting
 structure is compulsory, as seen earlier
 in \fig~\vref{fig:parse_tree_eg}. The
-representation internal to the compiler of this syntactic structure is 
+representation internal to the compiler of this syntactic structure is
 called an \emph{abstract syntax tree} (or simply
 \emph{syntax tree}), an example of which can be seen in
 \fig~\vref{fig:ast_eg}. It is a compressed version of the parse tree, where
@@ -261,7 +263,8 @@ error and produces an
 \begin{figure}
 \centering
 \includegraphics{annotated_ast_eg}
-\caption{An annotated abstract syntax tree\label{fig:annotated_ast_eg}}
+\caption{An annotated abstract syntax tree}
+\label{fig:annotated_ast_eg}
 \end{figure}
 
 \paragraph{Phases}
@@ -272,7 +275,8 @@ shown in \fig~\vref{fig:phases}.
 \begin{figure}
 \centering
 \includegraphics[bb=71 618 408 721]{phases}
-\caption{Decomposition of a compiler into phases\label{fig:phases}}
+\caption{Decomposition of a compiler into phases}
+\label{fig:phases}
 \end{figure}
 The first row makes up the analysis and the second is the synthesis.
 
@@ -287,7 +291,7 @@ corresponding identifier. Example of identifier attributes are
 \begin{itemize*}
   \item the allocated storage,
 
-  \item the type, 
+  \item the type,
 
   \item the \emph{scope} (\emph{i.e.,} where in the program it is
     valid),
@@ -368,7 +372,7 @@ about identifiers only.) like
 Identifier & Attributes\\
 \hline
 \hline
-\texttt{position} & \ldots\\ 
+\texttt{position} & \ldots\\
 \hline
 \texttt{initial} & \ldots\\
 \hline
@@ -415,7 +419,8 @@ node. A new version of the annotated syntax tree is proposed in \fig~\vref{fig:r
 \begin{figure}[b]
 \centering
 \includegraphics[bb=71 629 270 721]{refined_annotated_ast_eg}
-\caption{Refined annotated abstract syntax tree\label{fig:refined_annotated_ast_eg}}
+\caption{Refined annotated abstract syntax tree}
+\label{fig:refined_annotated_ast_eg}
 \end{figure}
 Note that the new node is not a token, just a (semantic) tag for the
 code generator.
