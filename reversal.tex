@@ -39,26 +39,31 @@ Let \(\pred{Inv}{s}\)\index{Inv@\predName{Inv}|(} be the property
 \(\forall s \in S.\pred{Inv}{s}\), the induction principle on the
 structure of~\(s\)\index{induction!example|(} requires that we
 establish
-\begin{itemize}
+\begin{itemize*}
 
   \item the basis \(\pred{Inv}{\el}\);
 
   \item the inductive step \(\forall s \in S.\pred{Inv}{s}
     \Rightarrow \forall x \in T.\pred{Inv}{\cons{x}{s}}\).
 
-\end{itemize}
-The basis is quickly found: \(\fun{rev}_0(\fun{rev}_0(\el))
-\xrightarrow{\smash{\gamma}} \fun{rev}_0(\el)
-\xrightarrow{\smash{\gamma}} \el\). The induction hypothesis is
-\(\pred{Inv}{s}\) and we want to establish
+\end{itemize*}
+The basis is quickly found:
+\begin{equation*}
+  \fun{rev}_0(\fun{rev}_0(\el))
+  \xrightarrow{\smash{\gamma}} \fun{rev}_0(\el)
+  \xrightarrow{\smash{\gamma}} \el.
+\end{equation*}
+The induction hypothesis is \(\pred{Inv}{s}\) and we want to establish
 \(\pred{Inv}{\cons{x}{s}}\)\index{Inv@\predName{Inv}|)}, for
 any~\(x\). If we commence head\hyp{}on with
-\(\fun{rev}_0(\fun{rev}_0(\cons{x}{s})) \xrightarrow{\smash{\delta}}
-\fun{rev}_0(\fun{cat}(\fun{rev}_0(s),[x]))\), we are stuck. But the
-term to rewrite involves both \fun{rev$_0$/1} and \fun{cat/2}, hence
-spurring us to conceive a lemma where the stumbling pattern
-\(\fun{cat}(\fun{rev}_0(\dots),\dots)\) occurs and is equivalent to a
-simpler term.\par\vskip\baselineskip
+\begin{equation*}
+  \fun{rev}_0(\fun{rev}_0(\cons{x}{s})) \xrightarrow{\smash{\delta}}
+  \fun{rev}_0(\fun{cat}(\fun{rev}_0(s),[x])),
+\end{equation*}
+we are stuck. But the term to rewrite involves both \fun{rev$_0$/1}
+and \fun{cat/2}, hence spurring us to conceive a lemma where the
+stumbling pattern \(\fun{cat}(\fun{rev}_0(\,\dots), \dots\!)\) occurs
+and is equivalent to a simpler term.\par\vskip\baselineskip
 
 Let
 \(\pred{CatRev}{s,t}\)\index{CatRev@\predName{CatRev}} \label{CatRev}
@@ -66,14 +71,14 @@ denote \(\fun{cat}(\fun{rev}_0(t),\fun{rev}_0(s)) \equiv
 \fun{rev}_0(\fun{cat}(s,t))\)\index{cat@\fun{cat/2}}. In order to
 prove it by induction on the structure of~\(s\), we need, for
 all~\(t\),
-\begin{itemize}
+\begin{itemize*}
 
   \item the basis \(\pred{CatRev}{\el,t}\);
 
   \item the inductive step \(\forall s,t \in S.\pred{CatRev}{s,t}
     \Rightarrow \forall x \in T.\pred{CatRev}{\cons{x}{s},t}\).
 
-\end{itemize}
+\end{itemize*}
 The former is almost within reach:
 \begin{align*}
   \fun{rev}_0(\fun{cat}(\el,t))
@@ -90,14 +95,14 @@ Let \(\pred{CatNil}{s}\)\index{CatNil@\predName{CatNil}|(} be the
 property \(\fun{cat}(s,\el) \equiv s\)\index{cat@\fun{cat/2}}. In
 order to prove it by induction on the structure of~\(s\), we have to
 prove
-\begin{itemize}
+\begin{itemize*}
 
   \item the basis \(\pred{CatNil}{\el}\);
 
   \item the inductive step \(\forall s \in S.\pred{CatNil}{s}
     \Rightarrow \forall x \in T.\pred{CatNil}{\cons{x}{s}}\).
 
-\end{itemize}
+\end{itemize*}
 The former is easy: \(\fun{cat}(\el,\el) \xrightarrow{\smash{\alpha}}
 \el\)\index{cat@\fun{cat/2}}. The latter is not complicated either:
 \(\fun{cat}(\cons{x}{s},\el) \xrightarrow{\smash{\beta}}
@@ -224,18 +229,22 @@ Let us prove\label{EqRev} \(\pred{EqRev}{s} \colon
 by
 structural\index{stack!reversal!equivalence}\index{equivalence!proof
   of $\sim$} induction on~\(s\):
-\begin{itemize*}
+\begin{itemize}
 
   \item the basis \(\pred{EqRev}{\el}\);
 
   \item the inductive step \(\forall s \in S.\pred{EqRev}{s}
     \Rightarrow \forall x \in T.\pred{EqRev}{\cons{x}{s}}\).
 
-\end{itemize*}
-The former is easy: \(\fun{rev}_0(\el) \xrightarrow{\smash{\gamma}}
-\el \xleftarrow{\smash{\zeta}} \fun{rcat}(\el,\el)
-\xleftarrow{\smash{\epsilon}}
-\fun{rev}(\el)\)\index{rev0@\fun{rev\(_0\)/1}}. For the latter, let us rewrite \(\fun{rev}_0(\cons{x}{s})\) and
+\end{itemize}
+The former is easy:
+\begin{equation*}
+  \fun{rev}_0(\el) \xrightarrow{\smash{\gamma}}
+  \el \xleftarrow{\smash{\zeta}} \fun{rcat}(\el,\el)
+  \xleftarrow{\smash{\epsilon}} \fun{rev}(\el).
+  \index{rev0@\fun{rev\(_0\)/1}}
+\end{equation*}
+For the latter, let us rewrite \(\fun{rev}_0(\cons{x}{s})\) and
 \(\fun{rev}(\cons{x}{s})\) so they converge:
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}lr@{}}
