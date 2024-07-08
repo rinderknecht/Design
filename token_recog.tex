@@ -74,7 +74,7 @@ If we input characters \exc{A} then \exc{B} in this buffer, we draw
 & \(\longleftarrow\)
 & file\\
   \cline{3-5}
-& 
+&
 &
 & \multicolumn{1}{@{\,}c@{\,}}{\(\upharpoonright\)}
 \end{tabular}
@@ -234,7 +234,8 @@ given in \fig~\vref{fig:dfa_geq}.
 \begin{figure}[b]
 \centering
 \includegraphics[bb=60 660 190 730]{dfa_geq}
-\caption{A transition diagram\label{fig:dfa_geq}}
+\caption{A transition diagram}
+\label{fig:dfa_geq}
 \end{figure}
 Double-circled states are called \emph{final states}. The special
 arrow which does not connect two states points to the \emph{initial
@@ -518,14 +519,15 @@ diagram itself. See \fig~\vref{fig:dfa_geq_completed}.
 \begin{figure}[b]
 \centering
 \includegraphics[bb=55 660 224 730]{dfa_geq_completed}
-\caption{Completion of \fig~\vref{fig:dfa_geq}
-\label{fig:dfa_geq_completed}}
+\caption{Completion of \fig~\vref{fig:dfa_geq}}
+\label{fig:dfa_geq_completed}
 \end{figure}
 Similarly, \fig~\vref{fig:dfa_relop}
 \begin{figure}
 \centering
 \includegraphics[bb=50 600 265 745]{dfa_relop}
-\caption{Relational operators\label{fig:dfa_relop}}
+\caption{Relational operators}
+\label{fig:dfa_relop}
 \end{figure}
 shows all the relational operators.
 
@@ -535,7 +537,8 @@ A transition diagram for specifying identifiers is given in \fig~\vref{fig:dfa_i
 \begin{figure}
 \centering
 \includegraphics[bb=48 684 260 755]{dfa_ident}
-\caption{Transition diagram for identifiers\label{fig:dfa_ident}}
+\caption{Transition diagram for identifiers}
+\label{fig:dfa_ident}
 \end{figure}
 \texttt{lexeme} is a function call which returns the recognised
 lexeme, as found in the \texttt{buffer}. The \other label on the last
@@ -554,7 +557,8 @@ dedicated transition diagrams, one for each keyword. For example, the
 \begin{figure}[b]
 \centering
 \includegraphics[bb=47 711 192 730]{dfa_if}
-\caption{Transition diagram for \term{if}\label{fig:dfa_if}}
+\caption{Transition diagram for \term{if}}
+\label{fig:dfa_if}
 \end{figure}
 If one keyword diagram succeeds, \emph{i.e.,} the lexer reaches a
 final state, then the corresponding keyword is transmitted to the
@@ -595,8 +599,8 @@ characters which are \emph{not} \(c\). Actually, the special label
 \begin{figure}
 \centering
 \includegraphics[bb=48 711 261 738]{dfa_if_completed}
-\caption{Completion of \fig~\vref{fig:dfa_if}
-\label{fig:dfa_if_completed}}
+\caption{Completion of \fig~\vref{fig:dfa_if}}
+\label{fig:dfa_if_completed}
 \end{figure}
 where \term{alpha} (which stands for alpha-numerical') is defined by
 the following regular definition:
@@ -637,7 +641,8 @@ state) and a \emph{table of keywords}. The specification is shown in \fig~\vref{
 \begin{figure}
 \centering
 \includegraphics[bb=48 684 285 755]{dfa_id_kwd}
-\caption{Transition diagram for keywords\label{fig:dfa_id_kwd}}
+\caption{Transition diagram for keywords}
+\label{fig:dfa_id_kwd}
 \end{figure}
 The table of keywords is a two-column table whose first column (the
 entry) contains the keyword lexemes and the second column the
@@ -653,7 +658,8 @@ page~\pageref{fig:switch}.
 \zi \Else \(\proc{Switch} \gets \polytoken{id}{\id{str}}\)
 \zi \End
 \end{codebox}
-\caption{Pseudo-code for function \texttt{switch}\label{fig:switch}}
+\caption{Pseudo-code for function \texttt{switch}}
+\label{fig:switch}
 \end{figure}
 Function names are in uppercase, like \proc{Lexeme}. Writing \(\id{x}
 \gets a\) means that we \emph{assign} the value of the
@@ -665,7 +671,7 @@ a special variable whose value becomes the result of the function
 \proc{Switch} when it finishes.
 
 \mypar{Numbers}
- 
+
 Let us consider now the numbers as specified by the regular definition
 \begin{align*}
 \term{num} & \rightarrow \text{\term{digit}\plus{} \lparen\exc{.}
@@ -677,11 +683,12 @@ intermediary step to their recognition.
 \begin{figure}
 \centering
 \includegraphics[bb=47 627 320 746]{dfa_num}
-\caption{Transition diagram for numbers\label{fig:dfa_num}}
+\caption{Transition diagram for numbers}
+\label{fig:dfa_num}
 \end{figure}
 
 \mypar{White spaces}
- 
+
 The only remaining issue concerns white spaces as specified by the
 regular definition
 \begin{align*}
@@ -691,13 +698,14 @@ which is equivalent to the transition diagram in \fig~\vref{fig:dfa_ws}.
 \begin{figure}
 \centering
 \includegraphics[bb=48 711 190 755]{dfa_ws}
-\caption{Transition diagram for white spaces\label{fig:dfa_ws}}
+\caption{Transition diagram for white spaces}
+\label{fig:dfa_ws}
 \end{figure}
 The specificity of this diagram is that there is no action
 associated to the final state: no token is emitted.
 
 \paragraph{A simplification}
- 
+
 There is a simple away to reduce the size of the diagrams used to
 specify the tokens while retaining the longest prefix property: allow
 to pass through several final states. This way, we can actually also
@@ -707,8 +715,8 @@ alternatively make up \fig~\vref{fig:dfa_geq_opt}.
 \begin{figure}
 \centering
 \includegraphics[bb=48 702 220 730]{dfa_geq_opt}
-\caption{Alternative to \fig~\vref{fig:dfa_geq_completed}
-\label{fig:dfa_geq_opt}}
+\caption{Alternative to \fig~\vref{fig:dfa_geq_completed}}
+\label{fig:dfa_geq_opt}
 \end{figure}
 But we have to change the recognition process a little bit here in
 order to keep the longest prefix match: we do not want to stop at
@@ -719,24 +727,24 @@ The simplified complete version with respect to the one given in
 \begin{figure}
 \centering
 \includegraphics[bb=25 600 200 745]{dfa_relop_opt}
-\caption{Simplification of \fig~\vref{fig:dfa_relop}
-\label{fig:dfa_relop_opt}}
+\caption{Simplification of \fig~\vref{fig:dfa_relop}}
+\label{fig:dfa_relop_opt}
 \end{figure}
 The transition diagram for specifying identifiers \emph{and} keywords
 looks now like \fig~\vref{fig:dfa_id_kwd_opt}.
 \begin{figure}
 \centering
 \includegraphics[bb=48 682 208 756]{dfa_id_kwd_opt}
-\caption{Simplification of \fig~\vref{fig:dfa_id_kwd}
-\label{fig:dfa_id_kwd_opt}}
+\caption{Simplification of \fig~\vref{fig:dfa_id_kwd}}
+\label{fig:dfa_id_kwd_opt}
 \end{figure}
 The transition diagram for specifying numbers is simpler now, as seen
 in \fig~\vref{fig:dfa_num_opt}.
 \begin{figure}
 \centering
 \includegraphics[bb=48 632 320 758]{dfa_num_opt}
-\caption{Simplification of \fig~\vref{fig:dfa_num}
-\label{fig:dfa_num_opt}}
+\caption{Simplification of \fig~\vref{fig:dfa_num}}
+\label{fig:dfa_num_opt}
 \end{figure}
 
 How do we interpret these new transition diagrams, where the final
@@ -778,7 +786,7 @@ state is final
   \item if there is an out-going edge which carries a matching
   character, we try to recognise a longer lexeme;
   \begin{enumerate*}
-  
+
     \item if we fail, \emph{i.e.,} if we cannot go further in the
       diagram and the current state is not final, then we shift back
       the current pointer~\(\upharpoonright\) to the position pointed

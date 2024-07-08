@@ -72,7 +72,8 @@ structure of a clause in \Erlang is summed up in
 \begin{figure}[t]
 \centering
 \includegraphics[bb=214 602 397 646]{clause}
-\caption{Structure of a clause in \Erlang\label{fig:clause}}
+\caption{Structure of a clause in \Erlang}
+\label{fig:clause}
 \end{figure}
 
 A comment is introduced by \erlcode{\%} and extends till the end of
@@ -467,7 +468,8 @@ boxed), in \fig~\ref{fig:sum1234}.
 \begin{figure}
 \centering
 \includegraphics[bb=72 620 412 721]{sum1234}
-\caption{Evaluation of \(\fun{sum}([1,2,3,4])\)\label{fig:sum1234}}
+\caption{Evaluation of \(\fun{sum}([1,2,3,4])\)}
+\label{fig:sum1234}
 \end{figure}
 It is now clear that the instances of the context accumulate so as to
 grow in inverse proportion to the argument's length: integers move one
@@ -481,8 +483,8 @@ step after step, in \fig~\vref{fig:sum1234_stack}.
 \begin{figure}[t]
 \centering
 \includegraphics{sum1234_stack}
-\caption{Contexts while computing \(\fun{sum}([1,2,3,4])\)
-\label{fig:sum1234_stack}}
+\caption{Contexts while computing \(\fun{sum}([1,2,3,4])\)}
+\label{fig:sum1234_stack}
 \end{figure}
 This example shows that the context instances grow, while the argument
 size decreases in such a way that the total memory remains constant.
@@ -727,16 +729,17 @@ Let us rename \erlcode{sum0/1} as \fun{sum\(_0\)/1} in
                            & \fun{sum}_0(n+m,s).
 \end{array}}
 \end{equation*}
-\caption{Summing integers in a stack with \fun{sum\(_0\)/1}
-\label{fig:sum0}}
+\caption{Summing integers in a stack with \fun{sum\(_0\)/1}}
+\label{fig:sum0}
 \end{figure}
 Consider the abstract syntax trees of the rewritten
 expressions in \fig~\ref{fig:sum0_1234}.
 \begin{figure}
 \centering
 \includegraphics{sum0_1234}
-\caption{Abstract syntax trees of \(\fun{sum}_0([1,2,3,4])
-  \twoheadrightarrow 10\)\label{fig:sum0_1234}}
+\caption{Abstract syntax trees of \(\fun{sum}_0([1,2,3,4]
+  \twoheadrightarrow 10\)}
+\label{fig:sum0_1234}
 \end{figure}
 The intermediary trees of~\(m+n\) have been skipped to emphasise that
 the size of the trees strictly decreases and the size of the context
@@ -935,16 +938,16 @@ sharing explicit, as with the definition of \fun{sum/1} in
 \begin{figure}
 \centering
 \includegraphics{sum_dag}%[bb=71 666 237 721]
-\caption{Definition of \fun{sum/1} with maximum sharing
-\label{fig:sum_dag}}
+\caption{Definition of \fun{sum/1} with maximum sharing}
+\label{fig:sum_dag}
 \end{figure}
 Let us compute \(\fun{sum}([3,7,5])\) and show the first rewrites in
 \fig~\vref{fig:sum375_push},
 \begin{figure}[b]
 \centering
 \includegraphics{sum375_push}
-\caption{Evaluation of \(\fun{sum}([3,7,5])\) with a DAG (phase 1/2)
-\label{fig:sum375_push}}
+\caption{Evaluation of \(\fun{sum}([3,7,5])\) with a DAG (phase 1/2)}
+\label{fig:sum375_push}
 \end{figure}
 where the full state of the memory is given as snapshots between
 dashed arrows. (DAG is the abbreviation of \emph{directed acyclic
@@ -981,8 +984,8 @@ The popping phase is shown at play in \fig~\vref{fig:sum375_pop},
 \begin{figure}[b]
 \centering
 \includegraphics{sum375_pop}
-\caption{Evaluation of \(\fun{sum}([3,7,5])\) (phase 2/2)
-\label{fig:sum375_pop}}
+\caption{Evaluation of \(\fun{sum}([3,7,5])\) (phase 2/2)}
+\label{fig:sum375_pop}
 \end{figure}
 which is to be read from right to left. The rightmost memory state is
 the result of the prior pushing phase, on the last state of
@@ -1033,8 +1036,8 @@ stack\hyp{}based policy (`Last In, First Out') in
 \centering
 \includegraphics{sum375_pop1}
 \caption{Evaluation of \(\fun{sum}([3,7,5])\) (phase 2/2, stack and
-  heap)
-\label{fig:sum375_pop1}}
+  heap)}
+\label{fig:sum375_pop1}
 \end{figure}
 Remember that the value \([3,7,5]\) is stored in the heap, not in the
 control stack, and that it may be shared. Also, due to space
@@ -1045,8 +1048,8 @@ stack in \fig~\vref{fig:sum375_stack_push}.
 \centering
 \includegraphics{sum375_stack_push}
 \caption{Control stack while computing \(\fun{sum}([3,7,5])\) (phase
-  1/2)
-\label{fig:sum375_stack_push}}
+  1/2)}
+\label{fig:sum375_stack_push}
 \end{figure}
 The poppings, from right to left, are presented in
 \fig~\ref{fig:sum375_stack_pop}.
@@ -1054,8 +1057,8 @@ The poppings, from right to left, are presented in
 \centering
 \includegraphics{sum375_stack_pop}
 \caption{Control stack while computing \(\fun{sum}([3,7,5])\)
-(phase 2/2)
-\label{fig:sum375_stack_pop}}
+(phase 2/2)}
+\label{fig:sum375_stack_pop}
 \end{figure}
 
 The corresponding algorithm consists in the following steps. Let us
@@ -1103,7 +1106,8 @@ tail form like \fun{sum\(_0\)/1} in \fig~\vref{fig:sum0}.
 
 \includegraphics[bb=71 636 394 721]{sum0_375_2}
 \caption{\(\fun{sum}_0([3,7,5]) \twoheadrightarrow 15\)
-without tail call optimisation\label{fig:sum0_375}}
+  without tail call optimisation}
+\label{fig:sum0_375}
 \end{figure}
 pushing in the control stack the tree newly produced by a rule and
 sharing the subtrees denoted by variables (including aliases)
@@ -1130,7 +1134,8 @@ contains only one item at all times. This optimisation is shown in
 \includegraphics[bb=71 628 350 721]{sum0_375tco1}
 \includegraphics[bb=71 636 375 721]{sum0_375tco2}
 \caption{\(\fun{sum}_0([3,7,5]) \twoheadrightarrow 15\) with tail call
-  optimisation\label{fig:sum0_375tco}}
+  optimisation}
+\label{fig:sum0_375tco}
 \end{figure}
 in \fig~\vref{fig:sum0_375}.
 
@@ -2293,8 +2298,8 @@ abstract syntax trees are easily compared in
 \subfloat[With nested tuples\label{fig:acc_tup}]{
   \includegraphics[bb=71 659 195 721]{acc_tup}
 }
-\caption{Two implementations of the same linear accumulator
-\label{fig:tuple_vs_stack}}
+\caption{Two implementations of the same linear accumulator}
+\label{fig:tuple_vs_stack}
 \end{figure}
 The encoding of a stack accumulator by means of tuples only supposes
 to add a component to each tuple, which holds what was the `next'
@@ -2483,7 +2488,8 @@ general. By looking at the call tree of \erlcode{fib(5)} in
 \begin{figure}
 \centering
 \includegraphics{fib5tree}
-\caption{Call tree of \texttt{fib(5)}\label{fig:fib5tree}}
+\caption{Call tree of \texttt{fib(5)}}
+\label{fig:fib5tree}
 \end{figure}
 we realise that some small subtrees are duplicated, like the ones
 rooted at~\erlcode{fib(2)} and, even larger ones,
@@ -2507,8 +2513,8 @@ graph), where the arrowed edges implement the reuse of subtrees.
 \begin{figure}[b]
 \centering
 \includegraphics[bb=71 671 349 718]{fib5shared}
-\caption{Call tree of \erlcode{fib(5)} with maximal sharing
-\label{fig:fib5shared}}
+\caption{Call tree of \erlcode{fib(5)} with maximal sharing}
+\label{fig:fib5shared}
 \end{figure}
 This graph representation leads us to think that if two successive
 Fibonacci numbers are kept at all times, we can achieve this maximal
@@ -2863,8 +2869,8 @@ where \erlcode{len0/1} is specified in \fig~\vref{fig:len0}.
 \fun{len}_0(\cons{x}{s},n) & \rightarrow & \fun{len}_0(s,n+1).
 \end{array}}
 \end{equation*}
-\caption{Computing the length of a stack (tail form)
-\label{fig:len0}}
+\caption{Computing the length of a stack (tail form)}
+\label{fig:len0}
 \end{figure}
 The result:
 \begin{center}
@@ -3108,8 +3114,8 @@ syntax trees.
 \subfloat[\erlcode{foldl(F,A,S)}]{%
   \includegraphics[bb=62 660 135 721]{foldl}%[bb=69 651 164 721]
 }
-\caption{The result of \erlcode{foldl/3} on a non\hyp{}empty stack
-\label{fig:foldl}}
+\caption{The result of \erlcode{foldl/3} on a non\hyp{}empty stack}
+\label{fig:foldl}
 \end{figure}
 The following definition implements the desired effect:
 \begin{verbatim}
@@ -3167,8 +3173,8 @@ right to left,' or \emph{leftward fold}. We expect
 \subfloat[\erlcode{foldr(F,A,S)}]{%
   \includegraphics[bb=62 660 132 721]{foldr}
 }
-\caption{The result of \erlcode{foldr/3} on a non\hyp{}empty stack
-\label{fig:foldr}}
+\caption{The result of \erlcode{foldr/3} on a non\hyp{}empty stack}
+\label{fig:foldr}
 \end{figure}
 We achieve this behaviour with the following definition:
 \begin{verbatim}
