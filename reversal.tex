@@ -39,14 +39,14 @@ Let \(\pred{Inv}{s}\)\index{Inv@\predName{Inv}|(} be the property
 \(\forall s \in S.\pred{Inv}{s}\), the induction principle on the
 structure of~\(s\)\index{induction!example|(} requires that we
 establish
-\begin{itemize*}
+\begin{itemize}
 
   \item the basis \(\pred{Inv}{\el}\);
 
   \item the inductive step \(\forall s \in S.\pred{Inv}{s}
     \Rightarrow \forall x \in T.\pred{Inv}{\cons{x}{s}}\).
 
-\end{itemize*}
+\end{itemize}
 The basis is quickly found: \(\fun{rev}_0(\fun{rev}_0(\el))
 \xrightarrow{\smash{\gamma}} \fun{rev}_0(\el)
 \xrightarrow{\smash{\gamma}} \el\). The induction hypothesis is
@@ -66,14 +66,14 @@ denote \(\fun{cat}(\fun{rev}_0(t),\fun{rev}_0(s)) \equiv
 \fun{rev}_0(\fun{cat}(s,t))\)\index{cat@\fun{cat/2}}. In order to
 prove it by induction on the structure of~\(s\), we need, for
 all~\(t\),
-\begin{itemize*}
+\begin{itemize}
 
   \item the basis \(\pred{CatRev}{\el,t}\);
 
   \item the inductive step \(\forall s,t \in S.\pred{CatRev}{s,t}
     \Rightarrow \forall x \in T.\pred{CatRev}{\cons{x}{s},t}\).
 
-\end{itemize*}
+\end{itemize}
 The former is almost within reach:
 \begin{align*}
   \fun{rev}_0(\fun{cat}(\el,t))
@@ -201,7 +201,7 @@ An additional parameter introduced by \fun{rcat/2} accumulates partial
 results, thus called an \emph{accumulator}\index{functional
   language!accumulator}. We can see it at work in
 \fig~\vref{fig:rev_321}.
-\begin{figure}
+\begin{figure}[b]
 \begin{equation*}
 \boxed{%
 \begin{array}{r@{\;}l@{\;}l}
@@ -214,30 +214,28 @@ results, thus called an \emph{accumulator}\index{functional
 \end{array}}
 \end{equation*}
 \caption{\(\fun{rev}([3,2,1]) \twoheadrightarrow [1,2,3]\)}
-\label{fig:rev_321}\index{stack!reversal!example}
+\label{fig:rev_321}
+\index{stack!reversal!example}
 \end{figure}
 \index{rcat@\fun{rcat/2}|)}
-
 Let us prove\label{EqRev} \(\pred{EqRev}{s} \colon
 \fun{rev}_0(s) \equiv
 \fun{rev}(s)\)\index{rev@\fun{rev/1}|(}\index{EqRev@\predName{EqRev}|(}
 by
 structural\index{stack!reversal!equivalence}\index{equivalence!proof
-  of $\sim$} induction on~\(s\), namely,
-\begin{itemize}
+  of $\sim$} induction on~\(s\):
+\begin{itemize*}
 
   \item the basis \(\pred{EqRev}{\el}\);
 
   \item the inductive step \(\forall s \in S.\pred{EqRev}{s}
     \Rightarrow \forall x \in T.\pred{EqRev}{\cons{x}{s}}\).
 
-\end{itemize}
+\end{itemize*}
 The former is easy: \(\fun{rev}_0(\el) \xrightarrow{\smash{\gamma}}
 \el \xleftarrow{\smash{\zeta}} \fun{rcat}(\el,\el)
 \xleftarrow{\smash{\epsilon}}
-\fun{rev}(\el)\)\index{rev0@\fun{rev\(_0\)/1}}.
-
-For the latter, let us rewrite \(\fun{rev}_0(\cons{x}{s})\) and
+\fun{rev}(\el)\)\index{rev0@\fun{rev\(_0\)/1}}. For the latter, let us rewrite \(\fun{rev}_0(\cons{x}{s})\) and
 \(\fun{rev}(\cons{x}{s})\) so they converge:
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}lr@{}}

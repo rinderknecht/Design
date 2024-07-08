@@ -646,7 +646,7 @@ Together with equation \eqref{eq:cost_power_2}, we further draw, for
    = p2^p - 2^p \sum_{k=0}^{p-1}\frac{1}{2^k+1}\notag\\
   &= p2^p - 2^p \sum_{k \geqslant 0}\frac{1}{2^k+1}
      + 2^p \sum_{k \geqslant p}\frac{1}{2^k+1}
-= p2^p - \alpha 2^p + \sum_{k \geqslant 0}\frac{1}{2^{k}+2^{-p}},
+= (p - \alpha) 2^p + \sum_{k \geqslant 0}\frac{1}{2^{k}+2^{-p}},
 \label{eq:Mjoin}
 \end{align}
 where \(\alpha := \sum_{k \geqslant 0}\frac{1}{2^k+1} \simeq
@@ -940,9 +940,12 @@ theorems.
   \item If \(k=2m\), then \(2^k\!/3 = (4^m-1)/3 + 1/3\). Since
     \(1/3<1\) and, by lemma~\ref{lem:div3}, \((4^m-1)/3\) is an
     integer, we have \(2^k\!/3 = \floor{2^k\!/3} + 1/3\) and
-    \(\floor{2^k\!/3} = (4^m-1)/3 = 4^{m-1} + 4^{m-2} + \dots + 1 =
-    2^{2m-2} + 2^{2m-4} + \dots + 1 = (1010\dots01)_2\). Hence
-    \(\nu_{\phi_{2m}} = m\). We know that \(\OB{\fun{tms}}{m+1} =
+    \begin{align*}
+      \floor{2^k\!/3} &= (4^m-1)/3 = 4^{m-1} + 4^{m-2} + \dots + 1\\
+                      &= 2^{2m-2} + 2^{2m-4} + \dots + 1\\
+                      &= (1010\dots01)_2.
+    \end{align*}
+    Hence \(\nu_{\phi_{2m}} = m\). We know that \(\OB{\fun{tms}}{m+1} =
     \OB{\fun{tms}}{m} + \nu_m\), therefore
     \(\OB{\fun{tms}}{1+\phi_{2m}} - \OB{\fun{tms}}{\phi_{2m}} = m\),
     or, equivalently, \(\OB{\fun{tms}}{1+\phi_k} -
@@ -950,10 +953,17 @@ theorems.
 
   \item If \(k=2m+1\), then \(2^k\!/3 = 2(4^m-1)/3 + 2/3\). Since
     \(2/3<1\) and, by lemma~\ref{lem:div3}, \((4^m-1)/3\) is an
-    integer, we have \(2^k\!/3 = \floor{2^k\!/3} + 2/3 =
-    \ceiling{2^k\!/3} - 1/3\) and \(\floor{2^k\!/3} = 2(4^m-1)/3 =
-    2^{2m-1} + 2^{2m-3} + \dots + 2 = (1010\dots10)_2\); so
-    \(\nu_{\phi_{2m+1}} = m\). From \(\OB{\fun{tms}}{m+1} =
+    integer, we have
+    \begin{equation*}
+      2^k\!/3 = \floor{2^k\!/3} + 2/3 = \ceiling{2^k\!/3} - 1/3
+    \end{equation*}
+    and
+    \begin{align*}
+      \floor{2^k\!/3} &= 2(4^m-1)/3\\
+                      &= 2^{2m-1} + 2^{2m-3} + \dots + 2\\
+                      &= (1010\dots10)_2;
+    \end{align*}
+    so \(\nu_{\phi_{2m+1}} = m\). From \(\OB{\fun{tms}}{m+1} =
     \OB{\fun{tms}}{m} + \nu_m\) comes \(\OB{\fun{tms}}{1+\phi_{2m+1}}
     - \OB{\fun{tms}}{\phi_{2m+1}} = m\), or,
     equivalently,\index{tms@$\OB{\fun{tms}}{n}$|(}
@@ -973,31 +983,48 @@ is \(p=1+\phi_k\).
   \item If \(k=2m+2\), then \(\phi_{2m+2} = 2^{2m} + \phi_{2m}\) (see
     proof of theorem~\ref{thm:OB_lambda}). From
     equation~\eqref{eq:OBtms_2m_i}, we draw
-    \(\OB{\fun{tms}}{\phi_{2m+2}} = \OB{\fun{tms}}{2^{2m}} +
+    \begin{equation*}
+      \OB{\fun{tms}}{\phi_{2m+2}} = \OB{\fun{tms}}{2^{2m}} +
     \OB{\fun{tms}}{\phi_{2m}} + \phi_{2m} = \OB{\fun{tms}}{\phi_{2m}}
-    - m4^m + \phi_{2m}\). Summing both sides from \(m=0\) to \(m=n-1\)
-    yields \(\OB{\fun{tms}}{\phi_{2n}} = \OB{\fun{tms}}{\phi_0} + S_n
-    + \sum_{m=0}^{n-1}{\phi_{2m}}\), where \(S_n :=
-    \sum_{m=0}^{n-1}{m4^m}\). We have \(S_n + n4^n =
-    \sum_{m=1}^{n}{m4^m} = \sum_{m=0}^{n-1}(m+1)4^{m+1} = 4 \cdot S_n
-    + 4\sum_{m=0}^{n-1}4^m\). Finally, \(9 \cdot S_n = (3n -4)4^n +
-    4\). On the other hand, \(9 \sum_{m=0}^{n-1}{\phi_{2m}} = 4^n - 3n
-    - 1\). Finally, remarking that \(\phi_0 = 0\) and
-    \(\OB{\fun{tms}}{0} = 0\), we gather that
+    - m4^m + \phi_{2m}.
+    \end{equation*}
+    Summing both sides from \(m=0\) to \(m=n-1\) yields
+    \begin{equation*}
+      \OB{\fun{tms}}{\phi_{2n}} = \OB{\fun{tms}}{\phi_0} + S_n
+    + \sum_{m=0}^{n-1}{\phi_{2m}},\; \text{where}\; S_n :=
+    \sum_{m=0}^{n-1}{m4^m}.
+    \end{equation*}
+    We need now to make out \(S_n\). We have
+    \begin{equation*}
+      S_n + n4^n = \sum_{m=1}^{n}{m4^m}
+                 = \sum_{m=0}^{n-1}(m+1)4^{m+1}
+                 = 4 \cdot S_n + 4\sum_{m=0}^{n-1}4^m.
+    \end{equation*}
+    Since \(\sum_{m=0}^{n-1}4^m = (4^n-1)/3\), we draw \(9 \cdot S_n =
+    (3n -4)4^n + 4\). On the other hand, \(9
+    \sum_{m=0}^{n-1}{\phi_{2m}} = 4^n - 3n - 1\). Finally, remarking
+    that \(\phi_0 = 0\) and \(\OB{\fun{tms}}{0} = 0\), we gather that
     \begin{equation}
       \OB{\fun{tms}}{\phi_{2n}} = (n-1)\phi_{2n}.
     \label{eq:OBtms_phi_2n}
     \end{equation}
-    Let us now work out \(Q(\phi_{2n}) = \tfrac{1}{2}\phi_{2n}(2(n-1)
+    Let us now work out
+    \begin{equation*}
+      Q(\phi_{2n}) = \tfrac{1}{2}\phi_{2n}(2(n-1)
     + \lg(1-1/4^n)) = \OB{\fun{tms}}{\phi_{2n}} +
-    \tfrac{1}{2}\phi_{2n}\lg(1-1/4^n)\), with an application
-    of~\eqref{eq:OBtms_phi_2n}. If we let \(f(x) := (1-x)
+    \tfrac{1}{2}\phi_{2n}\lg(1-1/4^n),
+    \end{equation*}
+    with an application of~\eqref{eq:OBtms_phi_2n}. If we let \(f(x) := (1-x)
     \ln(1-1/x)\), then \(\OB{\fun{tms}}{\phi_{2n}} - Q(\phi_{2n}) =
     f(4^n)/(6\ln 2)\). Elementary analysis shows that
     \(3\ln\tfrac{3}{4} \leqslant f(x) < 1\), for \(x \geqslant 4\),
-    that is, \(1 - \tfrac{1}{2}\lg 3 \leqslant
-    \OB{\fun{tms}}{\phi_{2n}} - Q(\phi_{2n}) < 1/(6\ln 2)\), if \(n
-    \geqslant 1\). This means that \(\boxed{0.2075 <
+    that is,
+    \begin{equation*}
+      1 - \frac{1}{2}\lg 3 \leqslant
+    \OB{\fun{tms}}{\phi_{2n}} - Q(\phi_{2n}) < \frac{1}{6\ln 2},\; \text{if \(n
+      \geqslant 1\)}.
+    \end{equation*}
+    This means that \(\boxed{0.2075 <
     \smash{\OB{\fun{tms}}{\phi_{2n}}} - Q(\phi_{2n}) < 0.2405.}\)
 
     From theorem~\ref{thm:OB_lambda} and
@@ -1006,10 +1033,13 @@ is \(p=1+\phi_k\).
       \OB{\fun{tms}}{1+\phi_{2n}} = (n-1)(1+\phi_{2n}) + 1.
       \label{eq:OBtms_succ_phi_2n}
     \end{equation}
-    Furthermore, \(Q(1+\phi_{2n}) = \tfrac{1}{2}(1+\phi_{2n}) (2(n-1)
-    + \lg(1+1/2^{2n-1})) = \OB{\fun{tms}}{1+\phi_{2n}} - 1 +
-    \tfrac{1}{6}(4^n + 2)\lg(1+2/4^n)\), the last step making use
-    of~\eqref{eq:OBtms_succ_phi_2n}. If \(g(x) := 1 -
+    Furthermore,
+    \begin{align*}
+      Q(1+\phi_{2n}) &= \frac{1}{2}(1+\phi_{2n}) (2(n-1) + \lg(1+1/2^{2n-1}))\\
+                    &= \OB{\fun{tms}}{1+\phi_{2n}} - 1 +
+      \frac{1}{6}(4^n + 2)\lg(1+2/4^n),
+    \end{align*}
+    the last step making use of~\eqref{eq:OBtms_succ_phi_2n}. If \(g(x) := 1 -
     \tfrac{1}{6}(x+2)\lg(1+2/4^n)\), then
     \(\OB{\fun{tms}}{1+\phi_{2n}} - Q(1+\phi_{2n}) =
     g(4^n)\). Elementary analysis entails that \(2 - \lg 3 \leqslant
@@ -1026,42 +1056,51 @@ is \(p=1+\phi_k\).
   \item If \(k=2m+1\), then \(\phi_{2m+1} = 2^{2m-1} + \phi_{2m-1}\)
     (see proof of theorem~\ref{thm:OB_lambda}). From
     equation~\eqref{eq:OBtms_2m_i}, we draw
-    \(\OB{\fun{tms}}{\phi_{2m+1}} = \OB{\fun{tms}}{2^{2m-1}} +
-    \OB{\fun{tms}}{\phi_{2m-1}} + \phi_{2m-1} =
-    \OB{\fun{tms}}{\phi_{2m-1}} - (2m-1)4^{m-1} +
-    \phi_{2m-1}\). Summing both sides from \(m=1\) to \(m=n-1\) and
+    \begin{align*}
+      \OB{\fun{tms}}{\phi_{2m+1}} &= \OB{\fun{tms}}{2^{2m-1}} +
+      \OB{\fun{tms}}{\phi_{2m-1}} + \phi_{2m-1}\\
+      &= \OB{\fun{tms}}{\phi_{2m-1}} - (2m-1)4^{m-1} +
+      \phi_{2m-1}.
+    \end{align*}
+    Summing both sides from \(m=1\) to \(m=n-1\) and
     multiplying by~\(9\) yields \(9\OB{\fun{tms}}{\phi_{2n+1}} =
     \tfrac{1}{2}S_{n+1} - 3(4^n-1) + \sum_{m=0}^{n-1}\phi_{2m+1}\),
     which simplifies into
     \begin{equation}
-      \OB{\fun{tms}}{\phi_{2n+1}} = (n - \tfrac{1}{2})\phi_{2n+1}.
+      \OB{\fun{tms}}{\phi_{2n+1}} = (n - \frac{1}{2})\phi_{2n+1}.
       \label{eq:OBtms_phi_2n_1}
     \end{equation}
-    We have \(Q(\phi_{2n+1}) = \tfrac{1}{2}\phi_{2n+1}(2n-1 +
-    \lg(1-1/4^n)) = \OB{\fun{tms}}{\phi_{2n+1}} +
-    \tfrac{1}{2}\phi_{2n+1}\lg(1-1/4^n)\), where the last equality
-    follows from~\eqref{eq:OBtms_phi_2n_1}. If we let \(f(x) :=
-    (1-x)\ln(1-1/x)\), as we did for \(Q(\phi_{2n})\), we have
-    \(\OB{\fun{tms}}{\phi_{2n+1}} - Q(\phi_{2n+1}) = f(4^n)/(3\ln
-    2)\). We know \(3\ln\tfrac{3}{4} \leqslant f(x) < 1\), for \(x
-    \geqslant 4\), therefore \(\lg 3 - 2 \leqslant
-    \OB{\fun{tms}}{\phi_{2n+1}} - Q(\phi_{2n+1}) < 1/(3\ln 2)\), if
-    \(n \geqslant 1\). Hence \(\boxed{0.4150 <
+    We have
+    \begin{align*}
+      Q(\phi_{2n+1}) &= \frac{1}{2}\phi_{2n+1}(2n-1 + \lg(1-1/4^n))\\
+      &= \OB{\fun{tms}}{\phi_{2n+1}} + \frac{1}{2}\phi_{2n+1}\lg(1-1/4^n),
+    \end{align*}
+    where the last equality follows from~\eqref{eq:OBtms_phi_2n_1}. If
+    we let \(f(x) := (1-x)\ln(1-1/x)\), as we did for
+    \(Q(\phi_{2n})\), we have \(\OB{\fun{tms}}{\phi_{2n+1}} -
+    Q(\phi_{2n+1}) = f(4^n)/(3\ln 2)\). We know \(3\ln\tfrac{3}{4}
+    \leqslant f(x) < 1\), for \(x \geqslant 4\), therefore \(\lg 3 - 2
+    \leqslant \OB{\fun{tms}}{\phi_{2n+1}} - Q(\phi_{2n+1}) < 1/(3\ln
+    2)\), if \(n \geqslant 1\). Hence \(\boxed{0.4150 <
       \smash{\OB{\fun{tms}}{\phi_{2n+1}}} - Q(\phi_{2n+1}) <
       0.4809.}\)
 
     From theorem~\ref{thm:OB_lambda} and
     equation~\eqref{eq:OBtms_phi_2n_1}, we deduce
     \begin{equation}
-      \OB{\fun{tms}}{1+\phi_{2n+1}} = (n-\tfrac{1}{2})(1+\phi_{2n+1})
-      + \tfrac{1}{2}.
+      \OB{\fun{tms}}{1+\phi_{2n+1}} = (n - \frac{1}{2})(1+\phi_{2n+1})
+      + \frac{1}{2}.
       \label{eq:OBtms_succ_phi_2n_1}
     \end{equation}
-    Moreover, \(Q(1+\phi_{2n+1}) = \tfrac{1}{2}(1+\phi_{2n+1})(2n-1 +
-    \lg(1+1/2^{2n+1})) = \OB{\fun{tms}}{1+\phi_{2n+1}} - \tfrac{1}{2}
-    + \tfrac{1}{6}(1+2^{2n+1})\lg(1+1/2^{2n+1})\), the last step being
-    a consequence of~\eqref{eq:OBtms_succ_phi_2n_1}. If we let \(h(x)
-    := \tfrac{1}{2} - \tfrac{1}{6}(1+x)\lg(1+1/x)\), then
+    Moreover,
+    \begin{align*}
+      Q(1+\phi_{2n+1}) &= \frac{1}{2}(1+\phi_{2n+1})(2n-1 + \lg(1+1/2^{2n+1}))\\
+                      &= \OB{\fun{tms}}{1+\phi_{2n+1}} - \frac{1}{2}
+                         + \frac{1}{6}(1+2^{2n+1})\lg(1+1/2^{2n+1}),
+    \end{align*}
+    the last step being a consequence
+    of~\eqref{eq:OBtms_succ_phi_2n_1}. If we let \(h(x) :=
+    \tfrac{1}{2} - \tfrac{1}{6}(1+x)\lg(1+1/x)\), then
     \(\OB{\fun{tms}}{1+\phi_{2n+1}} - Q(1+\phi_{2n+1}) =
     h(2^{2n+1})\). Elementary analysis shows that \(5 - 3\lg 3
     \leqslant h(x) < 1/2 - 1/(6\ln 2)\), for \(x \geqslant 8\), that
@@ -1175,7 +1214,7 @@ In summary, \(\Delta_0 = 0\) and \(\Delta_n = \Delta_{\floor{n/2}} +
   former is straightforward because it is a consequence of \(\floor{x}
   \leqslant x\). In the latter, because both sides of the inequality
   are integers, \(\floor{x/q} \leqslant \floor{\floor{x}/q}\) is
-  equivalent to state that \(p \leqslant \floor{x/q} \Rightarrow p
+  equivalent to stating that \(p \leqslant \floor{x/q} \Rightarrow p
   \leqslant \floor{\floor{x}/q}\), for any integer~\(p\). An obvious
   lemma is that if \(i\)~is an integer and \(y\)~a real number, \(i
   \leqslant \floor{y} \Leftrightarrow i \leqslant y\), so the original
@@ -1246,17 +1285,17 @@ two cases arise:
     n - \{\lg n\} + 1\) and \(\OW{\fun{tms}}{n} = n\lg n + \theta(1 -
     \{\lg n\}) \cdot n + 1\), with \(\theta(x) := x - 2^x\) and
     \(\{x\} := x - \floor{x}\) is the \emph{fractional
-      part}\index{fractional part@$\{x\}$|see{fractional
-        part}}\index{fractional part} of the real~\(x\). In
-    particular, we have \(0 \leqslant \{x\} < 1\). The derivative is
-    \(\theta'(x) = 1 - 2^x\ln 2\); it has one root \(\theta'(x_0) = 0
-    \Leftrightarrow x_0 = -\lg\ln 2\) and it is positive
-    before~\(x_0\), and negative after. Concordantly, \(\theta(x)\)
-    reaches its maximum at~\(x_0\): \(\max_{0<x\leqslant 1}\theta(x) =
-    \theta(x_0) = -(1+\ln\ln{2})/\!\ln{2} \simeq -0.9139\), and
-    \(\min_{0<x\leqslant 1}\theta(x) = \theta(1) = -1\). By
-    injectivity, \(\theta(1) = \theta(1-\{\lg n\})\) implies \(\{\lg
-    n\} = 0\), that is, \(n=2^p\) (first case).
+    part}\index{fractional part@$\{x\}$|see{fractional
+        part}}\index{fractional part} of the real~\(x\), so \(0
+    \leqslant \{x\} < 1\). The derivative is \(\theta'(x) = 1 - 2^x\ln
+    2\); it has one root \(\theta'(x_0) = 0 \Leftrightarrow x_0 =
+    -\lg\ln 2\) and it is positive before~\(x_0\), and negative
+    after. Concordantly, \(\theta(x)\) reaches its maximum at~\(x_0\):
+    \(\max_{0<x\leqslant 1}\theta(x) = \theta(x_0) =
+    -(1+\ln\ln{2})/\!\ln{2} \simeq -0.9139\), and \(\min_{0<x\leqslant
+      1}\theta(x) = \theta(1) = -1\). By injectivity, \(\theta(1) =
+    \theta(1-\{\lg n\})\) implies \(\{\lg n\} = 0\), that is,
+    \(n=2^p\) (first case).
 \end{itemize*}
 Hence \(\OW{\fun{tms}}{n} = n\lg n + A(\lg n) \cdot n + 1\), where
 \(A(x) := 1 - \{x\} - 2^{1 - \{x\}}\) is a periodic function, since
@@ -2520,12 +2559,14 @@ To prove it, we have two complementary cases to analyse:
     \end{equation}
     Since \(p-q-1 \geqslant 0\) and \(j < 2^q\), we have \((p-q-1)j
     \leqslant (p-q-1)2^q\) (tight if \(q=p-1\)). Hence
-    \((p-q+1)2^q+(p-q-1)j \leqslant
-    (p-q)2^{q+1}\). Inequation~\eqref{conj1} is entailed if \(2(p-q)
+    \begin{equation*}
+      (p-q+1)2^q+(p-q-1)j \leqslant (p-q)2^{q+1}.
+    \end{equation*}
+    Inequation~\eqref{conj1} is entailed if \(2(p-q)
     \leqslant 2^{p-q}\). Let \(g(x) := 2^x - 2x\), with \(x > 0\). We
     have \(g(1) = g(2) = 0\) and \(f(x) > 0\) for \(x > 2\). Thus,
     inequality~\eqref{conj1} holds and is tight if, and only if,
-    \(x=1\), that is, \(q=p-1\) (the case \(x=2\) implies \(i
+    \(x=1\), that is, \(q=p-1\) (case \(x=2\) implies \(i
     \leqslant 2^{p-1}\), which cannot be tight).\hfill\(\Box\)
 
 \end{itemize}
@@ -2634,7 +2675,7 @@ We have two complementary cases to consider:
     From \(q < p\) we deduce \(p-q+1 \geqslant 2\) and \(p-q-1
     \geqslant 0\); we also have \(2^q \geqslant 1\) and \(j \geqslant
     1\). Consequently, \((p-q+1)2^q \geqslant 2\) and \((p-q-1)(j-1)
-    \geqslant 0\), hence inequation~\eqref{ineq:2q_j} holds but the
+    \geqslant 0\), hence inequation~\eqref{ineq:2q_j} holds, but the
     bound is never tight.\hfill\(\Box\)
 
 \end{itemize}
@@ -3180,15 +3221,20 @@ p\), hence \(\OB{\fun{sum}}{n} \sim n\lg n\).\index{sum@$\OB{\fun{sum}}{n}$}
 \noindent Equation~\eqref{eq:best_merge} and~\eqref{eq:cost_unb} imply
 \(\OB{\fun{unb}}{n} = \sum_{i=1}^{r}{\min\{2^{e_i},2^{e_{i-1}} + \dots
   + 2^{e_0}\}}\)\index{unb@$\OB{\fun{unb}}{n}$|(}. Let us commence by
-noting that \(\sum_{j=0}^{i}{2^{e_j}} \leqslant \sum_{j=0}^{e_i}{2^j}
-= 2 \cdot 2^{e_i} - 1\). This is equivalent to a given binary number
-being always lower than or equal to the number with the same number of
-bits all set to~\(1\), for example, \((10110111)_2 \leqslant
-(11111111)_2\). By definition of~\(e_i\), we have \(e_{i-1} + 1
-\leqslant e_i\), so \(\sum_{j=0}^{i-1}{2^{e_j}} \leqslant
-2^{e_{i-1}+1} - 1 \leqslant 2^{e_i} - 1 < 2^{e_i}\) and
-\(\min\{2^{e_i},2^{e_{i-1}} + \dots + 2^{e_0}\} = 2^{e_{i-1}} + \dots
-+ 2^{e_0}\). We have now
+noting that
+\begin{equation*}
+  \sum_{j=0}^{i}{2^{e_j}} \leqslant \sum_{j=0}^{e_i}{2^j} = 2 \cdot
+  2^{e_i} - 1.
+\end{equation*}
+This is equivalent to a given binary number being always lower than or
+equal to the number with the same number of bits all set to~\(1\), for
+example, \((10110111)_2 \leqslant (11111111)_2\). By definition
+of~\(e_i\), we have \(e_{i-1} + 1 \leqslant e_i\), so
+\begin{equation*}
+  \sum_{j=0}^{i-1}{2^{e_j}} \leqslant 2^{e_{i-1}+1} - 1 \leqslant 2^{e_i} - 1 < 2^{e_i}
+\end{equation*}
+and \(\min\{2^{e_i},2^{e_{i-1}} + \dots + 2^{e_0}\} = 2^{e_{i-1}} +
+\dots + 2^{e_0}\). We have now
 \begin{equation}
 \OB{\fun{unb}}{n} = \sum_{i=1}^{r}\sum_{j=0}^{i-1}{2^{e_j}} < n.
 \label{ineq:OBunb}
@@ -3225,9 +3271,12 @@ relationship between \(\rho_j\), \(\rho_{j+1}\), \(\nu_j\) and
 of length~\(a\). Then \(\nu_{2n+1} = \nu_{\Xi} + a\) and \(\rho_{2n+1}
 = 0\). The next integer is \(2n+2 = (\Xi 10^a)_2\), so \(\nu_{2n+2} =
 \nu_{\Xi} + 1\) and \(\rho_{2n+2} = a\). Now, we can relate
-\(\rho\)~and~\(\nu\) by means of~\(a\): \(\rho_{2n+2} = \nu_{2n+1} -
-\nu_{\Xi} = \nu_{2n+1} - (\nu_{2n+2} - 1) = 1 + \nu_{2n+1} -
-\nu_{2n+2}\). We can check now that the same pattern also works
+\(\rho\)~and~\(\nu\) by means of~\(a\):
+\begin{equation*}
+  \rho_{2n+2} = \nu_{2n+1} - \nu_{\Xi} = \nu_{2n+1} - (\nu_{2n+2} - 1)
+  = 1 + \nu_{2n+1} - \nu_{2n+2}.
+\end{equation*}
+We can check now that the same pattern also works
 for~\(\rho_{2n+1}\) by simply using the definitions of
 \(\rho\)~and~\(\nu\): \(\rho_{2n+1} = 1 + \nu_{2n} -
 \nu_{2n+1}\). This achieves to establish, for any integer \(n>0\),
