@@ -171,14 +171,13 @@ sibling\index{tree!node!sibling} (two internal nodes are siblings if
 they have the same parent), it is a
 \emph{depth\hyp{}first}\index{binary tree!depth-first traversal}
 traversal. A simple program is
-\begin{equation}
-\fun{pre}_0(\fun{ext}()) \xrightarrow{\smash{\gamma}} \el;
-\;\;
-\fun{pre}_0(\fun{int}(x,t_1,t_2)) \xrightarrow{\smash{\delta}}
- \cons{x}{\fun{cat}(\fun{pre}_0(t_1),\fun{pre}_0(t_2))}.
+\begin{align}
+\fun{pre}_0(\fun{ext}()) &\xrightarrow{\smash{\gamma}} \el; \nonumber\\
+\fun{pre}_0(\fun{int}(x,t_1,t_2)) &\xrightarrow{\smash{\delta}}
+\cons{x}{\fun{cat}(\fun{pre}_0(t_1),\fun{pre}_0(t_2))}.
 \label{eq:pre0}
 \index{pre0@\fun{pre\(_0\)/1}}
-\end{equation}
+\end{align}
 We used the concatenation\index{stack!concatenation} on stacks provided by
 \fun{cat/2}\index{cat@\fun{cat/2}}, defined in~\eqref{def:cat}
 \vpageref{def:cat}, to order the values of the subtrees. We know that
@@ -240,7 +239,7 @@ node of the tree will perhaps lead to a total maximum (\emph{eager
 \end{equation}
 Summing both sides from \(k=0\) to \(k=n-1\) and simplifying yields
 \begin{equation*}
-\W{\fun{pre}_0}{n} = \tfrac{1}{2}(n^2 + 5n + 2) \sim \tfrac{1}{2}n^2.
+\W{\fun{pre}_0}{n} = \frac{1}{2}(n^2 + 5n + 2) \sim \frac{1}{2}n^2.
 \end{equation*}
 At this point, we check whether this closed form satisfies
 equation~\eqref{eq:pre0_max}. We have \(2(\W{\fun{pre}_0}{p} +
@@ -677,7 +676,7 @@ The function
 \caption{Preorder numbering}
 \label{fig:npre}
 \end{figure}
-implements this algorithm. We use an auxiliary function
+implements this algorithm, using a function
 \fun{npre/2}\index{npre@\fun{npre/2}} such that \(\fun{npre}(i,t)
 \twoheadrightarrow \pair{j}{t'}\), where \(t'\)~is the preorder
 numbering of~\(t\), with root~\(i\), and \(j\)~is the smallest integer
@@ -741,11 +740,15 @@ substack\index{induction!immediate substack order} of~\(s\)
 \fig~\vref{fig:pre}, we see that rule~\(\theta\) maintains termination
 if \fun{pre/2}\index{pre@\fun{pre/2}} terminates; rule~\(\iota\)
 terminates; finally, rule~\(\kappa\) rewrites a call into smaller
-calls: \(\fun{pre}(\fun{int}(x,t_1,t_2),s) \succ \fun{pre}(t_2,s)\)
-and \(\fun{pre}(\fun{int}(x,t_1,t_2),s) \succ \fun{pre}(t_1,u)\), for
-all~\(u\), in particular if \(\fun{pre}(t_2,s) \twoheadrightarrow
-u\). As a consequence, \fun{pre/1}\index{pre@\fun{pre/1}} terminates
-on all inputs.\index{binary
+calls:
+\begin{align*}
+  \fun{pre}(\fun{int}(x,t_1,t_2),s) &\succ \fun{pre}(t_2,s),\\
+  \fun{pre}(\fun{int}(x,t_1,t_2),s) &\succ \fun{pre}(t_1,u),\; \text{for
+    all~\(u\),}
+\end{align*}
+in particular if \(\fun{pre}(t_2,s) \twoheadrightarrow u\). As a
+consequence, \fun{pre/1}\index{pre@\fun{pre/1}} terminates on all
+inputs.\index{binary
   tree!preorder!termination|)}\index{termination!preorder
   traversal|)}\hfill\(\Box\)
 
@@ -756,7 +759,7 @@ binary trees, we will consider a simple statement we made earlier,
 formally expressed as \(\pred{Pre}{t} \colon \fun{pre}_0(t) \equiv
 \fun{pre}(t)\).\index{Pre@\predName{Pre}}\index{pre0@\fun{pre\(_0\)/1}}\index{pre@\fun{pre/1}}
 We need to prove
-\begin{itemize}
+\begin{itemize*}
 
   \item the basis \(\pred{Pre}{\fun{ext}()}\);
 
@@ -764,11 +767,15 @@ We need to prove
     \forall t_2.\pred{Pre}{t_2} \Rightarrow \! \forall
     x.\pred{Pre}{\fun{int}(x,t_1,t_2)}\).
 
-\end{itemize}
-The basis is easy because \(\fun{pre}_0(\fun{ext}())
-\xrightarrow{\smash{\gamma}} \el \xleftarrow{\smash{\iota}}
-\fun{pre}(\fun{ext}(),\el) \xleftarrow{\smash{\theta}}
-\fun{pre}(\fun{ext}())\). See definition of \fun{pre\(_0\)/1} at
+\end{itemize*}
+The basis is easy because
+\begin{equation*}
+  \fun{pre}_0(\fun{ext}())
+  \xrightarrow{\smash{\gamma}} \el \xleftarrow{\smash{\iota}}
+  \fun{pre}(\fun{ext}(),\el) \xleftarrow{\smash{\theta}}
+  \fun{pre}(\fun{ext}()).
+\end{equation*}
+See definition of \fun{pre\(_0\)/1} at
 equation~\eqref{eq:pre0} \vpageref{eq:pre0}. It is useful here to
 recall the definition of \fun{cat/2}\index{cat@\fun{cat/2}}:
 \begin{equation*}
@@ -799,12 +806,17 @@ the other side or get stuck. Let \(t := \fun{int}(x,t_1,t_2)\), then
 \end{array}
 \end{equation*}
 At this point, we start rewriting the other side, until we get stuck
-as well: \(\fun{pre}(t) = \fun{pre}(\fun{int}(x,t_1,t_2))
+as well:
+\begin{equation*}
+  \fun{pre}(t) = \fun{pre}(\fun{int}(x,t_1,t_2))
 \xrightarrow{\smash{\theta}} \fun{pre}(\fun{int}(x,t_1,t_2),\el)
 \xrightarrow{\smash{\kappa}}
-\cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))}\)\index{pre@\fun{pre/1}}\index{pre@\fun{pre/2}}. Comparing
-the two stuck expressions\index{rewrite system!stuck expression}
-suggests a subgoal to reach.
+\cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))}.
+\index{pre@\fun{pre/1}}
+\index{pre@\fun{pre/2}}
+\end{equation*}
+Comparing the two stuck expressions\index{rewrite system!stuck
+  expression} suggests a subgoal to reach.
 
 Let \(\pred{CatPre}{t,s} \colon \fun{cat}(\fun{pre}(t,\el),s) \equiv
 \fun{pre}(t,s)\)\index{CatPre@\predName{CatPre}}\index{cat@\fun{cat/2}}\index{pre@\fun{pre/2}}. When
@@ -836,13 +848,17 @@ well\hyp{}founded induction principle then requires that we establish
     \pred{CatPre}{t,s}\).
 
 \end{itemize*}
-The basis is easy: \(\fun{cat}(\fun{pre}(\fun{ext}(),\el),\el)
-\xrightarrow{\smash{\iota}} \fun{cat}(\el,\el)
-\xrightarrow{\smash{\alpha}} \el \xleftarrow{\smash{\iota}}
-\fun{pre}(\fun{ext}(),\el)\).\index{cat@\fun{cat/2}} We then assume
-\(\forall t',s'.(t,s) \succ_{B \times S} (t',s') \Rightarrow
-\pred{CatPre}{t',s'}\), which is the induction hypothesis, and proceed
-to rewrite the left\hyp{}hand side after letting \(t :=
+The basis is easy:
+\begin{equation*}
+  \fun{cat}(\fun{pre}(\fun{ext}(),\el),\el)
+  \xrightarrow{\smash{\iota}} \fun{cat}(\el,\el)
+  \xrightarrow{\smash{\alpha}} \el \xleftarrow{\smash{\iota}}
+  \fun{pre}(\fun{ext}(),\el).
+\index{cat@\fun{cat/2}}
+\end{equation*}
+We then assume \(\forall t',s'.(t,s) \succ_{B \times S} (t',s')
+\Rightarrow \pred{CatPre}{t',s'}\), which is the induction hypothesis,
+and proceed to rewrite the left\hyp{}hand side after letting \(t :=
 \fun{int}(x,t_1,t_2)\). The result is shown in \fig~\vref{fig:CatPre},
 \index{CatPre@\predName{CatPre}}
 \begin{figure}[t]
@@ -1013,9 +1029,9 @@ square brackets.) When \(S=1\), that is, the stack is flat, then
 \(\C{\fun{pre}}{n} = \C{\fun{flat}_2}{n}\), otherwise
 \(\C{\fun{pre}}{n} < \C{\fun{flat}_2}{n}\).
 
-\bigskip
+%\bigskip
 
-\begin{figure}[h]
+\begin{figure}[t]
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}c@{\;}l}
@@ -1050,14 +1066,19 @@ where the only difference with \fig~\ref{fig:pre_tree} is the moment
 when the root~\(x\) is pushed on the accumulator\index{functional
   language!accumulator}: between the inorder traversals of the
 subtrees \(t_1\)~and~\(t_2\). The implicit rewrites in
-\fig~\ref{fig:in_tree} are \(\fun{in}(t_2,s) \twoheadrightarrow
-s_1\),\index{in@\fun{in/2}} then \(\fun{in}(t_1,\cons{x}{s_1})
-\twoheadrightarrow s_2\) and \(\fun{in}(t,s) \twoheadrightarrow s_2\),
+\fig~\ref{fig:in_tree} are
+\begin{align*}
+  \fun{in}(t_2,s) &\twoheadrightarrow s_1,\index{in@\fun{in/2}}\\
+  \fun{in}(t_1,\cons{x}{s_1}) &\twoheadrightarrow s_2,\\
+  \fun{in}(t,s) &\twoheadrightarrow s_2,
+\end{align*}
 where \(t=\fun{int}(x,t_1,t_2)\). By eliminating the intermediary
 variables \(s_1\)~and~\(s_2\) we obtain the equivalence
-\(\fun{in}(t_1,\cons{x}{\fun{in}(t_2,s)}) \equiv \fun{in}(t,s)\). The
-case of the external node is the same as for preorder. This reasoning
-yields the function defined in \fig~\vref{fig:in},
+\begin{equation*}
+  \fun{in}(t_1,\cons{x}{\fun{in}(t_2,s)}) \equiv \fun{in}(t,s).
+\end{equation*}
+The case of the external node is the same as for preorder. This
+reasoning yields the function defined in \fig~\vref{fig:in},
 \begin{figure}[b]
 \begin{equation*}
 \boxed{
@@ -1182,8 +1203,11 @@ rightmost branch\index{tree!branch} is \([\fun{e}, \fun{g},
 rule~\(\beta\), we must have an initial tree whose right subtree is
 empty, so the left subtree contains \(n-1\) nodes (the root belongs,
 by definition, to the rightmost branch): this yields
-\(\W{\fun{in}_1}{n} = (n-1) + (n+1) =
-2n\).\index{in1@$\W{\fun{in}_1}{n}$}\index{binary tree!rotation|)}
+\begin{equation*}
+  \W{\fun{in}_1}{n} = (n-1) + (n+1) = 2n.
+  \index{in1@$\W{\fun{in}_1}{n}$}
+  \index{binary tree!rotation|)}
+\end{equation*}
 
 \paragraph{Exercise}
 
@@ -1221,10 +1245,13 @@ where \fun{rev/1}\index{rev@\fun{rev/1}}
 reverses\index{stack!reversal} its stack argument (see
 definition~\eqref{def:rev} \vpageref{def:rev}). This property is useful
 because the left\hyp{}hand side of the equivalence is more costly than
-the right\hyp{}hand side: \(\Call{\fun{in}(\fun{mir}(t))} =
-\C{\fun{mir}}{n} + \C{\fun{in}}{n} = (2n+1) + (2n+2) = 4n + 3\), to be
-compared with \(\Call{\fun{rev}(\fun{in}(t))} = \C{\fun{in}}{n} +
-\C{\fun{rev}}{n} = (2n+2) + (n+2) = 3n +
+the right\hyp{}hand side:
+\begin{equation*}
+  \Call{\fun{in}(\fun{mir}(t))} =
+  \C{\fun{mir}}{n} + \C{\fun{in}}{n} = (2n+1) + (2n+2) = 4n + 3,
+\end{equation*}
+to be compared with \(\Call{\fun{rev}(\fun{in}(t))} = \C{\fun{in}}{n}
++ \C{\fun{rev}}{n} = (2n+2) + (n+2) = 3n +
 4\).\index{mir@$\C{\fun{mir}}{n}$}
 
 \medskip
@@ -1241,14 +1268,18 @@ we establish
     x.\pred{InMir}{\fun{int}(x,t_1,t_2)}.\)
 
 \end{itemize}
-The former results from \(\fun{in}(\fun{mir}(\fun{ext}()))
-\xrightarrow{\smash{\sigma}} \fun{in}(\fun{ext}())
-\xrightarrow{\smash{\xi}} \fun{in}(\fun{ext}(),\el)
-\xrightarrow{\smash{\pi}} \el \xleftarrow{\smash{\zeta}}
-\fun{rcat}(\el,\el) \xleftarrow{\smash{\epsilon}} \fun{rev}(\el)
-\xleftarrow{\smash{\pi}} \fun{rev}(\fun{in}(\fun{ext}(),\el))
-\xleftarrow{\smash{\xi}}
-\fun{rev}(\fun{in}(\fun{ext}()))\).\index{rcat@\fun{rcat/2}}\index{rev@\fun{rev/1}}
+The former results from
+\begin{align*}
+  \fun{in}(\fun{mir}(\fun{ext}())) &\xrightarrow{\smash{\sigma}}
+  \fun{in}(\fun{ext}())\\
+  &\xrightarrow{\smash{\xi}} \fun{in}(\fun{ext}(),\el)\\
+  &\xrightarrow{\smash{\pi}} \el\\
+  &\xleftarrow{\smash{\zeta}} \fun{rcat}(\el,\el)\\
+  &\xleftarrow{\smash{\epsilon}} \fun{rev}(\el)\\
+  &\xleftarrow{\smash{\pi}} \fun{rev}(\fun{in}(\fun{ext}(),\el))\\
+  &\xleftarrow{\smash{\xi}} \fun{rev}(\fun{in}(\fun{ext}())).
+  \index{rcat@\fun{rcat/2}}\index{rev@\fun{rev/1}}
+\end{align*}
 Let us assume \(\pred{InMir}{t_1}\) and \(\pred{InMir}{t_2}\) and let
 \(t := \fun{int}(x,t_1,t_2)\), for any~\(x\). We rewrite the
 left\hyp{}hand side of the equivalence to be proved until we reach the
@@ -1478,11 +1509,14 @@ the pattern of a postorder traversal.
 Let \(\pred{PreMir}{t} \colon \fun{pre}(\fun{mir}(t)) \equiv
 \fun{rev}(\fun{post}(t))\).\index{PreMir@\predName{PreMir}|(} Previous
 experience with proving \(\pred{InMir}{t}\) leads us to weaken
-(generalise) the property in order to facilitate the proof:
-\(\pred{PreMir}{t,s} \colon \fun{pre}(\fun{mir}(t),s) \equiv
-\fun{rcat}(\fun{post}(t,\el),s)\).\index{rcat@\fun{rcat/2}} Clearly,
-\(\pred{PreMir}{t,\el} \Leftrightarrow \pred{PreMir}{t}\). Let us then
-define
+(generalise) the property in order to facilitate the proof: Let
+\begin{equation*}
+  \pred{PreMir}{t,s} \colon \fun{pre}(\fun{mir}(t),s) \equiv
+  \fun{rcat}(\fun{post}(t,\el),s).
+  \index{rcat@\fun{rcat/2}}
+\end{equation*}
+Clearly, \(\pred{PreMir}{t,\el} \Leftrightarrow
+\pred{PreMir}{t}\). Let us then define
 \begin{equation*}
   (t,s) \succ_{B \times S} (t',s') :\Leftrightarrow \text{\(t \succ_{B}
     t'\) or (\(t = t'\) and \(s \succ_{S} s'\))}.
@@ -1492,7 +1526,7 @@ This is conceptually the same order as the one on the calls to
 \vpageref{eq:BS_order}. The minimum element for this lexicographic
 order is \((\fun{ext}(),\el)\). Well\hyp{}founded induction then
 requires that we prove
-\begin{itemize}
+\begin{itemize*}
 
   \item the basis \(\pred{PreMir}{\fun{ext}(),\el}\);
 
@@ -1500,15 +1534,18 @@ requires that we prove
     \Rightarrow \pred{PreMir}{t',s'}) \Rightarrow
     \pred{PreMir}{t,s}\).
 
-\end{itemize}
-The basis:\index{mir@\fun{mir/1}|(}
-\(\fun{pre}(\fun{mir}(\fun{ext}()),\el) \xrightarrow{\smash{\sigma}}
-\fun{pre}(\fun{ext}(),\el) \xrightarrow{\smash{\iota}} \el
-\xleftarrow{\smash{\zeta}} \fun{rcat}(\el,\el)
-\xleftarrow{\smash{\mu}}
-\fun{rcat}(\fun{post}(\fun{ext}(),\el),\el)\). Let \(t :=
-\fun{int}(x,t_1,t_2)\). In \fig~\vref{fig:premir}, we have the
-rewrites of the left\hyp{}hand side,
+\end{itemize*}
+The basis is proved as follows:\index{mir@\fun{mir/1}|(}
+\begin{align*}
+  \fun{pre}(\fun{mir}(\fun{ext}()),\el)
+  &\xrightarrow{\smash{\sigma}} \fun{pre}(\fun{ext}(),\el)\\
+  &\xrightarrow{\smash{\iota}} \el\\
+  &\xleftarrow{\smash{\zeta}} \fun{rcat}(\el,\el)\\
+  &\xleftarrow{\smash{\mu}}
+  \fun{rcat}(\fun{post}(\fun{ext}(),\el),\el).
+\end{align*}
+Let \(t := \fun{int}(x,t_1,t_2)\). In \fig~\vref{fig:premir}, we have
+the rewrites of the left\hyp{}hand side,
 \begin{figure}
 \begin{equation*}
 \boxed{
@@ -2175,7 +2212,7 @@ enqueued instead of being discarded, because they are later needed to
 make the numbered tree.
 
 In \fig~\vref{fig:bf2_ex}
-\begin{figure}[!b]
+\begin{figure}[t]
 \centering
 \includegraphics{bf2_abcd_0}
 \includegraphics{bf2_abcd_1}
@@ -2271,24 +2308,26 @@ where \(\fun{per}_0(t_1)\) is evaluated before
 \(\fun{per}_0(t_1) \twoheadrightarrow \fun{false}()\).\index{binary
   tree!perfect $\sim$|)}
 
-% Wrapping figure better declared before a paragraph
-%
-\begin{wrapfigure}[7]{r}[0pt]{0pt}
-% [7] vertical lines
-% {r} mandatory right placement
-% [0pt] of margin overhang
-\centering
-\includegraphics{complete}
-\caption{}
-\label{fig:complete}
-\end{wrapfigure}
 
 \paragraph{Completeness}
 
 A binary tree is \emph{complete}\index{binary tree!complete $\sim$} if
 the children of every internal node are either two external nodes or
 two internal nodes themselves. An example is provided in
-\fig~\vref{fig:complete}. Recursively, a given tree is complete if,
+\fig~\vref{fig:complete}.
+% Wrapping figure better declared before a paragraph
+%
+%\begin{wrapfigure}[7]{r}[0pt]{0pt}
+% [7] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\begin{figure}
+\centering
+\includegraphics{complete}
+\caption{A complete tree}
+\label{fig:complete}
+\end{figure}
+Recursively, a given tree is complete if,
 and only if, its immediate subtrees are complete. This is the same
 rule we used for perfection. In other words, perfection and
 completeness are propagated bottom\hyp{}up. Therefore, we need to
@@ -2634,7 +2673,7 @@ nearby, in view of a better amortised (see
 page~\pageref{par:amortised_cost}) or average cost (see 2-way
 insertion in section~\ref{sec:2-way} \vpageref{sec:2-way}).
 
-\begin{wrapfigure}[7]{r}[0pt]{0pt}
+\begin{wrapfigure}[8]{r}[0pt]{0pt}
 \centering
 \includegraphics[bb=64 663 118 721]{binzip}
 \caption{}
@@ -2652,15 +2691,18 @@ context (a rooted path) and a substructure (at the end of that path),
 whose handle is the focus. In one move, it is possible to visit the
 children in any order, the parent or the sibling. Consider
 \fig~\ref{fig:binzip} where the slider is the node~\fun{d}. The
-substructure is \(s :=
-\fun{int}(\fun{d}(),\fun{int}(\fun{e}(),\fun{ext}(),\fun{ext}()),
-\fun{int}(\fun{f}(),\fun{ext}(),\fun{ext}()))\). To define rooted
-paths for the zipper, we need three data constructors: one denoting
-the empty path, \(\fun{top}()\), one denoting a turn to the left,
-\(\fun{left}(x,t,p)\), where \(x\)~is a node on the path, \(t\)~is the
-right subtree of~\(x\), and~\(p\) is the rest of the path up to the
-root, and one constructor denoting a turn to the right,
-\(\fun{right}(x,t,p)\), where \(t\)~is the left subtree of~\(x\).
+substructure is
+\begin{equation*}
+  s := \fun{int}(\fun{d}(),\fun{int}(\fun{e}(),\fun{ext}(),\fun{ext}()),
+       \fun{int}(\fun{f}(),\fun{ext}(),\fun{ext}())).
+\end{equation*}
+To define rooted paths for the zipper, we need three data
+constructors: one denoting the empty path, \(\fun{top}()\), one
+denoting a turn to the left, \(\fun{left}(x,t,p)\), where \(x\)~is a
+node on the path, \(t\)~is the right subtree of~\(x\), and~\(p\) is
+the rest of the path up to the root, and one constructor denoting a
+turn to the right, \(\fun{right}(x,t,p)\), where \(t\)~is the left
+subtree of~\(x\).
 
 Resuming our example above, the zipper is then the pair
 \(\pair{p}{s}\), with the path~\(p\) being \(\fun{right}(\fun{b}(),
@@ -2896,10 +2938,14 @@ not lose information. For example, the tree in \fig~\vref{fig:dyck2bt}
 \includegraphics[scale=0.9,bb=93 650 330 724]{bt2dyck}}
 \caption{Bijection between a binary tree and a Dyck path}
 \end{figure}
-would formally be \(t := \fun{int}(0, \fun{int}(1, \fun{ext}(),
+would formally be
+\begin{equation*}
+  t := \fun{int}(0, \fun{int}(1, \fun{ext}(),
 \fun{int}(2, \fun{ext}(), \fun{ext}())), \fun{int}(3, \fun{ext}(),
-\fun{ext}())\) and mapped into the Dyck path in
-\fig~\vref{fig:bt2dyck}\index{binary tree!preorder!encoding} as
+\fun{ext}()),
+\end{equation*}
+and mapped into the Dyck path in
+\fig~\ref{fig:bt2dyck}\index{binary tree!preorder!encoding} as
 follows:
 \begin{align*}
 \delta(t)
@@ -2929,7 +2975,7 @@ path, but we would have to remove the last item from the resulting
 stack, so it is more efficient to directly implement \(\delta\) as
 function \fun{dpre/1}\index{dpre@\fun{dpre/1}} (\emph{Dyck path as
   preorder}) in \fig~\vref{fig:dpre}.
-\begin{figure}
+\begin{figure}[b]
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}c@{\;}l}
@@ -3025,8 +3071,11 @@ and shown in \fig~\vref{fig:d2b}.
 \caption{Mapping a Dyck path to a binary tree in postorder}
 \label{fig:d2b}
 \end{figure}
-The cost is \(\C{\fun{d2b}}{n} = 2n +
-2\).\index{d2b@$\C{\fun{d2b}}{n}$}
+The cost is
+\begin{equation*}
+  \C{\fun{d2b}}{n} = 2n + 2.
+  \index{d2b@$\C{\fun{d2b}}{n}$}
+\end{equation*}
 
 Whether we choose a preorder or a postorder mapping, as a consequence
 of the established bijections, we know that there are as many binary

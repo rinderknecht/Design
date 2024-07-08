@@ -26,8 +26,8 @@ different ways.
 
 % Wrapping figure better declared before a paragraph
 %
-\begin{wrapfigure}[9]{r}[0pt]{0pt}
-% [9] vertical lines
+\begin{wrapfigure}[10]{r}[0pt]{0pt}
+% [10] vertical lines
 % {r} mandatory right placement
 % [0pt] of margin overhang
 \centering
@@ -78,6 +78,7 @@ measure of size in this chapter.
 % [10] vertical lines
 % {r} mandatory right placement
 % [0pt] of margin overhang
+\hspace*{0pt} % Somehow needed nowadays
 \centering
 \subfloat[Dyck path\label{fig:dyck}]{%
   \includegraphics[bb=71 634 158 712]{dyck}}
@@ -112,7 +113,10 @@ diagonal, or touch it. We want to show that \emph{there exists a
   bijection between Dyck paths of length~\(2n\) and Catalan trees with
   \(n\)~edges.}
 
-\begin{wrapfigure}[7]{r}[0pt]{0pt}
+\begin{wrapfigure}[8]{r}[0pt]{0pt}
+% [8] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
 \centering
 \includegraphics[bb=71 661 128 720]{ctree_pre}
 \caption{}
@@ -129,13 +133,14 @@ cycles.) Of course, there are many ways to achieve this tour and the
 one we envisage here is called a \emph{preorder traversal}. At every
 node, we take the leftmost unvisited edge and visit the subtree in
 preorder; when back at the node, we repeat the choice with the
-remaining unvisited children. For the sake of clarity, we show in
-\fig~\ref{fig:ctree_pre} the \emph{preorder numbering}\index{tree!Catalan $\sim$!preorder numbering} of \fig~\ref{fig:ctree}, where the order in
-which a node is visited first is shown instead of a black disk
-\((\bullet)\).
+remaining unvisited children. For more clarity, we show in
+\fig~\ref{fig:ctree_pre} the \emph{preorder
+numbering}\index{tree!Catalan $\sim$!preorder numbering} of
+\fig~\ref{fig:ctree}, where the order in which a node is visited first
+is shown instead of a black disk \((\bullet)\).
 
-\begin{wrapfigure}[12]{r}[0pt]{0pt}
-% [11] vertical lines
+\begin{wrapfigure}[14]{r}[0pt]{0pt}
+% [13] vertical lines
 % {r} mandatory right placement
 % [0pt] of margin overhang
 \centering
