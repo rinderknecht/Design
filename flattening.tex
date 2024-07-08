@@ -96,7 +96,7 @@ in the case of rule~\(\gamma\), the substructures of
 \(\fun{flat}(t)\), we obtain a new version,
 \fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}}, in
 \fig~\vref{fig:flat0}.
-\begin{figure}
+\begin{figure}[b]
 \begin{equation*}
 \boxed{%
 \begin{array}{r@{\;}l@{\;}l}
@@ -116,7 +116,7 @@ in the case of rule~\(\gamma\), the substructures of
 
 Let us consider an example in \fig~\vref{fig:flat0_ex}, where the call
 to be rewritten next is underlined in case of ambiguity.
-\begin{figure}
+\begin{figure}[t]
 \begin{equation*}
 \boxed{%
 \begin{array}{r@{\;}l@{\;}l}
@@ -224,7 +224,7 @@ from the root to a leaf.)
 
   \item If \(\Omega \geqslant \Gamma\), the minimum configuration is
   shown in \fig~\ref{fig:cat_min1}
-\begin{figure}[b]
+\begin{figure}
 \centering
 \subfloat[If \(\Omega \geqslant \Gamma\), the minimum is \(\Gamma\).
 \label{fig:cat_min1}]{\includegraphics[bb=66 660 191 722]{cat_min1}}
@@ -265,18 +265,6 @@ have\index{flat0@$\W{\fun{flat}_0}{n,\Omega,\Gamma}$}
 \caption{Maximum cost and right rotations}
 \end{figure}
 
-% Wrapping figure better declared before a paragraph
-%
-\begin{wrapfigure}[7]{r}[0pt]{0pt}
-% [7] vertical lines
-% {r} mandatory right placement
-\centering
-\includegraphics[bb=71 658 220 710]{flat}%[... 721]
-\caption{Defining \fun{flat/1}}
-\label{fig:flat}
-\index{stack!flattening!definition}
-\end{wrapfigure}
-
 \paragraph{Small-step design}
 \index{design!small-step $\sim$}
 
@@ -288,7 +276,22 @@ the abstract syntax trees, this operation is a \emph{right
 the argument, as shown in \figs~\vrefrange{fig:lift1}{fig:lift2},
 where the new function is called
 \fun{flat/1}\index{flat@\fun{flat/1}|(} and defined in
-\fig~\vref{fig:flat}. Let us run the previous example of
+\fig~\vref{fig:flat}.
+% Wrapping figure better declared before a paragraph
+%
+%\vspace*{0pt} % Because starts at the top of the page...
+%\begin{wrapfigure}[7]{r}[0pt]{0pt}
+% [7] vertical lines
+% {r} mandatory right placement
+\begin{figure}
+\centering
+\includegraphics[bb=71 658 220 710]{flat}%[... 721]
+\caption{Defining \fun{flat/1}}
+\label{fig:flat}
+\index{stack!flattening!definition}
+\end{figure}
+%\end{wrapfigure}
+Let us run the previous example of
 \fig~\vref{fig:flat0_ex} again in \fig~\vref{fig:flat_ex} with
 \fun{flat/1}. The difference in cost with
 \fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}} resides in the number

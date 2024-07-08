@@ -146,8 +146,8 @@ with. More general are the \emph{term\hyp{}rewriting
 tuples, integers and variables. Let us consider the following totally
 ordered system
 \begin{equation}
-(0,m) \rightarrow m;\qquad\qquad
-(n,m) \rightarrow (n-1,n \cdot m);\qquad\qquad
+(0,m) \rightarrow m;\qquad
+(n,m) \rightarrow (n-1,n \cdot m);\qquad
 n     \rightarrow (n,1).
 \label{eq:fact_tf}
 \end{equation}
@@ -295,8 +295,9 @@ analyses. (As an illustration of a reduction strategy more powerful
 than call-by-value, see the purely functional language \Haskell
 \citep{DoetsVanEijck_2004}.) Also it allows us to restrict the shape
 of the left\hyp{}hand sides, called \emph{patterns}\index{functional
-  language!pattern}, to one, outermost function call. For instance, we
-can then disallow a rule like
+  language!pattern}, to one, outermost function call, since we expect
+the arguments to be fully evaluated, that is, to be values. For
+instance, we disallow a rule like
 \begin{equation*}
 \fun{plus}(x,\fun{plus}(y,z)) \rightarrow
 \fun{plus}(\fun{plus}(x,y),z).
@@ -402,7 +403,7 @@ Let us set the abbreviations
 \end{itemize}
 after the convention of the programming language \Prolog
 \citep{SterlingShapiro_1994,Bratko_2000}. For instance, we may write
-\([1|[2|[3|\el]]]\) in stead of
+\([1|[2|[3|\el]]]\) instead of
 \(\fun{cons}(1,\fun{cons}(2,\fun{cons}(3,\fun{nil}())))\).  We can
 further abbreviate the notations as follows:
 \begin{itemize}
@@ -810,9 +811,12 @@ function\index{termination!Ackermann's
   function}\index{ack@\fun{ack/2}|(}, an early example of a total
 computable function which is not primitive recursive. It makes use of
 double recursion and two parameters to grow values as towers of
-exponents, for example, \(\fun{ack}(4,3) \twoheadrightarrow
-2^{2^{65536}} - 3\). It is not obviously terminating, because if the
-first argument does decrease, the second largely increases.
+exponents, for example,
+\begin{equation*}
+  \fun{ack}(4,3) \twoheadrightarrow 2^{2^{65536}} - 3.
+\end{equation*}
+It is not obviously terminating, because if the first argument does
+decrease, the second largely increases.
 
 Let us define a well\hyp{}founded ordering on pairs, called
 \emph{lexicographic order}\index{induction!lexicographic order}. Let
@@ -837,8 +841,11 @@ any infinite descending chain. Here, a lexicographic order on \((m,n)
 Clearly, \(\fun{ack}(0,0)\) is the minimum element. Second, we must
 prove that \fun{ack/2} rewrites to smaller calls. We are only
 concerned with rules \(\beta\)~and~\(\gamma\). With the former, we
-have \(\fun{ack}(m+1,0) \succ \fun{ack}(m,1)\). With the latter, we
-have
+have the inequality
+\begin{equation*}
+  \fun{ack}(m+1,0) \succ \fun{ack}(m,1).
+\end{equation*}
+With the latter, we have the following inequalities:
 \begin{equation*}
   \begin{array}{@{}r@{\;}l@{\;}l@{}}
     \fun{ack}(m+1,n+1) & \succ & \fun{ack}(m+1,n),\\
@@ -932,7 +939,7 @@ Note that we matched here an expression, namely
 \(\fun{cat}(\cons{x}{s},\fun{cat}(t,u))\), instead of a value, as is
 normally done with the call\hyp{}by\hyp{}value evaluation strategy,
 because we work with equivalences and we assumed that the system is
-terminating and confluent, so any reduction strategy will do.
+terminating and confluent, so \emph{any reduction strategy will do}.
 
 
 \section{Implementation}

@@ -349,16 +349,16 @@ series
 \begin{array}{r@{\;}c@{\;}l}
 \fun{join}(s,\el)
 & \smashedrightarrow{\gamma} &
-  [x\sb{0}|\fun{join}([x\sb{1},\ldots,x\sb{n-1}],\el)]\\
+  [x\sb{0}|\,\fun{join}([x\sb{1},\ldots,x\sb{n-1}],\el)]\\
 & \smashedrightarrow{\gamma} &
-  [x\sb{0}|[x\sb{1}|\fun{join}([x\sb{2},\ldots,x\sb{n-1}],\el)]]\\
-& = & [x\sb{0},x\sb{1}|\fun{join}([x\sb{2},\ldots,x\sb{n-1}],\el)]\\
+  [x\sb{0}|[x\sb{1}|\,\fun{join}([x\sb{2},\ldots,x\sb{n-1}],\el)]]\\
+& = & [x\sb{0},x\sb{1}|\,\fun{join}([x\sb{2},\ldots,x\sb{n-1}],\el)]\\
 & \smashedrightarrow{\gamma} &
-  [x\sb{0},x\sb{1}|[x\sb{2}|\fun{join}([x\sb{3},\ldots,x\sb{n-1}],\el)]]\\
-& = & [x\sb{0},x\sb{1},x\sb{2}|\fun{join}([x\sb{3},\ldots,x\sb{n-1}],\el)]\\
+  [x\sb{0},x\sb{1}|[x\sb{2}|\,\fun{join}([x\sb{3},\ldots,x\sb{n-1}],\el)]]\\
+& = & [x\sb{0},x\sb{1},x\sb{2}|\,\fun{join}([x\sb{3},\ldots,x\sb{n-1}],\el)]\\
 & \smash{\vdots} &\\
 & \smashedrightarrow{\gamma} &
-  [x\sb{0},x\sb{1},\ldots,x\sb{n-1}|\fun{join}(\el,\el)]\\
+  [x\sb{0},x\sb{1},\ldots,x\sb{n-1}|\,\fun{join}(\el,\el)]\\
 & \smashedrightarrow{\alpha} & [x\sb{0},x\sb{1},\ldots,x\sb{n-1}|\el]\\
 & = & [x\sb{0},x\sb{1},\ldots,x\sb{n-1}]\\
 & = & s.
