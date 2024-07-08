@@ -208,8 +208,13 @@ The cost of a successful linear search is \(\C{\fun{ls}}{n,k} = k\),
 if the sought key is at position~\(k\), where the first key is at
 position~\(1\). Therefore, the average cost of a successful linear
 search, assuming that each distinct key is equally likely to be sought
-is \(\M{\fun{ls}}{n} = \frac{1}{n}\sum_{k=1}^{n}\C{\fun{ls}}{n,k} =
-\tfrac{1}{2}(n+1)\).\index{linear search}\index{ls@$\M{\fun{ls}}{n}$}
+is
+\begin{equation*}
+  \M{\fun{ls}}{n} = \frac{1}{n}\sum_{k=1}^{n}\C{\fun{ls}}{n,k} =
+  \frac{1}{2}(n+1).
+  \index{linear search}
+  \index{ls@$\M{\fun{ls}}{n}$}
+\end{equation*}
 This raises the question of the average cost of
 \fun{mem/2}.\index{mem@\fun{mem/2}}
 
@@ -339,7 +344,7 @@ higher.  Nevertheless, the advantage is that \emph{equality is not
   tested on the way down}, only when the external node is reached, so
 only one comparison per node is required. The program is shown in
 \fig~\vref{fig:mem1}.
-\begin{figure}[b]
+\begin{figure}[t]
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}l@{\;}l}
@@ -532,7 +537,7 @@ that must be detected, leaving the search tree invariant.)
 
 Let us define a function \fun{mkl/1}\index{mkl@\fun{mkl/1}}
 \index{mkl@\fun{mkl/2}} (\emph{make leaves}) in \fig~\vref{fig:mkl}
-\begin{figure}
+\begin{figure}[b]
 \begin{equation*}
 \boxed{
 \begin{array}{@{}r@{\;}l@{\;}lr@{\;}l@{\;}l@{}}
