@@ -7,9 +7,9 @@ This is an overview of the topics developed in the rest of the book.
 
 \paragraph{String-rewriting}
 
-Let us assume that we own a string of white and black beads, like
-\(\circ \bullet \bullet \bullet \circ \circ \bullet\), and the
-game \citep{VanLeeuwen_1990a,Dershowitz_1993} consists in removing two
+Let us play with a string of white and black beads, like \(\circ
+\bullet \bullet \bullet \circ \circ \bullet\), and the game
+\citep{VanLeeuwen_1990a,Dershowitz_1993} consists in removing two
 adjacent beads and replace them with only one according to some rules,
 for example
 \begin{equation*}
@@ -39,9 +39,9 @@ Other compositions of the rules lead to the same result~\(\circ\) as
 well. Some others bring all\hyp{}white strings, the simplest being
 \(\circ \, \circ\). Some others lead to~\(\bullet\). Strings that can
 not be further rewritten, or \emph{reduced}, are called \emph{normal
-  forms}\index{rewrite system!normal form}. These observations induce
-us to wonder whether all strings have a normal form; if so, if it is
-unique and, furthermore, if it is either all\hyp{}white or
+forms}\index{rewrite system!normal form}. These observations should
+prompt us to wonder whether all strings have a normal form; if so, if
+it is unique and, furthermore, if it is either all\hyp{}white or
 black\hyp{}only.
 
 First, let us note that the system is
@@ -303,7 +303,7 @@ instance, we disallow a rule like
 \fun{plus}(\fun{plus}(x,y),z).
 \end{equation*}
 If the system is also terminating, we say that
-\((\twoheadrightarrow)\) defines an \emph{evaluation}\index{functional
+\((\xrightarrow{\smash{*}})\) defines an \emph{evaluation}\index{functional
   language!evaluation}, or \emph{interpretation}\index{functional
   language!interpretation|see{evaluation}}, of the terms. For example,
 the factorial\index{factorial|(}
@@ -688,7 +688,8 @@ is the number of bits of~\(n\). Therefore, \(2n - \floor{\lg n} - 1
 F(n) \sim 2n,\;\, \text{as \(n \rightarrow \infty\)}.
 \end{equation*}
 Two enumerations (counting vertically and diagonally) have shown that
-the exact total number of flips is of a lower magnitude than expected.
+the exact total number of flips is of a lower (logarithmic) magnitude
+than expected.
 
 This example resorts to a particular kind of amortised analysis called
 \emph{aggregate analysis}, because it relies on enumerative
