@@ -853,7 +853,7 @@ and~\(b\).\index{Low@\predName{Low}} Let \(m=2^p\). Using
 \(\OB{\fun{tms}}{2^p} = \tfrac{1}{2}p2^p\) and the inductive
 hypothesis \(\pred{Low}{i}\), we have
 \begin{equation}
-\tfrac{1}{2}m\lg m + (\tfrac{1}{2}i\lg i + ai + b) + i
+\frac{1}{2}m\lg m + \left(\frac{1}{2}i\lg i + ai + b\right) + i
 \leqslant
 \OB{\fun{tms}}{m} + \OB{\fun{tms}}{i} + i = \OB{\fun{tms}}{m+i}.
 \label{ineq:Btms_n_i}
@@ -863,14 +863,14 @@ We need now to find \(a\)~and~\(b\) such that the inductive step
 \(\tfrac{1}{2}(m+i)\lg(m+i) + a(m+i) + b \leqslant \B{}{m+i}\).
 Using~\eqref{ineq:Btms_n_i}, this is implied by
 \begin{equation*}
-\tfrac{1}{2}(m+i)\lg(m+i) + a(m+i) + b
+\frac{1}{2}(m+i)\lg(m+i) + a(m+i) + b
 \leqslant
-\tfrac{1}{2}m\lg m + (\tfrac{1}{2}i\lg i + ai + b) + i.
+\frac{1}{2}m\lg m + \left(\frac{1}{2}i\lg i + ai + b\right) + i.
 \end{equation*}
 We can already notice that this inequality is equivalent to
 \begin{equation}
-\tfrac{1}{2}m\lg(m+i) + \tfrac{1}{2}i\lg(m+i) + am
-\leqslant \tfrac{1}{2}m\lg m + \tfrac{1}{2}i\lg i + i.
+\frac{1}{2}m\lg(m+i) + \frac{1}{2}i\lg(m+i) + am
+\leqslant \frac{1}{2}m\lg m + \frac{1}{2}i\lg i + i.
 \label{ineq:Btms_n_i_details}
 \end{equation}
 But \(\tfrac{1}{2}m\lg(m+i) > \tfrac{1}{2}m\lg m\) and
@@ -882,7 +882,7 @@ We extend~\(i\) over the real numbers by defining \(i=x2^p=xm\), where
 \(x\)~is a real number such that \(0 < x \leqslant 1\). By replacing
 \(i\)~by~\(xm\) in inequality~\eqref{ineq:Btms_n_i_details}, we obtain
 \begin{equation*}
-\tfrac{1}{2}(1+x)\lg(1+x) + a \leqslant \tfrac{1}{2}x\lg x + x.
+\frac{1}{2}(1+x)\lg(1+x) + a \leqslant \frac{1}{2}x\lg x + x.
 \end{equation*}
 Let \(\Phi(x) := \tfrac{1}{2}x\lg x - \tfrac{1}{2}(1+x)\lg(1+x)
 + x\). Then, this is equivalent to \(a \leqslant \Phi(x)\).
@@ -900,7 +900,7 @@ is negative before, and positive after. Therefore, \(a_{\max} :=
 -\tfrac{1}{2}\lg\tfrac{4}{3}\). The base case was \(b \leqslant -2a\),
 therefore \(b_{\max} := -2a_{\max} = \lg\tfrac{4}{3}\). Finally,
 \begin{equation}
-  \tfrac{1}{2}n\lg n - \left(\tfrac{1}{2}\lg\tfrac{4}{3}\right)n + \lg\tfrac{4}{3}
+  \frac{1}{2}n\lg n - \left(\frac{1}{2}\lg\frac{4}{3}\right)n + \lg\frac{4}{3}
   \leqslant \OB{\fun{tms}}{n},
 \label{ineq:lower_Btms}
 \end{equation}
@@ -1067,7 +1067,7 @@ is \(p=1+\phi_k\).
     \tfrac{1}{2}S_{n+1} - 3(4^n-1) + \sum_{m=0}^{n-1}\phi_{2m+1}\),
     which simplifies into
     \begin{equation}
-      \OB{\fun{tms}}{\phi_{2n+1}} = (n - \frac{1}{2})\phi_{2n+1}.
+      \OB{\fun{tms}}{\phi_{2n+1}} = \left(n - \frac{1}{2}\right)\phi_{2n+1}.
       \label{eq:OBtms_phi_2n_1}
     \end{equation}
     We have
@@ -1088,7 +1088,8 @@ is \(p=1+\phi_k\).
     From theorem~\ref{thm:OB_lambda} and
     equation~\eqref{eq:OBtms_phi_2n_1}, we deduce
     \begin{equation}
-      \OB{\fun{tms}}{1+\phi_{2n+1}} = (n - \frac{1}{2})(1+\phi_{2n+1})
+      \OB{\fun{tms}}{1+\phi_{2n+1}} = \left(n -
+      \frac{1}{2}\right) (1+\phi_{2n+1})
       + \frac{1}{2}.
       \label{eq:OBtms_succ_phi_2n_1}
     \end{equation}
@@ -1129,7 +1130,7 @@ Let us use now the same inductive approach to find a good upper bound
 to \(\OB{\fun{tms}}{n}\). In other words, we want to minimise the real
 constants \(a'\)~and~\(b'\) such that, for \(n \geqslant 2\),
 \begin{equation*}
-\OB{\fun{tms}}{n} \leqslant \tfrac{1}{2}n\lg n + a'n + b'.
+\OB{\fun{tms}}{n} \leqslant \frac{1}{2}n\lg n + a'n + b'.
 \end{equation*}
 The only difference with the search for the lower bound is that
 inequalities are reversed, so we want
@@ -1144,9 +1145,8 @@ equation~\eqref{eq:der_Phi}). Therefore \(a'_{\min} := \max_{0
 base case, we have \(b'_{\min} = -2a_{\min} = 0\). Therefore, we have
 the bounds
 \begin{equation}
-\tfrac{1}{2}n\lg n - \left(\tfrac{1}{2}\lg\tfrac{4}{3}\right)n + \lg\tfrac{4}{3}
-\leqslant \OB{\fun{tms}}{n} \leqslant
-\tfrac{1}{2}n\lg n.
+\frac{1}{2}n\lg n - \left(\frac{1}{2}\lg\frac{4}{3}\right)n + \lg\frac{4}{3}
+\leqslant \OB{\fun{tms}}{n} \leqslant \frac{1}{2}n\lg n.
 \label{ineq:bounds_Btms}
 \index{tms@$\OB{\fun{tms}}{n}$}
 \end{equation}
@@ -2431,14 +2431,13 @@ present new results which relate the costs of both algorithms.
 The minimum cost of both variants of merge sort is the same:
 \(\OB{\fun{tms}}{n} = \OB{\fun{bms}}{n}\) and
 \begin{equation*}
-\tfrac{1}{2}n\lg n - \left(\tfrac{1}{2}\lg\tfrac{4}{3}\right)n + \lg\tfrac{4}{3}
-\leqslant \OB{\fun{tms}}{n} \leqslant
-\tfrac{1}{2}n\lg n.
+\frac{1}{2}n\lg n - \left(\frac{1}{2}\lg\frac{4}{3}\right)n + \lg\frac{4}{3}
+\leqslant \OB{\fun{tms}}{n} \leqslant \frac{1}{2}n\lg n.
 \end{equation*}
 The lower bound is tight for \(n=2\) and most accurate when \(n\)~is a
 Jacobsthal\index{Jacobsthal number} number (see~\eqref{eq:Jacobsthal}
 \vpageref{eq:Jacobsthal}). The upper bound is tight when
-\(n=2^p\). These results may not be intuitive a priori.
+\(n=2^p\). These results may not be intuitive \emph{a priori}.
 
 \mypar{Maximum cost}
 
