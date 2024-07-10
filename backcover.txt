@@ -1,6 +1,16 @@
-This book addresses a priori different audiences whose common interest is functional programming.
+This book addresses \emph{a priori} different audiences whose common
+interest is functional programming.
 
-For undergraduate students, we offer a very progressive introduction to functional programming, with long developments about algorithms on stacks and some kinds of binary trees. We also study memory allocation through aliasing (dynamic data-sharing), the role of the control stack and the heap, automatic garbage collection (GC), the optimisation of tail calls and the total allocated memory. Program transformation into tail form, higher-order functions and continuation-passing style are advanced subjects presented in the context of the programming language Erlang. We give a technique for translating short functional programs to Java.
+For undergraduate students, we offer a very progressive introduction
+to functional programming, with long developments about algorithms on
+stacks and some kinds of binary trees. We also study memory allocation
+through aliasing (dynamic data-sharing), the role of the control stack
+and the heap, automatic garbage collection (GC), the optimisation of
+tail calls and the total allocated memory. Program transformation into
+tail form, higher-order functions and continuation-passing style are
+advanced subjects presented in the context of the programming language
+Erlang. We give a technique for translating short functional programs
+to Java.
 
 For postgraduate students, each functional program is associated with
 the mathematical analysis of its minimum and maximum cost
@@ -9,8 +19,17 @@ of our approach is that we use elementary concepts (elementary
 calculus, induction, discrete mathematics) and we systematically seek
 explicit bounds in order to draw asymptotic equivalences. Furthermore,
 we cover in detail proofs of properties like correctness, termination
-and equivalence. An introduction to operational semantics is given in
-the context of the programming language OCaml, with a hint of type
-inference.
+and equivalence.
 
-For the professionals who do not know functional languages and who must learn how to program with the language XSLT, we propose an introduction which dovetails the part dedicated to undergraduate students. The reason of this unusual didactic choice lies on the observation that XSLT is rarely taught in college, therefore programmers who have not been exposed to functional programming face the two challenges of learning a new paradigm and use XML for programming: whereas the former puts forth recursion, the latter obscures it because of the inherent verbosity of XML. By learning first an abstract functional language, and then XML, we hope for a transfer of skills towards the design and implementation in XSLT without mediation.
+For the professionals who do not know functional languages and who
+must learn how to program with the language XSLT, we propose an
+introduction which dovetails the part dedicated to undergraduate
+students. The reason of this unusual didactic choice lies on the
+observation that XSLT is rarely taught in college, therefore
+programmers who have not been exposed to functional programming face
+the two challenges of learning a new paradigm and use XML for
+programming: whereas the former puts forth recursion, the latter
+obscures it because of the inherent verbosity of XML. By learning
+first an abstract functional language, and then XML, we hope for a
+transfer of skills towards the design and implementation in XSLT
+without mediation.

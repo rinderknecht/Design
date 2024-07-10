@@ -1909,8 +1909,8 @@ call to be evaluated is \erlcode{isrt(S,A)}, whose control context is
 \erlcode{ins(\textvisiblespace,X,A)}. Let us keep the call whilst
 saving into the accumulator~\erlcode{A} the variable~\erlcode{X}
 needed to rebuild the control context later, in a new clause of
-function \erlcode{appk/2}. This variable needs a priori to be tagged
-by some unique atom, say~\erlcode{k1}:
+function \erlcode{appk/2}. This variable needs \emph{a priori} to be
+tagged by some unique atom, say~\erlcode{k1}:
 \begin{alltt}
 isrt([X|S],\textbf{A})             \(\smashedrightarrow{\gamma}\) isrt(S,\textbf{[\{k1,X\}|A]}).
 ...

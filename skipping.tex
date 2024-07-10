@@ -197,11 +197,11 @@ found, the result is built from them \emph{and} the remaining,
 unvisited, items. There are usually two ways to keep visited items:
 either in an accumulative parameter, called \emph{accumulator}, or in
 the context of recursive calls. At this point, it is important to
-recall a cardinal guideline: Do not try first to design a definition
-in tail form, but opt instead for a direct approach. In some simple
-cases, a direct approach may actually be in tail form, but the point
-is methodological: a priori ignore all concerns about tail
-forms. Accordingly, let us use the context of a recursive call to
+recall a cardinal guideline: \emph{Do not try first to design a
+definition in tail form, but opt instead for a direct approach.} In
+some simple cases, a direct approach may actually be in tail form, but
+the point is methodological: \emph{a priori} ignore all concerns about
+tail forms. Accordingly, let us use the context of a recursive call to
 record the visited items. A stack being either empty or not, it is
 natural to start with
 \begin{equation*}
@@ -468,17 +468,19 @@ Of course, whilst in~\(\iota\) we just referenced~\(s\), the
 construction corresponding to the now missing context of~\(\kappa\)
 must be performed by~\(\nu\). Also, we must add another argument which
 refers to the original stack, so we can use it in a new rule~\(\mu\),
-the pendant of~\(\theta\). Note the shapes of the right\hyp{}hand
-sides: they are either a value~(\(\zeta\) and~\(\mu\)) or a function
-call whose arguments contain values. In other words, no function call
-has a context. This syntactic property of a definition is named \emph{tail
-  form}\index{functional language!tail form}. Intuitively, the
-practical consequence of such a form is that terminating calls unfold
-until a value is reached and nothing else is left to be done:
-\emph{the value of the last call is the value of the first call}. This
-kind of definition enables the sharing in rule~\clause{\mu}, where
-\(u\) (the reference to the original stack) becomes the value, instead
-of \(\fun{rev}(t)\).
+the pendant of~\(\theta\).
+
+Note the shapes of the right\hyp{}hand sides: they are either a
+value~(\(\zeta\) and~\(\mu\)) or a function call whose arguments
+contain values. In other words, no function call has a context. This
+syntactic property of a definition is named \emph{tail
+form}\index{functional language!tail form}. Intuitively, the practical
+consequence of such a form is that terminating calls unfold until a
+value is reached and nothing else is left to be done: \emph{the value
+of the last call is the value of the first call}. This kind of
+definition enables the sharing in rule~\clause{\mu}, where \(u\) (the
+reference to the original stack) becomes the value, instead of
+\(\fun{rev}(t)\).
 
 Implementations of functional language often use this property to
 optimise the evaluation, as we shall see in the last part of this
@@ -673,8 +675,11 @@ of~\(x\) in~\(s\). The evaluation trace\index{functional
 \cdot
 (\sigma\chi^{n-x_p-1}\upsilon),
 \end{equation*}
-whose length is \(x_1 + 2\sum_{k=2}^{p}(x_k-x_{k-1}) + (n - x_p + 1) =
-n + x_p - x_1 + 1\). In other words, if the position of the first
+whose length is
+\begin{equation*}
+  x_1 + 2\sum_{k=2}^{p}(x_k-x_{k-1}) + (n - x_p + 1) = n + x_p - x_1 + 1.
+\end{equation*}
+In other words, if the position of the first
 occurrence is noted~\(f\) and the position of the last is~\(l\), we
 find that\index{slst@$\C{\fun{slst}}{n}$}
 \begin{equation*}
