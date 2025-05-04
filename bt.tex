@@ -29,7 +29,7 @@ children are two external nodes; they are depicted as black discs.
 % {r} mandatory right placement
 % [0pt] of margin overhang
 \centering
-\includegraphics[bb=71 648 177 723]{leaf_tree}
+\includegraphics[bb=71 648 177 710]{leaf_tree}%723]{leaf_tree}
 \caption{A leaf tree}
 \label{fig:leaf_tree}
 \end{wrapfigure}
@@ -792,28 +792,33 @@ the other side or get stuck. Let \(t := \fun{int}(x,t_1,t_2)\), then
 \begin{equation*}
 \begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
 \fun{pre}_0(t)
-& = & \fun{pre}_0(\fun{int}(x,t_1,t_2))\\
+& = & \fun{pre}_0(\fun{int}(x,t_1,t_2)) \\
 & \xrightarrow{\smash{\delta}}
-& \cons{x}{\fun{cat}(\fun{pre}_0(t_1), \fun{pre}_0(t_2))}\\
+& \cons{x}{\fun{cat}(\fun{pre}_0(t_1), \fun{pre}_0(t_2))}
+& (\fun{pre}_0)\\
 & \equiv & \cons{x}{\fun{cat}(\fun{pre}(t_1), \fun{pre}_0(t_2))}
 & (\pred{Pre}{t_1})\\
 & \equiv & \cons{x}{\fun{cat}(\fun{pre}(t_1), \fun{pre}(t_2))}
 & (\pred{Pre}{t_2})\\
 & \xrightarrow{\smash{\theta}}
-& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2))}\\
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2))}
+& (\fun{pre})\\
 & \xrightarrow{\smash{\theta}}
-& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2,\el))}.
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2,\el))}
+& (\fun{pre}).
 \end{array}
 \end{equation*}
 At this point, we start rewriting the other side, until we get stuck
 as well:
 \begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\;\;}r@{}}
   \fun{pre}(t) = \fun{pre}(\fun{int}(x,t_1,t_2))
 \xrightarrow{\smash{\theta}} \fun{pre}(\fun{int}(x,t_1,t_2),\el)
 \xrightarrow{\smash{\kappa}}
 \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))}.
 \index{pre@\fun{pre/1}}
 \index{pre@\fun{pre/2}}
+\end{array}
 \end{equation*}
 Comparing the two stuck expressions\index{rewrite system!stuck
   expression} suggests a subgoal to reach.
@@ -864,14 +869,17 @@ and proceed to rewrite the left\hyp{}hand side after letting \(t :=
 \begin{figure}[t]
 \begin{equation*}
 \boxed{%
-\begin{array}{r@{\;}c@{\;}l}
+\begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
+%\begin{array}{r@{\;}c@{\;}l}
   \fun{cat}(\fun{pre}(t,\el),s)
 & =
 & \fun{cat}(\fun{pre}(\fun{int}(x,t_1,t_2),\el),s)\\
 & \xrightarrow{\smash{\kappa}}
-& \fun{cat}(\cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))},s)\\
+& \fun{cat}(\cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))},s)
+& (\fun{pre/2})\\
 & \xrightarrow{\smash{\beta}}
-& \cons{x}{\fun{cat}(\fun{pre}(t_1,\fun{pre}(t_2,\el)),s)}\\
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\fun{pre}(t_2,\el)),s)}
+& (\fun{cat})\\
 & \equiv_0
 & \cons{x}{\fun{cat}(\fun{cat}(\fun{pre}(t_1,\el),\fun{pre}(t_2,\el)),s)}\\
 & \equiv_1
@@ -881,9 +889,11 @@ and proceed to rewrite the left\hyp{}hand side after letting \(t :=
 & \equiv_3
 & \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,s))}\\
 & \xleftarrow{\smash{\kappa}}
-& \fun{pre}(\fun{int}(x,t_1,t_2),s)\\
+& \fun{pre}(\fun{int}(x,t_1,t_2),s)
+& (\fun{pre/2})\\
 & =
-& \fun{pre}(t,s).\hfill\Box
+& \fun{pre}(t,s)
+& \hfill\Box
 \end{array}}
 \end{equation*}
 \caption{Proof of \(\pred{CatPre}{t} \colon
@@ -923,22 +933,27 @@ We can resume conclusively in \fig~\vref{fig:pre0_pre}.\hfill\(\Box\)
 \fun{pre}_0(t)
 & = & \fun{pre}_0(\fun{int}(x,t_1,t_2))\\
 & \xrightarrow{\smash{\delta}}
-& \cons{x}{\fun{cat}(\fun{pre}_0(t_1), \fun{pre}_0(t_2))}\\
+& \cons{x}{\fun{cat}(\fun{pre}_0(t_1), \fun{pre}_0(t_2))}
+& (\fun{pre}_0)\\
 & \equiv & \cons{x}{\fun{cat}(\fun{pre}(t_1), \fun{pre}_0(t_2))}
 & (\pred{Pre}{t_1})\\
 & \equiv & \cons{x}{\fun{cat}(\fun{pre}(t_1), \fun{pre}(t_2))}
 & (\pred{Pre}{t_2})\\
 & \xrightarrow{\smash{\theta}}
-& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2))}\\
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2))}
+& (\fun{pre})\\
 & \xrightarrow{\smash{\theta}}
-& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2,\el))}\\
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2,\el))}
+& (\fun{pre})\\
 & \equiv
 & \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))}
 & (\pred{CatPre}{t_1,\fun{pre}(t_2,\el)})\\
 & \xleftarrow{\smash{\kappa}}
-& \fun{pre}(\fun{int}(x,t_1,t_2),\el)\\
+& \fun{pre}(\fun{int}(x,t_1,t_2),\el)
+& (\fun{pre/2})\\
 & \xleftarrow{\smash{\theta}}
-& \fun{pre}(\fun{int}(x,t_1,t_2))\\
+& \fun{pre}(\fun{int}(x,t_1,t_2))
+& (\fun{pre})\\
 & = & \fun{pre}(t). & \hfill\Box
 \end{array}}
 \end{equation*}
@@ -985,7 +1000,7 @@ requires a modification of \fun{pre/1}, defined in
 \fig~\vref{fig:pre}, so it processes binary leaf trees. The new
 function, \fun{lpre/1}\index{lpre@\fun{lpre/1}}, is shown in
 \fig~\vref{fig:lpre}.
-\begin{figure}
+\begin{figure}[b]
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}c@{\;}l}
@@ -1079,7 +1094,7 @@ variables \(s_1\)~and~\(s_2\) we obtain the equivalence
 \end{equation*}
 The case of the external node is the same as for preorder. This
 reasoning yields the function defined in \fig~\vref{fig:in},
-\begin{figure}[b]
+\begin{figure}[t]
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}c@{\;}l}
@@ -1152,7 +1167,7 @@ expressed as follows.
 \label{def:Rot}
 \end{equation*}
 In \fig~\vref{fig:rot},
-\begin{figure}[b]
+\begin{figure}[t]
 \centering
 \includegraphics[bb=71 627 374 715]{rot}
 \caption{Composing right\hyp{}rotations, top\hyp{}down}
@@ -1220,7 +1235,7 @@ Let us define a function \fun{mir/1}\index{mir@\fun{mir/1}}
 (\emph{mirror}) such that \(\fun{mir}(t)\) is the symmetric of the
 binary tree~\(t\) with respect to an exterior vertical line. An
 example is given in \fig~\vref{fig:mirror}.
-\begin{figure}[b]
+\begin{figure}[t]
 \centering
 \subfloat[\(t\)]{\includegraphics[bb=77 660 163 723]{bt_ex2}}
 \qquad
@@ -1269,17 +1284,33 @@ we establish
 
 \end{itemize}
 The former results from
-\begin{align*}
-  \fun{in}(\fun{mir}(\fun{ext}())) &\xrightarrow{\smash{\sigma}}
-  \fun{in}(\fun{ext}())\\
-  &\xrightarrow{\smash{\xi}} \fun{in}(\fun{ext}(),\el)\\
-  &\xrightarrow{\smash{\pi}} \el\\
-  &\xleftarrow{\smash{\zeta}} \fun{rcat}(\el,\el)\\
-  &\xleftarrow{\smash{\epsilon}} \fun{rev}(\el)\\
-  &\xleftarrow{\smash{\pi}} \fun{rev}(\fun{in}(\fun{ext}(),\el))\\
-  &\xleftarrow{\smash{\xi}} \fun{rev}(\fun{in}(\fun{ext}())).
+\begin{equation*}
+\begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
+  \fun{in}(\fun{mir}(\fun{ext}()))
+  & \xrightarrow{\smash{\sigma}}
+  & \fun{in}(\fun{ext}())
+  & (\fun{mir})\\
+  & \xrightarrow{\smash{\xi}}
+  & \fun{in}(\fun{ext}(),\el)
+  & (\fun{in})\\
+  & \xrightarrow{\smash{\pi}}
+  & \el
+  & (\fun{in/2})\\
+  & \xleftarrow{\smash{\zeta}}
+  & \fun{rcat}(\el,\el)
+  & (\fun{rcat})\\
+  & \xleftarrow{\smash{\epsilon}}
+  & \fun{rev}(\el)
+  & (\fun{rev})\\
+  & \xleftarrow{\smash{\pi}}
+  & \fun{rev}(\fun{in}(\fun{ext}(),\el))
+  & (\fun{in/2})\\
+  & \xleftarrow{\smash{\xi}}
+  & \fun{rev}(\fun{in}(\fun{ext}()))
+  & (\fun{in}).
   \index{rcat@\fun{rcat/2}}\index{rev@\fun{rev/1}}
-\end{align*}
+\end{array}
+\end{equation*}
 Let us assume \(\pred{InMir}{t_1}\) and \(\pred{InMir}{t_2}\) and let
 \(t := \fun{int}(x,t_1,t_2)\), for any~\(x\). We rewrite the
 left\hyp{}hand side of the equivalence to be proved until we reach the
@@ -1289,20 +1320,26 @@ right\hyp{}hand side or we get stuck:
 \fun{in}(\fun{mir}(t)) & = &
 \fun{in}(\fun{mir}(\fun{int}(x,t_1,t_2)))\\
 & \xrightarrow{\smash{\tau}}
-& \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)))\\
+& \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)))
+& (\fun{mir})\\
 & \xrightarrow{\smash{\xi}}
-& \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),\el)\\
-& \Rra{\rho}
-& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),\el)})\\
-& \Lla{\xi}
-& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1))})\\
+& \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),\el)
+& (\fun{in})\\
+& \xrightarrow{\smash{\rho}}
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),\el)})
+& (\fun{in/2})\\
+& \xleftarrow{\smash{\zeta}}
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1))})
+& (\fun{in})\\
 & \equiv
 & \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rev}(\fun{in}(t_1))})
 & (\pred{InMir}{t_1})\\
 & \xrightarrow{\smash{\xi}}
-& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rev}(\fun{in}(t_1,\el))})\\
-& \Rra{\epsilon}
-& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),\el)}).
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rev}(\fun{in}(t_1,\el))})
+& (\fun{in})\\
+& \xrightarrow{\smash{\epsilon}}
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),\el)})
+& (\fun{rev}).
 \end{array}
 \end{equation*}
 We cannot use the induction hypothesis \(\pred{InMir}{t_2}\) to get
@@ -1321,17 +1358,20 @@ we rewrite as follows:
 & =
 & \fun{in}(\fun{mir}(\fun{int}(x,t_1,t_2)),s)\\
 & \xrightarrow{\smash{\tau}}
-& \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),s)\\
-& \Rra{\rho}
-& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),s)})\\
+& \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),s)
+& (\fun{mir})\\
+& \xrightarrow{\smash{\rho}}
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),s)})
+& (\fun{in/2})\\
 & \equiv
 & \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),s)})
 & (\pred{InMir}{t_1,s})\\
 & \equiv_0
 & \fun{rcat}(\fun{in}(t_2,\el),\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),s)})\\
-& \Lla{\eta}
+& \xleftarrow{\smash{\eta}}
 & \fun{rcat}(\cons{x}{\fun{in}(t_2,\el)},
-\fun{rcat}(\fun{in}(t_1,\el),s)),
+\fun{rcat}(\fun{in}(t_1,\el),s))
+& (\fun{rcat}),
 \end{array}
 \end{equation*}
 where (\(\equiv_0\)) is
@@ -1553,9 +1593,11 @@ the rewrites of the left\hyp{}hand side,
 \fun{pre}(\fun{mir}(t),s)
 & = & \fun{pre}(\fun{mir}(\fun{int}(x,t_1,t_2)),s)\\
 & \xrightarrow{\smash{\tau}}
-& \fun{pre}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),s)\\
-& \Rra{\kappa}
-& \cons{x}{\fun{pre}(\fun{mir}(t_2),\fun{pre}(\fun{mir}(t_1),s))}\\
+& \fun{pre}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),s)
+& (\fun{mir})\\
+& \xrightarrow{\smash{\kappa}}
+& \cons{x}{\fun{pre}(\fun{mir}(t_2),\fun{pre}(\fun{mir}(t_1),s))}
+& (\fun{pre})\\
 & \equiv_0
 & \cons{x}{\fun{pre}(\fun{mir}(t_2),
            \fun{rcat}(\fun{post}(t_1,\el),s))}\\
@@ -1563,22 +1605,16 @@ the rewrites of the left\hyp{}hand side,
 & \cons{x}{\fun{rcat}(\fun{post}(t_2,\el),
            \fun{rcat}(\fun{post}(t_1,\el),s))}\\
 & \equiv_2
-& \cons{x}{\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el),
-                                 \fun{post}(t_2,\el)),
-                      s)}\\
-& \Lla{\zeta}
+& \cons{x}{\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el), \fun{post}(t_2,\el)), s)}\\
+& \xleftarrow{\smash{\zeta}}
 & \fun{rcat}(\el,\cons{x}{\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el),
-                                       \fun{post}(t_2,\el)),
-                            s)})\\
-& \Lla{\eta}
-& \fun{rcat}([x],\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el),
-                                       \fun{post}(t_2,\el)),
-                            s))\\
+                                       \fun{post}(t_2,\el)), s)})
+& (\fun{rcat})\\
+& \xleftarrow{\smash{\eta}}
+& \fun{rcat}([x],\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el), \fun{post}(t_2,\el)), s))
+& (\fun{rcat})\\
 & \equiv_3
-& \fun{rcat}(\fun{cat}(\fun{cat}(\fun{post}(t_1,\el),
-                                  \fun{post}(t_2,\el)),
-                       [x]),
-             s)\\
+& \fun{rcat}(\fun{cat}(\fun{cat}(\fun{post}(t_1,\el), \fun{post}(t_2,\el)), [x]), s)\\
 & \equiv_4
 & \fun{rcat}(\fun{cat}(\fun{post}(t_1,\el),
                        \fun{cat}(\fun{post}(t_2,\el),
@@ -1591,9 +1627,11 @@ the rewrites of the left\hyp{}hand side,
 & \equiv_6
 & \fun{rcat}(\fun{post}(t_1,\fun{post}(t_2,[x])),s)\\
 & \xleftarrow{\smash{\nu}}
-& \fun{rcat}(\fun{post}(\fun{int}(x,t_1,t_2),\el),s)\\
+& \fun{rcat}(\fun{post}(\fun{int}(x,t_1,t_2),\el),s)
+& (\fun{post/2})\\
 & =
-& \fun{rcat}(\fun{post}(t,\el),s).\hfill\Box
+& \fun{rcat}(\fun{post}(t,\el),s).
+& \hfill\Box
 \end{array}
 }
 \end{equation*}
@@ -1754,7 +1792,7 @@ forests\index{tree!forest} instead of trees, one or two at a time.
 
 The cutting function is \fun{def/1}\index{def@\fun{def/1}}
 (\emph{deforest}), defined in \fig~\vref{fig:def},
-\begin{figure}
+\begin{figure}[b]
 \abovedisplayskip=0pt
 \belowdisplayskip=0pt
 \centering
@@ -2287,7 +2325,7 @@ external node is~\(0\).) In \fig~\vref{fig:per} is shown the
 definition of \fun{per/1}\index{per@\fun{per/1}} (\emph{perfection}).
 If the tree~\(t\) is perfect, we also know its height~\(h\):
 \(\fun{per}(t) \twoheadrightarrow \fun{true}(h)\).
-\begin{figure}
+\begin{figure}[b]
 \centering
 \includegraphics{per}
 \caption{Abstract checking of perfection}
@@ -2317,16 +2355,16 @@ two internal nodes themselves. An example is provided in
 \fig~\vref{fig:complete}.
 % Wrapping figure better declared before a paragraph
 %
-%\begin{wrapfigure}[7]{r}[0pt]{0pt}
-% [7] vertical lines
+\begin{wrapfigure}[8]{r}[0pt]{0pt}
+% [8] vertical lines
 % {r} mandatory right placement
 % [0pt] of margin overhang
-\begin{figure}
+%\begin{figure}[b]
 \centering
 \includegraphics{complete}
 \caption{A complete tree}
 \label{fig:complete}
-\end{figure}
+\end{wrapfigure}
 Recursively, a given tree is complete if,
 and only if, its immediate subtrees are complete. This is the same
 rule we used for perfection. In other words, perfection and
@@ -2356,7 +2394,7 @@ rule applies either if \(t=\fun{ext}()\) or
 
 \begin{wrapfigure}[7]{r}[0pt]{0pt}
 \centering
-\includegraphics[bb=71 653 153 721]{bal}
+\includegraphics[bb=71 653 153 709]{bal}
 \caption{}
 \label{fig:bal}
 \end{wrapfigure}

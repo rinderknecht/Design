@@ -58,8 +58,9 @@ The induction hypothesis is \(\pred{Inv}{s}\) and we want to establish
 \(\pred{Inv}{\cons{x}{s}}\)\index{Inv@\predName{Inv}|)}, for
 any~\(x\). If we commence head\hyp{}on with
 \begin{equation*}
-  \fun{rev}_0(\fun{rev}_0(\cons{x}{s})) \xrightarrow{\smash{\delta}}
-  \fun{rev}_0(\fun{cat}(\fun{rev}_0(s),[x])),
+  \fun{rev}_0(\fun{rev}_0(\cons{x}{s}))
+  \xrightarrow{\smash{\delta}}
+  \fun{rev}_0(\fun{cat}(\fun{rev}_0(s),[x])) \qquad (\fun{rev}_0),
 \end{equation*}
 we are stuck. But the term to rewrite involves both \fun{rev$_0$/1}
 and \fun{cat/2}, hence spurring us to conceive a lemma where the
@@ -81,14 +82,17 @@ all~\(t\),
 
 \end{itemize}
 The former is almost within reach:
-\begin{align*}
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}l@{\;\;}r@{}}
   \fun{rev}_0(\fun{cat}(\el,t))
-  & \smashedrightarrow{\alpha}
-  \fun{rev}_0(t)\\
+  & \xrightarrow{\smash{\alpha}} \fun{rev}_0(t)
+  & (\fun{cat})\\
   & \leftrightsquigarrow \fun{cat}(\fun{rev}_0(t),\el)\\
-  & \smashedleftarrow{\gamma}
-    \fun{cat}(\fun{rev}_0(t),\fun{rev}_0(\el)).
-\end{align*}
+  & \xleftarrow{\smash{\gamma}}
+  \fun{cat}(\fun{rev}_0(t),\fun{rev}_0(\el))
+  & (\fun{rev}_0)
+\end{array}
+\end{equation*}
 The missing part is filled by showing that
 \((\leftrightsquigarrow)\)~is actually~\((\equiv)\).\par\vskip\baselineskip
 
@@ -134,7 +138,8 @@ establish \(\forall x \in T.\pred{CatRev}{\cons{x}{s},t}\):
 \begin{array}{@{}r@{\;}l@{\;}l@{\;\;}r@{}}
   \fun{cat}(\fun{rev}_0(t),\fun{rev}_0(\cons{x}{s}))
 & \xrightarrow{\smash{\delta}}
-& \fun{cat}(\fun{rev}_0(t),\fun{cat}(\fun{rev}_0(s),[x]))\\
+& \fun{cat}(\fun{rev}_0(t),\fun{cat}(\fun{rev}_0(s),[x]))
+& (\fun{rev}_0)\\
 & \equiv
 & \fun{cat}(\fun{cat}(\fun{rev}_0(t),\fun{rev}_0(s)),[x])
 & (\predName{CatAssoc})\\
@@ -142,10 +147,11 @@ establish \(\forall x \in T.\pred{CatRev}{\cons{x}{s},t}\):
 & \fun{cat}(\fun{rev}_0(\fun{cat}(s,t)),[x])
 & (\pred{CatRev}{s,t})\\
 & \xleftarrow{\smash{\delta}}
-& \fun{rev}_0(\cons{x}{\fun{cat}(s,t)})\\
+& \fun{rev}_0(\cons{x}{\fun{cat}(s,t)})
+& (\fun{rev}_0)\\
 & \xleftarrow{\smash{\beta}}
 & \fun{rev}_0(\fun{cat}(\cons{x}{s},t)).
-& \multicolumn{1}{r@{}}{\Box}
+& (\fun{cat}). %\multicolumn{1}{r@{}}{(\fun{cat}) \Box}
 \end{array}
 \end{equation*}
 Let us resume the proof of
@@ -154,7 +160,8 @@ Let us resume the proof of
 \begin{array}{@{}r@{\;}l@{\;}l@{\quad}r@{}}
   \fun{rev}_0(\fun{rev}_0(\cons{x}{s}))
 & \xrightarrow{\smash{\delta}}
-& \fun{rev}_0(\fun{cat}(\fun{rev}_0(s),[x]))\\
+& \fun{rev}_0(\fun{cat}(\fun{rev}_0(s),[x]))
+& (\fun{rev}_0)\\
 & \equiv
 & \fun{cat}(\fun{rev}_0([x]),\fun{rev}_0(\fun{rev}_0(s)))
 & (\pred{CatRev}{\fun{rev}_0(s),[x]})\\
@@ -162,16 +169,20 @@ Let us resume the proof of
 & \fun{cat}(\fun{rev}_0([x]),s)
 & (\pred{Inv}{s})\\
 & \xrightarrow{\smash{\delta}}
-& \fun{cat}(\fun{cat}(\fun{rev}_0(\el),[x]),s)\\
+& \fun{cat}(\fun{cat}(\fun{rev}_0(\el),[x]),s)
+& (\fun{rev}_0)\\
 & \xrightarrow{\smash{\gamma}}
-& \fun{cat}(\fun{cat}(\el,[x]),s)\\
+& \fun{cat}(\fun{cat}(\el,[x]),s)
+& (\fun{rev}_0)\\
 & \xrightarrow{\smash{\alpha}}
-& \fun{cat}([x],s)\\
+& \fun{cat}([x],s)
+& (\fun{cat}) \\
 & \xrightarrow{\smash{\beta}}
-& \cons{x}{\fun{cat}(\el,s)}\\
-& \xrightarrow{\smash{\alpha}} &
-\cons{x}{s}.
-& \hfill\Box
+& \cons{x}{\fun{cat}(\el,s)}
+& (\fun{cat})\\
+& \xrightarrow{\smash{\alpha}}
+& \cons{x}{s}
+& \hfill \Box
 \end{array}
 \end{equation*}
 \index{rev0@\fun{rev\(_0\)/1}|)}\index{cat@\fun{cat/2}|)}
@@ -251,7 +262,8 @@ For the latter, let us rewrite \(\fun{rev}_0(\cons{x}{s})\) and
 \begin{array}{@{}r@{\;}l@{\;}lr@{}}
   \fun{rev}_0(\cons{x}{s})
 & \xrightarrow{\smash{\delta}}
-& \fun{cat}(\fun{rev}_0(s),[x])\\
+& \fun{cat}(\fun{rev}_0(s),[x])
+& (\fun{rev}_0)\\
 & \equiv
 & \fun{cat}(\fun{rev}(s),[x])
 & (\pred{EqRev}{s})\\
@@ -259,9 +271,11 @@ For the latter, let us rewrite \(\fun{rev}_0(\cons{x}{s})\) and
 & \fun{rcat}(s,[x])
 & (\text{to be determined})\\
 & \xleftarrow{\smash{\eta}}
-& \fun{rcat}(\cons{x}{s},\el)\\
+& \fun{rcat}(\cons{x}{s},\el)
+& (\fun{rcat})\\
 & \xleftarrow{\smash{\epsilon}}
-& \fun{rev}(\cons{x}{s}).
+& \fun{rev}(\cons{x}{s})
+& (\fun{rev}).
 \end{array}
 \end{equation*}
 The missing part is filled by showing \((\leftrightsquigarrow)\) to
@@ -283,27 +297,36 @@ Induction on the structure of~\(s\) requires the proofs of
 
 \end{itemize}
 First, for the establishment of the basis, we have:
-\begin{align*}
+\begin{equation*}
+\begin{array}{@{}r@{\;}l@{\;}lr@{}}
   \fun{rcat}(\el,t)
-  & \smashedrightarrow{\zeta} t\\
-  & \smashedleftarrow{\alpha} \fun{cat}(\el,t)\\
-  & \smashedleftarrow{\zeta} \fun{cat}(\fun{rcat}(\el,\el),t)\\
-  & \smashedleftarrow{\epsilon} \fun{cat}(\fun{rev}(\el),t).
-\end{align*}
+  & \smashedrightarrow{\zeta} t
+  & (\fun{rcat})\\
+  & \smashedleftarrow{\alpha} \fun{cat}(\el,t)
+  & (\fun{cat})\\
+  & \smashedleftarrow{\zeta} \fun{cat}(\fun{rcat}(\el,\el),t)
+  & (\fun{rcat})\\
+  & \smashedleftarrow{\epsilon} \fun{cat}(\fun{rev}(\el),t)
+  & (\fun{rev}).
+\end{array}
+\end{equation*}
 Next, let us assume \(\pred{RevCat}{s,t}\) and prove \(\forall x \in
 T.\pred{RevCat}{\cons{x}{s},t}\):
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{}r@{}}
   \fun{rcat}(\cons{x}{s},t)
 & \xrightarrow{\smash{\eta}}
-& \fun{rcat}(s,\cons{x}{t})\\
+& \fun{rcat}(s,\cons{x}{t})
+& (\fun{rcat})\\
 & \equiv
 & \fun{cat}(\fun{rev}(s),\cons{x}{t})
-& (\pred{RevCat}{s,\cons{x}{t}})\\
+& (\pred{RevCat}{s,\cons{x}{t}}) \\
 & \xleftarrow{\smash{\alpha}}
-& \fun{cat}(\fun{rev}(s),\cons{x}{\fun{cat}(\el,t)})\\
+& \fun{cat}(\fun{rev}(s),\cons{x}{\fun{cat}(\el,t)})
+& (\fun{cat})\\
 & \xleftarrow{\smash{\beta}}
-& \fun{cat}(\fun{rev}(s),\fun{cat}([x],t))\\
+& \fun{cat}(\fun{rev}(s),\fun{cat}([x],t))
+& (\fun{cat})\\
 & \equiv
 & \fun{cat}(\fun{cat}(\fun{rev}(s),[x]),t)
 & (\pred{CatAssoc}{\fun{rev}(s),[x],t})\\
@@ -311,10 +334,11 @@ T.\pred{RevCat}{\cons{x}{s},t}\):
 & \fun{cat}(\fun{rcat}(s,[x]),t)
 & (\pred{RevCat}{s,[x]})\\
 & \xleftarrow{\smash{\eta}}
-& \fun{cat}(\fun{rcat}(\cons{x}{s},\el),t)\\
+& \fun{cat}(\fun{rcat}(\cons{x}{s},\el),t)
+& (\fun{rcat})\\
 & \xleftarrow{\smash{\epsilon}}
-& \fun{cat}(\fun{rev}(\cons{x}{s}),t).
-& \multicolumn{1}{r@{}}{\Box}
+& \fun{cat}(\fun{rev}(\cons{x}{s}),t)
+& (\fun{rev}).
 \end{array}
 \end{equation*}
 Finally, we proved \(\forall s.\pred{EqRev}{s}\), that is,
