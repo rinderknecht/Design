@@ -128,15 +128,15 @@ to be rewritten next is underlined in case of ambiguity.
 & \xrightarrow{\smash{\gamma}}
 & \fun{cat}(\fun{cat}(\underline{\fun{flat}_0([1])},\fun{flat}_0([2])),\fun{flat}_0([3]))\\
 & \xrightarrow{\smash{\delta}}
-& \fun{cat}(\fun{cat}([1|\underline{\fun{flat}_0(\el)}],\fun{flat}_0([2])),\fun{flat}_0([3]))\\
+& \fun{cat}(\fun{cat}(\cons{1}{\underline{\fun{flat}_0(\el)}},\fun{flat}_0([2])),\fun{flat}_0([3]))\\
 & \xrightarrow{\smash{\psi}}
 & \fun{cat}(\fun{cat}([1],\underline{\fun{flat}_0([2])}),\fun{flat}_0([3]))\\
 & \xrightarrow{\smash{\delta}}
-& \fun{cat}(\fun{cat}([1],[2|\underline{\fun{flat}_0(\el)}]),\fun{flat}_0([3]))\\
+& \fun{cat}(\fun{cat}([1],\cons{2}{\underline{\fun{flat}_0(\el)}}),\fun{flat}_0([3]))\\
 & \xrightarrow{\smash{\psi}}
 & \fun{cat}(\fun{cat}([1],[2]),\underline{\fun{flat}_0([3])})\\
 & \xrightarrow{\smash{\delta}}
-& \fun{cat}(\fun{cat}([1],[2]),[3|\underline{\fun{flat}_0(\el)}])\\
+& \fun{cat}(\fun{cat}([1],[2]),\cons{3}{\underline{\fun{flat}_0(\el)}})\\
 & \xrightarrow{\smash{\psi}}
 & \fun{cat}(\fun{cat}([1],[2]),[3])\\
 & \twoheadrightarrow & [1,2,3].
@@ -324,12 +324,12 @@ Consider the following costs:
 & \xrightarrow{\smash{\omega}} & \fun{flat}([[[1],2],3])\\
 & \xrightarrow{\smash{\gamma}} & \fun{flat}([[1],[2],3])\\
 & \xrightarrow{\smash{\gamma}} & \fun{flat}([1,\el,[2],3])\\
-& \xrightarrow{\smash{\delta}} & [1|\fun{flat}([\el,[2],3])\\
-& \xrightarrow{\smash{\omega}} & [1|\fun{flat}([[2],3])]\\
-& \xrightarrow{\smash{\gamma}} & [1|\fun{flat}([2,\el,3])]\\
-& \xrightarrow{\smash{\delta}} & [1,2|\fun{flat}([\el,3])]\\
-& \xrightarrow{\smash{\omega}} & [1,2|\fun{flat}([3])]\\
-& \xrightarrow{\smash{\delta}} & [1,2,3|\fun{flat}(\el)]\\
+& \xrightarrow{\smash{\delta}} & \cons{1}{\fun{flat}([\el,[2],3])}\\
+& \xrightarrow{\smash{\omega}} & \cons{1}{\fun{flat}([[2],3])}\\
+& \xrightarrow{\smash{\gamma}} & \cons{1}{\fun{flat}([2,\el,3])}\\
+& \xrightarrow{\smash{\delta}} & \cons{1,2}{\fun{flat}([\el,3])}\\
+& \xrightarrow{\smash{\omega}} & \cons{1,2}{\fun{flat}([3])}\\
+& \xrightarrow{\smash{\delta}} & \cons{1,2,3}{\fun{flat}(\el)}\\
 & \xrightarrow{\smash{\psi}}   & [1,2,3].
 \end{array}}
 \end{equation*}

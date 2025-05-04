@@ -109,14 +109,17 @@ no horizontal line is drawn. The composition of inference rules is a
 \emph{derivation}. In the case of \fun{cut/2}, all derivations are
 isomorphic to a stack, whose top is the conclusion.
 
-The logical reading of rule \TirName{Pref} is: `If \(\fun{cut}(s,k-1)
-\twoheadrightarrow \pair{t}{u}\), then we have
-\(\fun{cut}(\cons{x}{s},k) \twoheadrightarrow
-\pair{\cons{x}{t}}{u}\).'  This top\hyp{}down reading qualifies as
+The logical reading of rule \TirName{Pref} is:
+\begin{center}
+  `If \(\fun{cut}(s,k-1) \twoheadrightarrow \pair{t}{u}\), then we
+  have \(\fun{cut}(\cons{x}{s},k) \twoheadrightarrow
+  \pair{\cons{x}{t}}{u}\).'
+\end{center}
+This top\hyp{}down reading qualifies as
 \emph{deductive}\index{inference system!deductive reading}. The
 previous derivation then can be regarded as the proof of the relation
-instance \(\fun{cut}([5,3,6,0,2],3) \twoheadrightarrow
-\pair{[5,3,6]}{[0,2]}\).
+instance\\
+\(\fun{cut}([5,3,6,0,2],3) \twoheadrightarrow \pair{[5,3,6]}{[0,2]}\).
 
 
 \paragraph{Induction on proofs}
@@ -169,7 +172,7 @@ the immediate sub\-derivation of~\(\Delta\) (the induction hypothesis)
 and then proceed to prove that \predName{CorCut} holds for the entire
 derivation. This is the immediate subterm induction we use when
 reasoning on a stack as an object: we assume the theorem to hold
-for~\(s\) and then move to prove it for~\(\cons{x}{s}\).
+for~\(s\) and then prove it for~\(\cons{x}{s}\).
 
 A case by case analysis on the kind of rule that can end~\(\Delta\)
 guides the proof. To avoid clashes between variables in the theorem

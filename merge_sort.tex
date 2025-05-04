@@ -813,7 +813,7 @@ prompt us to look, like \cite{McIlroy_1974}, for an additional linear
 term in the general case, that is, the greatest real constants~\(a\)
 and~\(b\) such that, for \(n \geqslant 2\),
 \begin{equation}
-\pred{Low}{n} \colon \tfrac{1}{2}n\lg n + an + b \leqslant \OB{\fun{tms}}{n}.
+\pred{Low}{n} \colon \frac{1}{2}n\lg n + an + b \leqslant \OB{\fun{tms}}{n}.
 \label{ineq:McIlroy}
 \end{equation}\index{Low@\predName{Low}}%
 The base case is \(\pred{Low}{2} \colon 2a + b \leqslant 0\). The most
@@ -884,12 +884,11 @@ We extend~\(i\) over the real numbers by defining \(i=x2^p=xm\), where
 \begin{equation*}
 \frac{1}{2}(1+x)\lg(1+x) + a \leqslant \frac{1}{2}x\lg x + x.
 \end{equation*}
-Let \(\Phi(x) := \tfrac{1}{2}x\lg x - \tfrac{1}{2}(1+x)\lg(1+x)
-+ x\). Then, this is equivalent to \(a \leqslant \Phi(x)\).
-
-The function~\(\Phi\) can be continuously extended at~\(0\), as
-\(\lim_{x \to 0} x\lg x = 0\), and it is differentiable on the
-interval \(]0,1]\):
+Let \(\Phi(x) := \tfrac{1}{2}x\lg x - \tfrac{1}{2}(1+x)\lg(1+x) +
+x\). Then, this is equivalent to the inequality \(a \leqslant
+\Phi(x)\). The function~\(\Phi\) can be continuously extended
+at~\(0\), as \(\lim_{x \to 0} x\lg x = 0\), and it is differentiable
+on the interval \(]0,1]\):
 \begin{equation}
 \frac{d\Phi}{dx} = \frac{1}{2}\lg\frac{4x}{x+1}.
 \label{eq:der_Phi}
@@ -1088,8 +1087,7 @@ is \(p=1+\phi_k\).
     From theorem~\ref{thm:OB_lambda} and
     equation~\eqref{eq:OBtms_phi_2n_1}, we deduce
     \begin{equation}
-      \OB{\fun{tms}}{1+\phi_{2n+1}} = \left(n -
-      \frac{1}{2}\right) (1+\phi_{2n+1})
+      \OB{\fun{tms}}{1+\phi_{2n+1}} = \frac{1}{2}(2n - 1)(1+\phi_{2n+1})
       + \frac{1}{2}.
       \label{eq:OBtms_succ_phi_2n_1}
     \end{equation}
@@ -1135,7 +1133,7 @@ constants \(a'\)~and~\(b'\) such that, for \(n \geqslant 2\),
 The only difference with the search for the lower bound is that
 inequalities are reversed, so we want
 \begin{equation*}
-\Phi(x) \leqslant a', \;\text{where \(\Phi(x) := \tfrac{1}{2}x\lg x - \tfrac{1}{2}(1+x)\lg(1+x) + x\)}.
+\Phi(x) \leqslant a', \;\text{where \(\Phi(x) := \frac{1}{2}x\lg x - \frac{1}{2}(1+x)\lg(1+x) + x\)}.
 \end{equation*}
 Here, we need to find the maximum of~\(\Phi\) on the closed interval
 \([0,1]\). The two positive roots of~\(\Phi\) are \(0\)~and~\(1\), and
@@ -1550,7 +1548,7 @@ top-down and bottom-up merge sort can be easily seen in the
 \qquad
 \subfloat[Top-down\label{fig:top_down}]{%
 \includegraphics{top_down}}
-\caption{Comparing merge sorts on \([6,3,2,4,1,5]\)}
+\caption{Comparing merge sorts of \([6,3,2,4,1,5]\)}
 \label{fig:top_vs_bot}
 \end{figure}
 In all generality,
@@ -2580,22 +2578,24 @@ of~\(n\) starts with two 1-bits, formally written as
 \OW{\fun{tms}}{2^p} + \OW{\fun{bms}}{i} + 2^p + i - 1 =
 \OW{\fun{bms}}{2^p+i}.
 \end{equation*}
-The inequality is tight, \(\OW{\fun{tms}}{2^p+i} =
+The inequality is tight: \(\OW{\fun{tms}}{2^p+i} =
 \OW{\fun{bms}}{2^p+i}\), if, and only if, \(\OW{\fun{bms}}{i} =
 \OW{\fun{tms}}{i}\). \index{bms@$\OW{\fun{bms}}{n}$}
-\index{tms@$\OW{\fun{tms}}{n}$} Using the case analysis above, if \(i
-= 2^q + j\), we have \(\OW{\fun{tms}}{2^p+i} =
-\OW{\fun{bms}}{2^p+i}\), if, and only if, \(\OW{\fun{tms}}{2^{p-1}+j}
-= \OW{\fun{bms}}{2^{p-1}+j}\). These equivalences can be repeated,
-yielding two strictly decreasing sequences of positive integers,
-\(2^p+i > 2^{p-1}+j > 2^{p-2}+k > \dots\) and \(i > j > k > \dots\)
-The end of the latter recursive descent is simply~\(0\), which means
-that the former stops at a power of~\(2\), for which we know
-equation~\eqref{eq:2p}. In other words, the binary representation
-of~\(n\) is made of a series of one or more 1-bits (from \(2^p\),
-\(2^{p-1}\), \(2^{p-2}\), \ldots), possibly followed by successive
-0-bits, which we formally write \(n=(1^+0^*)_2\). This means that
-\(n\)~is the difference between two powers of~\(2\):
+\index{tms@$\OW{\fun{tms}}{n}$}
+
+Using the case analysis above, if \(i = 2^q + j\), we have
+\(\OW{\fun{tms}}{2^p+i} = \OW{\fun{bms}}{2^p+i}\), if, and only if,
+\(\OW{\fun{tms}}{2^{p-1}+j} = \OW{\fun{bms}}{2^{p-1}+j}\). These
+equivalences can be repeated, yielding two strictly decreasing
+sequences of positive integers, \(2^p+i > 2^{p-1}+j > 2^{p-2}+k >
+\dots\) and \(i > j > k > \dots\) The end of the latter recursive
+descent is simply~\(0\), which means that the former stops at a power
+of~\(2\), for which we know equation~\eqref{eq:2p}. In other words,
+the binary representation of~\(n\) is made of a series of one or more
+1-bits (from \(2^p\), \(2^{p-1}\), \(2^{p-2}\), \ldots), possibly
+followed by successive 0-bits, which we formally write
+\(n=(1^+0^*)_2\). This means that \(n\)~is the difference between two
+powers of~\(2\):
 \begin{equation}
 \boxed{\OW{\fun{bms}}{n} = \OW{\fun{tms}}{n} \Leftrightarrow n=2^p - 2^q.}
 \label{eq:Wbms_eq_Wtms}
@@ -2712,7 +2712,7 @@ bits of~\(n\), that is to say, \(\C{\fun{exp2}}{n} = \floor{\lg n} +
 
 In sum, we established, for \(n \geqslant 2\),
 \begin{align*}
-n\lg n - \tfrac{3}{2}n + 2 &< \OM{\fun{tms}}{n} < n\lg n - n + 1,\\
+n\lg n - \frac{3}{2}n + 2 &< \OM{\fun{tms}}{n} < n\lg n - n + 1,\\
 n\lg n - \alpha n + (2\alpha - 1) &< \OM{\fun{bms}}{n}
 < n\lg n - (\alpha - 1)n - (3 - 2\alpha),
 \end{align*}
@@ -3030,7 +3030,9 @@ To our knowledge, only \cite{Okasaki_1998a} mentions this variant; he
 shows that it can be efficiently implemented with purely functional
 data structures, just as the off\hyp{}line version. (Notice that his
 context is nevertheless different from ours as he relies on lazy
-evaluation and amortised analysis.)
+evaluation and amortised analysis.) Online merge sort is used in the
+standard library of the proof assistant \index{Coq@\textsf{Coq}}
+\textsf{Coq} \citep{BertotCasteran_2004}.
 
 Our code is shown in \fig~\ref{fig:oms}\index{merge sort!online
   $\sim$!program}.
@@ -3050,7 +3052,7 @@ Our code is shown in \fig~\ref{fig:oms}\index{merge sort!online
                     & \xrightarrow{\smash{\gamma}}
                     & \cons{\fun{one}(s)}{t};\\
 \fun{add}(s,\cons{\fun{one}(u)}{t}) & \xrightarrow{\smash{\delta}}
-                    & [\fun{zero}()|\fun{add}(\fun{mrg}(s,u),t)].\\
+                    & \cons{\fun{zero}()}{\fun{add}(\fun{mrg}(s,u),t)}.\\
 \\
 \fun{unb}(\el,u) & \xrightarrow{\smash{\mu}} & u;\\
 \fun{unb}(\cons{\fun{zero}()}{s},u)
@@ -3109,15 +3111,16 @@ string. Otherwise, a series of balanced mergers of size~\(2^i\) are
 performed, as this is dual to adding~\(1\) to \((\Xi{011}\ldots
 1)_2\), where \(\Xi\)~is arbitrary. Therefore
 \begin{equation*}
-\abovedisplayskip=2pt
-\belowdisplayskip=2pt
+%\abovedisplayskip=2pt
+%\belowdisplayskip=2pt
 \OC{\fun{add}}{2j} = 0,\qquad
 \OC{\fun{add}}{2j-1} = \sum_{i=0}^{\rho_{2j}}{\OC{\fun{mrg}}{2^i,2^i}},
 \end{equation*}
 where \(\rho_n\)~is the highest power of~\(2\) dividing~\(n\) (ruler
 function)\index{ruler function}.  Let
 \(\OC{\fun{sum}}{n}\)\index{sum@$\OC{\fun{sum}}{n}$} be the number of
-comparisons to add \(n\)~keys to \(\el\). We have
+comparisons to add \(n\)~keys to the empty stack~\(\el\). That is to
+say, we have the following:
 \begin{gather}
 \abovedisplayskip=0pt
 \belowdisplayskip=0pt

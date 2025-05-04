@@ -35,18 +35,19 @@ An evaluation is shown with abstract syntax trees in
 Let \(\pred{Inv}{s}\)\index{Inv@\predName{Inv}|(} be the property
 \(\fun{rev}_0(\fun{rev}_0(s)) \equiv s\), that is, the function
 \fun{rev\(_0\)/1}\index{rev0@\fun{rev\(_0\)/1}} is an
-\emph{involution}\index{stack!reversal!involution}. In order to prove
-\(\forall s \in S.\pred{Inv}{s}\), the induction principle on the
-structure of~\(s\)\index{induction!example|(} requires that we
-establish
-\begin{itemize*}
+\emph{involution}\index{stack!reversal!involution}.
+
+In order to prove \(\forall s \in S.\pred{Inv}{s}\), the induction
+principle on the structure of~\(s\)\index{induction!example|(}
+requires that we establish
+\begin{itemize}
 
   \item the basis \(\pred{Inv}{\el}\);
 
   \item the inductive step \(\forall s \in S.\pred{Inv}{s}
     \Rightarrow \forall x \in T.\pred{Inv}{\cons{x}{s}}\).
 
-\end{itemize*}
+\end{itemize}
 The basis is quickly found:
 \begin{equation*}
   \fun{rev}_0(\fun{rev}_0(\el))
@@ -71,14 +72,14 @@ denote \(\fun{cat}(\fun{rev}_0(t),\fun{rev}_0(s)) \equiv
 \fun{rev}_0(\fun{cat}(s,t))\)\index{cat@\fun{cat/2}}. In order to
 prove it by induction on the structure of~\(s\), we need, for
 all~\(t\),
-\begin{itemize*}
+\begin{itemize}
 
   \item the basis \(\pred{CatRev}{\el,t}\);
 
   \item the inductive step \(\forall s,t \in S.\pred{CatRev}{s,t}
     \Rightarrow \forall x \in T.\pred{CatRev}{\cons{x}{s},t}\).
 
-\end{itemize*}
+\end{itemize}
 The former is almost within reach:
 \begin{align*}
   \fun{rev}_0(\fun{cat}(\el,t))
@@ -91,24 +92,24 @@ The former is almost within reach:
 The missing part is filled by showing that
 \((\leftrightsquigarrow)\)~is actually~\((\equiv)\).\par\vskip\baselineskip
 
-Let \(\pred{CatNil}{s}\)\index{CatNil@\predName{CatNil}|(} be the
-property \(\fun{cat}(s,\el) \equiv s\)\index{cat@\fun{cat/2}}. In
-order to prove it by induction on the structure of~\(s\), we have to
-prove
-\begin{itemize*}
+%% Let \(\pred{CatNil}{s}\)\index{CatNil@\predName{CatNil}|(} be the
+%% property \(\fun{cat}(s,\el) \equiv s\)\index{cat@\fun{cat/2}}. In
+%% order to prove it by induction on the structure of~\(s\), we have to
+%% prove
+%% \begin{itemize*}
 
-  \item the basis \(\pred{CatNil}{\el}\);
+%%   \item the basis \(\pred{CatNil}{\el}\);
 
-  \item the inductive step \(\forall s \in S.\pred{CatNil}{s}
-    \Rightarrow \forall x \in T.\pred{CatNil}{\cons{x}{s}}\).
+%%   \item the inductive step \(\forall s \in S.\pred{CatNil}{s}
+%%     \Rightarrow \forall x \in T.\pred{CatNil}{\cons{x}{s}}\).
 
-\end{itemize*}
-The former is easy: \(\fun{cat}(\el,\el) \xrightarrow{\smash{\alpha}}
-\el\)\index{cat@\fun{cat/2}}. The latter is not complicated either:
-\(\fun{cat}(\cons{x}{s},\el) \xrightarrow{\smash{\beta}}
-\cons{x}{\fun{cat}(s,\el)} \equiv \cons{x}{s}\), where the equivalence
-is none other than the induction hypothesis
-\(\pred{CatNil}{s}\)\index{CatNil@\predName{CatNil}|)}.\hfill\(\Box\)
+%% \end{itemize*}
+%% The former is easy: \(\fun{cat}(\el,\el) \xrightarrow{\smash{\alpha}}
+%% \el\)\index{cat@\fun{cat/2}}. The latter is not complicated either:
+%% \(\fun{cat}(\cons{x}{s},\el) \xrightarrow{\smash{\beta}}
+%% \cons{x}{\fun{cat}(s,\el)} \equiv \cons{x}{s}\), where the equivalence
+%% is none other than the induction hypothesis
+%% \(\pred{CatNil}{s}\)\index{CatNil@\predName{CatNil}|)}.\hfill\(\Box\)
 
 %% Note that we could have proved instead \(\fun{cat}(s,\el)
 %% \twoheadrightarrow s\), for all values~\(s\). The difference is that
@@ -393,8 +394,7 @@ where \(s = [x_1, x_2, \dots, x_n]\). The cost of all these calls to
 \begin{equation*}
 \abovedisplayskip=4pt
 \belowdisplayskip=4pt
- 1 + 2 + \dots + (n-1) = \tfrac{1}{2}n(n-1) \sim
-\tfrac{1}{2}n^2,
+ 1 + 2 + \dots + (n-1) = \frac{1}{2}n(n-1) \sim \frac{1}{2}n^2,
 \end{equation*}
 because the cost of \(\fun{cat}(s,t)\)\index{cat@\fun{cat/2}} is \(1 +
 \fun{len}(s)\), where
@@ -501,6 +501,8 @@ so \(\C{\fun{rev}}{n} = n + 2\). The cost is
 \paragraph{Exercises}
 
 \begin{enumerate}
+
+  \item Prove \(\pred{CatNil}{s} \colon \fun{cat}(s,\el) \equiv s\).
 
   \item Prove \(\pred{LenRev}{s} \colon \fun{len}(\fun{rev}_0(s)) \equiv
   \fun{len}(s)\).

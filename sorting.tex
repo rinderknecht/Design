@@ -180,8 +180,8 @@ By cancelling identical terms in the sums (telescoping)
 \(\sum_{k=0}^{n-1}{\C{\fun{ins}}{k}}\), we draw\index{ins@$\C{\fun{ins}}{n}$}
 \begin{equation*}
 \C{\fun{ins}}{n}
-  = 3n + \tfrac{1}{2}n(n-1) + \C{\fun{ins}}{0}
-  = \tfrac{1}{2}{n^2} + \tfrac{5}{2}{n} + 1.
+  = 3n + \frac{1}{2}n(n-1) + \C{\fun{ins}}{0}
+  = \frac{1}{2}{n^2} + \frac{5}{2}{n} + 1.
 \end{equation*}
 This last equation is actually valid even if \(n =
 0\). Let~\(\C{\fun{dist}}{n!}\) be the cost for distributing an item
@@ -224,7 +224,7 @@ to~\clause{\gamma}, we deduce the following equations, where \(k >
 \C{\fun{perm}}{1}   \eqn{\beta} 1;\\
 \C{\fun{perm}}{k+1}
   &\eqn{\gamma} 1 + \C{\fun{perm}}{k} + \C{\fun{dist}}{k!}
-   = \tfrac{1}{2}(k^2 + 7k + 8)k! + 2 + \C{\fun{perm}}{k}.
+   = \frac{1}{2}(k^2 + 7k + 8)k! + 2 + \C{\fun{perm}}{k}.
 \intertext{Again, summing both sides, most of the terms cancel out:}
 \sum_{k=1}^{n-1}{\C{\fun{perm}}{k+1}}
   &= \frac{1}{2}\sum_{k=1}^{n-1}{(k^2+7k+8)k!} + \sum_{k=1}^{n-1}{2}
