@@ -560,7 +560,7 @@ for a big\hyp{}step design in \fig~\ref{fig:chg}.
 \end{figure}
 Notice how the length~\(n'\) of the new history is simply passed down
 the inference rules. It can simply be made out:
-\begin{itemize*}
+\begin{itemize}
 
   \item replacing a pop by a pop or a push by a push leaves the
     original length invariant;
@@ -571,7 +571,7 @@ the inference rules. It can simply be made out:
   \item replacing a push by a pop, assuming this is valid, decreases
     the original length by~\(2\).
 
-\end{itemize*}
+\end{itemize}
 This task is up to the new
 function~\fun{rep/3}\index{rep@\fun{rep/3}|(} (\emph{replace}), which
 implements the second phase. The design is to return a pair made of

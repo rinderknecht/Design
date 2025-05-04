@@ -1,9 +1,6 @@
 \section{Skipping}
 \label{sec:skipping}
 
-Here we envisage how to copy a stack while ignoring a given
-item. [\emph{The progression is very slow on purpose.}]
-
 \paragraph{First occurrence}
 \label{def:linear_search}
 \index{stack!skipping an item!first occurrence}
@@ -31,7 +28,7 @@ following evaluations:\label{sfst_ex}
 
 Let us try a direct approach. In particular, at this point, it is
 important \emph{not} to seek a definition in tail form. Tail form must
-be considered as an optimisation and early optimisation is opening
+be considered as an optimisation and early optimisation is unsealing
 Pandora's jar. The first idea that may come to mind is to define an
 auxiliary function \fun{mem/2} such that the call \(\fun{mem}(s,x)\)
 checks whether a given item \(x\)~is in a given stack~\(s\), because
@@ -302,21 +299,21 @@ More complicated examples, given \vpageref{sfst_ex}, yield
 \begin{array}{r@{\;}l@{\;}l}
 \fun{sfst}([4,[1,2],\el,\el,4],\el)
 & \smashedrightarrow{\kappa} &
-  [4|\fun{sfst}([[1,2],\el,\el,4],\el)]\\
+  \cons{4}{\fun{sfst}([[1,2],\el,\el,4],\el)}\\
 & \smashedrightarrow{\kappa} &
-  [4|[[1,2]|\fun{sfst}([\el,\el,4],\el)]]\\
-& = & [4,[1,2]|\fun{sfst}([\el,\el,4],\el)]\\
-& \smashedrightarrow{\iota} & [4,[1,2]|[\el,4]]\\
+  \cons{4}{\cons{[1,2]}{\fun{sfst}([\el,\el,4],\el)}}\\
+& = & \cons{4, [1,2]}{\fun{sfst}([\el,\el,4],\el)}\\
+& \smashedrightarrow{\iota} & \cons{4,[1,2]}{[\el,4]}\\
 & = & [4,[1,2],\el,4].
 \end{array}
 \end{equation*}
 \begin{equation*}
 \begin{array}{r@{\;}l@{\;}l}
 \fun{sfst}([3,\el],[5,2])
-& \smashedrightarrow{\kappa} & [3|\fun{sfst}([\el],[5,2])]\\
-& \smashedrightarrow{\kappa} & [3|[\el|\fun{sfst}(\el,[5,2])]]\\
-& = & [3,\el|\fun{sfst}(\el,[5,2])]\\
-& \smashedrightarrow{\theta} & [3,\el|\el]\\
+& \smashedrightarrow{\kappa} & \cons{3}{\fun{sfst}([\el],[5,2])}\\
+& \smashedrightarrow{\kappa} & \cons{3}{\cons{\el}{\fun{sfst}(\el,[5,2])}}\\
+& = & \cons{3,\el}{\fun{sfst}(\el,[5,2])}\\
+& \smashedrightarrow{\theta} & \cons{3,\el}{\el}\\
 & = & [3,\el].
 \end{array}
 \end{equation*}

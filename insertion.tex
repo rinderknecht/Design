@@ -81,9 +81,9 @@ Let us consider a short example in \fig~\vref{fig:isrt_312}.
 & \xrightarrow{\smash{\lambda}}
 & \fun{ins}([1,2],3)\\
 & \xrightarrow{\smash{\kappa}}
-& [1|\fun{ins}([2],3)]\\
+& \cons{1}{\fun{ins}([2],3)}\\
 & \xrightarrow{\smash{\kappa}}
-& [1,2|\fun{ins}(\el,3)]\\
+& \cons{1,2}{\fun{ins}(\el,3)}\\
 & \xrightarrow{\smash{\lambda}}
 & [1,2,3].
 \end{array}}
@@ -489,7 +489,7 @@ its proof by structural induction on~\(s\).
     \cons{x}{s}\). In particular, \(\pred{InsCmp}{\fun{isrt}(s)}\) is
     \(\fun{ins}(\fun{isrt}(s),x) \approx \cons{x}{\fun{isrt}(s)}\). We
     have
-    \begin{itemize*}
+    \begin{itemize}
 
       \item Rule \TirName{Push} and the induction hypothesis
         \(\fun{isrt}(s) \approx s\) imply \(\cons{x}{\fun{isrt}(s)}
@@ -502,7 +502,7 @@ its proof by structural induction on~\(s\).
         \approx \cons{x}{s}\) and \(\pred{Isrt}{\cons{x}{s}}\)
         follow.
 
-    \end{itemize*}
+    \end{itemize}
     By the induction principle, we conclude \(\forall s \in
     S.\pred{Isrt}{s}\).\hfill\(\Box\)
 

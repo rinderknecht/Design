@@ -403,7 +403,7 @@ Let us set the abbreviations
 \end{itemize}
 after the convention of the programming language \Prolog
 \citep{SterlingShapiro_1994,Bratko_2000}. For instance, we may write
-\([1|[2|[3|\el]]]\) instead of
+\(\cons{1}{\cons{2}{\cons{3}{\el}}}\) instead of
 \(\fun{cons}(1,\fun{cons}(2,\fun{cons}(3,\fun{nil}())))\).  We can
 further abbreviate the notations as follows:
 \begin{itemize}
@@ -414,9 +414,9 @@ further abbreviate the notations as follows:
   \item \([x] := \cons{x}{\el}\).
 
 \end{itemize}
-For example, \([1|[2|[3|\el]]]\) is more compactly written as
-\([1,2,3]\). Our system for \fun{cat/2}\index{cat@\fun{cat/2}} now
-becomes a bit more legible:
+For example, \(\cons{1}{\cons{2}{\cons{3}{\el}}}\) is more compactly
+written as \([1,2,3]\). Our rewrite system for
+\fun{cat/2}\index{cat@\fun{cat/2}} now becomes a bit more legible:
 \begin{equation}
 \fun{cat}(        \el,t) \xrightarrow{\smash{\alpha}} t;\qquad
 \fun{cat}(\cons{x}{s},t) \xrightarrow{\smash{\beta}}
@@ -702,7 +702,7 @@ the previous example consists in determining the average number of
 
 \section{Inductive proofs}
 
-Let us notice that \(\fun{cat}([1], [2,3,4]) \twoheadrightarrow
+Let us remark that \(\fun{cat}([1], [2,3,4]) \twoheadrightarrow
 [1,2,3,4] \twoheadleftarrow \fun{cat}([1,2],
 [3,4])\)\index{cat@\fun{cat/2}|(}. It is enlightening to create
 \emph{equivalence classes} of terms that are joinable. These classes
@@ -710,7 +710,7 @@ then define an equivalence relationship~\((\equiv)\)
 \index{equivalence@$a \equiv b$|see{equivalence of expressions}}
 \index{equivalence!$\sim$ of expressions} as follows:
 \begin{center}
-  \(a \equiv b\) if there exists a value~\(v\) such that \(a
+  \(a \equiv b\) if there exists a unique value~\(v\) such that \(a
   \xrightarrow{\smash[t]{*}} v\) and \(b \xrightarrow{\smash{*}} v\).
 \end{center}
 For instance, \(\fun{cat}([1,2], [3,4]) \equiv \fun{cat}([1],
