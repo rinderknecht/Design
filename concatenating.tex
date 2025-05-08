@@ -454,8 +454,10 @@ already know that it can not be a partial result, because
 (\erlcode{|})~is not associative. So some more work has to be done
 with \(u\)~\emph{and}~\(t\), but, first, we should understand what
 \(u\)~contains at this point and unfolding a call, with a piece of
-paper and a pencil, is quite enlightening. Let \(s\)~be a stack of
-\(n\)~items \([x_0,x_1,\dots,x_{n-1}]\). We have the following:
+paper and a pencil, is quite enlightening.
+
+Let \(s\)~be a stack of \(n\)~items \([x_0,x_1,\dots,x_{n-1}]\). We
+have the following:
 \begin{equation*}
 \begin{array}{r@{\;}c@{\;}l}
 \fun{cat}(s,t,\el) & \smashedrightarrow{\beta} &
@@ -472,10 +474,12 @@ bound to a stack which contains the same items as the original first
 argument~\(s\), but in \emph{reverse order}. In other words, given the
 call \(\fun{cat}(s,t,\el)\), the parameter~\(u\) in the first pattern
 of \fun{cat/3} holds~\(s\) reversed. What can we do with
-\(u\)~and~\(t\) in order to reach the result?  The key is to realise
-that the answer depends on the contents of~\(u\), which, therefore,
-needs to be matched more accurately: is~\(u\) empty or not? This leads
-to split rule~\clause{\alpha} into \(\alpha_0\) and \(\alpha_1\):
+\(u\)~and~\(t\) in order to reach the result?
+
+The key is to realise that the answer depends on the contents
+of~\(u\), which, therefore, needs to be matched more accurately:
+is~\(u\) empty or not? This leads to split rule~\clause{\alpha} into
+\(\alpha_0\) and \(\alpha_1\):
 \newlength\Split\settowidth\Split{\(_{\alpha_0}\)}
 \begin{equation*}
 \begin{array}{r@{\;}c@{\;}l}
@@ -505,8 +509,10 @@ the result we are looking for? Given the rewrite \(\fun{cat}(s,t,\el)
 \twoheadrightarrow \fun{cat}(\el,t,\cons{x}{u})\), we know that
 \(\cons{x}{u}\)~is~\(s\) reversed, so item \(x\)~is last in~\(s\) and
 it should be on top of~\(t\) in the result. What should we do
-with~\(u\)? The key is to realise that we need to start the same
-process again, that is, we need another recursive call:
+with~\(u\)?
+
+The key is to realise that we need to start the same process again,
+that is, we need another recursive call:
 \begin{equation*}
 \begin{array}{r@{\;}c@{\;}l}
 \fun{cat}(\el,t,\el) & \MyArrow{\Split}{\alpha\sb{0}} & t;\\
@@ -580,9 +586,9 @@ accumulator is not a partial result but a \emph{temporary stack} used
 to hold the items of the first stack in reverse order. We shall find
 many occurrences of this situation. Meanwhile, it is important to
 remember that a tail form variant of a function operating on stacks
-may lead to a slower program. Also, the derived definition in tail
-form may be longer, as illustrated by \fun{cat\(_0\)/2}: four rules
-instead of two.
+may lead to a slower program. Moreover, the definition we derived in
+tail form may be longer, as illustrated by \fun{cat\(_0\)/2}: four
+rules instead of two.
 
 The rewrites \(\fun{cat}_0([1,2,3],[4,5]) \twoheadrightarrow
 [1,2,3,4,5]\) seen above can be abstractly conceived as a product
@@ -593,7 +599,7 @@ rules \(\C{\fun{cat\(_0\)}}{n}\) of \(\fun{cat\(_0\)}(s,t)\), given
 that the length of a rule is~\(1\), hence \(\len{\alpha} = \len{\beta}
 = \len{\gamma} = \len{\delta} = 1\) and the length of the composition
 of two rules is the sum of their lengths: \(\len{\alpha \cdot \delta}
-= \len{\alpha} + \len{\delta}\). Therefore,
+= \len{\alpha} + \len{\delta}\). Therefore, we have the following:
 \begin{align*}
 \C{\fun{cat\(_0\)}}{n}
   &= \len{\alpha\delta^n\gamma^n\beta}
@@ -614,7 +620,7 @@ Let us reconsider the definition~\eqref{def:fact} of
 \end{equation*}
 For instance, we have
 \begin{equation*}
-\begin{array}{r@{\;}c@{\;}lc@{\;}l}
+\begin{array}{r@{\;}c@{\;}l@{\;}c@{\;}l}
 \fun{fact}(3) & \xrightarrow{\beta} & 3 \cdot \fun{fact}(3-1)
               & = & 3 \cdot \fun{fact}(2)\\
               & \xrightarrow{\smash[t]{\beta}} &
@@ -707,7 +713,7 @@ which do not require to be reversed or undone.
 The previously considered function call \(\fun{fact}_0(5)\) is
 evaluated thusly:
 \begin{equation*}
-\begin{array}{r@{\;}c@{\;}lc@{\;}l}
+\begin{array}{r@{\;}c@{\;}l@{\;}c@{\;}l}
 \fun{fact}_0(5)
 & \xrightarrow{\smash[t]{\alpha}} & \fun{fact}_0(5,1),
 && \text{since \(5 > 1\)},\\
@@ -774,7 +780,7 @@ of~\(1\):
 \end{equation*}
 The same example now runs as
 \begin{equation*}
-\begin{array}{r@{\;}c@{\;}lc@{\;}l}
+\begin{array}{r@{\;}c@{\;}l@{\;}c@{\;}l}
 \fun{fact}_1(5)
 & \xrightarrow{\smash[t]{\alpha}} & \fun{fact}_1(5-1,5)
 & = & \fun{fact}_1(4,5)\\

@@ -115,7 +115,8 @@ in the case of rule~\(\gamma\), the substructures of
 \end{figure}
 
 Let us consider an example in \fig~\vref{fig:flat0_ex}, where the call
-to be rewritten next is underlined in case of ambiguity.
+to be rewritten next is underlined in case of ambiguity. (We underline
+the call that is rewritten.)
 \begin{figure}[!b]
 \begin{equation*}
 \boxed{%
@@ -124,19 +125,19 @@ to be rewritten next is underlined in case of ambiguity.
 & \xrightarrow{\smash{\omega}}
 & \fun{flat}_0([[[1],2],3])\\
 & \xrightarrow{\smash{\gamma}}
-& \fun{cat}(\underline{\fun{flat}_0([[1],2])},\fun{flat}_0([3]))\\
+& \fun{cat}(\ufun{flat}_0([[1],2]),\fun{flat}_0([3]))\\
 & \xrightarrow{\smash{\gamma}}
-& \fun{cat}(\fun{cat}(\underline{\fun{flat}_0([1])},\fun{flat}_0([2])),\fun{flat}_0([3]))\\
+& \fun{cat}(\fun{cat}(\ufun{flat}_0([1]),\fun{flat}_0([2])),\fun{flat}_0([3]))\\
 & \xrightarrow{\smash{\delta}}
-& \fun{cat}(\fun{cat}(\cons{1}{\underline{\fun{flat}_0(\el)}},\fun{flat}_0([2])),\fun{flat}_0([3]))\\
+& \fun{cat}(\fun{cat}(\cons{1}{\ufun{flat}_0(\el)},\fun{flat}_0([2])),\fun{flat}_0([3]))\\
 & \xrightarrow{\smash{\psi}}
-& \fun{cat}(\fun{cat}([1],\underline{\fun{flat}_0([2])}),\fun{flat}_0([3]))\\
+& \fun{cat}(\fun{cat}([1],\ufun{flat}_0([2])),\fun{flat}_0([3]))\\
 & \xrightarrow{\smash{\delta}}
-& \fun{cat}(\fun{cat}([1],\cons{2}{\underline{\fun{flat}_0(\el)}}),\fun{flat}_0([3]))\\
+& \fun{cat}(\fun{cat}([1],\cons{2}{\ufun{flat}_0(\el)}),\fun{flat}_0([3]))\\
 & \xrightarrow{\smash{\psi}}
-& \fun{cat}(\fun{cat}([1],[2]),\underline{\fun{flat}_0([3])})\\
+& \fun{cat}(\fun{cat}([1],[2]),\ufun{flat}_0([3]))\\
 & \xrightarrow{\smash{\delta}}
-& \fun{cat}(\fun{cat}([1],[2]),\cons{3}{\underline{\fun{flat}_0(\el)}})\\
+& \fun{cat}(\fun{cat}([1],[2]),\cons{3}{\ufun{flat}_0(\el)})\\
 & \xrightarrow{\smash{\psi}}
 & \fun{cat}(\fun{cat}([1],[2]),[3])\\
 & \twoheadrightarrow & [1,2,3].
@@ -463,7 +464,7 @@ pairs are\index{flat@\fun{flat/1}}:
 We can actually drop the function names, as all the pairs involve
 \fun{flat/1}\index{flat@\fun{flat/1}}. A common class of measures are
 monotone embeddings into (\(\mathbb{N},>\)), so let us seek a measure
-satisfying
+satisfying:
 \begin{itemize*}
 
   \item \(\measure{\cons{\cons{x}{s}}{t}} > \measure{\cons{x,s}{t}}\);
