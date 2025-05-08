@@ -89,13 +89,13 @@ measure of size in this chapter.
 \caption{Bijection}
 \label{fig:bijection}
 \end{wrapfigure}
-In most textbooks \cite[\S~5.1 \&~5.2]{SedgewickFlajolet_1996} is
+In most textbooks \cite[\S~5.1 \&~5.2]{SedgewickFlajolet_1996}, it is
 shown how to find the number of Catalan trees with \(n\)~edges by
-means of some quite powerful mathematical tools known as
+leveraging some extremely powerful mathematical method known as
 \emph{generating functions}\index{enumerative combinatorics!generating
-  function} \cite[chap.~7]{GrahamKnuthPatashnik_1994}. Instead, for
-didactical purposes, we opt for a more intuitive technique in
-enumerative combinatorics\index{enumerative combinatorics} which
+  function} \cite[chap.~7]{GrahamKnuthPatashnik_1994}. Instead, here,
+for didactical purposes, we decided to use a more intuitive technique
+in enumerative combinatorics\index{enumerative combinatorics} which
 consists in constructing a one\hyp{}to\hyp{}one correspondence between
 two finite sets, so the cardinal of one set is the cardinal of the
 other. In other words, we are going to relate bijectively, on the one
@@ -113,12 +113,12 @@ diagonal, or touch it. We want to show that \emph{there exists a
   bijection between Dyck paths of length~\(2n\) and Catalan trees with
   \(n\)~edges.}
 
-\begin{wrapfigure}[8]{r}[0pt]{0pt}
-% [8] vertical lines
+\begin{wrapfigure}[7]{r}[0pt]{0pt}
+% [7] vertical lines
 % {r} mandatory right placement
 % [0pt] of margin overhang
 \centering
-\includegraphics[bb=71 661 128 720]{ctree_pre}
+\includegraphics[bb=71 661 128 710]{ctree_pre}
 \caption{}
 \label{fig:ctree_pre}
 \end{wrapfigure}
@@ -139,12 +139,12 @@ numbering}\index{tree!Catalan $\sim$!preorder numbering} of
 \fig~\ref{fig:ctree}, where the order in which a node is visited first
 is shown instead of a black disk \((\bullet)\).
 
-\begin{wrapfigure}[14]{r}[0pt]{0pt}
+\begin{wrapfigure}[13]{r}[0pt]{0pt}
 % [13] vertical lines
 % {r} mandatory right placement
 % [0pt] of margin overhang
 \centering
-\includegraphics[bb=71 591 186 721]{reflection}
+\includegraphics[bb=71 591 186 711]{reflection}
 \caption{Reflection of a prefix w.r.t. \(y = x - 1\)}
 \label{fig:reflection}
 \end{wrapfigure}
@@ -388,7 +388,7 @@ total number of nodes at level~\(l\) in all Catalan trees with
 \end{equation}
 
 Let \(\Expected{P_n}\) be the \emph{average path length} of a Catalan
-tree with \(n\)~edges. We have
+tree with \(n\)~edges. We have, by definition:
 \begin{equation*}
   \Expected{P_n} := \frac{1}{C_{n}} \cdot \sum_{l=0}^{n}l\sum_{d=0}^{n}\mathcal{N}_n(l,d),
 \end{equation*}
@@ -415,8 +415,11 @@ half of an even row in Pascal's triangle. We see in
 \fig~\vref{fig:pascal_triangle} that the first half equals the second
 half, only the central element remaining (there is an odd number of
 entries in an even row). This is readily proven as follows:
-\(\sum_{j=0}^{n-1}\binom{2n}{j} = \sum_{j=0}^{n-1}\binom{2n}{2n-j} =
-\sum_{i=n+1}^{2n}\binom{2n}{i}\). Therefore
+\begin{equation*}
+\sum_{j=0}^{n-1}\binom{2n}{j} = \sum_{j=0}^{n-1}\binom{2n}{2n-j} =
+\sum_{i=n+1}^{2n}\binom{2n}{i}.
+\end{equation*}
+Therefore
 \begin{equation*}
 \sum_{i=0}^{2n}\binom{2n}{i} = 2 \cdot \!\! \sum_{i=n+1}^{2n}\binom{2n}{i}
 + \binom{2n}{n},
@@ -574,15 +577,13 @@ and height~\(h\) is in bijection with a Dyck path of length~\(2n\) and
 height~\(h\) (see \fig~\vref{fig:catalan_tree} and
 \fig~\ref{fig:bijection}). This simple fact allows us to reckon on the
 height of the Dyck paths and transfer the result back to Catalan
-trees.
-
-We have already seen the correspondence between lattice paths and
-Catalan trees, in which a rise reaching the $l$th diagonal corresponds
-to a node at level~$l$ in the tree, counting levels from root
-level~$0$. A simple bijection between paths will show that for every
-node on level~$l$ of a tree of height~$h$ and size~$n$, there is a
-corresponding node on either level $h-l+1$ or $h-l$ in another tree of
-same height and size. (This bijection was found by Nachum Dershowitz.)
+trees. We have already seen the correspondence between lattice paths
+and Catalan trees, in which a rise reaching the $l$th diagonal
+corresponds to a node at level~$l$ in the tree, counting levels from
+root level~$0$. A simple bijection between paths will show that for
+every node on level~$l$ of a tree of height~$h$ and size~$n$, there is
+a corresponding node on either level $h-l+1$ or $h-l$ in another tree
+of same height and size \citep{Rinderknecht_2013d}.
 
 Consider the Dyck path in~\Fig~\ref{fig:h},
 \begin{figure}
