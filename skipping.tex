@@ -169,7 +169,7 @@ item was not found'. For example,
 But, for now, let us backtrack and ask ourselves again whether using
 \fun{mem/2} is really a good idea.
 
-\paragraph{Better approach}
+\paragraph{A better approach}
 
 Let us suppose that the input stack contains the item at the
 bottom. Using \fun{mem/2} to find it leads to a complete traversal of
@@ -407,7 +407,7 @@ take all the positions in the stack:
 \begin{equation*}
   \M{\fun{sfst}}{n} = \frac{1}{n}\sum_{j=0}^{n-1}\C{\fun{sfst}}{n,j} =
   \frac{1}{n}\sum_{j=0}^{n-1}(j+1) = \frac{1}{n}\sum_{j=0}^{n}j
-  = \frac{n+1}{2} \sim \frac{n}{2}, \text{by}~\eqref{eq:sum_k}.
+  = \frac{n+1}{2} \sim \frac{n}{2}, \quad \text{by}~\eqref{eq:sum_k}.
 \end{equation*}
 
 Notice that rule~\(\kappa\) implies the creation of a
