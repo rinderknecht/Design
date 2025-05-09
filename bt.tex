@@ -36,7 +36,7 @@ children are two external nodes; they are depicted as black discs.
 Internal nodes are usually associated with some kind of information,
 whilst external nodes are not, like the one shown in
 \fig~\vref{fig:bt_ex1}:
-\begin{figure}[b]
+\begin{figure}
 \centering
 \subfloat[Extended binary tree\label{fig:bt_ex1}]{
 \includegraphics{bt_ex1}}
@@ -77,10 +77,12 @@ of its edges.)
 
 Some authors use a different nomenclature for the definition of the
 leaves and height. It is also common to stumble upon the concept of
-\emph{depth}\index{binary tree!depth} of a tree, which can be mistaken
-for its height, the former counting the number of nodes on a maximum
-path.
-\begin{thm}%[Internal and external nodes]
+\emph{depth}\index{binary tree!depth} of a tree, coming from graph
+theory and which can be mistaken for its height, the former counting
+the number of nodes on a maximum path. Confusing depth and height
+leads to an off\hyp{}by\hyp{}one error in formulas.
+
+\begin{thm}[Internal and external nodes]
 \label{thm:int_ext}
 \textsl{A binary tree with \(n\)~internal nodes has \(n+1\)~external
   nodes.}
@@ -106,11 +108,10 @@ nodes. The latter applies to three arguments because two children are
 expected, as well as some information. The order of these arguments
 may differ. Because we may see an internal node to stand,
 horizontally, between its subtrees \(t_1\)~and~\(t_2\), we may prefer
-to write \(\fun{int}(t_1,x,t_2)\). (Semitic readers might wish to swap
-\(t_1\)~and~\(t_2\).) Alternatively, we may consider that an internal
-node lies, vertically, before its subtrees, in which case we might
-prefer to write \(\fun{int}(x,t_1,t_2)\). The latter makes typing or
-handwriting small trees easier, in particular for
+to write \(\fun{int}(t_1,x,t_2)\). Alternatively, we may consider
+that an internal node lies, vertically, before its subtrees, in which
+case we might prefer to write \(\fun{int}(x,t_1,t_2)\). The latter
+makes typing or handwriting small trees easier, in particular for
 testing\index{testing} purposes. For example, the binary tree of
 \fig~\vref{fig:bt_ex1} formally corresponds to \(\fun{int}(8, t_1,
 \fun{int}(3, \fun{ext}(), \fun{ext}(2, \fun{ext}(), \fun{ext}())))\),
@@ -118,7 +119,7 @@ where \(t_1=\fun{int}(1, \fun{ext}(3, \fun{ext}(), \fun{int}(5,
 \fun{ext}(), \fun{ext}())), \fun{ext}(9, \fun{ext}(),
 \fun{ext}()))\). We will use henceforth the convention
 \(\fun{int}(x,t_1,t_2)\), sometimes called \emph{prefix
-  notation}.\index{binary tree!prefix notation}\index{binary
+notation}.\index{binary tree!prefix notation}\index{binary
   tree!internal node|)}\index{binary tree!external node|)}
 
 The \emph{size}\index{binary tree!size} of a binary tree is the number
@@ -537,14 +538,16 @@ wonder what the interpretation of this accumulator\index{functional
 The arrows evince the traversal in the tree and connect different
 stages of the preorder stack: a downwards arrow points to the argument
 of a recursive call on the corresponding child; an upward arrow points
-to the result of the call on the parent. For instance, the
-subtree~\(t_2\) corresponds to the recursive call
+to the result of the call on the parent.
+
+For instance, the subtree~\(t_2\) corresponds to the recursive call
 \(\fun{pre}(t_2,s)\)\index{pre@\fun{pre/2}} whose value is
 named~\(s_1\). Likewise, we have \(\fun{pre}(t_1,s_1)
 \twoheadrightarrow s_2\), which is therefore equivalent to
 \(\fun{pre}(t_1,\fun{pre}(t_2,s)) \twoheadrightarrow s_2\). Finally,
 the root is associated with the evaluation \(\fun{pre}(t,s)
-\twoheadrightarrow \cons{x}{s_2}\), that is, \(\fun{pre}(t,s) \equiv
+\twoheadrightarrow \cons{x}{s_2}\), which is none other than the
+equivalence \(\fun{pre}(t,s) \equiv
 \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,s))}\).\index{pre@\fun{pre/2}}
 The rule for external nodes is not shown and simply consists in
 letting the stack invariant. We can finally write the functional
@@ -564,6 +567,7 @@ program in \fig~\vref{fig:pre}.
 \caption{Cost and memory efficient preorder}
 \label{fig:pre}
 \end{figure}
+
 We now understand that, given \(\fun{pre}(t,s)\), the nodes in the
 stack~\(s\) are the nodes that follow, in preorder, the nodes in the
 subtree~\(t\). The cost is extremely simple:
@@ -648,12 +652,10 @@ is the number we found earlier and the second component is a numbered
 tree. As usual with recursive definitions, we assume that the
 recursive calls on substructures are correct (that is, they yield the
 expected values) and we infer the value of the call on the whole
-structure at hand, here \(\pair{k}{\fun{int}(i,t'_1,t'_2)}\).
-
-The function
+structure at hand, here \(\pair{k}{\fun{int}(i,t'_1,t'_2)}\). The function
 \fun{npre/1}\index{npre@\fun{npre/1}} (\emph{number in preorder}) in
 \fig~\vref{fig:npre}
-\begin{figure}[t]
+\begin{figure}[b]
 \abovedisplayskip=0pt
 \belowdisplayskip=0pt
 \centering
@@ -682,10 +684,8 @@ implements this algorithm, using a function
 numbering of~\(t\), with root~\(i\), and \(j\)~is the smallest integer
 not found in~\(t'\) (in other words, \(j-i\) is the size of~\(t\)
 and~\(t'\)). This function is the one illustrated in
-\fig~\vref{fig:prenum0}.
-
-By the way, we should perhaps recall that inference
-systems\index{induction!inference system}, first seen
+\fig~\vref{fig:prenum0}. By the way, we should perhaps recall that
+inference systems\index{induction!inference system}, first seen
 \vpageref{par:infsys}, can be eliminated by the introduction of
 auxiliary functions (one for each premise). In this instance, we could
 equivalently write\index{snd@\fun{snd/1}} the program in
@@ -794,31 +794,28 @@ the other side or get stuck. Let \(t := \fun{int}(x,t_1,t_2)\), then
 \fun{pre}_0(t)
 & = & \fun{pre}_0(\fun{int}(x,t_1,t_2)) \\
 & \xrightarrow{\smash{\delta}}
-& \cons{x}{\fun{cat}(\fun{pre}_0(t_1), \fun{pre}_0(t_2))}
-& (\fun{pre}_0)\\
+& \cons{x}{\fun{cat}(\fun{pre}_0(t_1), \fun{pre}_0(t_2))}\\
 & \equiv & \cons{x}{\fun{cat}(\fun{pre}(t_1), \fun{pre}_0(t_2))}
 & (\pred{Pre}{t_1})\\
-& \equiv & \cons{x}{\fun{cat}(\fun{pre}(t_1), \fun{pre}(t_2))}
+& \equiv & \cons{x}{\fun{cat}(\ufun{pre}(t_1), \fun{pre}(t_2))}
 & (\pred{Pre}{t_2})\\
 & \xrightarrow{\smash{\theta}}
-& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2))}
-& (\fun{pre})\\
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \ufun{pre}(t_2))}\\
 & \xrightarrow{\smash{\theta}}
-& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2,\el))}
-& (\fun{pre}).
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2,\el))}.
 \end{array}
 \end{equation*}
 At this point, we start rewriting the other side, until we get stuck
 as well:
 \begin{equation*}
-\begin{array}{@{}r@{\;}l@{\;}l@{\;\;}r@{}}
+%\begin{array}{@{}r@{\;}l@{\;}l@{\;\;}r@{\!}}
   \fun{pre}(t) = \fun{pre}(\fun{int}(x,t_1,t_2))
 \xrightarrow{\smash{\theta}} \fun{pre}(\fun{int}(x,t_1,t_2),\el)
 \xrightarrow{\smash{\kappa}}
 \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))}.
 \index{pre@\fun{pre/1}}
 \index{pre@\fun{pre/2}}
-\end{array}
+%\end{array}
 \end{equation*}
 Comparing the two stuck expressions\index{rewrite system!stuck
   expression} suggests a subgoal to reach.
@@ -855,7 +852,7 @@ well\hyp{}founded induction principle then requires that we establish
 \end{itemize*}
 The basis is easy:
 \begin{equation*}
-  \fun{cat}(\fun{pre}(\fun{ext}(),\el),\el)
+  \fun{cat}(\ufun{pre}(\fun{ext}(),\el),\el)
   \xrightarrow{\smash{\iota}} \fun{cat}(\el,\el)
   \xrightarrow{\smash{\alpha}} \el \xleftarrow{\smash{\iota}}
   \fun{pre}(\fun{ext}(),\el).
@@ -864,22 +861,20 @@ The basis is easy:
 We then assume \(\forall t',s'.(t,s) \succ_{B \times S} (t',s')
 \Rightarrow \pred{CatPre}{t',s'}\), which is the induction hypothesis,
 and proceed to rewrite the left\hyp{}hand side after letting \(t :=
-\fun{int}(x,t_1,t_2)\). The result is shown in \fig~\vref{fig:CatPre},
+\fun{int}(x,t_1,t_2)\). See \fig~\vref{fig:CatPre}, where
 \index{CatPre@\predName{CatPre}}
 \begin{figure}[t]
 \begin{equation*}
 \boxed{%
-\begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
+\begin{array}{@{}r@{\;}c@{\;}l@{\qquad}}
 %\begin{array}{r@{\;}c@{\;}l}
   \fun{cat}(\fun{pre}(t,\el),s)
 & =
-& \fun{cat}(\fun{pre}(\fun{int}(x,t_1,t_2),\el),s)\\
+& \fun{cat}(\ufun{pre}(\fun{int}(x,t_1,t_2),\el),s)\\
 & \xrightarrow{\smash{\kappa}}
-& \fun{cat}(\cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))},s)
-& (\fun{pre/2})\\
+& \ufun{cat}(\cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))},s)\\
 & \xrightarrow{\smash{\beta}}
-& \cons{x}{\fun{cat}(\fun{pre}(t_1,\fun{pre}(t_2,\el)),s)}
-& (\fun{cat})\\
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\fun{pre}(t_2,\el)),s)}\\
 & \equiv_0
 & \cons{x}{\fun{cat}(\fun{cat}(\fun{pre}(t_1,\el),\fun{pre}(t_2,\el)),s)}\\
 & \equiv_1
@@ -889,11 +884,9 @@ and proceed to rewrite the left\hyp{}hand side after letting \(t :=
 & \equiv_3
 & \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,s))}\\
 & \xleftarrow{\smash{\kappa}}
-& \fun{pre}(\fun{int}(x,t_1,t_2),s)
-& (\fun{pre/2})\\
+& \fun{pre}(\fun{int}(x,t_1,t_2),s)\\
 & =
-& \fun{pre}(t,s)
-& \hfill\Box
+& \fun{pre}(t,s). \hfill\Box
 \end{array}}
 \end{equation*}
 \caption{Proof of \(\pred{CatPre}{t} \colon
@@ -901,7 +894,6 @@ and proceed to rewrite the left\hyp{}hand side after letting \(t :=
   \fun{pre}(t,s)\)}
 \label{fig:CatPre}
 \end{figure}
-where
 \begin{itemize*}
 
   \item (\(\equiv_0\)) is the instance
@@ -912,7 +904,7 @@ where
 
   \item (\(\equiv_1\)) is an application of the lemma on the
   associativity of stack concatenation\index{stack!concatenation}
-  (page~\pageref{proof:assoc_cat}), namely
+  (page~\pageref{proof:assoc_cat}), that is:
   \index{pre@\fun{pre/2}}\index{CatAssoc@\predName{CatAssoc}}
   \(\pred{CatAssoc}{\fun{pre}(t_1,\el),\fun{pre}(t_2,\el),s}\);
 
@@ -926,34 +918,29 @@ where
     particular when \(s' = \fun{pre}(t_2,s)\).\index{pre@\fun{pre/2}}
 \end{itemize*}
 We can resume conclusively in \fig~\vref{fig:pre0_pre}.\hfill\(\Box\)
-\begin{figure}
+\begin{figure}[!b]
 \begin{equation*}
 \boxed{%
 \begin{array}{r@{\;}c@{\;}l@{\qquad}r}
 \fun{pre}_0(t)
 & = & \fun{pre}_0(\fun{int}(x,t_1,t_2))\\
 & \xrightarrow{\smash{\delta}}
-& \cons{x}{\fun{cat}(\fun{pre}_0(t_1), \fun{pre}_0(t_2))}
-& (\fun{pre}_0)\\
+& \cons{x}{\fun{cat}(\fun{pre}_0(t_1), \fun{pre}_0(t_2))}\\
 & \equiv & \cons{x}{\fun{cat}(\fun{pre}(t_1), \fun{pre}_0(t_2))}
 & (\pred{Pre}{t_1})\\
-& \equiv & \cons{x}{\fun{cat}(\fun{pre}(t_1), \fun{pre}(t_2))}
+& \equiv & \cons{x}{\fun{cat}(\ufun{pre}(t_1), \fun{pre}(t_2))}
 & (\pred{Pre}{t_2})\\
 & \xrightarrow{\smash{\theta}}
-& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2))}
-& (\fun{pre})\\
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \ufun{pre}(t_2))}\\
 & \xrightarrow{\smash{\theta}}
-& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2,\el))}
-& (\fun{pre})\\
+& \cons{x}{\fun{cat}(\fun{pre}(t_1,\el), \fun{pre}(t_2,\el))}\\
 & \equiv
 & \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,\el))}
 & (\pred{CatPre}{t_1,\fun{pre}(t_2,\el)})\\
 & \xleftarrow{\smash{\kappa}}
-& \fun{pre}(\fun{int}(x,t_1,t_2),\el)
-& (\fun{pre/2})\\
+& \fun{pre}(\fun{int}(x,t_1,t_2),\el)\\
 & \xleftarrow{\smash{\theta}}
-& \fun{pre}(\fun{int}(x,t_1,t_2))
-& (\fun{pre})\\
+& \fun{pre}(\fun{int}(x,t_1,t_2))\\
 & = & \fun{pre}(t). & \hfill\Box
 \end{array}}
 \end{equation*}
@@ -1087,7 +1074,7 @@ subtrees \(t_1\)~and~\(t_2\). The implicit rewrites in
   \fun{in}(t_1,\cons{x}{s_1}) &\twoheadrightarrow s_2,\\
   \fun{in}(t,s) &\twoheadrightarrow s_2,
 \end{align*}
-where \(t=\fun{int}(x,t_1,t_2)\). By eliminating the intermediary
+where \(t=\fun{int}(x,t_1,t_2)\). Eliminating the intermediary
 variables \(s_1\)~and~\(s_2\) we obtain the equivalence
 \begin{equation*}
   \fun{in}(t_1,\cons{x}{\fun{in}(t_2,s)}) \equiv \fun{in}(t,s).
@@ -1285,29 +1272,22 @@ we establish
 \end{itemize}
 The former results from
 \begin{equation*}
-\begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
-  \fun{in}(\fun{mir}(\fun{ext}()))
+\begin{array}{@{}r@{\;}c@{\;}l@{\qquad}}
+  \fun{in}(\ufun{mir}(\fun{ext}()))
   & \xrightarrow{\smash{\sigma}}
-  & \fun{in}(\fun{ext}())
-  & (\fun{mir})\\
+  & \ufun{in}(\fun{ext}())\\
   & \xrightarrow{\smash{\xi}}
-  & \fun{in}(\fun{ext}(),\el)
-  & (\fun{in})\\
+  & \fun{in}(\fun{ext}(),\el)\\
   & \xrightarrow{\smash{\pi}}
-  & \el
-  & (\fun{in/2})\\
+  & \el\\
   & \xleftarrow{\smash{\zeta}}
-  & \fun{rcat}(\el,\el)
-  & (\fun{rcat})\\
+  & \fun{rcat}(\el,\el)\\
   & \xleftarrow{\smash{\epsilon}}
-  & \fun{rev}(\el)
-  & (\fun{rev})\\
+  & \fun{rev}(\el)\\
   & \xleftarrow{\smash{\pi}}
-  & \fun{rev}(\fun{in}(\fun{ext}(),\el))
-  & (\fun{in/2})\\
+  & \fun{rev}(\ufun{in}(\fun{ext}(),\el))\\
   & \xleftarrow{\smash{\xi}}
-  & \fun{rev}(\fun{in}(\fun{ext}()))
-  & (\fun{in}).
+  & \fun{rev}(\ufun{in}(\fun{ext}())).
   \index{rcat@\fun{rcat/2}}\index{rev@\fun{rev/1}}
 \end{array}
 \end{equation*}
@@ -1318,28 +1298,22 @@ right\hyp{}hand side or we get stuck:
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
 \fun{in}(\fun{mir}(t)) & = &
-\fun{in}(\fun{mir}(\fun{int}(x,t_1,t_2)))\\
+\fun{in}(\ufun{mir}(\fun{int}(x,t_1,t_2)))\\
 & \xrightarrow{\smash{\tau}}
-& \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)))
-& (\fun{mir})\\
+& \ufun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)))\\
 & \xrightarrow{\smash{\xi}}
-& \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),\el)
-& (\fun{in})\\
+& \ufun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),\el)\\
 & \xrightarrow{\smash{\rho}}
-& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),\el)})
-& (\fun{in/2})\\
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),\el)})\\
 & \xleftarrow{\smash{\zeta}}
-& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1))})
-& (\fun{in})\\
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\ufun{in}(\fun{mir}(t_1))})\\
 & \equiv
-& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rev}(\fun{in}(t_1))})
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rev}(\ufun{in}(t_1))})
 & (\pred{InMir}{t_1})\\
 & \xrightarrow{\smash{\xi}}
-& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rev}(\fun{in}(t_1,\el))})
-& (\fun{in})\\
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\ufun{rev}(\fun{in}(t_1,\el))})\\
 & \xrightarrow{\smash{\epsilon}}
-& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),\el)})
-& (\fun{rev}).
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),\el)}).
 \end{array}
 \end{equation*}
 We cannot use the induction hypothesis \(\pred{InMir}{t_2}\) to get
@@ -1356,22 +1330,18 @@ we rewrite as follows:
 \begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
 \fun{in}(\fun{mir}(t),s)
 & =
-& \fun{in}(\fun{mir}(\fun{int}(x,t_1,t_2)),s)\\
+& \fun{in}(\ufun{mir}(\fun{int}(x,t_1,t_2)),s)\\
 & \xrightarrow{\smash{\tau}}
-& \fun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),s)
-& (\fun{mir})\\
+& \ufun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),s)\\
 & \xrightarrow{\smash{\rho}}
-& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),s)})
-& (\fun{in/2})\\
+& \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),s)})\\
 & \equiv
 & \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),s)})
 & (\pred{InMir}{t_1,s})\\
 & \equiv_0
 & \fun{rcat}(\fun{in}(t_2,\el),\cons{x}{\fun{rcat}(\fun{in}(t_1,\el),s)})\\
 & \xleftarrow{\smash{\eta}}
-& \fun{rcat}(\cons{x}{\fun{in}(t_2,\el)},
-\fun{rcat}(\fun{in}(t_1,\el),s))
-& (\fun{rcat}),
+& \ufun{rcat}(\cons{x}{\fun{in}(t_2,\el)},\fun{rcat}(\fun{in}(t_1,\el),s)),
 \end{array}
 \end{equation*}
 where (\(\equiv_0\)) is
@@ -1381,7 +1351,7 @@ The right\hyp{}hand side now:
 %\begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
 \fun{rcat}(\fun{in}(t,\el),s)
 \! = \!
- \fun{rcat}(\fun{in}(\fun{int}(x,t_1,t_2),\el),s)
+ \fun{rcat}(\ufun{in}(\fun{int}(x,t_1,t_2),\el),s)
 \! \xrightarrow{\smash{\rho}}\!
  \fun{rcat}(\fun{in}(t_1,\cons{x}{\fun{in}(t_2,\el)}),s).
 %\end{array}
@@ -1455,7 +1425,7 @@ and (\(\equiv_1\)) is the instance
 need to prove \(\fun{cat}(\fun{in}(t,\el),s) \equiv
 \fun{in}(t,s)\). This equivalence is likely to be true, as it is
 similar to \(\pred{CatPre}{t,s}\).\index{CatPre@\predName{CatPre}}
-Assuming this lemma, we achieve the proof.\hfill\(\Box\)
+Assuming this lemma, we conclude the proof.\hfill\(\Box\)
 
 \paragraph{Exercises}
 \begin{enumerate*}
@@ -1577,12 +1547,12 @@ requires that we prove
 \end{itemize*}
 The basis is proved as follows:\index{mir@\fun{mir/1}|(}
 \begin{align*}
-  \fun{pre}(\fun{mir}(\fun{ext}()),\el)
+  \fun{pre}(\ufun{mir}(\fun{ext}()),\el)
   &\xrightarrow{\smash{\sigma}} \fun{pre}(\fun{ext}(),\el)\\
   &\xrightarrow{\smash{\iota}} \el\\
   &\xleftarrow{\smash{\zeta}} \fun{rcat}(\el,\el)\\
   &\xleftarrow{\smash{\mu}}
-  \fun{rcat}(\fun{post}(\fun{ext}(),\el),\el).
+  \fun{rcat}(\ufun{post}(\fun{ext}(),\el),\el).
 \end{align*}
 Let \(t := \fun{int}(x,t_1,t_2)\). In \fig~\vref{fig:premir}, we have
 the rewrites of the left\hyp{}hand side,
@@ -1591,13 +1561,11 @@ the rewrites of the left\hyp{}hand side,
 \boxed{
 \begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
 \fun{pre}(\fun{mir}(t),s)
-& = & \fun{pre}(\fun{mir}(\fun{int}(x,t_1,t_2)),s)\\
+& = & \fun{pre}(\ufun{mir}(\fun{int}(x,t_1,t_2)),s)\\
 & \xrightarrow{\smash{\tau}}
-& \fun{pre}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),s)
-& (\fun{mir})\\
+& \ufun{pre}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),s)\\
 & \xrightarrow{\smash{\kappa}}
-& \cons{x}{\fun{pre}(\fun{mir}(t_2),\fun{pre}(\fun{mir}(t_1),s))}
-& (\fun{pre})\\
+& \cons{x}{\fun{pre}(\fun{mir}(t_2),\fun{pre}(\fun{mir}(t_1),s))}\\
 & \equiv_0
 & \cons{x}{\fun{pre}(\fun{mir}(t_2),
            \fun{rcat}(\fun{post}(t_1,\el),s))}\\
@@ -1607,12 +1575,10 @@ the rewrites of the left\hyp{}hand side,
 & \equiv_2
 & \cons{x}{\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el), \fun{post}(t_2,\el)), s)}\\
 & \xleftarrow{\smash{\zeta}}
-& \fun{rcat}(\el,\cons{x}{\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el),
-                                       \fun{post}(t_2,\el)), s)})
-& (\fun{rcat})\\
+& \ufun{rcat}(\el,\cons{x}{\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el),
+                                       \fun{post}(t_2,\el)), s)})\\
 & \xleftarrow{\smash{\eta}}
-& \fun{rcat}([x],\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el), \fun{post}(t_2,\el)), s))
-& (\fun{rcat})\\
+& \ufun{rcat}([x],\fun{rcat}(\fun{cat}(\fun{post}(t_1,\el), \fun{post}(t_2,\el)), s))\\
 & \equiv_3
 & \fun{rcat}(\fun{cat}(\fun{cat}(\fun{post}(t_1,\el), \fun{post}(t_2,\el)), [x]), s)\\
 & \equiv_4
@@ -1627,8 +1593,7 @@ the rewrites of the left\hyp{}hand side,
 & \equiv_6
 & \fun{rcat}(\fun{post}(t_1,\fun{post}(t_2,[x])),s)\\
 & \xleftarrow{\smash{\nu}}
-& \fun{rcat}(\fun{post}(\fun{int}(x,t_1,t_2),\el),s)
-& (\fun{post/2})\\
+& \fun{rcat}(\ufun{post}(\fun{int}(x,t_1,t_2),\el),s)\\
 & =
 & \fun{rcat}(\fun{post}(t,\el),s).
 & \hfill\Box
@@ -2365,12 +2330,12 @@ two internal nodes themselves. An example is provided in
 \caption{A complete tree}
 \label{fig:complete}
 \end{wrapfigure}
-Recursively, a given tree is complete if,
-and only if, its immediate subtrees are complete. This is the same
-rule we used for perfection. In other words, perfection and
-completeness are propagated bottom\hyp{}up. Therefore, we need to
-decide what to say about the external nodes, in particular, the empty
-tree. If we decide that the latter is complete, then
+Recursively, a given tree is complete if, and only if, its immediate
+subtrees are complete. This is the same rule we used for
+perfection. In other words, perfection and completeness are propagated
+fron the bottom up. Therefore, we need to decide what to say about the
+external nodes, in particular, the empty tree. If we decide that the
+latter is complete, then
 \(\fun{int}(x,\fun{ext}(),\fun{int}(y,\fun{ext}(),\fun{ext}()))\)
 would, incorrectly, be deemed complete. If not, leaves\index{binary
   tree!leaf} \(\fun{int}(x,\fun{ext}(),\fun{ext}())\) would,
@@ -2680,14 +2645,16 @@ nodes. For instance, we mentioned that the tree in
 \Box, 2, 3, \Box, \Box, \Box, 4, 5, 6]\). If we only want to retain
 the shape of the tree, we could replace the contents of the internal
 nodes by~\(0\) and the external nodes by~\(1\), yielding the encoding
-\([1,1,1,0,0,1,1,0,0,1,1,1,0,0,0]\). A binary tree of size~\(n\) can
-be uniquely represented by a binary number of \(2n+1\) bits. In fact,
-we can discard the first bit because the first two bits are
-always~\(1\), so \(2n\)~bits are actually enough. For an extended
-preorder traversal, we choose to map external nodes to~\(0\) and
-internal nodes to~\(1\), so, the tree in \fig~\vref{fig:preorder}
-yields \([0, 1, 2, \Box, 3, \Box, \Box, 4, \Box, \Box, 5, \Box, 6,
-\Box, \Box]\) and \((111010010010100)_2\). We can also discard the
+\([1,1,1,0,0,1,1,0,0,1,1,1,0,0,0]\).
+
+A binary tree of size~\(n\) can be uniquely represented by a binary
+number of \(2n+1\) bits. In fact, we can discard the first bit because
+the first two bits are always~\(1\), so \(2n\)~bits are actually
+enough. For an extended preorder traversal, we choose to map external
+nodes to~\(0\) and internal nodes to~\(1\), so, the tree in
+\fig~\vref{fig:preorder} yields \([0, 1, 2, \Box, 3, \Box, \Box, 4,
+  \Box, \Box, 5, \Box, 6, \Box, \Box]\), which corresponds to the
+binary number \((111010010010100)_2\). We can also discard the
 rightmost bit, since the last two bits are always~\(0\).
 
 \section{Random traversals}
@@ -2864,7 +2831,7 @@ We actually know the appropriate objects in the instance of \emph{Dyck
 about queueing\index{queue}. A Dyck path is a broken line in a grid
 from the point \((0,0)\) to \((2n,0)\), made up of the two kinds of
 segments shown in \fig~\vref{fig:rise_fall},
-\begin{figure}
+\begin{figure}[b]
 \centering
 \subfloat[Rise\label{fig:rise}]{%
   \includegraphics[bb=69 662 132 721,scale=0.75]{enqueue}
@@ -2901,37 +2868,41 @@ not the mapping of another tree. Since, by definition, non\hyp{}empty
 binary trees are made of an internal node connected to two binary
 subtrees, we may wonder how to split a Dyck word into three parts: one
 corresponding to the root of the tree and two corresponding to the
-immediate subtrees. Since any Dyck word starts with a rise and ends
-with a fall, we may ask what is the word in\hyp{}between. In general,
-it is not a Dyck word; for example, chopping off the ends of
-\fun{rfrrff} yields \fun{frrf}. Instead, we seek a decomposition of
-Dyck words into Dyck words. If the Dyck word has exactly one
-\emph{return}, that is, one fall leading to the abscissa axis, then
-cutting out the first rise and that unique return (which must be the
-last fall) yields another Dyck word. For instance, \(\fun{rrfrrfff} =
-\fun{r} \cdot \fun{rfrrff} \cdot \fun{f}\). Such words are called
-\emph{prime}, because any Dyck word can be uniquely decomposed as the
-concatenation of such words (whence the reference to prime factorisation
-in elementary number theory): for all non\hyp{}empty Dyck words~\(d\),
-there exists \({n > 0}\) unique prime Dyck words~\(p_i\) such that \(d
-= p_1 \cdot p_2 \cdots p_n\). This naturally yields the \emph{arch
-  decomposition}\index{Dyck path!decomposition!arch $\sim$}, whose
-name stems from an architectural analogy: for all Dyck words~\(d\),
-there exists \({n > 0}\) Dyck words \(d_i\) and returns~\(\fun{f}_i\)
-such that
+immediate subtrees.
+
+Since any Dyck word starts with a rise and ends with a fall, we may
+ask what is the word in\hyp{}between. In general, it is not a Dyck
+word; for example, chopping off the ends of \fun{rfrrff} yields
+\fun{frrf}. Instead, we seek a decomposition of Dyck words into Dyck
+words. If the Dyck word has exactly one \emph{return}, that is, one
+fall leading to the abscissa axis, then cutting out the first rise and
+that unique return (which must be the last fall) yields another Dyck
+word. For instance, \(\fun{rrfrrfff} = \fun{r} \cdot \fun{rfrrff}
+\cdot \fun{f}\).
+
+Such words are called \emph{prime}, because any Dyck word can be
+uniquely decomposed as the concatenation of such words (whence the
+reference to prime factorisation in elementary number theory): for all
+non\hyp{}empty Dyck words~\(d\), there exists \({n > 0}\) unique prime
+Dyck words~\(p_i\) such that \(d = p_1 \cdot p_2 \cdots p_n\). This
+naturally yields the \emph{arch decomposition}\index{Dyck
+  path!decomposition!arch $\sim$}, whose name stems from an
+architectural analogy: for all Dyck words~\(d\), there exists \({n >
+  0}\) Dyck words \(d_i\) and returns~\(\fun{f}_i\) such that
 \begin{equation*}
 d = (\fun{r} \cdot d_1 \cdot \fun{f}_1) \cdots (\fun{r} \cdot d_n
 \cdot \fun{f}_n).
 \end{equation*}
-See \cite{PanayotopoulosSapounakis_1995, Lothaire_2005,
-  FlajoletSedgewick_2009}. Unfortunately, this analysis is not
-suitable as it stands, because \(n\)~may be greater than~\(2\),
-precluding any analogy with binary trees. The solution is simple
-enough: let us keep the first prime factor \(\fun{r} \cdot d_1 \cdot
-\fun{f}_1\) and \emph{not} factorise the suffix, which is a Dyck
-word. To wit, for all non\hyp{}empty Dyck words~\(d\), there exists
-one return~\(\fun{f}_1\) and two Dyck subwords \(d_1\) and~\(d_2\)
-(possibly empty) such that
+For more details, see \cite{PanayotopoulosSapounakis_1995,
+  Lothaire_2005, FlajoletSedgewick_2009}.
+
+Unfortunately, this analysis is not suitable as it stands, because
+\(n\)~may be greater than~\(2\), precluding any analogy with binary
+trees. The solution is simple enough: let us keep the first prime
+factor \(\fun{r} \cdot d_1 \cdot \fun{f}_1\) and \emph{not} factorise
+the suffix, which is a Dyck word. To wit, for all non\hyp{}empty Dyck
+words~\(d\), there exists one return~\(\fun{f}_1\) and two Dyck
+subwords \(d_1\) and~\(d_2\) (possibly empty) such that we have
 \begin{equation*}
 d = (\fun{r} \cdot d_1 \cdot \fun{f}_1) \cdot d_2.
 \end{equation*}
@@ -3001,7 +2972,7 @@ follows:
 \varepsilon \cdot \fun{f} \cdot \varepsilon) \cdot
 \fun{f} \cdot (\fun{r}_3 \cdot \varepsilon \cdot \fun{f} \cdot
 \varepsilon)
-= \fun{r}_0\fun{r}_1\fun{f}\fun{r}_2\fun{f}\fun{f}\fun{r}_3\fun{f}.
+= \fun{r}_0 \cdot \fun{r}_1 \cdot \fun{f} \cdot \fun{r}_2 \cdot \fun{f} \cdot \fun{f} \cdot \fun{r}_3 \cdot \fun{f}.
 \end{align*}
 Notice that if we replace the rises by their associated contents (in
 subscript) and the falls by~\(\Box\), we obtain \([0, 1, \Box, 2,
@@ -3215,7 +3186,7 @@ length of its largest extended level\index{binary tree!extended
   width}~\(w_n\)\index{binary tree!width} of a binary tree of
 size~\(n\) satisfies
 \begin{equation*}
-w_n \sim \sqrt{\pi n} \sim \tfrac{1}{2} h_n.
+w_n \sim \sqrt{\pi n} \sim \frac{1}{2} h_n.
 \end{equation*}
 In particular, this result implies that the average size of the stack
 needed to perform the preorder traversal with
