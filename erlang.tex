@@ -116,13 +116,17 @@ comp(\{int,\_,T1,T2\})   -> \textbf{case} comp(T1) \textbf{of}
                          \textbf{end};
 comp(ext)             -> false.
 \end{alltt}
-The call \(\fun{comp}(t_2)\) could evaluate in \(\fun{false}()\), leading to select the rule \(\fun{comp}(t) \rightarrow \fun{false}()\). This backtracking is not possible in \Erlang: once the head of a clause has been successfully matched, the remaining heads will not be considered. By factoring the call \(\fun{comp}(t_1)\), we can solve this problem and the inference rule becomes just one case.
+The call \(\fun{comp}(t_2)\) could evaluate in \(\fun{false}()\),
+leading to select the rule \(\fun{comp}(t) \rightarrow
+\fun{false}()\). This backtracking is not possible in \Erlang: once
+the head of a clause has been successfully matched, the remaining
+heads will not be considered. By factoring the call
+\(\fun{comp}(t_1)\), we can solve this problem and the inference rule
+becomes just one case.
 
 The function in \fig~\vref{fig:pre2b0} becomes
 \begin{alltt}
-pre2b0(S) -> \textbf{case} pre2b1(S) \textbf{of}
-               \{T,[]\} -> T
-             \textbf{end}.
+pre2b0(S) -> \textbf{case} pre2b1(S) \textbf{of} \{T,[]\} -> T \textbf{end}.
 
 pre2b1([ext|S]) -> \{ext,S\};
 pre2b1([X|S])   ->
@@ -148,8 +152,9 @@ realise that some functions act simply as a conditional expressions. We
 can see this in \fig~\vref{fig:bst}, with functions \fun{norm/1} and
 \fun{cmp/3}:
 \begin{alltt}
-bst(T) -> \textbf{case} bst(T,infty) \textbf{of} false -> false;
-                                   \_ -> true
+bst(T) -> \textbf{case} bst(T,infty) \textbf{of}
+            false -> false;
+            \_    -> true
           \textbf{end}.
 
 bst(ext,M)           -> M;
@@ -386,7 +391,7 @@ shared with the pattern. Of course, the same would hold for any
 constant. We already know how many such nodes are created by calls to
 \fun{cat/2} and, since the length of~\(s\) in the recursive call
 \(\fun{rev}_0(s)\) decreases by~\(1\) each time, the number of pushes
-is \(\sum_{k=1}^{n-1}k = \tfrac{1}{2}n(n-1)\), if the original stack
+is \(\sum_{k=1}^{n-1}k = n(n-1)/2\), if the original stack
 contains \(n\)~items. We need to add one push for each \([x]\), that
 is,~\(n\). In total: \(n(n+1)/2\).
 
@@ -414,7 +419,7 @@ stacks: \((p+1)2^p = n\lg n + n\). This is the total number of
 cons\hyp{}nodes\index{cons-node}. In the case of top\hyp{}down
 mergers, only the first half of the stacks, including the original
 one, are reversed, hence allocate cons\hyp{}nodes. As a consequence,
-the total number of cons\hyp{}nodes created is \(\tfrac{1}{2}n\lg n\).
+the total number of cons\hyp{}nodes created is \((n\lg n)/2\).
 \index{memory!merging|)}
 
 %\section{Context of a call}
@@ -2247,8 +2252,8 @@ compare now \(\M{\fun{isrt\_tf}}{n}\) to \(\M{\fun{isrt}}{n}\),
 for~\(n\geqslant{}0\):
 \begin{equation*}
 \M{\fun{isrt\_tf}}{n}
-  = \tfrac{1}{2}{n^2} + \tfrac{1}{2}{n} + 1
-  \sim \tfrac{1}{2}{n^2} \sim 2 \cdot \M{\fun{isrt}}{n}.
+  = \frac{1}{2}{n^2} + \frac{1}{2}{n} + 1
+  \sim \frac{1}{2}{n^2} \sim 2 \cdot \M{\fun{isrt}}{n}.
 \end{equation*}
 In other words, \erlcode{isrt\_tf/1}, in spite of being optimised, is
 nevertheless 50\%~slower than the original function, \emph{in average
@@ -4457,8 +4462,11 @@ Another higher\hyp{}order solution \erlcode{allp0/1} relies on a map
 allp0(   []) -> [];
 allp0([X|S]) -> [[X]|map(\textbf{fun}(T) -> [X|T] \textbf{end},allp0(S))].
 \end{alltt}
-We have \(\C{\fun{allp}_0}{n} = (n+1) + \sum_{k=1}^{n-1}k =
-\frac{1}{2}n^2 + \frac{1}{2}n + 1\).
+We have
+\begin{equation}
+\C{\fun{allp}_0}{n} = (n+1) + \sum_{k=1}^{n-1}k =
+\frac{1}{2}n^2 + \frac{1}{2}n + 1.
+\end{equation}
 \index{functional language!higher-order $\sim$!continuations|)}
 \index{functional language!Erlang@\Erlang|)}
 \index{functional language!higher-order $\sim$|)}
