@@ -229,8 +229,8 @@ and~\texttt{x}, we need to specify that \texttt{Item} extends the
 predefined class \texttt{Comparable}. Therefore, we must rewrite our
 class definitions as follows:
 \begin{alltt}
-\public \abstractX \class Stack<Item
-\hfill\extends Comparable<? \super Item>> \{
+\public \abstractX
+\class Stack<Item \extends Comparable<? \super Item>> \{
   ...
 \}
 \public \class EStack<Item \extends Comparable<? \super Item>>
@@ -275,8 +275,8 @@ single dispatch. Function \fun{ins/2} too, but first requires a refinement
 introducing a conditional. Easy things first:
 \begin{alltt}
 // Stack.java
-\public \abstractX \class Stack<Item
-\hfill\extends Comparable<? \super Item>> \{
+\public \abstractX
+\class Stack<Item \extends Comparable<? \super Item>> \{
   ...
   \public \abstractX Stack<Item> isrt();
 \}
@@ -316,8 +316,8 @@ Note how we split rule~\(\lambda\) in two cases: \(\el\) and
 partake to the conditional. We can now translate to \Java:
 \begin{alltt}
 // Stack.java
-\public \abstractX \class Stack<Item
-\hfill\extends Comparable<? \super Item>> \{
+\public \abstractX
+\class Stack<Item \extends Comparable<? \super Item>> \{
   ...
   \protectedX \abstractX NStack<Item> ins(\final Item x);
 \}
@@ -407,11 +407,11 @@ component' and another about its `second component.' We have
 Now we can proceed as follows:
 \begin{alltt}
 // Stack.java
-\public \abstractX \class Stack<Item
-\hfill\extends Comparable<? \super Item>> \{
+\public \abstractX
+\class Stack<Item \extends Comparable<? \super Item>> \{
   ...
   \public \abstractX
-            Pair<Stack<Item>,Stack<Item>> cut(\final int k);
+  Pair<Stack<Item>,Stack<Item>> cut(\final int k);
 \}
 \end{alltt}
 Notice that, as usual, a function with \(n\)~parameters is translated
@@ -537,12 +537,12 @@ Then we have two functions that can be translated to \Java only using
 single dispatch:\index{merge sort!merging!$\sim$ in \Java|(}
 \begin{alltt}
 // Stack.java
-\public \abstractX \class Stack<Item
-\hfill\extends Comparable<? \super Item>> \{
+\public \abstractX
+\class Stack<Item \extends Comparable<? \super Item>> \{
   ...
   \public \abstractX Stack<Item> mrg(\final Stack<Item> t);
-  \public \abstractX Stack<Item> mrg0(\final Item x,
-                                   \final Stack<Item> s);
+  \public \abstractX
+  Stack<Item> mrg0(\final Item x, \final Stack<Item> s);
 \}
 // EStack.java
 \public \class EStack<Item \extends Comparable<? \super Item>>
@@ -681,8 +681,8 @@ can now translate the refined program:\index{merge sort!top-down
   $\sim$!$\sim$ in \Java|(}
 \begin{alltt}
 // Stack.java
-\public \abstractX \class Stack<Item
-\hfill\extends Comparable<? \super Item>> \{
+\public \abstractX
+\class Stack<Item \extends Comparable<? \super Item>> \{
   ...
   \public \abstractX Stack<Item> tms();
   \protectedX \abstractX Stack<Item> tms0(\final Item x);
@@ -692,9 +692,9 @@ can now translate the refined program:\index{merge sort!top-down
        \extends Stack<Item> \{
   ...
   \public Stack<Item> tms() \{ \return \this; \}
+
   \protectedX Stack<Item> tms0(\final Item x) \{
-    \return push(x);
-  \}
+    \return push(x); \}
 \}
 
 // NStack.java
@@ -704,8 +704,7 @@ can now translate the refined program:\index{merge sort!top-down
   \public Stack<Item> tms() \{ \return tail.tms0(head); \}
 
   \protectedX Stack<Item> tms0(\final Item x) \{
-    \return tail.cutr(\new EStack<Item>().push(x),\this);
-  \}
+    \return tail.cutr(\new EStack<Item>().push(x),\this); \}
 \}
 \end{alltt}
 \index{merge sort!top-down $\sim$!$\sim$ in \Java|)} Notice again how
@@ -736,7 +735,80 @@ simply discarded. We need to introduce two auxiliary functions,
 whether the third parameter contains at least two items and whether
 the second contains at least one. The result is shown in
 \fig~\ref{fig:cutr}.
-\begin{figure}
+
+Note how \(\fun{cutr}_1(s,\el,u) \rightarrow
+\fun{mrg}(\fun{tms}(s),\fun{tms}(\el))\) was simplified using the
+theorems \(\fun{tms}(\el) \equiv \el\) and \(\fun{mrg}(s,\el) \equiv
+s\). The translation is now direct:\index{merge sort!top-down
+  $\sim$!$\sim$ in \Java|(}
+\begin{alltt}
+// Stack.java
+\public \abstractX
+\class Stack<Item \extends Comparable<? \super Item>> \{
+  ...
+  \public \abstractX
+  Stack<Item> cutr(\final Stack<Item> s, \final Stack<Item> t);
+
+  \protectedX \abstractX
+  Stack<Item> cutr0(\final Stack<Item> s, \final Stack<Item> t);
+
+  \protectedX \abstractX
+  Stack<Item> cutr1(\final Stack<Item> s, \final Stack<Item> u);
+\}
+
+// EStack.java
+\public \class EStack<Item \extends Comparable<? \super Item>>
+\extends Stack<Item> \{
+  ...
+  \public
+  Stack<Item> cutr(\final Stack<Item> s, \final Stack<Item> t) \{
+    \return s.tms().mrg(t.tms()); \}
+
+  \protectedX
+  Stack<Item> cutr0(\final Stack<Item> s, \final Stack<Item> t) \{
+    \return s.tms().mrg(t.tms()); \}
+
+  \protectedX
+  Stack<Item> cutr1(\final Stack<Item> s, \final Stack<Item> u) \{
+    \return s.tms(); \}
+\}
+
+// NStack.java
+\public \class NStack<Item \extends Comparable<? \super Item>>
+       \extends Stack<Item> \{
+  ...
+  \public
+  Stack<Item> cutr(\final Stack<Item> s, \final Stack<Item> t) \{
+    \return tail.cutr0(s,t); \}
+
+  \protectedX
+   Stack<Item> cutr0(\final Stack<Item> s, \final Stack<Item> t) \{
+    \return t.cutr1(s,tail); \}
+
+  \protectedX
+  Stack<Item> cutr1(\final Stack<Item> s, \final Stack<Item> u) \{
+    \return u.cutr(s.push(head),tail); \}
+\}
+\end{alltt}
+Note that it is of the utmost importance to constantly mind the
+parameter in the source function whose translation will be the base
+for dispatch. Finally, the \texttt{Main} class might look like
+\begin{alltt}
+// Main.java
+\public \class Main \{
+  \public \static \void \main (String[] args) \{
+    Stack<Integer> nil = \new EStack<Integer>();
+    Stack<Integer> s = nil.push(5).push(2).push(7);\hfill// 7 2 5
+    Stack<Integer> t = nil.push(4).push(1);\hfill// 1 4
+    s.tms().print();\hfill// 2 5 7
+    s.cat(t).tms().print();\hfill// 1 2 4 5 7
+  \}
+\}
+\end{alltt}
+\index{merge sort!top-down $\sim$!$\sim$ in \Java|)}
+\index{Java@\Java!translation to $\sim$|)}
+
+\begin{figure}[b]
 \begin{equation*}
 \boxed{
 \begin{array}{@{}r@{\;}l@{\;}l@{}}
@@ -759,76 +831,3 @@ the second contains at least one. The result is shown in
 \caption{Cutting and merging top-down}
 \label{fig:cutr}
 \end{figure}
-Note how \(\fun{cutr}_1(s,\el,u) \rightarrow
-\fun{mrg}(\fun{tms}(s),\fun{tms}(\el))\) was simplified using the
-theorems \(\fun{tms}(\el) \equiv \el\) and \(\fun{mrg}(s,\el) \equiv
-s\). The translation is now direct:\index{merge sort!top-down
-  $\sim$!$\sim$ in \Java|(}
-\begin{alltt}
-// Stack.java
-\public \abstractX \class Stack<Item
-\hfill\extends Comparable<? \super Item>> \{
-  ...
-  \public    \abstractX Stack<Item> cutr(\final Stack<Item> s,
-                                      \final Stack<Item> t);
-  \protectedX \abstractX Stack<Item> cutr0(\final Stack<Item> s,
-                                       \final Stack<Item> t);
-  \protectedX \abstractX Stack<Item> cutr1(\final Stack<Item> s,
-                                       \final Stack<Item> u);
-\}
-
-// EStack.java
-\public \class EStack<Item \extends Comparable<? \super Item>>
-       \extends Stack<Item> \{
-  ...
-  \public Stack<Item> cutr(\final Stack<Item> s,
-                          \final Stack<Item> t) \{
-    \return s.tms().mrg(t.tms()); \}
-
-  \protectedX Stack<Item> cutr0(\final Stack<Item> s,
-                              \final Stack<Item> t) \{
-    \return s.tms().mrg(t.tms()); \}
-
-  \protectedX Stack<Item> cutr1(\final Stack<Item> s,
-                              \final Stack<Item> u) \{
-    \return s.tms();
-  \}
-\}
-
-// NStack.java
-\public \class NStack<Item \extends Comparable<? \super Item>>
-       \extends Stack<Item> \{
-  ...
-  \public Stack<Item> cutr(\final Stack<Item> s,
-                          \final Stack<Item> t) \{
-    \return tail.cutr0(s,t);
-  \}
-
-  \protectedX Stack<Item> cutr0(\final Stack<Item> s,
-                              \final Stack<Item> t) \{
-    \return t.cutr1(s,tail);
-  \}
-
-  \protectedX Stack<Item> cutr1(\final Stack<Item> s,
-                              \final Stack<Item> u) \{
-    \return u.cutr(s.push(head),tail);
-  \}
-\}
-\end{alltt}
-Note that it is of the utmost importance to constantly mind the
-parameter in the source function whose translation will be the base
-for dispatch. Finally, the \texttt{Main} class might look like
-\begin{alltt}
-// Main.java
-\public \class Main \{
-  \public \static \void \main (String[] args) \{
-    Stack<Integer> nil = \new EStack<Integer>();
-    Stack<Integer> s = nil.push(5).push(2).push(7);\hfill// 7 2 5
-    Stack<Integer> t = nil.push(4).push(1);\hfill// 1 4
-    s.tms().print();\hfill// 2 5 7
-    s.cat(t).tms().print();\hfill// 1 2 4 5 7
-  \}
-\}
-\end{alltt}
-\index{merge sort!top-down $\sim$!$\sim$ in \Java|)}
-\index{Java@\Java!translation to $\sim$|)}
