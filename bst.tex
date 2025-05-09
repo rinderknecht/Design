@@ -211,7 +211,7 @@ search, assuming that each distinct key is equally likely to be sought
 is
 \begin{equation*}
   \M{\fun{ls}}{n} = \frac{1}{n}\sum_{k=1}^{n}\C{\fun{ls}}{n,k} =
-  \frac{1}{2}(n+1).
+  \frac{n+1}{2}.
   \index{linear search}
   \index{ls@$\M{\fun{ls}}{n}$}
 \end{equation*}
@@ -996,19 +996,19 @@ rotation requires the tree to have the shape
   \begin{equation*}
     \boxed{
       \begin{array}{@{}r@{\;}l@{\;}l@{}}
-  \fun{in}_3(\fun{rotl}(t))
+  \ufun{in}_3(\fun{rotl}(t))
   & \rightarrow & \fun{in}_2(\fun{rotl}(t),\el)\\
-  & = & \fun{in}_2(\fun{rotl}(\fun{bst}(x,t_1,\fun{bst}(y,t_2,t_3))),\el)\\
+  & = & \fun{in}_2(\ufun{rotl}(\fun{bst}(x,t_1,\fun{bst}(y,t_2,t_3))),\el)\\
   & \xrightarrow{\smash{\epsilon}} &
-  \fun{in}_2(\fun{bst}(y,\fun{bst}(x,t_1,t_2),t_3),\el)\\
+  \ufun{in}_2(\fun{bst}(y,\fun{bst}(x,t_1,t_2),t_3),\el)\\
   & \rightarrow &
   \fun{in}_2(\fun{bst}(x,t_1,t_2),\cons{y}{\fun{in}_2(t_3,\el)})\\
   & \equiv &
  \fun{in}_2(t_1,\cons{x}{\fun{in}_2(t_2,\cons{y}{\fun{in}_2(t_3,\el)})})\\
   & \leftarrow &
-  \fun{in}_2(t_1,\cons{x}{\fun{in}_2(\fun{bst}(y,t_2,t_3),\el)})\\
+  \fun{in}_2(t_1,\cons{x}{\ufun{in}_2(\fun{bst}(y,t_2,t_3),\el)})\\
   & \leftarrow &
-  \fun{in}_2(\fun{bst}(x,t_1,\fun{bst}(y,t_2,t_3)),\el)\\
+  \ufun{in}_2(\fun{bst}(x,t_1,\fun{bst}(y,t_2,t_3)),\el)\\
   & = &
   \fun{in}_2(t,\el)\\
   & \leftarrow &
@@ -1188,7 +1188,7 @@ stack~\(s\). First, we need to prove directly (without induction)
 \!\xrightarrow{\smash{\lambda}}\! \fun{ext}()
 \!\xleftarrow{\smash{\psi}}\! \fun{mkl}(\el,\fun{ext}())
 \!\xleftarrow{\smash{\xi}}\! \fun{mkl}(\el)
-\!\xleftarrow{\smash{\gamma}}\! \fun{mkl}(\fun{rev}_0(\el)\!).
+\!\xleftarrow{\smash{\gamma}}\! \fun{mkl}(\ufun{rev}_0(\el)\!).
 \end{equation*}
 Second, we set the inductive hypothesis to be
 \(\pred{RootLeaf\(_0\)}{s}\) and we proceed to prove
@@ -1200,7 +1200,7 @@ equivalences, which constitute lemmas (subgoals) that will need
 demonstration later.
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
-\fun{mkl}(\fun{rev}_0(\cons{x}{s}))
+\fun{mkl}(\ufun{rev}_0(\cons{x}{s}))
 & \xrightarrow{\smash{\delta}} &
   \fun{mkl}(\fun{cat}(\fun{rev}_0(s),[x]))\\
 & \equiv &
@@ -1213,16 +1213,16 @@ demonstration later.
   \fun{insl}(x,\fun{mkl}(\fun{rev}_0(s),\fun{ext}()))\\
 & \equiv &
   \fun{insl}(x,\fun{mkl}(\fun{rev}_0(s)))\\
-& \equiv & \fun{insl}(x,\fun{mkr}(s)) & (\pred{RootLeaf\(_0\)}{s}\!)\\
+& \equiv & \fun{insl}(x,\ufun{mkr}(s)) & (\pred{RootLeaf\(_0\)}{s}\!)\\
 & \xrightarrow{\smash{\xi}} &
   \fun{insl}(x,\fun{mkr}(s,\fun{ext}()))\\
-& \equiv_1 & \fun{mkr}(s,\fun{insl}(x,\fun{ext}()))
+& \equiv_1 & \fun{mkr}(s,\ufun{insl}(x,\fun{ext}()))
 & (\text{Lemma})\\
 & \xrightarrow{\smash{\phi}} &
   \fun{mkr}(s,\fun{bst}(x,\fun{ext}(),\fun{ext}()))\\
 & \xleftarrow{\smash{\iota}} &
-  \fun{mkr}(s,\fun{insr}(x,\fun{ext}()))\\
-& \xleftarrow{\smash{\mu}} & \fun{mkr}(\cons{x}{s},\fun{ext}())\\
+  \fun{mkr}(s,\ufun{insr}(x,\fun{ext}()))\\
+& \xleftarrow{\smash{\mu}} & \ufun{mkr}(\cons{x}{s},\fun{ext}())\\
 & \xleftarrow{\smash{\kappa}} & \fun{mkr}(\cons{x}{s}).
 & \hfill\Box
 \end{array}
@@ -1240,16 +1240,16 @@ more confidence for working out a formal proof, instead of dispensing
 with one. It is enough to reason by induction on the structure of the
 stack~\(u\). First, we verify \(\pred{MklCat}{\el,v,t}\):
 \begin{equation*}
-\fun{mkl}(\fun{cat}(\el,v),t)
+\fun{mkl}(\ufun{cat}(\el,v),t)
   \xrightarrow{\smash{\alpha}} \fun{mkl}(v,t)
-  \xleftarrow{\smash{\psi}} \fun{mkl}(v,\fun{mkl}(\el,t)).
+  \xleftarrow{\smash{\psi}} \ufun{mkl}(v,\fun{mkl}(\el,t)).
 \end{equation*}
 Second, we assume \(\pred{MklCat}{u,v,t}\), for all~\(v\) and~\(t\),
 which is thus the inductive hypothesis, and we prove
 \(\pred{MklCat}{\cons{x}{u},v,t}\):
 \begin{equation*}
   \begin{array}{@{}r@{\;}l@{\;}l@{\quad}r@{}}
-      \fun{mkl}(\fun{cat}(\cons{x}{u},v),t)
+  \fun{mkl}(\ufun{cat}(\cons{x}{u},v),t)
 & \xrightarrow{\smash{\beta}} &
   \fun{mkl}(\cons{x}{\fun{cat}(u,v)},t)\\
 & \equiv &
@@ -1257,7 +1257,7 @@ which is thus the inductive hypothesis, and we prove
 & \equiv_0 & \fun{mkl}(v,\fun{mkl}(u,\fun{insl}(x,t)))
          & \!\!(\pred{MklCat}{u,v,\fun{inst}(x,t)}\!)\\
 & \xleftarrow{\smash{\omega}} &
-  \fun{mkl}(v,\fun{mkl}(\cons{x}{u},t)). & \hfill\Box
+  \fun{mkl}(v,\ufun{mkl}(\cons{x}{u},t)). & \hfill\Box
 \end{array}
 \end{equation*}
 
@@ -1282,7 +1282,7 @@ about its shape nor contents.) We start, as usual, with a verification
 inductive argument.) of the basis\index{MkInsr@\predName{MkInsr}}
 \(\pred{MkInsr}{x,\el,t}\):
 \begin{equation*}
-  \fun{insl}(x,\fun{mkr}(\el,t))
+  \fun{insl}(x,\ufun{mkr}(\el,t))
 \xrightarrow{\smash{\lambda}} \fun{insl}(x,t)
 \equiv \fun{mkr}(\el,\fun{insl}(x,t)).
 \end{equation*}
@@ -1292,7 +1292,7 @@ keys~\(y\), by rewriting both sides of the equivalence and aiming at
 the same term:
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{\;\;\,}r@{}}
-  \fun{insl}(x,\fun{mkr}(\cons{y}{s},t))
+  \fun{insl}(x,\ufun{mkr}(\cons{y}{s},t))
 & \xrightarrow{\smash{\mu}} &
   \fun{insl}(x,\fun{mkr}(s,\fun{insr}(y,t)))\\
 & \equiv_1 & \fun{mkr}(s,\fun{insl}(x,\fun{insr}(y,t)))
@@ -1322,7 +1322,7 @@ other variables are keys, hence are atomic. The verification of
 lengthy, compared to earlier related proofs:
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{\quad}r@{}}
-  \fun{insl}(x,\fun{insr}(y,\fun{ext}()))
+  \fun{insl}(x,\ufun{insr}(y,\fun{ext}()))
 & \xrightarrow{\smash{\iota}} &
   \fun{insl}(x,\fun{bst}(y,\fun{ext}(),\fun{ext}())) & \otimes
 \end{array}
@@ -1338,19 +1338,19 @@ y\) or \(y \succ x\). We have
 \begin{array}{@{}r@{\;}l@{\;}l@{\quad}r@{}}
 \otimes
 & \xrightarrow{\smash{\upsilon}} &
-  \fun{bst}(y,\fun{ext}(),\fun{insl}(x,\fun{ext}()))
+  \fun{bst}(y,\fun{ext}(),\ufun{insl}(x,\fun{ext}()))
 & (x \succ y)\\
 & \xrightarrow{\smash{\phi}} &
   \fun{bst}(y,\fun{ext}(),\fun{bst}(x,\fun{ext}(),\fun{ext}()))\\
 & \xleftarrow{\smash{\epsilon}} &
-\fun{rotr}(\fun{bst}(x,\fun{bst}(y,\fun{ext}(),\fun{ext}()),\fun{ext}()))\\
+  \ufun{rotr}(\fun{bst}(x,\fun{bst}(y,\fun{ext}(),\fun{ext}()),\fun{ext}()))\\
 & \xleftarrow{\smash{\iota}} &
-  \fun{rotr}(\fun{bst}(x,\fun{insr}(y,\fun{ext}()),\fun{ext}()))\\
+  \fun{rotr}(\fun{bst}(x,\ufun{insr}(y,\fun{ext}()),\fun{ext}()))\\
 & \xleftarrow{\smash{\eta}} &
-  \fun{insr}(y,\fun{bst}(x,\fun{ext}(),\fun{ext}()))
+  \ufun{insr}(y,\fun{bst}(x,\fun{ext}(),\fun{ext}()))
 & (x \succ y)\\
 & \xleftarrow{\smash{\phi}} &
-  \fun{insr}(y,\fun{insl}(x,\fun{ext}())).
+  \fun{insr}(y,\ufun{insl}(x,\fun{ext}())).
 \end{array}
 \end{equation*}
 
@@ -1358,19 +1358,19 @@ y\) or \(y \succ x\). We have
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
 \otimes & \xrightarrow{\smash{\tau}} &
-  \fun{bst}(y,\fun{insl}(x,\fun{ext}()),\fun{ext}())
+  \fun{bst}(y,\ufun{insl}(x,\fun{ext}()),\fun{ext}())
 & (y \succ x)\\
 & \xrightarrow{\smash{\phi}} &
   \fun{bst}(y,\fun{bst}(x,\fun{ext}(),\fun{ext}()),\fun{ext}())\\
 & \xleftarrow{\smash{\xi}} &
-\fun{rotl}(\fun{bst}(x,\fun{ext}(),\fun{bst}(y,\fun{ext}(),\fun{ext}())))\\
+  \ufun{rotl}(\fun{bst}(x,\fun{ext}(),\fun{bst}(y,\fun{ext}(),\fun{ext}())))\\
 & \xleftarrow{\smash{\iota}} &
-  \fun{rotl}(\fun{bst}(x,\fun{ext}(),\fun{insr}(y,\fun{ext}())))\\
+  \fun{rotl}(\fun{bst}(x,\fun{ext}(),\ufun{insr}(y,\fun{ext}())))\\
 & \xleftarrow{\smash{\theta}} &
-  \fun{insr}(y,\fun{bst}(x,\fun{ext}(),\fun{ext}()))
+  \ufun{insr}(y,\fun{bst}(x,\fun{ext}(),\fun{ext}()))
 & (y \succ x)\\
 & \xleftarrow{\smash{\phi}} &
-  \fun{insr}(y,\fun{insl}(x,\fun{ext}())).
+  \fun{insr}(y,\ufun{insl}(x,\fun{ext}())).
 \end{array}
 \end{equation*}
 \end{itemize}
@@ -1396,7 +1396,7 @@ Two cases arise: either \(a \succ x\) or \(x \succ a\).
     \item If \(a \succ y\), then
       \begin{equation*}
       \begin{array}{@{}r@{\;}l@{\;}l@{\hspace{-8mm}}r@{}}
-        \otimes & equiv &
+        \otimes & \equiv &
         \fun{rotr}(\fun{bst}(a,\fun{insr}(y,\fun{insl}(x,t_1)),t_2))
         & (a \succ y)\\
         & \equiv_2 & \fun{rotr}(\fun{bst}(a,\fun{insl}(x,
@@ -1406,7 +1406,7 @@ Two cases arise: either \(a \succ x\) or \(x \succ a\).
         & \equiv & \fun{rotr}(\fun{insl}(x,
         \fun{rotl}(\fun{rotr}(\fun{bst}(a,\fun{insr}(y,t_1),t_2)))))\\
         & \xleftarrow{\smash{\eta}} &
-        \fun{rotr}(\fun{insl}(x,\fun{rotl}(\fun{insr}(y,
+        \fun{rotr}(\fun{insl}(x,\fun{rotl}(\ufun{insr}(y,
         \fun{bst}(a,t_1,t_2)))))\\
         & = & \fun{rotr}(\fun{insl}(x,\fun{rotl}(\fun{insr}(y,t))))
         & (t=\fun{bst}(a,t_1,t_2))\\
@@ -1440,7 +1440,7 @@ Two cases arise: either \(a \succ x\) or \(x \succ a\).
   \fun{rotl}(\fun{insl}(x,\fun{rotr}(\fun{rotl}(\fun{bst}(a,t_1,
   \fun{insr}(y,t_2))))))\\
   & \xleftarrow{\smash{\theta}} &
-  \fun{rotl}(\fun{insl}(x,\fun{rotr}(\fun{insr}(y,
+  \fun{rotl}(\fun{insl}(x,\fun{rotr}(\ufun{insr}(y,
   \fun{bst}(a,t_1,t_2)))))\\
   & = & \fun{rotl}(\fun{insl}(x,\fun{rotr}(\fun{insr}(y,t))))
   & (t=\fun{bst}(a,t_1,t_2))\\
@@ -1478,7 +1478,7 @@ rotations commute with leaf insertion.
   & \equiv & \fun{rotr}(\fun{insl}(x,
   \fun{rotl}(\fun{rotr}(\fun{bst}(a,\fun{insr}(y,t_1),t_2)))))\\
   & \xleftarrow{\smash{\eta}} &
-  \fun{rotr}(\fun{insl}(x,\fun{rotl}(\fun{insr}(y,
+  \fun{rotr}(\fun{insl}(x,\fun{rotl}(\ufun{insr}(y,
   \fun{bst}(a,t_1,t_2)))))\\
   & = & \fun{rotr}(\fun{insl}(x,\fun{rotl}(\fun{insr}(y,t))))
   & (t=\fun{bst}(a,t_1,t_2))\\
@@ -1504,8 +1504,8 @@ required in stead of \((\equiv_4)\).
   \fun{rotl}(\fun{insl}(x,\fun{bst}(a,t_1,\fun{insr}(y,t_2))))\\
   & \equiv_3 & \fun{insl}(x,\fun{rotl}(\fun{bst}(a,t_1,
   \fun{insr}(y,t_2))))\\
-  & \xleftarrow{\smash{\theta}} & \fun{insl}(x,\fun{insr}(y,
-  \fun{bst}(a,t_1,t_2)))\\
+  & \xleftarrow{\smash{\theta}}
+  & \fun{insl}(x,\ufun{insr}(y,\fun{bst}(a,t_1,t_2)))\\
   & = & \fun{insl}(x,\fun{insr}(y,t)). & (t=\fun{bst}(a,t_1,t_2))
 \end{array}
 \end{equation*}
@@ -1533,10 +1533,10 @@ induction underlies. We start as follows:
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{}}
   \fun{insl}(x,\fun{rotl}(t))
-& = & \fun{insl}(x,\fun{rotl}(\fun{bst}(a, t_1,
-\fun{bst}(b,t_2,t_3))))\\
-& \xrightarrow{\smash{\zeta}} &
-\fun{insl}(x,\fun{bst}(b,\fun{bst}(a,t_1,t_2),t_3)) \quad \otimes
+  & = &
+  \fun{insl}(x,\ufun{rotl}(\fun{bst}(a, t_1,\fun{bst}(b,t_2,t_3))))\\
+  & \xrightarrow{\smash{\zeta}} &
+  \fun{insl}(x,\fun{bst}(b,\fun{bst}(a,t_1,t_2),t_3)) \quad \otimes
 \end{array}
 \end{equation*}
 Two cases arise: either \(b \succ x\) or \(x \succ b\).
@@ -1554,7 +1554,7 @@ Two cases arise: either \(b \succ x\) or \(x \succ b\).
       \fun{rotl}(\fun{bst}(a,\fun{insl}(x,t_1),
       \fun{bst}(b,t_2,t_3)))\\
       & \xleftarrow{\smash{\tau}} &
-      \fun{rotl}(\fun{insl}(x,\fun{bst}(a,t_1,
+      \fun{rotl}(\ufun{insl}(x,\fun{bst}(a,t_1,
       \fun{bst}(b,t_2,t_3))))\\
       & = & \fun{rotl}(\fun{insl}(x,t)).
     \end{array}\)
@@ -1566,9 +1566,9 @@ Two cases arise: either \(b \succ x\) or \(x \succ b\).
       & \equiv &
       \fun{rotl}(\fun{bst}(a,t_1,\fun{bst}(b,\fun{insl}(x,t_2),t_3)))\\
       & \xleftarrow{\smash{\tau}} &
-      \fun{rotl}(\fun{bst}(a,t_1,\fun{insl}(x,\fun{bst}(b,t_2,t_3))))\\
+      \fun{rotl}(\fun{bst}(a,t_1,\ufun{insl}(x,\fun{bst}(b,t_2,t_3))))\\
       & \xleftarrow{\smash{\upsilon}} &
-      \fun{rotl}(\fun{insl}(x,\fun{bst}(a,t_1,\fun{bst}(b,t_2,t_3))))\\
+      \fun{rotl}(\ufun{insl}(x,\fun{bst}(a,t_1,\fun{bst}(b,t_2,t_3))))\\
       & = & \fun{rotl}(\fun{insl}(x,t)).
       \end{array}\)
 
@@ -1581,10 +1581,10 @@ Two cases arise: either \(b \succ x\) or \(x \succ b\).
     & \equiv &
     \fun{rotl}(\fun{bst}(a,t_1,\fun{bst}(b,t_2,\fun{insl}(x,t_3))))\\
     & \xleftarrow{\smash{\upsilon}} &
-    \fun{rotl}(\fun{bst}(a,t_1,\fun{insl}(x,\fun{bst}(b,t_2,t_3))))
+    \fun{rotl}(\fun{bst}(a,t_1,\ufun{insl}(x,\fun{bst}(b,t_2,t_3))))
     & (x \succ b)\\
     & \xleftarrow{\smash{\upsilon}} &
-    \fun{rotl}(\fun{insl}(x,\fun{bst}(a,t_1,\fun{bst}(b,t_2,t_3))))
+    \fun{rotl}(\ufun{insl}(x,\fun{bst}(a,t_1,\fun{bst}(b,t_2,t_3))))
     & (x \succ a)\\
     & = & \fun{rotl}(\fun{insl}(x,t)). & \hfill\Box
   \end{array}
