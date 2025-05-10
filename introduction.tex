@@ -393,7 +393,7 @@ rewrites never end, but because the normal form\index{rewrite
   system!normal form} is not a value. In operational terms, the
 interpreter fails to rewrite the call for some arguments.
 
-Let us set the abbreviations
+Let us set the following abbreviations:
 \begin{itemize}
 
   \item \(\el := \fun{nil}()\)\index{nil@\fun{nil/0}|)},
@@ -427,11 +427,11 @@ Finally, let us illustrate it with the following
 evaluation:\index{stack!concatenation!example}
 \begin{equation*}
 \fun{cat}([1,2],[3,4])
-\!\xrightarrow{\smash{\beta}}\!
+\xrightarrow{\smash{\beta}}
 \cons{1}{\fun{cat}([2],[3,4])}
-\!\xrightarrow{\smash{\beta}}\!
+\xrightarrow{\smash{\beta}}
 \cons{1}{\cons{2}{\fun{cat}(\el,[3,4])}}
-\!\xrightarrow{\smash{\alpha}}\!
+\xrightarrow{\smash{\alpha}}
 [1,2,3,4].
 \end{equation*}
 
@@ -449,10 +449,11 @@ other terms. That abstract space serves as a model of a computer
 \fig~\vref{fig:cat_dag} the same definition of~\fun{cat/2} as given
 in~\eqref{def:cat}. The arrows on certain edges denote some data
 sharing. When trees are used to visualise terms, they are called
-\emph{abstract syntax trees}\index{tree!abstract syntax $\sim$}. When
-some trees share subtrees, the whole forest is called a \emph{directed
-acyclic graph}.\index{directed acyclic graph} \index{tree|see{directed
-    acyclic graph}}
+\emph{abstract syntax trees} (AST)\index{tree!abstract syntax
+  $\sim$}. When some trees share subtrees, the whole forest is called
+a \emph{directed acyclic graph} (DAG).
+\index{directed acyclic graph}
+\index{tree|see{directed acyclic graph}}
 \begin{figure}[H]
 \centering
 \includegraphics[bb=73 654 300 720]{cat_dag}
@@ -514,8 +515,7 @@ equations
 \C{\fun{cat}}{0} \eqn{\smash{\alpha}} 1\qquad
 \C{\fun{cat}}{n+1} \eqn{\smash{\beta}} 1 + \C{\fun{cat}}{n}.
 \end{equation*}
-which together yield \(\C{\fun{cat}}{n} = n +
-1\).\label{cost:cat}\index{stack!concatenation!cost}
+which, together, yield \(\C{\fun{cat}}{n} = n + 1\). \label{cost:cat}\index{stack!concatenation!cost}
 
 
 \mypar{Extremal costs}
@@ -650,7 +650,7 @@ of flips~\(F(n)\) in a sequence of \(n\)~increments is
 F(n) := \sum_{k \geqslant 0}{\left\lfloor\frac{n}{2^k}\right\rfloor}.
 \label{eq:F}
 \end{equation}
-The sum is actually always finite, as illustrated by the example in
+The sum is actually always finite, as illustrated in
 \fig~\vref{fig:ruler}. There, we can see \emph{diagonally} that
 \(1\)-bits at position~\(j\) appear in positions~\(j-1\) down
 to~\(0\), so account for \(2^j + 2^{j-1} + \dots + 2^0 = 2^{j+1}-1\).
@@ -680,10 +680,11 @@ tight bounds for any \(n>0\):
 1 \leqslant \nu_{n} \leqslant \floor{\lg n} + 1,
 \end{equation*}
 because equality~\eqref{eq:e_r} establishes that \(\floor{\lg n} + 1\)
-is the number of bits of~\(n\). Therefore, \(2n - \floor{\lg n} - 1
-\leqslant F(n) \leqslant 2n\). By l'Hospital rule, \(\lim_{n \to
-  +\infty}{(\lg n/n)} = \lim_{n \to +\infty}(1/n\ln 2) = 0\), where
-\(\ln n\)~is the \emph{natural logarithm}. Therefore,
+is the number of bits of the number~\(n\). Therefore, \(2n -
+\floor{\lg n} - 1 \leqslant F(n) \leqslant 2n\). L'Hospital rule
+entails that \(\lim_{n \to +\infty}{(\lg n/n)} = \lim_{n \to
+  +\infty}(1/n\ln 2) = 0\), where \(\ln n\)~is the \emph{natural
+logarithm}. Therefore,
 \begin{equation*}
 F(n) \sim 2n,\;\, \text{as \(n \rightarrow \infty\)}.
 \end{equation*}
@@ -801,10 +802,9 @@ many usages.
 Consider the following example where \(m,n \in \mathbb{N}\):
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{}}
-\fun{ack}(0,n)     & \xrightarrow{\smash{\alpha}} & n+1;\\
-\fun{ack}(m+1,0)   & \xrightarrow{\smash{\beta}}  & \fun{ack}(m,1);\\
-\fun{ack}(m+1,n+1) & \xrightarrow{\smash{\gamma}}
-                   & \fun{ack}(m,\fun{ack}(m+1,n)).
+\fun{ack}(0,n)     & \rightarrow & n+1;\\
+\fun{ack}(m+1,0)   & \rightarrow & \fun{ack}(m,1);\\
+\fun{ack}(m+1,n+1) & \rightarrow & \fun{ack}(m,\fun{ack}(m+1,n)).
 \end{array}
 \end{equation*}
 This is a simplified form of Ackermann's
@@ -905,31 +905,30 @@ of~\(s\), so we must establish
     \Rightarrow \forall x \in T.\pred{CatAssoc}{\cons{x}{s},t,u}\).
 
 \end{itemize}
-The base case is direct:
+Underlining the call being rewritten, the base case is:
 \begin{equation*}
-  \fun{cat}(\el,\fun{cat}(t,u))
-\xrightarrow{\smash{\alpha}} \fun{cat}(t,u)
-\xleftarrow{\smash{\alpha}}
-\fun{cat}(\fun{cat}(\el,t),u).
+  \ufun{cat}(\el,\fun{cat}(t,u))
+    \xrightarrow{\smash{\alpha}} \fun{cat}(t,u)
+    \xleftarrow{\smash{\alpha}} \fun{cat}(\ufun{cat}(\el,t),u).
 \index{cat@\fun{cat/2}}
 \end{equation*}
 Let us assume now \(\pred{CatAssoc}{s,t,u}\), called the
 \emph{induction hypothesis}\index{induction!$\sim$ hypothesis}, and
 let us prove
 \(\pred{CatAssoc}{\cons{x}{s},t,u}\)\index{CatAssoc@\predName{CatAssoc}|)},
-for any term~\(x\). We have
+for any term~\(x\). We have:
 \begin{equation*}
 \begin{array}{r@{\;}l@{\;}l@{\qquad}r@{}}
-  \fun{cat}(\cons{x}{s},\fun{cat}(t,u))
+  \ufun{cat}(\cons{x}{s},\fun{cat}(t,u))
 & \xrightarrow{\smash\beta}
 & \cons{x}{\fun{cat}(s,\fun{cat}(t,u))}\\
 & \equiv
 & \cons{x}{\fun{cat}(\fun{cat}(s,t),u)}
 & (\pred{CatAssoc}{s,t,u})\\
 & \xleftarrow{\smash\beta}
-& \fun{cat}(\cons{x}{\fun{cat}(s,t)},u)\\
+& \ufun{cat}(\cons{x}{\fun{cat}(s,t)},u)\\
 & \xleftarrow{\smash\beta}
-& \fun{cat}(\fun{cat}(\cons{x}{s},t),u).\index{cat@\fun{cat/2}}
+& \fun{cat}(\ufun{cat}(\cons{x}{s},t),u).\index{cat@\fun{cat/2}}
 \end{array}
 \end{equation*}
 Thus\index{CatAssoc@\predName{CatAssoc}}
