@@ -711,10 +711,10 @@ then the result is what was expected. This property is called
 \emph{total correctness}\index{correctness!total
   $\sim$|see{termination}}, which is partial correctness and
 termination. Let us prove the termination of \fun{isrt/1} by the
-dependency pairs\index{termination!dependency pair} method
+method of dependency pairs\index{termination!dependency pair}
 (section~\ref{flattening:termination},
 page~\pageref{flattening:termination}). The pairs to order are
-\((\fun{ins}(\cons{y}{s},x), \fun{ins}(s,x))_\kappa\),
+the following: \((\fun{ins}(\cons{y}{s},x), \fun{ins}(s,x))_\kappa\),
 \((\fun{isrt}(\cons{x}{s}), \fun{isrt}(s))_\nu\) and
 \((\fun{isrt}(\cons{x}{s}), \fun{ins}(\fun{isrt}(s), x))_\nu\). By
 using the proper subterm\index{induction!proper subterm order}

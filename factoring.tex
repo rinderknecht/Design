@@ -564,10 +564,10 @@ the smallest \(q > p\) such that \(\Border{}{\Border{q-1}{y} \cdot a}
 = \Border{}{\Border{q}{y} \cdot a}\) with \(\Border{q}{y} \cdot a
 \prefeq \Border{q-1}{y}\). Because a border is a proper prefix, that
 is to say, \(\Border{}{y} \pref y\), we have \(\Border{2}{y} =
-\Border{}{\Border{}{y}} \pref \Border{}{y}\), yielding \(\Border{q}{y}
-\cdot a \prefeq \Border{q-1}{y} \pref \dots \pref \Border{}{y} \pref
+\Border{}{\Border{}{y}} \pref \Border{}{y}\), so \(\Border{q}{y} \cdot
+a \prefeq \Border{q-1}{y} \pref \dots \pref \Border{}{y} \pref
 y\). Therefore \(\Border{q}{y} \cdot a \prefeq y\), since \({q > 0}\),
-and \(\Border{}{ya} = \Border{q}{y} \cdot a\). This reasoning
+and \(\Border{}{ya} = \Border{q}{y} \cdot a\). This line of reasoning
 establishes that
 \begin{equation*}
 \Border{}{ya} =
@@ -830,15 +830,16 @@ so, if the word contains \(n\)~letters, at least \(n-1\) comparisons
 are needed, as the border of the first letter alone needs no
 comparison. This lower bound is tight, as the following reasoning
 shows. Let us call \emph{positive comparison}\index{word
-  factoring!comparison!positive $\sim$} a successful prefix test as
-found in the definition of~\(\BorderName\), that is, \(\Border{}{y}
-\cdot a \prefeq y\). Dually, a \emph{negative comparison}\index{word
-  factoring!comparison!negative $\sim$} is a failed prefix test. In
-order to minimise the number of calls to evaluate \(\Border{}{ya}\),
-we may notice that a positive comparison only entails the evaluation
-of~\(\Border{}{y}\), whilst a negative comparison requires two:
-\(\Border{}{\Border{}{y} \cdot a}\). Therefore, the first idea may be
-to assume that only positive comparisons occur:
+  factoring!comparison!positive $\sim$} a successful prefix test, as
+found in the definition of~\(\BorderName\), in other words:
+\(\Border{}{y} \cdot a \prefeq y\). Dually, a \emph{negative
+comparison}\index{word factoring!comparison!negative $\sim$} is a
+failed prefix test. In order to minimise the number of calls to
+evaluate \(\Border{}{ya}\), we may notice that a positive comparison
+only entails the evaluation of~\(\Border{}{y}\), whilst a negative
+comparison requires two: \(\Border{}{\Border{}{y} \cdot
+  a}\). Therefore, the first idea may be to assume that only positive
+comparisons occur:
 \begin{equation*}
 \Border{}{x} \!\eqn{n-2}\!
 \Border{}{\ind{x}{0,n-2}} \cdot \ind{x}{n-1}
@@ -901,9 +902,10 @@ maximise the number of comparisons, we may want to compute as many
 borders as possible. In order to do so, evaluating \(\Border{}{x}\)
 would lead to finding the maximum border of a factor of
 length~\(n-1\), where \(n\)~is the length of~\(x\). The best case
-\(x=a^{n}\) showed that \(\Border{}{x} = \ind{x}{1,n-1}\), which fits
-our purpose, except we would like \(\Border{}{\ind{x}{1,n-1}}\). In
-other words, we add the constraint that the first comparison is
+\(x=a^{n}\) shows that we have \(\Border{}{x} = \ind{x}{1,n-1}\),
+which is fitting, except we would like
+\(\Border{}{\ind{x}{1,n-1}}\). In other words, to obtain the maximum
+cost, we add the constraint that the first comparison must be
 negative:
 \begin{align*}
 \Border{}{x}
