@@ -841,7 +841,7 @@ subterm relations, which means, in the case of binary trees, that a
 tree is a subtree of another. The minimum element for the
 lexicographic order we just defined is \((\fun{ext}(),\el)\). The
 well\hyp{}founded induction principle then requires that we establish
-\begin{itemize*}
+\begin{itemize}
 
   \item the basis \(\pred{CatPre}{\fun{ext}(),\el}\);
 
@@ -849,7 +849,7 @@ well\hyp{}founded induction principle then requires that we establish
     \Rightarrow \pred{CatPre}{t',s'}) \Rightarrow
     \pred{CatPre}{t,s}\).
 
-\end{itemize*}
+\end{itemize}
 The basis is easy:
 \begin{equation*}
   \fun{cat}(\ufun{pre}(\fun{ext}(),\el),\el)
@@ -894,7 +894,7 @@ and proceed to rewrite the left\hyp{}hand side after letting \(t :=
   \fun{pre}(t,s)\)}
 \label{fig:CatPre}
 \end{figure}
-\begin{itemize*}
+\begin{itemize}
 
   \item (\(\equiv_0\)) is the instance
   \(\pred{CatPre}{t_1,\fun{pre}(t_2,\el)}\) of the induction
@@ -916,9 +916,9 @@ and proceed to rewrite the left\hyp{}hand side after letting \(t :=
     \fun{pre}(t_2,s)}\) of the induction hypothesis because \((t,s)
     \succ_{B \times S} (t_1,s')\), for all stacks~\(s'\), in
     particular when \(s' = \fun{pre}(t_2,s)\).\index{pre@\fun{pre/2}}
-\end{itemize*}
+\end{itemize}
 We can resume conclusively in \fig~\vref{fig:pre0_pre}.\hfill\(\Box\)
-\begin{figure}[!b]
+\begin{figure}[]
 \begin{equation*}
 \boxed{%
 \begin{array}{r@{\;}c@{\;}l@{\qquad}r}
@@ -1368,8 +1368,7 @@ quickly suggest\index{Rcat@\predName{Rcat}}
 \begin{equation*}
   \pred{Rcat}{s,t,u} \colon \fun{rcat}(s,\fun{rcat}(t,u)) \equiv \fun{rcat}(\fun{cat}(t,s),u).
 \end{equation*}
-We actually do not need induction to prove this theorem if we recall
-what we already proved:
+We actually do not need induction if we recall what we already proved:
 \begin{itemize*}
 
   \item \(\pred{CatRev}{s,t} \colon \fun{cat}(\fun{rev}_0(t),
@@ -1428,7 +1427,7 @@ similar to \(\pred{CatPre}{t,s}\).\index{CatPre@\predName{CatPre}}
 Assuming this lemma, we conclude the proof.\hfill\(\Box\)
 
 \paragraph{Exercises}
-\begin{enumerate*}
+\begin{enumerate}
 
   \item Prove the missing lemma \(\pred{CatIn}{t,s} \colon
   \fun{cat}(\fun{in}(t,\el),s) \equiv
@@ -1439,7 +1438,7 @@ Assuming this lemma, we conclude the proof.\hfill\(\Box\)
     distinct. Make sure its cost is linear in the number of internal
     nodes. Compare your solution with that of \cite{MuBird_2003}.
 
-\end{enumerate*}
+\end{enumerate}
 \index{binary tree!inorder|)}
 
 \mypar{Postorder}
@@ -2289,27 +2288,26 @@ height\index{tree!height}. (The height\index{tree!height} of an
 external node is~\(0\).) In \fig~\vref{fig:per} is shown the
 definition of \fun{per/1}\index{per@\fun{per/1}} (\emph{perfection}).
 If the tree~\(t\) is perfect, we also know its height~\(h\):
-\(\fun{per}(t) \twoheadrightarrow \fun{true}(h)\).
-\begin{figure}[b]
+\(\fun{per}(t) \twoheadrightarrow \fun{true}(h)\).  Note that the
+rules are ordered, so the last one may only apply when the previous
+ones have not been matched. A refinement without inference rules is
+shown in \fig~\vref{fig:per0}, where \(\fun{per}_0(t_1)\) is evaluated
+before \(\fun{per}_0(t_2)\)\index{per0@\fun{per\(_0\)/1}} since
+\(\fun{t}(\fun{per}_0(t_1), \fun{per}_0(t_2))\) is inefficient if
+\(\fun{per}_0(t_1) \twoheadrightarrow \fun{false}()\).\index{binary
+  tree!perfect $\sim$|)}
+\begin{figure}
 \centering
 \includegraphics{per}
 \caption{Abstract checking of perfection}
 \label{fig:per}
 \end{figure}
-Note that the rules are ordered, so the last one may only apply when
-the previous ones have not been matched. A refinement without
-inference rules is shown in \fig~\vref{fig:per0},
 \begin{figure}
 \centering
 \includegraphics[bb=71 604 251 721]{per0}
 \caption{Refinement of \fig~\ref{fig:per}}
 \label{fig:per0}
 \end{figure}
-where \(\fun{per}_0(t_1)\) is evaluated before
-\(\fun{per}_0(t_2)\)\index{per0@\fun{per\(_0\)/1}} since
-\(\fun{t}(\fun{per}_0(t_1), \fun{per}_0(t_2))\) is inefficient if
-\(\fun{per}_0(t_1) \twoheadrightarrow \fun{false}()\).\index{binary
-  tree!perfect $\sim$|)}
 
 
 \paragraph{Completeness}
@@ -2593,9 +2591,11 @@ implements the fusion of \fun{mir/1} and
 \fun{post2b/1}. Unfortunately, the cost of \(\fun{pre2b}(t)\)
 \index{pre2b@\fun{pre2b/1}} is greater than the cost of
 \(\fun{post2b}(t)\) because of the stack reversal \(\fun{rev}(s)\) at
-the start: \(\C{\fun{pre2b}}{n} = 2n + 3 + \C{\fun{rev}}{n} = 3n +
-5\).\index{pre2b@$\C{\fun{pre2b}}{n}$}\index{rev@$\C{\fun{rev}}{n}$}
-
+the start:
+\begin{equation*}
+  \C{\fun{pre2b}}{n} = 2n + 3 + \C{\fun{rev}}{n} = 3n + 5.
+  \index{pre2b@$\C{\fun{pre2b}}{n}$}\index{rev@$\C{\fun{rev}}{n}$}
+\end{equation*}
 The design of \fun{pre2b/1}\index{pre2b@\fun{pre2b/1}} is based on
 small steps with an accumulator. A more direct approach would extract
 the left subtree and then the right subtree from the rest of the
@@ -2642,20 +2642,19 @@ trees, as long as we do not care for the contents of the internal
 nodes. For instance, we mentioned that the tree in
 \fig~\vref{fig:postorder} yields the extended postorder\index{binary
   tree!postorder!encoding} traversal \([\Box, \Box, \Box, 0, 1, \Box,
-\Box, 2, 3, \Box, \Box, \Box, 4, 5, 6]\). If we only want to retain
+  \Box, 2, 3, \Box, \Box, \Box, 4, 5, 6]\). If we only want to retain
 the shape of the tree, we could replace the contents of the internal
 nodes by~\(0\) and the external nodes by~\(1\), yielding the encoding
-\([1,1,1,0,0,1,1,0,0,1,1,1,0,0,0]\).
-
-A binary tree of size~\(n\) can be uniquely represented by a binary
-number of \(2n+1\) bits. In fact, we can discard the first bit because
-the first two bits are always~\(1\), so \(2n\)~bits are actually
-enough. For an extended preorder traversal, we choose to map external
-nodes to~\(0\) and internal nodes to~\(1\), so, the tree in
-\fig~\vref{fig:preorder} yields \([0, 1, 2, \Box, 3, \Box, \Box, 4,
-  \Box, \Box, 5, \Box, 6, \Box, \Box]\), which corresponds to the
-binary number \((111010010010100)_2\). We can also discard the
-rightmost bit, since the last two bits are always~\(0\).
+\([1,1,1,0,0,1,1,0,0,1,1,1,0,0,0]\). A binary tree of size~\(n\) can
+be uniquely represented by a binary number of \(2n+1\) bits. In fact,
+we can discard the first bit because the first two bits are
+always~\(1\), so \(2n\)~bits are actually enough. For an extended
+preorder traversal, we choose to map external nodes to~\(0\) and
+internal nodes to~\(1\), so, the tree in \fig~\vref{fig:preorder}
+yields \([0, 1, 2, \Box, 3, \Box, \Box, 4, \Box, \Box, 5, \Box, 6,
+  \Box, \Box]\), which corresponds to the binary number
+\((111010010010100)_2\). We can also discard the rightmost bit, since
+the last two bits are always~\(0\).
 
 \section{Random traversals}
 
