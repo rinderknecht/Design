@@ -375,15 +375,16 @@ rule~\clause{\alpha}, instead of one step by
 rule~\clause{\beta}. We are hence in a situation where we discover
 that the original definition was already specialised for speed when
 the second stack is empty. If we remove rule~\clause{\beta}, the
-program is shorter but becomes slower in that special case. This kind
-of dilemma is quite common in programming and there is sometimes no
-clear\hyp{}cut answer as to what is the best design. Perhaps another
-argument can here tip the scale slightly in favour of the
-removal. Indeed, whilst the removal slows down some calls, it makes
-the number of rewrites easy to remember: it is the number of items of
-the first stack plus~\(1\); in particular, the length of the second
-argument is irrelevant. So let us settle for a new definition with a
-new name:
+program is shorter but becomes slower in that special case.
+
+This kind of dilemma is quite common in programming and there is
+sometimes no clear\hyp{}cut answer as to what is the best
+design. Perhaps another argument can here tip the scale slightly in
+favour of the removal. Indeed, whilst the removal slows down some
+calls, it makes the number of rewrites easy to remember: it is the
+number of items of the first stack plus~\(1\); in particular, the
+length of the second argument is irrelevant. So let us settle for a
+new definition with a new name:
 \begin{equation*}
 \begin{array}{r@{\;}l@{\;}l}
 \fun{cat}(\el,t) & \xrightarrow{\alpha} & t;\\
@@ -735,7 +736,7 @@ The reason why \(\fun{fact}_0(5) \equiv \fun{fact}(5)\) is that
 \end{equation}
 This equality holds because, in general, for all numbers~\(x\),
 \(y\)~and~\(z\),
-\begin{enumerate*}
+\begin{enumerate}
 
 \item \label{mult_assoc} the multiplication is associative: \(x \cdot
   (y \cdot z) = (x \cdot y) \cdot z\);
@@ -743,7 +744,7 @@ This equality holds because, in general, for all numbers~\(x\),
 \item \label{mult_one} the number \(1\) is neutral with respect to
   (\(\cdot\)): \(x \cdot 1 = 1 \cdot x = x\).
 
-\end{enumerate*}
+\end{enumerate}
 To show exactly why, let us write~(\(\eqn{\ref{mult_assoc}}\))
 and~(\(\eqn{\ref{mult_one}}\)) to denote, respectively, the use of
 associativity and neutrality, then lay out the following equalities

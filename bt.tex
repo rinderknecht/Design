@@ -2325,7 +2325,7 @@ two internal nodes themselves. An example is provided in
 %\begin{figure}[b]
 \centering
 \includegraphics{complete}
-\caption{A complete tree}
+\caption{}
 \label{fig:complete}
 \end{wrapfigure}
 Recursively, a given tree is complete if, and only if, its immediate
@@ -2348,7 +2348,7 @@ rule applies either if \(t=\fun{ext}()\) or
 
 \begin{figure}[H]
 \centering
-\includegraphics{comp}
+\includegraphics[bb=71 660 381 721]{comp}
 \caption{Checking completeness}
 \label{fig:comp}
 \end{figure}
@@ -2374,11 +2374,18 @@ whose heights differ at most by~\(1\) have similar heights. See
 the height\index{binary tree!height}\index{height@\fun{height/1}} of a
 binary tree and then modify it to obtain a function checking the
 balance:
+%% \begin{equation*}
+%% \fun{height}(\fun{ext}()) \rightarrow 0;
+%% \;
+%% \fun{height}(\fun{int}(x,t_1,t_2)) \rightarrow 1 +
+%% \max\{\fun{height}(t_1), \fun{height}(t_2)\}.
+%% \end{equation*}
 \begin{equation*}
-\fun{height}(\fun{ext}()) \rightarrow 0;
-\;
-\fun{height}(\fun{int}(x,t_1,t_2)) \rightarrow 1 +
+\begin{array}{r@{\;}c@{\;}l}
+\fun{height}(\fun{ext}()) & \rightarrow & 0;\\
+\fun{height}(\fun{int}(x,t_1,t_2)) & \rightarrow & 1 +
 \max\{\fun{height}(t_1), \fun{height}(t_2)\}.
+\end{array}
 \end{equation*}
 
 The modification is shown in \fig~\vref{fig:balance}, where the
