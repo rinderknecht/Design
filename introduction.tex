@@ -739,7 +739,7 @@ because it is
 If we want to prove equivalences with variables ranging over
 infinite sets, like \(\fun{cat}(s,\fun{cat}(t,u)) \equiv
 \fun{cat}(\fun{cat}(s,t),u)\)\index{cat@\fun{cat/2}|)}, we need some
-induction principle.
+\emph{induction principle}.
 
 
 \mypar{Well-founded induction}
@@ -802,9 +802,10 @@ many usages.
 Consider the following example where \(m,n \in \mathbb{N}\):
 \begin{equation*}
 \begin{array}{@{}r@{\;}l@{\;}l@{}}
-\fun{ack}(0,n)     & \rightarrow & n+1;\\
-\fun{ack}(m+1,0)   & \rightarrow & \fun{ack}(m,1);\\
-\fun{ack}(m+1,n+1) & \rightarrow & \fun{ack}(m,\fun{ack}(m+1,n)).
+\fun{ack}(0,n)     & \smashedrightarrow{\theta} & n+1;\\
+\fun{ack}(m+1,0)   & \smashedrightarrow{\iota} & \fun{ack}(m,1);\\
+\fun{ack}(m+1,n+1) & \smashedrightarrow{\kappa}
+                   & \fun{ack}(m,\fun{ack}(m+1,n)).
 \end{array}
 \end{equation*}
 This is a simplified form of Ackermann's
@@ -841,12 +842,12 @@ any infinite descending chain. Here, a lexicographic order on \((m,n)
 \end{equation*}
 Clearly, \(\fun{ack}(0,0)\) is the minimum element. Second, we must
 prove that \fun{ack/2} rewrites to smaller calls. We are only
-concerned with rules \(\beta\)~and~\(\gamma\). With the former, we
+concerned with rules \(\iota\)~and~\(\kappa\). With the former, we
 have the inequality
 \begin{equation*}
   \fun{ack}(m+1,0) \succ \fun{ack}(m,1).
 \end{equation*}
-With the latter, we have the following inequalities:
+With rule~\(\kappa\), we have the following inequalities:
 \begin{equation*}
   \begin{array}{@{}r@{\;}l@{\;}l@{}}
     \fun{ack}(m+1,n+1) & \succ & \fun{ack}(m+1,n),\\
@@ -890,10 +891,10 @@ prove a property, with the timely help of the induction
 principle. Precisely, we want to rewrite each side of the equivalence
 we wish to prove until we either find the same term (equality), or we
 use the induction hypothesis (equivalence). We want to be free to
-choose a rewrite amongst those possible for a term, and this freedom
-is entailed by the termination and the confluence of the rewrite
-system defining the functions, which we always assume when proving
-properties of such functions.
+choose a rewrite amongst those possible for a given term, and this
+freedom is entailed by the joint termination and confluence of the
+rewrite system defining the functions: we always assume they hold when
+proving properties of such functions.
 
 We apply the well\hyp{}founded induction principle to the structure
 of~\(s\), so we must establish
@@ -1010,9 +1011,9 @@ an advanced programming course.
 \paragraph{Design Pattern}
 
 The design pattern in \Java which models a stack \index{stack!$\sim$
-  in \Java} relies on polymorphic methods, recursive classes and
-generics. A generic and abstract class \texttt{Stack} captures the
-essence of a stack as follows:
+  in \Java} relies on polymorphic methods and abstract and generic
+classes. The following class \texttt{Stack} captures the essence of a
+stack:
 \begin{alltt}
 // Stack.java
 \public \abstractX \class Stack<Item> \{

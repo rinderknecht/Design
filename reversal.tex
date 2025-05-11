@@ -30,7 +30,8 @@ An evaluation is shown with abstract syntax trees in
 \includegraphics[bb=69 627 375 721]{rev0_321_2}
 \includegraphics[bb=69 627 375 721]{rev0_321_3}
 \caption{\(\fun{rev}_0([3,2,1]) \twoheadrightarrow [1,2,3]\)}
-\label{fig:rev0_321}\index{stack!reversal!example}
+\label{fig:rev0_321}
+\index{stack!reversal!example}
 \end{figure}
 Let \(\pred{Inv}{s}\)\index{Inv@\predName{Inv}|(} be the property
 \(\fun{rev}_0(\fun{rev}_0(s)) \equiv s\), that is, the function
@@ -40,14 +41,14 @@ Let \(\pred{Inv}{s}\)\index{Inv@\predName{Inv}|(} be the property
 In order to prove \(\forall s \in S.\pred{Inv}{s}\), the induction
 principle on the structure of~\(s\)\index{induction!example|(}
 requires that we establish
-\begin{itemize}
+\begin{itemize*}
 
   \item the basis \(\pred{Inv}{\el}\);
 
   \item the inductive step \(\forall s \in S.\pred{Inv}{s}
     \Rightarrow \forall x \in T.\pred{Inv}{\cons{x}{s}}\).
 
-\end{itemize}
+\end{itemize*}
 The basis is quickly found (we underline the call being rewritten,
 when there is more than one):
 \begin{equation*}
@@ -74,45 +75,52 @@ denote \(\fun{cat}(\fun{rev}_0(t),\fun{rev}_0(s)) \equiv
 \fun{rev}_0(\fun{cat}(s,t))\)\index{cat@\fun{cat/2}}. In order to
 prove it by induction on the structure of~\(s\), we need, for
 all~\(t\),
-\begin{itemize}
+\begin{itemize*}
 
   \item the basis \(\pred{CatRev}{\el,t}\);
 
   \item the inductive step \(\forall s,t \in S.\pred{CatRev}{s,t}
     \Rightarrow \forall x \in T.\pred{CatRev}{\cons{x}{s},t}\).
 
-\end{itemize}
+\end{itemize*}
 The former is almost within reach:
 \begin{equation*}
-\begin{array}{@{}r@{\;}l@{\;}l}
-  \fun{rev}_0(\ufun{cat}(\el,t))
-  & \xrightarrow{\smash{\alpha}} \fun{rev}_0(t)\\
-  & \leftrightsquigarrow \fun{cat}(\fun{rev}_0(t),\el)\\
-  & \xleftarrow{\smash{\gamma}}
-  \fun{cat}(\fun{rev}_0(t),\ufun{rev}_0(\el))
-\end{array}
+\fun{rev}_0(\fun{cat}(\el,t)) \xrightarrow{\smash{\alpha}}
+\fun{rev}_0(t) \leftrightsquigarrow \fun{cat}(\fun{rev}_0(t),\el)
+\xleftarrow{\smash{\gamma}}
+\fun{cat}(\fun{rev}_0(t),\fun{rev}_0(\el)).
 \end{equation*}
+%% \begin{equation*}
+%% \begin{array}{@{}r@{\;}l@{\;}l}
+%%   \fun{rev}_0(\ufun{cat}(\el,t))
+%%   & \xrightarrow{\smash{\alpha}} \fun{rev}_0(t)\\
+%%   & \leftrightsquigarrow \fun{cat}(\fun{rev}_0(t),\el)\\
+%%   & \xleftarrow{\smash{\gamma}}
+%%   \fun{cat}(\fun{rev}_0(t),\ufun{rev}_0(\el))
+%% \end{array}
+%% \end{equation*}
 The missing part is filled by showing that
-\((\leftrightsquigarrow)\)~is actually~\((\equiv)\).\par\vskip\baselineskip
+\((\leftrightsquigarrow)\)~is \(\pred{CatNil}{s}\).
+\par\vskip\baselineskip
 
-%% Let \(\pred{CatNil}{s}\)\index{CatNil@\predName{CatNil}|(} be the
-%% property \(\fun{cat}(s,\el) \equiv s\)\index{cat@\fun{cat/2}}. In
-%% order to prove it by induction on the structure of~\(s\), we have to
-%% prove
-%% \begin{itemize*}
+Let \(\pred{CatNil}{s}\)\index{CatNil@\predName{CatNil}|(} be the
+property \(\fun{cat}(s,\el) \equiv s\)\index{cat@\fun{cat/2}}. In
+order to prove it by induction on the structure of~\(s\), we have to
+prove
+\begin{itemize*}
 
-%%   \item the basis \(\pred{CatNil}{\el}\);
+  \item the basis \(\pred{CatNil}{\el}\);
 
-%%   \item the inductive step \(\forall s \in S.\pred{CatNil}{s}
-%%     \Rightarrow \forall x \in T.\pred{CatNil}{\cons{x}{s}}\).
+  \item the inductive step \(\forall s \in S.\pred{CatNil}{s}
+    \Rightarrow \forall x \in T.\pred{CatNil}{\cons{x}{s}}\).
 
-%% \end{itemize*}
-%% The former is easy: \(\fun{cat}(\el,\el) \xrightarrow{\smash{\alpha}}
-%% \el\)\index{cat@\fun{cat/2}}. The latter is not complicated either:
-%% \(\fun{cat}(\cons{x}{s},\el) \xrightarrow{\smash{\beta}}
-%% \cons{x}{\fun{cat}(s,\el)} \equiv \cons{x}{s}\), where the equivalence
-%% is none other than the induction hypothesis
-%% \(\pred{CatNil}{s}\)\index{CatNil@\predName{CatNil}|)}.\hfill\(\Box\)
+\end{itemize*}
+The former is easy: \(\fun{cat}(\el,\el) \xrightarrow{\smash{\alpha}}
+\el\)\index{cat@\fun{cat/2}}. The latter is not complicated either:
+\(\fun{cat}(\cons{x}{s},\el) \xrightarrow{\smash{\beta}}
+\cons{x}{\fun{cat}(s,\el)} \equiv \cons{x}{s}\), where the equivalence
+is none other than the induction hypothesis
+\(\pred{CatNil}{s}\)\index{CatNil@\predName{CatNil}|)}.\hfill\(\Box\)
 
 %% Note that we could have proved instead \(\fun{cat}(s,\el)
 %% \twoheadrightarrow s\), for all values~\(s\). The difference is that
