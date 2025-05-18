@@ -55,7 +55,8 @@ variables of the corresponding left\hyp{}hand side:
 \fun{cat}(\fun{rev}_0(s),[x]).
 \end{array}
 \end{equation*}
-\index{rev0@\fun{rev\(_0\)/1}|)}By contrast,
+\index{rev0@\fun{rev\(_0\)/1}|)}
+By contrast,
 \fun{rev/1}\index{rev@\fun{rev/1}} relies on another function,
 \fun{rcat/2}\index{rcat@\fun{rcat/2}}, to accumulate partial results,
 as if each arrow covered a short distance, only contributing minimally
@@ -96,7 +97,7 @@ in the case of rule~\(\gamma\), the substructures of
 \(\fun{flat}(t)\), we obtain a new version,
 \fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}}, in
 \fig~\vref{fig:flat0}.
-\begin{figure}[t]
+\begin{figure}[b]
 \begin{equation*}
 \boxed{%
 \begin{array}{r@{\;}l@{\;}l}
@@ -117,7 +118,7 @@ in the case of rule~\(\gamma\), the substructures of
 Let us consider an example in \fig~\vref{fig:flat0_ex}, where the call
 to be rewritten next is underlined in case of ambiguity. (We underline
 the call that is rewritten.)
-\begin{figure}[!b]
+\begin{figure}
 \begin{equation*}
 \boxed{%
 \begin{array}{r@{\;}l@{\;}l}
@@ -275,7 +276,7 @@ stacks, thus approaching little by little a flat stack. In terms of
 the abstract syntax trees, this operation is a \emph{right
 rotation}\index{binary tree!rotation} of the tree associated with the
 argument, as shown in \figs~\vrefrange{fig:lift1}{fig:lift2}, where
-the new function is called \fun{flat/1}\index{flat@\fun{flat/1}|(} and
+the new function is \fun{flat/1}\index{flat@\fun{flat/1}|(} and
 defined in \fig~\vref{fig:flat}.
 % Wrapping figure better declared before a paragraph
 %
@@ -498,7 +499,8 @@ for all~\(x\), we have \(\measure{\cons{\cons{x}{s}}{t}} >
 \measure{\cons{x,s}{t}}\). The second inequality yields faster:
 \(\measure{\cons{y}{t}} = 1 + \measure{t} > \measure{t}\). This
 entails the termination of
-\fun{flat/1}\index{flat@\fun{flat/1}}.\index{stack!flattening!termination|)}\hfill\(\Box\)
+\fun{flat/1}\index{flat@\fun{flat/1}}.
+\index{stack!flattening!termination|)}\hfill\(\Box\)
 
 \cite{Giesl_1997} tackled the termination of mutually recursive
 functions. Functional programs, as special cases of

@@ -104,19 +104,25 @@ is~\(n\). The cost of enqueueing\index{enq@$\C{\fun{enq}}{n}$} is
 \(\C{\fun{enq}}{n} = 1\). The minimum
 cost\index{deq@$\B{\fun{deq}}{n}$} for dequeueing is
 \(\B{\fun{deq}}{n} = 1\), by rule~\(\iota\). The maximum cost is
-\(\W{\fun{deq}}{n} = n+2\), as seen with the trace
-\(\theta\eta^{n-1}\zeta\iota\). Let~\(\A{n}\) be the cost of a
-sequence of \(n\)~updates on a functional queue originally empty. A
-first attempt at assessing~\(\A{n}\) consists in ignoring any
-dependence on previous operations and take the maximum individual
-cost. Since \(\C{\fun{enq}}{k} \leqslant \C{\fun{deq}}{k}\), we
-consider a series of \(n\)~dequeueings in their worst case, that is,
-with all the items located in the rear stack. Besides, after
-\(k\)~updates, there may be at most \(k\)~items in the queue, so
-\begin{equation*}
-\A{n} \leqslant \sum_{k=1}^{n-1}{\W{\fun{deq}}{k}} =
-\frac{1}{2}{(n-1)(n+4)} \sim \frac{1}{2}{n^2}.
-\end{equation*}
+\begin{equation}
+  \W{\fun{deq}}{n} = \len{\theta\eta^{n-1}\zeta\iota} = 1 + (n-1)
++ 1 + 1 = n + 2. \label{eq:Wdeq}
+\end{equation}
+Let~\(\A{n}\) be the cost of a sequence of \(n\)~updates on a
+functional queue originally empty. A first attempt at
+assessing~\(\A{n}\) consists in ignoring any dependence on previous
+operations and take the maximum individual cost. Since
+\(\C{\fun{enq}}{k} \leqslant \C{\fun{deq}}{k}\), we consider a series
+of \(n\)~dequeueings in their worst case, that is, with all the items
+located in the rear stack. Besides, after \(k\)~updates, there may be
+at most \(k\)~items in the queue, so
+\begin{equation}
+  \A{n} \leqslant \sum_{k=1}^{n-1}{\W{\fun{deq}}{k}} =
+  \sum_{k=1}^{n-1}{(k+2)} =
+  \frac{1}{2}(n+4)(n-1) \sim \frac{1}{2}{n^2}.
+  \label{ineq:Sn_upper_bound}
+\end{equation}
+from equations~\eqref{eq:Wdeq} and~\eqref{eq:sum_k}.
 
 \paragraph{Aggregate analysis}
 \index{cost!amortised $\sim$}
@@ -181,7 +187,9 @@ to deduce the total cost in this case, we must find a
 \emph{decomposition}\index{Dyck path!decomposition} of the path, by
 which we mean to identify patterns whose costs are easy to calculate
 and which make up any path, or to associate any path to another path
-whose cost is the same but easy to find. \Fig~\ref{fig:dyck_eq}
+whose cost is the same but easy to find.
+
+\Fig~\ref{fig:dyck_eq}
 \begin{figure}[!b]
 \centering
 \includegraphics[bb=75 570 508 727,scale=0.7]{dyck_eq}
@@ -196,7 +204,7 @@ simple: after the first series of falls, if we are back to the
 abscissa axis, we have a mountain and we proceed with the rest of the
 path. Otherwise, the next operation is a rise and we exchange it with
 the first fall after it. This brings us down by~\(1\) and the process
-resumes until the abscissas are reached. We call this méthod
+resumes until the abscissas are reached. We call this method
 \emph{rescheduling}\index{Dyck path!rescheduling} because it amounts,
 in operational terms, to reordering subsequences of operations \emph{a
 posteriori}.
@@ -235,9 +243,12 @@ cost\index{deq@$\W{\fun{deq}}{n}$} \(\W{\fun{deq}}{e_i} = e_i + 2\),
 due to the front being empty because we started the rises from the
 abscissa axis. The next \(e_i-1\) falls have all cost~\(1\), because
 the front is not empty. For the \(i\)th mountain, the cost is thus
-\(e_i+(e_i+2)+(e_i-1) = 3e_i+1\). Then \(\A{e,k} =
-\sum_{i=1}^{k}{(3e_i+1)} = 3e + k\). The maximum cost is obtained by
-maximising \(\A{e,k}\) for a given~\(e\):
+\(e_i+(e_i+2)+(e_i-1) = 3e_i+1\). Then
+\begin{equation*}
+  \A{e,k} = \sum_{i=1}^{k}{(3e_i+1)} = 3e + k.
+\end{equation*}
+The maximum cost is obtained by maximising \(\A{e,k}\) for a
+given~\(e\):
 \begin{equation*}
 \W{}{e,e} := \max_{1 \leqslant k \leqslant e}{\A{e,k}} = \A{e,e} = 4e
 = 2n,\,\; \text{with \(n=e+d=2e\)},
@@ -264,7 +275,7 @@ to~\(1\).
 Another worst case occurs if \(e = d + 1\) and the line is then a Dyck
 meander whose extremity ends at ordinate \(e-d=1\). An example is
 given in \fig~\ref{fig:meander1},
-\begin{figure}[t]
+\begin{figure}[b]
 \centering
 \includegraphics[bb=75 570 480 727,scale=0.82]{meander1}
 \caption{Dyck meander modelling queue operations (total cost~\(21\))}
@@ -319,9 +330,10 @@ where the lower bound is tight if all updates are enqueueings and the
 upper bound when a saw\hyp{}toothed range is followed by one
 enqueueing or else two enqueueings and one dequeueing. By definition,
 the amortised cost of one operation is~\(\A{n}/n\) and lies between
-\(1\)~and~\(2\), which is less than our first analysis (\(\sim
-n/2\)). We published a slightly different analysis on the same
-examples \citep{Rinderknecht_2011}.
+\(1\)~and~\(2\), which is less than our quadratic worst\hyp{}case
+analysis in
+inequality~\eqref{ineq:Sn_upper_bound}. See~\citep{Rinderknecht_2011}
+for a slightly different analysis on the same examples.
 
 \paragraph{Side note}
 

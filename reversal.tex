@@ -90,15 +90,6 @@ The former is almost within reach:
 \xleftarrow{\smash{\gamma}}
 \fun{cat}(\fun{rev}_0(t),\fun{rev}_0(\el)).
 \end{equation*}
-%% \begin{equation*}
-%% \begin{array}{@{}r@{\;}l@{\;}l}
-%%   \fun{rev}_0(\ufun{cat}(\el,t))
-%%   & \xrightarrow{\smash{\alpha}} \fun{rev}_0(t)\\
-%%   & \leftrightsquigarrow \fun{cat}(\fun{rev}_0(t),\el)\\
-%%   & \xleftarrow{\smash{\gamma}}
-%%   \fun{cat}(\fun{rev}_0(t),\ufun{rev}_0(\el))
-%% \end{array}
-%% \end{equation*}
 The missing part is filled by showing that
 \((\leftrightsquigarrow)\)~is \(\pred{CatNil}{s}\).
 \par\vskip\baselineskip
@@ -421,11 +412,11 @@ because the cost of \(\fun{cat}(s,t)\)\index{cat@\fun{cat/2}} is \(1 +
 \end{array}
 \end{equation}
 The problem is not calling \fun{cat/2}, but the fact that the calls
-are embedded in the most unfavourable configuration. Indeed, we proved
-the associativity\index{stack!concatenation!associativity} of
+are embedded in the most unfavourable configuration. Indeed, if we
+proved the associativity\index{stack!concatenation!associativity} of
 \fun{cat/2}\index{cat@\fun{cat/2}} \vpageref{proof:assoc_cat}, to wit,
-\(\fun{cat}(\fun{cat}(s,t),u) \equiv
-\fun{cat}(s,\fun{cat}(t,u))\).
+\(\fun{cat}(\fun{cat}(s,t),u) \equiv \fun{cat}(s,\fun{cat}(t,u))\),
+the cost of both sides differ.
 
 \par\vskip\baselineskip
 

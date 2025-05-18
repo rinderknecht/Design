@@ -27,12 +27,11 @@ consecutively repeated items. For example, we might have \(\fun{red}([4,1,2,2,2,
 % [6] vertical lines
 % {r} mandatory right placement (better because of a list)
 \centering
-\includegraphics[bb=71 672 203 726]{red}
+\includegraphics[bb=71 672 203 721]{red}
 \caption{Reducing}
 \label{fig:red}
 \end{wrapfigure}
-A
-directed acyclic graph of the second rule is depicted in
+A directed acyclic graph of the second rule is depicted in
 \fig~\vref{fig:red_dag1}.
 \begin{figure}[b]
 \centering
@@ -218,6 +217,10 @@ Let \fun{top\(_0\)/1}\index{top0@\fun{top\(_0\)/1}} and
 \fun{pop\(_0\)/1}\index{pop0@\fun{pop\(_0\)/1}} be the equivalent of
 \fun{top/1} and \fun{pop/1} operating on updates instead of versions.
 Their definitions are found in \fig~\vref{fig:pop_top}.
+An ancillary function \fun{top\(_0\)/2}\index{top0@\fun{top\(_0\)/2}}
+keeps track of the difference between the lengths of the last and
+current versions. We have found the item when the difference is~\(0\)
+and the current update is a push.
 \begin{figure}[h]
 \begin{equation*}
 \boxed{%
@@ -233,10 +236,6 @@ Their definitions are found in \fig~\vref{fig:pop_top}.
 \caption{The top and the rest of an history of updates}
 \label{fig:pop_top}
 \end{figure}
-An ancillary function \fun{top\(_0\)/2}\index{top0@\fun{top\(_0\)/2}}
-keeps track of the difference between the lengths of the last and
-current versions. We have found the item when the difference is~\(0\)
-and the current update is a push.
 
 As previously, we want the call
 \(\fun{ver}_0(k,h)\)\index{ver0@\fun{ver\(_0\)/2}} to evaluate in
@@ -311,10 +310,12 @@ that is, work with \(\pair{n}{h}\), and modify
 \fun{push/2}\index{push@\fun{push/2}}
 and~\fun{pop/1}\index{pop@\fun{pop/1}} accordingly:
 \begin{equation*}
-\fun{push}_2(x,\pair{n}{h}) \! \rightarrow \!
-\pair{n\!+\!1}{\cons{\ufun{push}(x)}{h}}.\quad
-\fun{pop}_2(\pair{n}{h}) \! \rightarrow \!
+\begin{array}{@{}r@{\;}l@{\;}l@{}}
+\fun{push}_2(x,\pair{n}{h}) & \rightarrow &
+\pair{n\!+\!1}{\cons{\ufun{push}(x)}{h}}.\\
+\fun{pop}_2(\pair{n}{h}) & \rightarrow &
 \pair{n\!-\!1}{\cons{\ufun{pop}()}{h}}.
+\end{array}
 \end{equation*}
 We have to rewrite~\fun{ver/2}\index{ver2@\fun{ver\(_2\)/2}} so it keeps
 track of the length of the last version:
@@ -371,9 +372,12 @@ the call~\eqref{ex:history} on page~\pageref{ex:history} and saves
 \(n\)~cons\hyp{}nodes in a history of length~\(n\). See
 \fig~\ref{fig:ver}.
 \begin{equation*}
-\fun{push}_4(x,\pair{n}{h}) \rightarrow
-\pair{n\!+\!1}{\ufun{push}(x,h)}.\quad
-\fun{pop}_4(\pair{n}{h}) \rightarrow \pair{n\!-\!1}{\ufun{pop}(h)}.
+\begin{array}{@{}r@{\;}l@{\;}l@{}}
+\fun{push}_4(x,\pair{n}{h}) & \rightarrow &
+\pair{n\!+\!1}{\ufun{push}(x,h)}.\\
+\fun{pop}_4(\pair{n}{h}) & \rightarrow &
+\pair{n\!-\!1}{\ufun{pop}(h)}.
+\end{array}
 \end{equation*}
 \begin{figure}[t]
 \begin{equation*}
@@ -532,7 +536,7 @@ original history. This same dilemma was encountered when we compared
 \fun{sfst\(_0\)/2}\index{sfst0@\fun{sfst\(_0\)/2}} in
 section~\ref{sec:skipping} on page~\pageref{sec:skipping}. Let us opt
 for a big\hyp{}step design in \fig~\ref{fig:chg}.
-\begin{figure}[b]
+\begin{figure}
 \centering
 \framebox[\columnwidth]{\vbox{%
 \begin{gather*}
