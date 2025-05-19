@@ -510,11 +510,9 @@ shows an excerpt of a comparison tree with such a useless
 comparison. The special external node~\(\bot\) corresponds to no
 permutation because the comparison \(a_1 < a_3\) cannot fail as it is
 implied by transitivity of the previous comparisons on the path from
-the root. Therefore,
-\begin{center}
-  \emph{a comparison tree for \(n\)~keys without redundancy has
-    \(n!\)~external nodes.}
-\end{center}
+the root. Therefore, \emph{a comparison tree for \(n\)~keys without
+redundancy has \(n!\)~external nodes.}
+
 Because we are investigating minimum\hyp{}comparison sorting, we shall
 consider henceforth optimal comparison trees with \(n!\)~external
 nodes. Furthermore, amongst them, we want to determine the trees such
@@ -559,7 +557,7 @@ squares. Since, by definition, minimum\hyp{}comparison trees have
 external nodes than a perfect binary tree of identical height, that
 is, \(n! \leqslant 2^{S(n)}\), therefore
 \begin{equation*}
-S(n) \geqslant \ceiling{\lg n!},
+\ceiling{\lg n!} \leqslant S(n),
 \end{equation*}
 where \(\ceiling{x}\) (\textsl{ceiling of~\(x\)})
 \index{ceiling@$\ceiling{x}$|see{ceiling function}} \index{ceiling
@@ -574,7 +572,8 @@ monotonically increasing function. Then
 \abovedisplayskip=0pt
 \sum_{k=a}^{b-1}f(k) \leqslant \int_{a}^{b}{\!\!f(x)} \,dx
                    \leqslant \sum_{k=a+1}^{b}{\!\!\!f(k)}.
-\tag*{\(\blacksquare\)}
+%\tag*{\(\blacksquare\)}
+\tag*{\(\Box\)}
 \end{equation}
 \end{thm}
 \noindent Let us take \(a:=1\), \(b:=n\) and \(f(x) := \lg x\). The

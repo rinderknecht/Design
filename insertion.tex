@@ -26,9 +26,11 @@ assuming a minimum and a maximum function,
 \fun{min/2}\index{min@\fun{min/2}} and
 \fun{max/2}\index{max@\fun{max/2}}:
 \begin{equation*}
-\fun{ins}(x,\el)         \rightarrow [x];\qquad
-\fun{ins}(x,\cons{y}{s}) \rightarrow
-   \cons{\fun{min}(x,y)}{\fun{ins}(\fun{max}(x,y),s)}.
+\begin{array}{@{}r@{\;}l@{\;}l@{}}
+\fun{ins}(x,\el) & \rightarrow & [x];\\
+\fun{ins}(x,\cons{y}{s}) & \rightarrow &
+\cons{\fun{min}(x,y)}{\fun{ins}(\fun{max}(x,y),s)}.
+\end{array}
 \end{equation*}
 Temporarily, let us restrict ourselves to sorting natural numbers in
 increasing order. We need to provide definitions to calculate the
@@ -235,6 +237,8 @@ inversions in a random permutation of \(n\)~objects is
 \begin{equation*}
 \belowdisplayskip=-4pt
 \sum_{j=0}^{n-1}\frac{1}{j+1}\sum_{i=0}^{j}\len{\kappa^i} =
+\sum_{j=0}^{n-1}\frac{1}{j+1}\cdot\frac{j(j+1)}{2} =
+\frac{1}{2}\sum_{j=0}^{n-1}j =
 \frac{n(n-1)}{4}.
 \end{equation*}
 \index{permutation!inversion|)}
