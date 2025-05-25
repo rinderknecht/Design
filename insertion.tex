@@ -1132,7 +1132,7 @@ as with \(\M{\fun{isrt}}{n}\), namely, we look for the cost for
 sorting all permutations of \((1,2,\dots,n)\), divided by~\(n!\). The
 insertions are illustrated by the \emph{evaluation
   tree}\index{tree!evaluation $\sim$} in \fig~\ref{fig:2way_unbal},
-\begin{figure}[t]
+\begin{figure}[!b]
 \centering
 \includegraphics{2way_unbal}
 \caption{Sorting \([a,b,c]\) (first argument of \fun{i2w/3} hidden)}
@@ -1463,12 +1463,17 @@ let us note \(\B{\fun{i2wb}}{n}\) the cost of any call
 \(\fun{i2wb}(s)\), where the stack~\(s\) contains \(n\)~keys. If \(p
 \geqslant 0\), then
 \begin{equation*}
-\B{\fun{i2wb}}{2p}   = 1 +     2p + p = 3p + 1,\quad
-\B{\fun{i2wb}}{2p+1} = 1 + (2p+1) + p = 3p + 2.
+\begin{array}{@{}r@{\;}c@{\;}l@{}}
+\B{\fun{i2wb}}{2p}   & = & 1 +     2p + p = 3p + 1,\\
+\B{\fun{i2wb}}{2p+1} & = & 1 + (2p+1) + p = 3p + 2.
+\end{array}
 \end{equation*}
-Another, more compact, way to put it is: \(\B{\fun{i2wb}}{n} = 1 + n
-+ \floor{n/2} \sim \tfrac{3}{2}{n}\). The equivalence is correct
-because \(n/2-1 < \floor{n/2} \leqslant n/2\).
+Another, more compact, way to put it is:
+\begin{equation*}
+  \B{\fun{i2wb}}{n} = 1 + n + \floor{n/2} \sim \frac{3}{2}{n}.
+\end{equation*}
+The equivalence is correct because \(n/2-1 < \floor{n/2} \leqslant
+n/2\).
 
 \paragraph{Exercise}
 
