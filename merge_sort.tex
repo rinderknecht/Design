@@ -474,7 +474,7 @@ Therefore, \emph{insertion is a special case of merging.}
 Nevertheless, the average costs are not exactly the same. First, we
 have \(\M{\fun{mrg}}{m,n} = \OM{\fun{mrg}}{m,n} + 1\), because we need
 to account for using once either rule~\(\theta\) or~\(\iota\) in
-\fig~\ref{fig:mrg}, as we already acknowledged by
+\fig~\vref{fig:mrg}, as we already acknowledged by
 equation~\eqref{def:cost_mrg}. Then, equations~\eqref{eq:ins}
 \vpageref{eq:ins} and~\eqref{eq:Amrg} yield
 \begin{equation*}
@@ -873,10 +873,10 @@ We can already notice that this inequality is equivalent to
 \leqslant \frac{1}{2}m\lg m + \frac{1}{2}i\lg i + i.
 \label{ineq:Btms_n_i_details}
 \end{equation}
-But \(\tfrac{1}{2}m\lg(m+i) > \tfrac{1}{2}m\lg m\) and
-\(\tfrac{1}{2}i\lg(m+i) > \tfrac{1}{2}i\lg i\), therefore the
+But \(\tfrac{1}{2}m\lg m < \tfrac{1}{2}m\lg(m+i)\) and
+\(\tfrac{1}{2}i\lg i < \tfrac{1}{2}i\lg(m+i)\), therefore the
 constant~\(a\) we are seeking must satisfy \(am \leqslant i\) for all
-\(0 < i < m\), hence we expect \(a < 0\).
+\(0 < i < m\), hence we expect~\(a\) to be strictly negative.
 
 We extend~\(i\) over the real numbers by defining \(i=x2^p=xm\), where
 \(x\)~is a real number such that \(0 < x \leqslant 1\). By replacing
