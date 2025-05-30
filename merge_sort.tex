@@ -885,7 +885,7 @@ We extend~\(i\) over the real numbers by defining \(i=x2^p=xm\), where
 \frac{1}{2}(1+x)\lg(1+x) + a \leqslant \frac{1}{2}x\lg x + x.
 \end{equation*}
 Let \(\Phi(x) := \tfrac{1}{2}x\lg x - \tfrac{1}{2}(1+x)\lg(1+x) +
-x\). Then, this is equivalent to the inequality \(a \leqslant
+x\). Then, the previous inequality is equivalent to \(a \leqslant
 \Phi(x)\). The function~\(\Phi\) can be continuously extended
 at~\(0\), as \(\lim_{x \to 0} x\lg x = 0\), and it is differentiable
 on the interval \(]0,1]\):
@@ -963,9 +963,9 @@ theorems.
                       &= (1010\dots10)_2;
     \end{align*}
     so \(\nu_{\phi_{2m+1}} = m\). From \(\OB{\fun{tms}}{m+1} =
-    \OB{\fun{tms}}{m} + \nu_m\) comes \(\OB{\fun{tms}}{1+\phi_{2m+1}}
-    - \OB{\fun{tms}}{\phi_{2m+1}} = m\), or,
-    equivalently,\index{tms@$\OB{\fun{tms}}{n}$|(}
+    \OB{\fun{tms}}{m} + \nu_m\), we can deduce that:
+    \(\OB{\fun{tms}}{1+\phi_{2m+1}} - \OB{\fun{tms}}{\phi_{2m+1}} =
+    m\), or, equivalently,\index{tms@$\OB{\fun{tms}}{n}$|(}
     \(\OB{\fun{tms}}{1+\phi_k} - \OB{\fun{tms}}{\phi_k} =
     \floor{k/2}\).\hfill\(\Box\)
 
@@ -993,7 +993,7 @@ is \(p=1+\phi_k\).
     + \sum_{m=0}^{n-1}{\phi_{2m}},\; \text{where}\; S_n :=
     \sum_{m=0}^{n-1}{m4^m}.
     \end{equation*}
-    We need now to make out \(S_n\). We have
+    We need now to make out a closed form for~\(S_n\). We have
     \begin{equation*}
       S_n + n4^n = \sum_{m=1}^{n}{m4^m}
                  = \sum_{m=0}^{n-1}(m+1)4^{m+1}
@@ -1009,9 +1009,9 @@ is \(p=1+\phi_k\).
     \end{equation}
     Let us now work out
     \begin{equation*}
-      Q(\phi_{2n}) = \tfrac{1}{2}\phi_{2n}(2(n-1)
-    + \lg(1-1/4^n)) = \OB{\fun{tms}}{\phi_{2n}} +
-    \tfrac{1}{2}\phi_{2n}\lg(1-1/4^n),
+      Q(\phi_{2n}) = \frac{1}{2}\phi_{2n}(2(n-1)
+      + \lg(1-1/4^n)) = \OB{\fun{tms}}{\phi_{2n}}
+      + \frac{1}{2}\phi_{2n}\lg(1-1/4^n),
     \end{equation*}
     with an application of~\eqref{eq:OBtms_phi_2n}. If we let \(f(x) := (1-x)
     \ln(1-1/x)\), then \(\OB{\fun{tms}}{\phi_{2n}} - Q(\phi_{2n}) =
@@ -1029,7 +1029,7 @@ is \(p=1+\phi_k\).
     From theorem~\ref{thm:OB_lambda} and
     equation~\eqref{eq:OBtms_phi_2n}, we have
     \begin{equation}
-      \OB{\fun{tms}}{1+\phi_{2n}} = (n-1)(1+\phi_{2n}) + 1.
+      \OB{\fun{tms}}{1+\phi_{2n}} = (1+\phi_{2n})(n-1) + 1.
       \label{eq:OBtms_succ_phi_2n}
     \end{equation}
     Furthermore,
@@ -1038,10 +1038,10 @@ is \(p=1+\phi_k\).
                     &= \OB{\fun{tms}}{1+\phi_{2n}} - 1 +
       \frac{1}{6}(4^n + 2)\lg(1+2/4^n),
     \end{align*}
-    the last step making use of~\eqref{eq:OBtms_succ_phi_2n}. If \(g(x) := 1 -
+    the last step using~\eqref{eq:OBtms_succ_phi_2n}. If \(g(x) := 1 -
     \tfrac{1}{6}(x+2)\lg(1+2/4^n)\), then
-    \(\OB{\fun{tms}}{1+\phi_{2n}} - Q(1+\phi_{2n}) =
-    g(4^n)\). Elementary analysis entails that \(2 - \lg 3 \leqslant
+    \(\OB{\fun{tms}}{1+\phi_{2n}} - Q(1+\phi_{2n}) = g(4^n)\). Some
+    elementary analysis entails the inequality \(2 - \lg 3 \leqslant
     g(x) < 1 - 1/(3\ln 2)\), when \(x \geqslant 4\), that is, \(2 -
     \lg 3 \leqslant g(4^n) < 1 - 1/(3\ln 2)\), for \(n \geqslant
     1\). Approximately, \(\boxed{0.4150 <
@@ -1058,8 +1058,7 @@ is \(p=1+\phi_k\).
     \begin{align*}
       \OB{\fun{tms}}{\phi_{2m+1}} &= \OB{\fun{tms}}{2^{2m-1}} +
       \OB{\fun{tms}}{\phi_{2m-1}} + \phi_{2m-1}\\
-      &= \OB{\fun{tms}}{\phi_{2m-1}} - (2m-1)4^{m-1} +
-      \phi_{2m-1}.
+      &= \OB{\fun{tms}}{\phi_{2m-1}} - (2m-1)4^{m-1} + \phi_{2m-1}.
     \end{align*}
     Summing both sides from \(m=1\) to \(m=n-1\) and
     multiplying by~\(9\) yields \(9\OB{\fun{tms}}{\phi_{2n+1}} =
@@ -1074,9 +1073,9 @@ is \(p=1+\phi_k\).
       Q(\phi_{2n+1}) &= \frac{1}{2}\phi_{2n+1}(2n-1 + \lg(1-1/4^n))\\
       &= \OB{\fun{tms}}{\phi_{2n+1}} + \frac{1}{2}\phi_{2n+1}\lg(1-1/4^n),
     \end{align*}
-    where the last equality follows from~\eqref{eq:OBtms_phi_2n_1}. If
-    we let \(f(x) := (1-x)\ln(1-1/x)\), as we did for
-    \(Q(\phi_{2n})\), we have \(\OB{\fun{tms}}{\phi_{2n+1}} -
+    where the last equality follows from~\eqref{eq:OBtms_phi_2n_1}.
+    If, as we did for \(Q(\phi_{2n})\), we let \(f(x) :=
+    (1-x)\ln(1-1/x)\), then we have \(\OB{\fun{tms}}{\phi_{2n+1}} -
     Q(\phi_{2n+1}) = f(4^n)/(3\ln 2)\). We know \(3\ln\tfrac{3}{4}
     \leqslant f(x) < 1\), for \(x \geqslant 4\), therefore \(\lg 3 - 2
     \leqslant \OB{\fun{tms}}{\phi_{2n+1}} - Q(\phi_{2n+1}) < 1/(3\ln
@@ -1087,7 +1086,7 @@ is \(p=1+\phi_k\).
     From theorem~\ref{thm:OB_lambda} and
     equation~\eqref{eq:OBtms_phi_2n_1}, we deduce
     \begin{equation}
-      \OB{\fun{tms}}{1+\phi_{2n+1}} = \frac{1}{2}(2n - 1)(1+\phi_{2n+1})
+      \OB{\fun{tms}}{1+\phi_{2n+1}} = \frac{1}{2}(1+\phi_{2n+1})(2n - 1)
       + \frac{1}{2}.
       \label{eq:OBtms_succ_phi_2n_1}
     \end{equation}
