@@ -1065,7 +1065,7 @@ is \(p=1+\phi_k\).
     \tfrac{1}{2}S_{n+1} - 3(4^n-1) + \sum_{m=0}^{n-1}\phi_{2m+1}\),
     which simplifies into
     \begin{equation}
-      \OB{\fun{tms}}{\phi_{2n+1}} = \left(n - \frac{1}{2}\right)\phi_{2n+1}.
+      \OB{\fun{tms}}{\phi_{2n+1}} = \frac{1}{2}\phi_{2n+1}(2n - 1).
       \label{eq:OBtms_phi_2n_1}
     \end{equation}
     We have
@@ -1075,13 +1075,18 @@ is \(p=1+\phi_k\).
     \end{align*}
     where the last equality follows from~\eqref{eq:OBtms_phi_2n_1}.
     If, as we did for \(Q(\phi_{2n})\), we let \(f(x) :=
-    (1-x)\ln(1-1/x)\), then we have \(\OB{\fun{tms}}{\phi_{2n+1}} -
-    Q(\phi_{2n+1}) = f(4^n)/(3\ln 2)\). We know \(3\ln\tfrac{3}{4}
-    \leqslant f(x) < 1\), for \(x \geqslant 4\), therefore \(\lg 3 - 2
-    \leqslant \OB{\fun{tms}}{\phi_{2n+1}} - Q(\phi_{2n+1}) < 1/(3\ln
-    2)\), if \(n \geqslant 1\). Hence \(\boxed{0.4150 <
-      \smash{\OB{\fun{tms}}{\phi_{2n+1}}} - Q(\phi_{2n+1}) <
-      0.4809.}\)
+    (1-x)\ln(1-1/x)\), then we have
+    \begin{equation*}
+    \OB{\fun{tms}}{\phi_{2n+1}} - Q(\phi_{2n+1}) = f(4^n)/(3\ln 2).
+    \end{equation*}
+    We know \(3\ln\tfrac{3}{4} \leqslant f(x) < 1\), for \(x \geqslant
+    4\), therefore
+    \begin{equation*}
+      \lg 3 - 2 \leqslant \OB{\fun{tms}}{\phi_{2n+1}} -
+      Q(\phi_{2n+1}) < \frac{1}{3\ln 2},\; \text{if \(n \geqslant 1\)}.
+    \end{equation*}
+    Hence \(\boxed{0.4150 < \smash{\OB{\fun{tms}}{\phi_{2n+1}}} -
+      Q(\phi_{2n+1}) < 0.4809.}\)
 
     From theorem~\ref{thm:OB_lambda} and
     equation~\eqref{eq:OBtms_phi_2n_1}, we deduce
@@ -1096,16 +1101,16 @@ is \(p=1+\phi_k\).
                       &= \OB{\fun{tms}}{1+\phi_{2n+1}} - \frac{1}{2}
                          + \frac{1}{6}(1+2^{2n+1})\lg(1+1/2^{2n+1}),
     \end{align*}
-    the last step being a consequence
-    of~\eqref{eq:OBtms_succ_phi_2n_1}. If we let \(h(x) :=
-    \tfrac{1}{2} - \tfrac{1}{6}(1+x)\lg(1+1/x)\), then
+    from~\eqref{eq:OBtms_succ_phi_2n_1}. We deduce
     \(\OB{\fun{tms}}{1+\phi_{2n+1}} - Q(1+\phi_{2n+1}) =
-    h(2^{2n+1})\). Elementary analysis shows that \(5 - 3\lg 3
-    \leqslant h(x) < 1/2 - 1/(6\ln 2)\), for \(x \geqslant 8\), that
-    is, \(5 - 3\lg 3 \leqslant \OB{\fun{tms}}{1+\phi_{2n+1}} -
-    Q(1+\phi_{2n+1}) < 1/2 - 1/(6\ln 2)\), if \(n \geqslant 1\). So
-    \(\boxed{0.2450 < \smash{\OB{\fun{tms}}{1+\phi_{2n+1}}} -
-      Q(1+\phi_{2n+1}) < 0.2596.}\)
+    h(2^{2n+1})\), by letting \(h(x) := \tfrac{1}{2} -
+    \tfrac{1}{6}(1+x)\lg(1+1/x)\). Elementary analysis shows that \(5
+    - 3\lg 3 \leqslant h(x) < 1/2 - 1/(6\ln 2)\), for \(x \geqslant
+    8\), that is to say, \(5 - 3\lg 3 \leqslant
+    \OB{\fun{tms}}{1+\phi_{2n+1}} - Q(1+\phi_{2n+1}) < 1/2 - 1/(6\ln
+    2)\), if \(n \geqslant 1\). So \(\boxed{0.2450 <
+      \smash{\OB{\fun{tms}}{1+\phi_{2n+1}}} - Q(1+\phi_{2n+1}) <
+      0.2596.}\)
 
     \bigskip
     \textsl{Hence \(p = 1+\phi_{2m+1} = (1010\dots1011)_2\) minimises
@@ -1253,11 +1258,11 @@ bits etc. until the leftmost column containing \(n-2^{\floor{\lg
    = \sum_{k=0}^{\floor{\lg n}}{\!(n-2^k+1)}
    = (n + 1)(\floor{\lg n} + 1) - 2^{\floor{\lg n}+1} + 1.
 \end{equation*}
-Let \(n := (b_{m-1}\dots b_0)_2\), then \(2^{m-1} \leqslant n
-\leqslant 2^m - 1\) and \(2^{m-1} < 2^{m-1} + 1 \leqslant n + 1
-\leqslant 2^m\), so \(m-1 < \lg(n+1) \leqslant m\), that is, \(m =
-\ceiling{\lg(n+1)}\), which, with equation~\eqref{eq:e_r}
-\vpageref{eq:e_r}, proves
+Let express the binary representation of~\(n\): \(n := (b_{m-1}\dots
+b_0)_2\), then \(2^{m-1} \leqslant n \leqslant 2^m - 1\) and \(2^{m-1}
+< 2^{m-1} + 1 \leqslant n + 1 \leqslant 2^m\), so we have \(m-1 <
+\lg(n+1) \leqslant m\), that is, \(m = \ceiling{\lg(n+1)}\), which,
+with equation~\eqref{eq:e_r} \vpageref{eq:e_r}, establishes that
 \begin{equation*}
   1 + \floor{\lg n} = \ceiling{\lg(n+1)}.
 \end{equation*}
@@ -1279,15 +1284,14 @@ two cases arise:
     1\);
 
   \item otherwise, we have \(\ceiling{\lg n} = \floor{\lg n} + 1 = \lg
-    n - \{\lg n\} + 1\) and \(\OW{\fun{tms}}{n} = n\lg n + \theta(1 -
-    \{\lg n\}) \cdot n + 1\), with \(\theta(x) := x - 2^x\) and
-    \(\{x\} := x - \floor{x}\) is the \emph{fractional
+    n - \{\lg n\} + 1\) and then \(\OW{\fun{tms}}{n} = n\lg n +
+    \theta(1 - \{\lg n\}) \cdot n + 1\), with \(\theta(x) := x - 2^x\)
+    and \(\{x\} := x - \floor{x}\) is the \emph{fractional
     part}\index{fractional part@$\{x\}$|see{fractional
-        part}}\index{fractional part} of the real~\(x\), so \(0
-    \leqslant \{x\} < 1\). The derivative is \(\theta'(x) = 1 - 2^x\ln
-    2\); it has one root \(\theta'(x_0) = 0 \Leftrightarrow x_0 =
-    -\lg\ln 2\) and it is positive before~\(x_0\), and negative
-    after. Concordantly, \(\theta(x)\) reaches its maximum at~\(x_0\):
+        part}}\index{fractional part} of~\(x\) (\(0 \leqslant \{x\} <
+    1\)). The derivative \(\theta'(x) = 1 - 2^x\ln 2\) has one root:
+    \(\theta'(x_0) = 0\), that is \(x_0 = -\lg\ln 2\), and it is
+    positive before~\(x_0\), and negative after. Concordantly,
     \(\max_{0<x\leqslant 1}\theta(x) = \theta(x_0) =
     -(1+\ln\ln{2})/\!\ln{2} \simeq -0.9139\), and \(\min_{0<x\leqslant
       1}\theta(x) = \theta(1) = -1\). By injectivity, \(\theta(1) =
