@@ -1016,17 +1016,20 @@ is \(p=1+\phi_k\).
     with an application of~\eqref{eq:OBtms_phi_2n}. If we let \(f(x) := (1-x)
     \ln(1-1/x)\), then \(\OB{\fun{tms}}{\phi_{2n}} - Q(\phi_{2n}) =
     f(4^n)/(6\ln 2)\). Elementary analysis shows that
-    \(3\ln\tfrac{3}{4} \leqslant f(x) < 1\), for \(x \geqslant 4\),
+    \(3\ln(3/4) \leqslant f(x) < 1\), for \(x \geqslant 4\),
     that is,
     \begin{equation*}
       1 - \frac{1}{2}\lg 3 \leqslant
     \OB{\fun{tms}}{\phi_{2n}} - Q(\phi_{2n}) < \frac{1}{6\ln 2},\; \text{if \(n
       \geqslant 1\)}.
     \end{equation*}
-    This means that \(\boxed{0.2075 <
-    \smash{\OB{\fun{tms}}{\phi_{2n}}} - Q(\phi_{2n}) < 0.2405.}\)
-
-    From theorem~\ref{thm:OB_lambda} and
+    This means that
+    \begin{equation}
+      0.2075 < \smash{\OB{\fun{tms}}{\phi_{2n}}} - Q(\phi_{2n}) <
+      0.2405.
+      \label{ineq:OBtms_phi_2n}
+    \end{equation}
+    Now, from theorem~\ref{thm:OB_lambda} and
     equation~\eqref{eq:OBtms_phi_2n}, we have
     \begin{equation}
       \OB{\fun{tms}}{1+\phi_{2n}} = (1+\phi_{2n})(n-1) + 1.
@@ -1044,12 +1047,17 @@ is \(p=1+\phi_k\).
     elementary analysis entails the inequality \(2 - \lg 3 \leqslant
     g(x) < 1 - 1/(3\ln 2)\), when \(x \geqslant 4\), that is, \(2 -
     \lg 3 \leqslant g(4^n) < 1 - 1/(3\ln 2)\), for \(n \geqslant
-    1\). Approximately, \(\boxed{0.4150 <
-      \smash{\OB{\fun{tms}}{1+\phi_{2n}}} - Q(1+\phi_{2n}) <
-      0.5192.}\)
+    1\). Approximately,
+    \begin{equation}
+      0.4150 < \smash{\OB{\fun{tms}}{1+\phi_{2n}}} - Q(1+\phi_{2n}) <
+      0.5192.
+      \label{ineq:OBtms_1_phi_2n}
+    \end{equation}
 
-    \bigskip \textsl{Hence \(p=\phi_{2n} = (1010\dots01)_2\) minimises
-      \(\OB{\fun{tms}}{p} - \tfrac{1}{2}p\lg(\tfrac{3}{4}p)\).}
+    \bigskip \textsl{Comparing~\eqref{ineq:OBtms_phi_2n}
+      and~\eqref{ineq:OBtms_1_phi_2n} shows that \(p=\phi_{2n} =
+      (1010\dots01)_2\) minimises \(\OB{\fun{tms}}{p} -
+      \tfrac{1}{2}p\lg(\tfrac{3}{4}p)\).}
     \bigskip
 
   \item If \(k=2m+1\), then \(\phi_{2m+1} = 2^{2m-1} + \phi_{2m-1}\)
@@ -1060,10 +1068,9 @@ is \(p=1+\phi_k\).
       \OB{\fun{tms}}{\phi_{2m-1}} + \phi_{2m-1}\\
       &= \OB{\fun{tms}}{\phi_{2m-1}} - (2m-1)4^{m-1} + \phi_{2m-1}.
     \end{align*}
-    Summing both sides from \(m=1\) to \(m=n-1\) and
-    multiplying by~\(9\) yields \(9\OB{\fun{tms}}{\phi_{2n+1}} =
-    \tfrac{1}{2}S_{n+1} - 3(4^n-1) + \sum_{m=0}^{n-1}\phi_{2m+1}\),
-    which simplifies into
+    Summing both sides from \(m=1\) to \(m=n-1\) and multiplying
+    by~\(9\) yields \(9\OB{\fun{tms}}{\phi_{2n+1}} = S_{n+1}/2 -
+    3(4^n-1) + \sum_{m=0}^{n-1}\phi_{2m+1}\), which simplifies into
     \begin{equation}
       \OB{\fun{tms}}{\phi_{2n+1}} = \frac{1}{2}\phi_{2n+1}(2n - 1).
       \label{eq:OBtms_phi_2n_1}
@@ -1079,16 +1086,19 @@ is \(p=1+\phi_k\).
     \begin{equation*}
     \OB{\fun{tms}}{\phi_{2n+1}} - Q(\phi_{2n+1}) = f(4^n)/(3\ln 2).
     \end{equation*}
-    We know \(3\ln\tfrac{3}{4} \leqslant f(x) < 1\), for \(x \geqslant
+    We know \(3\ln(3/4) \leqslant f(x) < 1\), for \(x \geqslant
     4\), therefore
     \begin{equation*}
       \lg 3 - 2 \leqslant \OB{\fun{tms}}{\phi_{2n+1}} -
       Q(\phi_{2n+1}) < \frac{1}{3\ln 2},\; \text{if \(n \geqslant 1\)}.
     \end{equation*}
-    Hence \(\boxed{0.4150 < \smash{\OB{\fun{tms}}{\phi_{2n+1}}} -
-      Q(\phi_{2n+1}) < 0.4809.}\)
-
-    From theorem~\ref{thm:OB_lambda} and
+    Hence
+    \begin{equation}
+      0.4150 < \smash{\OB{\fun{tms}}{\phi_{2n+1}}} -
+      Q(\phi_{2n+1}) < 0.4809.
+      \label{ineq:OBtms_phi_2n_1}
+    \end{equation}
+    Now, from theorem~\ref{thm:OB_lambda} and
     equation~\eqref{eq:OBtms_phi_2n_1}, we deduce
     \begin{equation}
       \OB{\fun{tms}}{1+\phi_{2n+1}} = \frac{1}{2}(1+\phi_{2n+1})(2n - 1)
@@ -1106,15 +1116,24 @@ is \(p=1+\phi_k\).
     h(2^{2n+1})\), by letting \(h(x) := \tfrac{1}{2} -
     \tfrac{1}{6}(1+x)\lg(1+1/x)\). Elementary analysis shows that \(5
     - 3\lg 3 \leqslant h(x) < 1/2 - 1/(6\ln 2)\), for \(x \geqslant
-    8\), that is to say, \(5 - 3\lg 3 \leqslant
-    \OB{\fun{tms}}{1+\phi_{2n+1}} - Q(1+\phi_{2n+1}) < 1/2 - 1/(6\ln
-    2)\), if \(n \geqslant 1\). So \(\boxed{0.2450 <
-      \smash{\OB{\fun{tms}}{1+\phi_{2n+1}}} - Q(1+\phi_{2n+1}) <
-      0.2596.}\)
+    8\), that is to say,
+    \begin{equation*}
+      5 - 3\lg 3 \leqslant \OB{\fun{tms}}{1+\phi_{2n+1}} -
+      Q(1+\phi_{2n+1}) < \frac{1}{2} - \frac{1}{6\ln 2},\; \text{if
+        \(n \geqslant 1\)}.
+    \end{equation*}
+    So
+    \begin{equation}
+      0.2450 < \smash{\OB{\fun{tms}}{1+\phi_{2n+1}}} -
+      Q(1+\phi_{2n+1}) < 0.2596.
+      \label{ineq:OBtms_1_phi_2n_1}
+    \end{equation}
 
     \bigskip
-    \textsl{Hence \(p = 1+\phi_{2m+1} = (1010\dots1011)_2\) minimises
-    \(\OB{\fun{tms}}{p} - \tfrac{1}{2}p\lg p\).}
+    \textsl{From~\eqref{ineq:OBtms_phi_2n_1}
+      and~\eqref{ineq:OBtms_1_phi_2n_1}, \(p = 1+\phi_{2m+1} =
+      (1010\dots1011)_2\) minimises \(\OB{\fun{tms}}{p} -
+      \tfrac{1}{2}p\lg p\).}
 
 \end{itemize}
 Finally, we conclude that the lower bound in~\eqref{ineq:lower_Btms}
@@ -1443,13 +1462,13 @@ strictly increasing for \(p > 0\). Let us find \(\lim_{p \to
   +\infty}\Psi(p)\) by rewriting \(\Psi(p)\) as follows:
 \begin{align*}
 \Psi(p)
-  &= 2 - \frac{2}{p+2} + (2p+1)\lg(p+\tfrac{1}{2}) - (p+1)\lg(p+1)
+  &= 2 - \frac{2}{p+2} + (2p+1)\lg(p+1/2) - (p+1)\lg(p+1)
      - p\lg p\\
-  &= 2 - \frac{2}{p+2} + p\left(\lg(p+\tfrac{1}{2})^2 - \lg(p+1)
-   - \lg p\right) + \lg(p+\tfrac{1}{2})\\
+  &= 2 - \frac{2}{p+2} + p\left(\lg(p+1/2)^2 - \lg(p+1)
+   - \lg p\right) + \lg(p+1/2)\\
   &\phantom{=} \quad - \lg(p+1)\\
   &= 2 - \frac{2}{p+2} + p\lg\left(1 + \frac{1}{4p(p+1)}\right) +
-  \lg\frac{p + \myfrac{1}/{2}}{p+1}.
+  \lg\frac{p + 1/2}{p+1}.
 \end{align*}
 The limit of \(x\ln(1+1/x^2)\) as \(x \to +\infty\) can be found by
 changing \(x\)~into \(1/y\) and considering the limit as \(y \to
