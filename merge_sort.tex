@@ -861,7 +861,7 @@ hypothesis \(\pred{Low}{i}\), we have
 We need now to find \(a\)~and~\(b\) such that the inductive step
 \(\pred{L}{m+i}\) holds as well, that is,
 \(\tfrac{1}{2}(m+i)\lg(m+i) + a(m+i) + b \leqslant \B{}{m+i}\).
-Using~\eqref{ineq:Btms_n_i}, this is implied by
+Using~\eqref{ineq:Btms_n_i}, this inequality is implied by
 \begin{equation*}
 \frac{1}{2}(m+i)\lg(m+i) + a(m+i) + b
 \leqslant
@@ -1809,35 +1809,50 @@ sum in each tree of the non\hyp{}boxed terms is identical.
 \caption{Maximum-cost trees for \(n\)~odd and \(n+1\)}
 \label{fig:Wn_odd}
 \end{figure}
-     where the non\hyp{}boxed expressions sum
-     \(\OW{\fun{bms}}{n} - \sum_{k=0}^{q-1}\OW{\fun{bms}}{2^k} -
-     \sum_{k=2}^{q}2^k + 2((q-1)+(r-q+1)) = \OW{\fun{bms}}{n} -
-     \sum_{k=0}^{q-1}((k-1)2^{k}+1) - \sum_{k=2}^{q}2^k + 2r =
-     \OW{\fun{bms}}{n} - (q-1)2^q - q + 2r + 1\), using
-     equation~\eqref{eq:worst_power} and \(\sum_{k=0}^{q-1}k2^k =
-     (q-2)2^{q}+2\). Indeed, let \(S_{q} :=
-     \sum_{k=0}^{q-1}{k2^{k-1}}\). Then \(S_{q} + q2^{q-1} = \smash[t]{\sum_{k=1}^{q}{k2^{k-1}}} = \smash[t]{\sum_{k=0}^{q-1}{(k+1)2^{k}}}
-= \smash[t]{\sum_{k=0}^{q-1}{k2^{k}}} + \smash[t]{\sum_{k=0}^{q-1}{2^{k}}}
-= 2 \cdot S_{q} + 2^{q} - 1\), hence
-     \begin{equation}
-       \abovedisplayskip=4pt
-       \belowdisplayskip=4pt
-       S_{q} = \smash[t]{\textstyle\sum_{k=1}^{q-1}{k2^{k-1}}} = (q-2)2^{q-1} + 1.\label{eq:Sj}
-     \end{equation}
-     The same sum in \fig~\ref{fig:w2p1_succ}
-     equals \(\OW{\fun{bms}}{n+1} - \OW{\fun{bms}}{2^q} + (r-q+1) =
-     \OW{\fun{bms}}{n+1} - (q-1)2^{q} - q + r\). Equating the two
-     quantities and simplifying yields
-     \begin{equation*}
-       \OW{\fun{bms}}{n+1} = \OW{\fun{bms}}{n} + r + 1=
-       \OW{\fun{bms}}{n} + \nu_n.
-     \end{equation*}
-     Recalling the recurrences~\eqref{def:nu} \vpageref{def:nu} and
-     setting \(n=2k-1\), this equation is simplified into
-     \begin{equation}
-       \OW{\fun{bms}}{2k} = \OW{\fun{bms}}{2k-1} + \nu_{k-1} + 1.
-       \label{eq:OWbms_2k}
-     \end{equation}
+    where the non\hyp{}boxed expressions sum
+    \begin{multline*}
+      \OW{\fun{bms}}{n} - \sum_{k=0}^{q-1}\OW{\fun{bms}}{2^k} -
+      \sum_{k=2}^{q}2^k + 2((q-1)+(r-q+1))\\
+      \begin{aligned}
+        & = \OW{\fun{bms}}{n} - \sum_{k=0}^{q-1}((k-1)2^{k}+1)
+        - \sum_{k=2}^{q}2^k + 2r\\
+        & = \OW{\fun{bms}}{n} - (q-1)2^q - q + 2r + 1,
+      \end{aligned}
+    \end{multline*}
+    using equation~\eqref{eq:worst_power} and \(\sum_{k=0}^{q-1}k2^k =
+    (q-2)2^{q}+2\). Indeed, let \(S_{q} :=
+    \sum_{k=0}^{q-1}{k2^{k-1}}\). Then
+    \begin{align*}
+      S_{q} + q2^{q-1} & = \smash[t]{\sum_{k=1}^{q}{k2^{k-1}}}
+      = \smash[t]{\sum_{k=0}^{q-1}{(k+1)2^{k}}} \\
+      & = \smash[t]{\sum_{k=0}^{q-1}{k2^{k}}} + \smash[t]{\sum_{k=0}^{q-1}{2^{k}}}
+      = 2 \cdot S_{q-1} + 2^{q} - 1,
+    \end{align*}
+    hence
+    \begin{equation}
+      \abovedisplayskip=4pt
+      \belowdisplayskip=4pt
+      S_{q} = \smash[t]{\textstyle\sum_{k=1}^{q-1}{k2^{k-1}}} =
+      (q-2)2^{q-1} + 1.
+      \label{eq:Sj}
+    \end{equation}
+    The same sum in \fig~\ref{fig:w2p1_succ}
+    equals
+    \begin{equation*}
+      \OW{\fun{bms}}{n+1} - \OW{\fun{bms}}{2^q} + (r-q+1) =
+      \OW{\fun{bms}}{n+1} - (q-1)2^{q} - q + r.
+    \end{equation*}
+    Equating the two quantities and simplifying yields
+    \begin{equation*}
+      \OW{\fun{bms}}{n+1} = \OW{\fun{bms}}{n} + r + 1=
+      \OW{\fun{bms}}{n} + \nu_n.
+    \end{equation*}
+    Recalling the recurrences~\eqref{def:nu} \vpageref{def:nu} and
+    setting \(n=2k-1\), this equation is simplified into
+    \begin{equation}
+      \OW{\fun{bms}}{2k} = \OW{\fun{bms}}{2k-1} + \nu_{k-1} + 1.
+      \label{eq:OWbms_2k}
+    \end{equation}
 
 \end{itemize}
 From equations~\eqref{eq:OWbms_2k} and~\eqref{eq:OWbms_2k_1}, we deduce
@@ -1997,9 +2012,9 @@ x_0\) and positive if \(x > x_0\).
 \end{enumerate}
 Before we study these two cases in detail, we need a small reminder
 about cubic polynomials. Let \(\rho_0\), \(\rho_1\) and~\(\rho_2\) be
-the roots of \(P(x) = ax^3 + bx^2 + cx + d\). So \(P(x) =
-a(x-\rho_0)(x-\rho_1)(x-\rho_2) = ax^3 - a(\rho_0+\rho_1+\rho_2)x^2 +
-a(\rho_0\rho_1 + \rho_0\rho_2 + \rho_1 \rho_2)x -
+the roots of the polynomial \(P(x) = ax^3 + bx^2 + cx + d\). So \(P(x)
+= a(x-\rho_0)(x-\rho_1)(x-\rho_2) = ax^3 - a(\rho_0+\rho_1+\rho_2)x^2
++ a(\rho_0\rho_1 + \rho_0\rho_2 + \rho_1 \rho_2)x -
 a(\rho_0\rho_1\rho_2)\), so \(\rho_0\rho_1\rho_2 = -d/a\).
 \begin{enumerate}
 
@@ -2044,7 +2059,7 @@ a(\rho_0\rho_1\rho_2)\), so \(\rho_0\rho_1\rho_2 = -d/a\).
 \end{enumerate}
 In any case, we need to minimise \(\Psi(p,2^p)\). We have:
 \begin{equation*}
-\Psi(p,2^p) = - \frac{1}{2^p+1} - \sum_{k=0}^{p}\frac{1}{2^k+1}.
+  \Psi(p,2^p) = - \frac{1}{2^p+1} - \sum_{k=0}^{p}\frac{1}{2^k+1}.
 \end{equation*}
 We check that \(\Psi(p,2^p) > \Psi(p+1,2^{p+1})\), so the function
 decreases for integer points and \(a_{\max} = \min_{p > 0}\Psi(p,2^p)
