@@ -2728,7 +2728,8 @@ But, since \(\OW{\fun{tms}}{1} = \OW{\fun{bms}}{1} = 0\), the
 inequality is actually an equality.\index{tms@$\OW{\fun{tms}}{n}$}
 \begin{equation*}
 \boxed{\OW{\fun{bms}}{n} = \OW{\fun{tms}}{n} + n - \ceiling{\lg n} - 1
-  \Leftrightarrow n=1 \;\text{or}\; n=2^p+1.}
+  \Leftrightarrow n=1 \;\text{or}\; n=2^p+1, \text{with \(p \geqslant
+    0\)}.}
 \end{equation*}
 
 \paragraph{Program}
@@ -2831,10 +2832,10 @@ make three cases: \((2p,2q)\), \((2p,2q+1)\) and \((2p+1,2q+1)\).
       \OM{\fun{tms}}{p+q} \leqslant \OM{\fun{tms}}{p} +
       \OM{\fun{tms}}{q} + p + q - \frac{p}{q+1} - \frac{q}{p+1}.
     \end{equation*}
-    Therefore, \(\tfrac{1}{2}r \geqslant \OM{\fun{tms}}{p+q} + p + q -
+    Therefore, \(r/2 \geqslant \OM{\fun{tms}}{p+q} + p + q -
     2 + \tfrac{q+1}{p+1} + \tfrac{p+1}{q+1} - \tfrac{p}{2q+1} -
     \tfrac{q}{2p+1}\). If the right\hyp{}hand side is greater than or
-    equal to \(\tfrac{1}{2}\OM{\fun{tms}}{m+n}\), then
+    equal to \(\OM{\fun{tms}}{m+n}/2\), then
     \(\pred{T}{m,n}\) is proved. In other words, we need to prove
     \begin{equation*}
       \frac{p+1}{q+1} + \frac{q+1}{p+1} \geqslant 1 +
@@ -2995,13 +2996,16 @@ bounds on \(\OM{\fun{bms}}{n}\) in~\eqref{ineq:bounds_Mbms}
 \begin{equation*}
 (n^2 + 13n - \ln 2n + 10)/8 < \M{\fun{i2wb}}{n} < (n^2 + 13n - \ln 2n + 17)/8.
 \end{equation*}
-where \(\alpha \simeq 1.2645\) and \(\ceiling{x} < x + 1\).
-
-Hence, \((n+2)\lg n + 1.236n + 1.529 < (n^2 + 13n - \ln 2n + 10)/8\)
+where \(\alpha \simeq 1.2645\) and \(\ceiling{x} < x + 1\). Hence,
+\begin{equation*}
+  (n+2)\lg n + 1.236n + 1.529 < (n^2 + 13n - \ln 2n + 10)/8
+\end{equation*}
 implies \(\M{\fun{bms\(_0\)}}{n} < \M{\fun{i2wb}}{n}\), and also
-\((n^2 + 13n - \ln 2n + 17)/8 < (n+2)\lg n + 0.152n + 0.69\) implies
-\(\M{\fun{i2wb}}{n} < \M{\fun{bms\(_0\)}}{n}\). With the help of a
-computer algebra system, we find that
+\begin{equation*}
+  (n^2 + 13n - \ln 2n + 17)/8 < (n+2)\lg n + 0.152n + 0.69
+\end{equation*}
+implies \(\M{\fun{i2wb}}{n} < \M{\fun{bms\(_0\)}}{n}\). With the help
+of a computer algebra system, we find that
 \begin{enumerate}
 
   \item \(\M{\fun{i2wb}}{n} < \M{\fun{bms\(_0\)}}{n}\) if \(3
@@ -3307,22 +3311,27 @@ for \(\sum_{j=1}^{p}\rho_j\) if we think of the carry propagation and
 the number of~\(1\)-bits when adding~\(1\) to a binary number (since
 \(j\)~ranges over successive integers). This amounts to finding a
 relationship between \(\rho_j\), \(\rho_{j+1}\), \(\nu_j\) and
-\(\nu_{j+1}\). Let us assume that \(2n+1 = (\Xi 01^a)_2\), where
-\(\Xi\)~is an arbitrary bit string and \((1^a)_2\)~is a 1-bit string
-of length~\(a\). Then \(\nu_{2n+1} = \nu_{\Xi} + a\) and \(\rho_{2n+1}
-= 0\). The next integer is \(2n+2 = (\Xi 10^a)_2\), so \(\nu_{2n+2} =
-\nu_{\Xi} + 1\) and \(\rho_{2n+2} = a\). Now, we can relate
-\(\rho\)~and~\(\nu\) by means of~\(a\):
-\begin{equation*}
-  \rho_{2n+2} = \nu_{2n+1} - \nu_{\Xi} = \nu_{2n+1} - (\nu_{2n+2} - 1)
-  = 1 + \nu_{2n+1} - \nu_{2n+2}.
-\end{equation*}
-We can check now that the same pattern also works
-for~\(\rho_{2n+1}\) by simply using the definitions of
-\(\rho\)~and~\(\nu\): \(\rho_{2n+1} = 1 + \nu_{2n} -
-\nu_{2n+1}\). This achieves to establish, for any integer \(n>0\),
-that \(\rho_n = 1 + \nu_{n-1} - \nu_{n}\). Summing on both sides
-yields
+\(\nu_{j+1}\).
+\begin{itemize}
+
+  \item Let us assume that \(2n+1 = (\Xi 01^a)_2\), where \(\Xi\)~is
+    an arbitrary bit string and \((1^a)_2\)~is a 1-bit string of
+    length~\(a\). Then \(\nu_{2n+1} = \nu_{\Xi} + a\) and
+    \(\rho_{2n+1} = 0\).
+
+  \item Otherwise, \(2n+2 = (\Xi 10^a)_2\), so \(\nu_{2n+2} =
+    \nu_{\Xi} + 1\) and \(\rho_{2n+2} = a\). Now, we can relate
+    \(\rho\)~and~\(\nu\) by means of~\(a\):
+    \begin{equation*}
+      \rho_{2n+2} = \nu_{2n+1} - \nu_{\Xi} = \nu_{2n+1} - (\nu_{2n+2} - 1)
+      = 1 + \nu_{2n+1} - \nu_{2n+2}.
+    \end{equation*}
+    We can check now that the same pattern also works
+    for~\(\rho_{2n+1}\) by simply using the definitions of
+    \(\rho\)~and~\(\nu\): \(\rho_{2n+1} = 1 + \nu_{2n} - \nu_{2n+1}\).
+\end{itemize}
+This achieves to establish, for any integer \(n>0\), that \(\rho_n = 1
++ \nu_{n-1} - \nu_{n}\). Summing on both sides yields
 \begin{equation*}
 \sum_{j=1}^{p}{\rho_j} = p - \nu_p.
 \end{equation*}

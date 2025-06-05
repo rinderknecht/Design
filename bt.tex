@@ -196,23 +196,23 @@ of~\(t\). From the definition of \fun{pre\(_0\)/1}, we deduce
 \end{equation*}
 where \(p\)~is the size of~\(t_1\). So \(\C{\fun{pre}_0}{n+1} =
 \C{\fun{pre}_0}{p} + \C{\fun{pre}_0}{n-p} + p + 2\). This recurrence
-belongs to a class called \emph{divide and conquer}
-\index{design!big-step $\sim$} \index{divide and conquer|see{design,
-    big-step $\sim$}} because it springs from strategies which
-consists in splitting the input (here, of size \(n+1\)), recursively
-applying the relevant solving strategy to the smaller parts (here, of
-sizes~\(p\) and \(n-p\)) and finally combining the solutions of the
-parts into a solution of the partition. The extra cost incurred by
-combining smaller solutions (here, \(p+2\)) is called the
-\emph{toll}\index{toll} and the closed form and asymptotic behaviour
-of the solution to the recurrence crucially depends upon its kind.
+belongs to a class that is an instance of the \emph{divide and
+conquer} principle\index{design!big-step $\sim$}\index{divide and conquer|see{design, big-step $\sim$}} because it springs from
+strategies which consists in splitting the input (here, of size
+\(n+1\)), recursively applying the relevant solving strategy to the
+smaller parts (here, of sizes~\(p\) and \(n-p\)) and finally combining
+the solutions of the parts into a solution of the partition. The extra
+cost incurred by combining smaller solutions (here, \(p+2\)) is called
+the \emph{toll}\index{toll} and the closed form and asymptotic
+behaviour of the solution to the recurrence crucially depends upon its
+kind.
 
 In another context (see page~\pageref{big-step}), we,
 idiosyncratically, called this strategy \emph{big\hyp{}step design}
 \index{design!big-step $\sim$} because we wanted a convenient way to
 contrast it with another sort of modelling which we called
 \emph{small\hyp{}step design}.\index{design!small-step $\sim$} As a
-consequence, we already have seen instances of `divide and conquer,'
+consequence, we already have seen instances of `divide and conquer',
 for example, in the case of merge sort\index{merge sort} in
 chapter~\vref{chap:merge_sort}, which often epitomises the concept
 itself.
@@ -398,9 +398,9 @@ instead, a stack replaces the original parameter, and it does not
 contain partial results, but pieces of the original tree from which to
 pick internal nodes easily (the root of the first tree) in the
 expected order. An example is given in \fig~\vref{fig:pre3_abcde},
-\begin{figure}[!b]
+\begin{figure}[!t]
 \centering
-\includegraphics[bb=71 650 374 710]{pre3_abcde_0} %[... ... ... 723]
+\includegraphics[bb=71 650 374 713]{pre3_abcde_0} %[... ... ... 723]
 \includegraphics[bb=71 668 306 721]{pre3_abcde_1}
 \includegraphics{pre3_abcde_2}
 \caption{A preorder traversal with \fun{pre\(_4\)/1}}
@@ -522,7 +522,9 @@ contents of the nodes are pushed in the proper order: \(\fun{pre}(t)
 \rightarrow \fun{pre}(t,\el)\).\index{pre@\fun{pre/2}} Now, we should
 wonder what the interpretation of this accumulator\index{functional
   language!accumulator} is when considering the pattern
-\(\fun{pre}(t,s)\). Let us have a look at the internal node
+\(\fun{pre}(t,s)\).
+
+Let us have a look at the internal node
 \(t=\fun{int}(x,t_1,t_2)\) in \fig~\vref{fig:pre_tree}.
 \begin{figure}
 \centering
@@ -538,9 +540,8 @@ wonder what the interpretation of this accumulator\index{functional
 The arrows evince the traversal in the tree and connect different
 stages of the preorder stack: a downwards arrow points to the argument
 of a recursive call on the corresponding child; an upward arrow points
-to the result of the call on the parent.
-
-For instance, the subtree~\(t_2\) corresponds to the recursive call
+to the result of the call on the parent. For instance, the
+subtree~\(t_2\) corresponds to the recursive call
 \(\fun{pre}(t_2,s)\)\index{pre@\fun{pre/2}} whose value is
 named~\(s_1\). Likewise, we have \(\fun{pre}(t_1,s_1)
 \twoheadrightarrow s_2\), which is therefore equivalent to
@@ -550,9 +551,9 @@ the root is associated with the evaluation \(\fun{pre}(t,s)
 equivalence \(\fun{pre}(t,s) \equiv
 \cons{x}{\fun{pre}(t_1,\fun{pre}(t_2,s))}\).\index{pre@\fun{pre/2}}
 The rule for external nodes is not shown and simply consists in
-letting the stack invariant. We can finally write the functional
+letting the stack invariant. Finally we have the functional
 program in \fig~\vref{fig:pre}.
-\begin{figure}[b]
+\begin{figure}[h]
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}c@{\;}l}
