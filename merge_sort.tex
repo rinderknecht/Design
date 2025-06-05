@@ -2575,14 +2575,15 @@ To prove it, we have two complementary cases to analyse:
 \begin{itemize}
 
   \item \(i=2^q\), with \(0 \leqslant q < p\). Then \(\lg i = q\) and
-  equation~\eqref{conj} is equivalent to \((p-q)2^q \leqslant 2^p -
-  2^q\), that is
-  \begin{equation}
-   p-q \leqslant 2^{p-q} - 1.\label{conj0}
-  \end{equation}
-  Let \(f(x) := 2^x - x - 1\), with \(x > 0\). We have \(f(0) = f(1) =
-  0\) and \(f(x) > 0\) for \(x>1\), so the inequality~\eqref{conj0}
-  holds and is tight if, and only if, \(x=1\), that is, \(q=p-1\).
+    equation~\eqref{conj} is equivalent to \((p-q)2^q \leqslant 2^p -
+    2^q\), that is
+    \begin{equation}
+      p-q \leqslant 2^{p-q} - 1.\label{conj0}
+    \end{equation}
+    Let \(f(x) := 2^x - x - 1\), with \(x > 0\). We have \(f(0) = f(1)
+    = 0\) and \(f(x) > 0\) for \(x>1\), so the
+    inequality~\eqref{conj0} holds and is tight if, and only if,
+    \(x=1\), that is, \(q=p-1\).
 
   \item \(i = 2^q + j\), with \(0 \leqslant q < p\) and \(0 < j <
     2^q\). Then \(\floor{\lg i} = q = \ceiling{\lg i} - 1\) and
@@ -2606,8 +2607,8 @@ To prove it, we have two complementary cases to analyse:
 \end{itemize}
 
 Let us find now the shape of~\(n\) when \(\pred{W\(_L\)}{n}\) is
-tight. We proved above that if \(q=p-1\), that is, the binary notation
-of~\(n\) starts with two 1-bits, formally written as
+tight. We proved above that, if \(q=p-1\), that is, the binary
+notation of~\(n\) starts with two 1-bits, f ormally written as
 \((11(0+1)^*)_2\), then the following inequality holds:
 \begin{equation*}
 \OW{\fun{tms}}{2^p+i} =
@@ -2615,31 +2616,32 @@ of~\(n\) starts with two 1-bits, formally written as
 \OW{\fun{tms}}{2^p} + \OW{\fun{bms}}{i} + 2^p + i - 1 =
 \OW{\fun{bms}}{2^p+i}.
 \end{equation*}
-The inequality is tight: \(\OW{\fun{tms}}{2^p+i} =
-\OW{\fun{bms}}{2^p+i}\), if, and only if, \(\OW{\fun{bms}}{i} =
-\OW{\fun{tms}}{i}\). \index{bms@$\OW{\fun{bms}}{n}$}
+This inequality is tight: \(\OW{\fun{tms}}{2^p+i} =
+\OW{\fun{bms}}{2^p+i} \Leftrightarrow \OW{\fun{tms}}{i} =
+\OW{\fun{bms}}{i}\). \index{bms@$\OW{\fun{bms}}{n}$}
 \index{tms@$\OW{\fun{tms}}{n}$}
 
 Using the case analysis above, if \(i = 2^q + j\), we have
 \(\OW{\fun{tms}}{2^p+i} = \OW{\fun{bms}}{2^p+i}\), if, and only if,
 \(\OW{\fun{tms}}{2^{p-1}+j} = \OW{\fun{bms}}{2^{p-1}+j}\). These
 equivalences can be repeated, yielding two strictly decreasing
-sequences of positive integers, \(2^p+i > 2^{p-1}+j > 2^{p-2}+k >
-\dots\) and \(i > j > k > \dots\) The end of the latter recursive
-descent is simply~\(0\), which means that the former stops at a power
-of~\(2\), for which we know equation~\eqref{eq:2p}. In other words,
-the binary representation of~\(n\) is made of a series of one or more
-1-bits (from \(2^p\), \(2^{p-1}\), \(2^{p-2}\), \ldots), possibly
-followed by successive 0-bits, which we formally write
-\(n=(1^+0^*)_2\). This means that \(n\)~is the difference between two
-powers of~\(2\):
-\begin{equation}
-\boxed{\OW{\fun{bms}}{n} = \OW{\fun{tms}}{n} \Leftrightarrow n=2^p - 2^q.}
-\label{eq:Wbms_eq_Wtms}
-\end{equation}
+sequences of positive integers, that is, \(2^p+i > 2^{p-1}+j >
+2^{p-2}+k > \dots\) and \(i > j > k > \dots\) The end of the latter
+recursive descent is simply~\(0\), which means that the former stops
+at a power of~\(2\), for which we know equation~\eqref{eq:2p}. In
+other words, the binary representation of~\(n\) is made of a series of
+one or more 1-bits (from \(2^p\), \(2^{p-1}\), \(2^{p-2}\), \ldots),
+possibly followed by successive 0-bits, which we formally write
+\(n=(1^+0^*)_2\), that is, \(n\)~is the difference between two powers
+of~\(2\). Moreover, recalling that \(\OW{\fun{bms}}{2^q} =
+\OW{\fun{tms}}{2^q}\), we have established
+\begin{equation*}
+\boxed{\OW{\fun{bms}}{n} = \OW{\fun{tms}}{n} \Leftrightarrow n=2^q \;
+  \text{or} \; n=2^p - 2^q, \text{with \(p > q \geqslant 0\)}.}
+\end{equation*}
 Note that if \(n=2^p-1\), the number of unbalanced mergers,
 bottom\hyp{}up, is maximum, and the maximum costs are the same in both
-variants. Also, the case \(n=2^p\) minimises both maximum costs.
+variants.
 
 \paragraph{Upper bound}
 
