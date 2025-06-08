@@ -26,12 +26,12 @@ different ways.
 
 % Wrapping figure better declared before a paragraph
 %
-\begin{wrapfigure}[10]{r}[0pt]{0pt}
-% [10] vertical lines
+\begin{wrapfigure}[9]{r}[0pt]{0pt}
+% [9] vertical lines
 % {r} mandatory right placement
 % [0pt] of margin overhang
 \centering
-\includegraphics[bb=71 646 160 712]{catalan_tree}
+\includegraphics[bb=71 646 160 702]{catalan_tree}
 \caption{Catalan tree of height~4}
 \label{fig:catalan_tree}
 \end{wrapfigure}
@@ -42,10 +42,10 @@ trees is the distinction of a node, called the \emph{root}, and the
 absence of cycles, that is, closed paths made of nodes successively
 connected. Catalan trees are often called \emph{ordered trees}, or
 \emph{planted plane trees}, in graph theory, and \emph{unranked
-  trees}, or \emph{\(n\)-ary trees} in programming theory. An example
-is given in \fig~\ref{fig:catalan_tree}. Note how the root is the
-topmost node and has four subtrees, whose root are called
-\emph{children}, given in order. The nodes drawn as white disks
+trees}, \emph{\(n\)-ary trees}, or \emph{rose trees} in programming
+theory. An example is given in \fig~\ref{fig:catalan_tree}. Note how
+the root is the topmost node and has four subtrees, whose root are
+called \emph{children}, given in order. The nodes drawn as white disks
 \((\circ)\) make up a maximal path starting from the root (the number
 of nodes along it is maximal). The ending node has no children; there
 are actually~\(8\) such nodes in total, called the \emph{leaves}. The
@@ -234,7 +234,8 @@ level~\(0\).
 \subfloat[Catalan tree\label{fig:ctree_deg}]{%
 \includegraphics[bb=65 663 127 721]{ctree_deg}
 }
-\caption{Degree-based bijection}\label{fig:degree_based_bijection}
+\caption{Degree-based bijection}
+\label{fig:degree_based_bijection}
 \end{figure}
 %%\end{wrapfigure}
 The first step of our method for finding the average path length
@@ -349,11 +350,10 @@ new root is of degree \(2l+d\) and there are \(n+l\)
 edges. Importantly, the transformation can be inverted for any tree
 (it is injective and surjective), so it is indeed a bijection. We
 deduce
-\begin{equation}
+\begin{equation*}
 \mathcal{N}_n(l,d) = \frac{2l+d}{2n-d}\binom{2n-d}{n+l}
 = \binom{2n-d-1}{n+l-1} - \binom{2n-d-1}{n+l},
-\label{eq:Nn_l_d}
-\end{equation}
+\end{equation*}
 where the last step follows from expressing the binomial coefficient
 in terms of the factorial function. In particular, this entails that
 the total number of nodes at level~\(l\) in all Catalan trees with
@@ -453,7 +453,7 @@ Setting \(x=y=1\) yields the identity \(2^n =
 \Expected{P_n} = \frac{n+1}{2}\left[4^{n}\binom{2n}{n}^{-1} - 1\right].
 \label{eq:EPn}
 \end{equation}
-Recalling \eqref{eq:Cn} \vpageref{eq:Cn}, we obtain the asymptotic
+Recalling~\eqref{eq:Cn} \vpageref{eq:Cn}, we obtain the asymptotic
 expansion:
 \begin{equation}
 \Expected{P_n} \sim \frac{1}{2}n\sqrt{\pi n}.
@@ -510,7 +510,7 @@ and
   \frac{1}{4}n\sqrt{\pi n}.
 \label{eq:EIn}
 \end{equation}
-Moreover, formulas \eqref{eq:EPn}, \eqref{eq:EEn} and~\eqref{eq:EIn}
+Finally, formulas \eqref{eq:EPn}, \eqref{eq:EEn} and~\eqref{eq:EIn}
 entail
 \begin{equation*}
 \Expected{I_n} \sim \Expected{E_n} \sim \frac{1}{2}\Expected{P_n}.
@@ -527,38 +527,38 @@ that is, an internal node (non\hyp{}leaf), therefore, leaves and
 non\hyp{}leaves are equinumerous and, since their total number is
 \(n+1\), the average number of leaves is \((n+1)/2\).
 
-This fact has an interesting consequence for the programming of
-algorithms on Catalan trees, in particular, the data
-structure. Indeed, a first idea would be to use a data constructor
-\fun{tree} with a pair argument, whose first component is the data
-stored at the root and the second component is the list of the
-subtrees, for instance \(\fun{tree}(0,[\fun{tree}(1,\el),
-\fun{tree}(2,\el)])\) denotes a tree with a root~\(0\), and two
-leaves, \(1\)~and~\(2\). Note how leaves are uniquely distinguished by
-an empty list of subtrees, which makes function definitions by case
-easy because only two cases are enough to cover all
-configurations. The downside becomes apparent when implementing the
-algorithms in a real functional language, because storing a list means
-having an indirection to the heap, where the contents of the list is
-actually laid out. Therefore, with the previous encoding of Catalan
-trees, each leaf means one indirection and no contents, which may seem
-wasteful. If we assume that the Catalan trees to be processed are
-random, the question boils down to determining the average number of
-leaves, which we happily know now to be half of the nodes. In other
-words, \(50\%\) of the nodes are represented in memory with an
-indirection without contents. An alternative encoding consists in
-using lists only if they contain at least one subtree, that is, only
-for inner nodes, and leaves would be represented by a constructor
-without list. The previous example would be thus rewritten:
-\(\fun{inner}(0,[\fun{leaf}(1),\fun{leaf}(2)])\). This is not quite
-right, because we could inadvertently write \(\fun{inner}(0,\el)\),
-which is incorrect. Instead, we need to define a data structure for
-encoding non\hyp{}empty lists, like so: \(\fun{single}(x)\), for the
-singleton list containing~\(x\), and \(\fun{many}(x,l)\), for lists
-containing at least two items, the first being~\(x\) and the remaining
-ones being found in the sublist~\(l\). Consequently, the previous
-example is now correctly written as
-\(\fun{inner}(0,\fun{many}(\fun{leaf}(1),\fun{single}(\fun{leaf}(2))))\).
+%% This fact has an interesting consequence for the programming of
+%% algorithms on Catalan trees, in particular, the data
+%% structure. Indeed, a first idea would be to use a data constructor
+%% \fun{tree} with a pair argument, whose first component is the data
+%% stored at the root and the second component is the list of the
+%% subtrees, for instance \(\fun{tree}(0,[\fun{tree}(1,\el),
+%%   \fun{tree}(2,\el)])\) denotes a tree with a root~\(0\) and two
+%% leaves, \(1\)~and~\(2\). Note how leaves are uniquely distinguished by
+%% an empty list of subtrees, which makes function definitions by case
+%% easy because only two cases are enough to cover all
+%% configurations. The downside becomes apparent when implementing the
+%% algorithms in a real functional language, because storing a list means
+%% having an indirection to the heap, where the contents of the list is
+%% actually laid out. Therefore, with the previous encoding of Catalan
+%% trees, each leaf means one indirection and no contents, which may seem
+%% wasteful. If we assume that the Catalan trees to be processed are
+%% chosen uniformly at random, the question boils down to determining the
+%% average number of leaves, which we happily know now to be half of the
+%% nodes. In other words, \(50\%\) of the nodes are represented in memory
+%% with an indirection without contents. An alternative encoding consists
+%% in using lists only if they contain at least one subtree, that is,
+%% only for inner nodes, and leaves would be represented by a constructor
+%% without list. The previous example would be thus rewritten:
+%% \(\fun{inner}(0,[\fun{leaf}(1),\fun{leaf}(2)])\). This is not quite
+%% right, because we could inadvertently write \(\fun{inner}(0,\el)\),
+%% which is incorrect. Instead, we need to define a data structure for
+%% encoding non\hyp{}empty lists, like \(\fun{single}(x)\) for the
+%% singleton list containing~\(x\), and \(\fun{many}(x,l)\), for lists
+%% containing at least two items, the first being~\(x\) and the remaining
+%% ones being found in the sublist~\(l\). Consequently, the previous
+%% example is now correctly written as
+%% \(\fun{inner}(0,\fun{many}(\fun{leaf}(1),\fun{single}(\fun{leaf}(2))))\).
 
 For further reading, we recommend the papers by
 \citet*{DershwowitzZaks_1980,DershowitzZaks_1981,DershowitzZaks_1990}.
@@ -575,10 +575,10 @@ tree reduced to a single leaf has height~\(0\).
 We begin with the key observation that a Catalan tree with \(n\)~edges
 and height~\(h\) is in bijection with a Dyck path of length~\(2n\) and
 height~\(h\) (see \fig~\vref{fig:catalan_tree} and
-\fig~\ref{fig:bijection}). This simple fact allows us to reckon on the
+\fig~\ref{fig:bijection}). This simple fact allows us to reason on the
 height of the Dyck paths and transfer the result back to Catalan
-trees. We have already seen the correspondence between lattice paths
-and Catalan trees, in which a rise reaching the $l$th diagonal
+trees. Indeed, we have already seen the correspondence between lattice
+paths and Catalan trees, in which a rise reaching the $l$th diagonal
 corresponds to a node at level~$l$ in the tree, counting levels from
 root level~$0$. A simple bijection between paths will show that for
 every node on level~$l$ of a tree of height~$h$ and size~$n$, there is
@@ -592,7 +592,7 @@ Consider the Dyck path in~\Fig~\ref{fig:h},
 \caption{A Dyck path of length~\(2n\) and height~\(h\)}
 \label{fig:h}
 \end{figure}
-in bijection with a tree with~\(n=8\) edges and height~\(h=3\). Let us
+in bijection with a tree with \(n=8\) edges and height \(h=3\). Let us
 find the last (rightmost) point on the path where it reaches its full
 height (the dotted line of equation \(y = x + h\)), which we call the
 \emph{apex} of the path (marked~$A$ in the figure). The immediately
@@ -616,11 +616,11 @@ depending on whether it was to the left (segment before~$A$) or right
 (segment after~$B$) of the apex.  In the example in the figure, the
 rise~$a$ reaches level~$1$, and its counterpart after the
 transformation rises to level \(3-1+1=3\); the rise~$b$ reached
-level~$2$ and still does so because \(3-2+1=2\); the rise~$c$ also
-reached level~$2$, but because it was to the right of the apex, it
-reaches now level \(3-2=1\). It follows from this bijection that
+level~$2$ and still does so after because \(3-2+1=2\); the rise~$c$
+also reached level~$2$, but because it was to the right of the apex,
+it reaches now level \(3-2=1\). It follows from this bijection that
 \emph{the average height is within one of twice the average level of a
-  node, that is, the average path length}. Equation~\eqref{eq:EPn} is
+node, that is, the average path length}. Equation~\eqref{eq:EPn} is
 equivalent to
 \begin{equation*}
 2\frac{\Expected{P_n}}{n+1} = 4^{n}\binom{2n}{n}^{-1} - 1.
