@@ -97,7 +97,7 @@ in the case of rule~\(\gamma\), the substructures of
 \(\fun{flat}(t)\), we obtain a new version,
 \fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}}, in
 \fig~\vref{fig:flat0}.
-\begin{figure}[b]
+\begin{figure}
 \begin{equation*}
 \boxed{%
 \begin{array}{r@{\;}l@{\;}l}
@@ -116,8 +116,7 @@ in the case of rule~\(\gamma\), the substructures of
 \end{figure}
 
 Let us consider an example in \fig~\vref{fig:flat0_ex}, where the call
-to be rewritten next is underlined in case of ambiguity. (We underline
-the call that is rewritten.)
+to be rewritten next is underlined in case of ambiguity.
 \begin{figure}
 \begin{equation*}
 \boxed{%
@@ -156,8 +155,9 @@ call: in our example, we delayed the evaluation of
 calls to \fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}}. When
 deriving complicated recurrences or traces, we may try instead
 counting the number of times each rule is used in any
-evaluation. Calling \fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}}
-yields
+evaluation.
+
+Calling \fun{flat\(_0\)/1}\index{flat0@\fun{flat$_0$/1}} yields
 \begin{itemize*}
 
   \item using rule~\(\omega\) once for each empty stack originally in
