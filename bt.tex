@@ -457,8 +457,7 @@ the cost by not visiting the external nodes, as shown in
 \end{figure}
 We then have
 \begin{equation*}
-\C{\fun{pre}_5}{n} = \C{\fun{pre}_3}{n} - (n+1) = n +
-2.
+\C{\fun{pre}_5}{n} = \C{\fun{pre}_3}{n} - (n+1) = n + 2.
 \end{equation*}
 \index{pre6@\fun{pre\(_6\)/1}}\index{pre5@\fun{pre\(_5\)/1}}\index{pre5@$\C{\fun{pre}_5}{n}$}
 Despite the gain, the optimised program is significantly longer and
@@ -741,7 +740,7 @@ substack\index{induction!immediate substack order} of~\(s\)
 \fig~\vref{fig:pre}, we see that rule~\(\theta\) maintains termination
 if \fun{pre/2}\index{pre@\fun{pre/2}} terminates; rule~\(\iota\)
 terminates; finally, rule~\(\kappa\) rewrites a call into smaller
-calls:
+calls, according to~\((\succ)\):
 \begin{align*}
   \fun{pre}(\fun{int}(x,t_1,t_2),s) &\succ \fun{pre}(t_2,s),\\
   \fun{pre}(\fun{int}(x,t_1,t_2),s) &\succ \fun{pre}(t_1,u),\; \text{for
@@ -891,8 +890,7 @@ and proceed to rewrite the left\hyp{}hand side after letting \(t :=
 \end{array}}
 \end{equation*}
 \caption{Proof of \(\pred{CatPre}{t} \colon
-  \fun{cat}(\fun{pre}(t,\el),s) \equiv
-  \fun{pre}(t,s)\)}
+  \fun{cat}(\fun{pre}(t,\el),s) \equiv \fun{pre}(t,s)\)}
 \label{fig:CatPre}
 \end{figure}
 \begin{itemize}
@@ -1205,7 +1203,7 @@ rightmost branch\index{tree!branch} is \([\fun{e}, \fun{g},
 \fun{h}]\)). Therefore, if we want to maximise the use of
 rule~\(\beta\), we must have an initial tree whose right subtree is
 empty, so the left subtree contains \(n-1\) nodes (the root belongs,
-by definition, to the rightmost branch): this yields
+by definition, to the rightmost branch): this yields that
 \begin{equation*}
   \W{\fun{in}_1}{n} = (n-1) + (n+1) = 2n.
   \index{in1@$\W{\fun{in}_1}{n}$}
@@ -1480,8 +1478,10 @@ The meaning of the stack~\(s\) in the call
 is the same as in \(\fun{pre}(t,s)\), modulo ordering: \(s\)~is made
 of the contents, in postorder, of the nodes that follow, in postorder,
 the nodes of the subtree~\(t\). The cost is familiar as well:
-\(\C{\fun{post}}{n} = \C{\fun{in}}{n} = \C{\fun{pre}}{n} = 2n +
-2\).\index{post@$\C{\fun{post}}{n}$}
+\begin{equation*}
+  \C{\fun{post}}{n} = \C{\fun{in}}{n} = \C{\fun{pre}}{n} = 2n + 2.
+  \index{post@$\C{\fun{post}}{n}$}
+\end{equation*}
 
 An example of \emph{postorder numbering}\index{binary tree!postorder
   numbering} is shown in \fig~\vref{fig:postorder}, so the postorder
