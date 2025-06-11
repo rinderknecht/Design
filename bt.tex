@@ -652,9 +652,10 @@ is the number we found earlier and the second component is a numbered
 tree. As usual with recursive definitions, we assume that the
 recursive calls on substructures are correct (that is, they yield the
 expected values) and we infer the value of the call on the whole
-structure at hand, here \(\pair{k}{\fun{int}(i,t'_1,t'_2)}\). The function
-\fun{npre/1}\index{npre@\fun{npre/1}} (\emph{number in preorder}) in
-\fig~\vref{fig:npre}
+structure at hand, here \(\pair{k}{\fun{int}(i,t'_1,t'_2)}\).
+
+The function \fun{npre/1}\index{npre@\fun{npre/1}} (\emph{number in
+preorder}) in \fig~\vref{fig:npre}
 \begin{figure}[b]
 \abovedisplayskip=0pt
 \belowdisplayskip=0pt
@@ -2259,7 +2260,7 @@ which could be contrasted with \fig~\vref{fig:bf3}.
 \index{binary tree!level order|)}
 
 \paragraph{Exercises}
-\begin{enumerate*}
+\begin{enumerate}
 
   \item How would you proceed to prove the correctness of
   \fun{bfn/1}?\index{bfn@\fun{bfn/1}}
@@ -2268,8 +2269,7 @@ which could be contrasted with \fig~\vref{fig:bf3}.
   \(n\)~is the size
   of~\(t\).\index{bfn@$\C{\fun{bfn}}{n}$}\index{bfn@\fun{bfn/1}}
 
-\end{enumerate*}
-
+\end{enumerate}
 
 
 \section{Classic shapes}
@@ -2319,8 +2319,8 @@ two internal nodes themselves. An example is provided in
 \fig~\vref{fig:complete}.
 % Wrapping figure better declared before a paragraph
 %
-\begin{wrapfigure}[8]{r}[0pt]{0pt}
-% [8] vertical lines
+\begin{wrapfigure}[7]{r}[0pt]{0pt}
+% [7] vertical lines
 % {r} mandatory right placement
 % [0pt] of margin overhang
 %\begin{figure}[b]
@@ -2685,9 +2685,9 @@ nearby, in view of a better amortised (see
 page~\pageref{par:amortised_cost}) or average cost (see 2-way
 insertion in section~\ref{sec:2-way} \vpageref{sec:2-way}).
 
-\begin{wrapfigure}[8]{r}[0pt]{0pt}
+\begin{wrapfigure}[6]{r}[0pt]{0pt}
 \centering
-\includegraphics[bb=64 663 118 721]{binzip}
+\includegraphics[bb=64 663 118 702]{binzip}
 \caption{}
 \label{fig:binzip}
 \end{wrapfigure}
@@ -2860,7 +2860,7 @@ finite word over the alphabet made of the letters~\fun{r}
 such that all its prefixes\index{word factoring!prefix} contain more
 letters~\fun{r} than~\fun{f}, or an equal number. This condition is
 equivalent to the geometrical characterisation `above the abscissa
-axis or reaches it.' For instance, \fun{rff} is not a Dyck word
+axis or reaches it.'  For instance, \fun{rff} is not a Dyck word
 because the prefix \fun{rff} (actually, the whole word) contains more
 falls than rises, so the associated path ends below the axis. The Dyck
 word corresponding to the Dyck path in \fig~\vref{fig:dyck_path} is
@@ -2891,8 +2891,9 @@ Such words are called \emph{prime}, because any Dyck word can be
 uniquely decomposed as the concatenation of such words (whence the
 reference to prime factorisation in elementary number theory): for all
 non\hyp{}empty Dyck words~\(d\), there exists \({n > 0}\) unique prime
-Dyck words~\(p_i\) such that \(d = p_1 \cdot p_2 \cdots p_n\). This
-naturally yields the \emph{arch decomposition}\index{Dyck
+Dyck words~\(p_i\) such that \(d = p_1 \cdot p_2 \cdots p_n\).
+
+This naturally yields the \emph{arch decomposition}\index{Dyck
   path!decomposition!arch $\sim$}, whose name stems from an
 architectural analogy: for all Dyck words~\(d\), there exists \({n >
   0}\) Dyck words \(d_i\) and returns~\(\fun{f}_i\) such that
