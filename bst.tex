@@ -7,7 +7,7 @@ desirable: the binary tree should be as balanced\index{binary
   tree!balanced $\sim$} as possible and the choice of visiting
 \begin{wrapfigure}[7]{r}[0pt]{0pt}
 \centering
-\includegraphics[bb=71 661 118 709]{bst_ex}
+\includegraphics[bb=71 661 118 714]{bst_ex}
 \caption{}
 \label{fig:bst_ex}
 \end{wrapfigure}
@@ -296,7 +296,7 @@ last. If we measure the cost as the number of function calls, we would
 not care, but, if we are interested in minimising the number of
 comparisons involved in a search, it is best to move that rule
 \emph{after} the other inequality tests, as in \fig~\vref{fig:mem0}.
-\begin{figure}[b]
+\begin{figure}
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}l@{\;}l}
@@ -344,7 +344,7 @@ higher.  Nevertheless, the advantage is that \emph{equality is not
   tested on the way down}, only when the external node is reached, so
 only one comparison per node is required. The program is shown in
 \fig~\vref{fig:mem1}.
-\begin{figure}[t]
+\begin{figure}[b]
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}l@{\;}l}
