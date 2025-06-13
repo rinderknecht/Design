@@ -1484,10 +1484,10 @@ characterise the worst case.
 \mypar{Average cost}
 
 Let us consider the average cost when \(n=2p\). Then\index{i2wb@$\M{\fun{i2wb}}{n}$}
-\begin{equation*}
-\M{\fun{i2wb}}{2p} =
-  1 + \sum_{k=0}^{2p-1}{\M{}{k}} + \M{\curvearrowright}{p},
-\end{equation*}
+\begin{equation}
+  \M{\fun{i2wb}}{2p} = 1 + \sum_{k=0}^{2p-1}{\M{}{k}} + \M{\curvearrowright}{p},
+  \label{eq:i2wb_2p_orig}
+\end{equation}
 where \(\M{}{k}\)~is the average cost of inserting a key into a
 simulated stack of \(k\)~keys and
 \(\M{\curvearrowright}{p}\)~is\index{rev@$\M{\curvearrowright}{n}$}
@@ -1496,7 +1496,7 @@ in~\(\M{\curvearrowright}{p}\) is correct since there are
 \(\floor{n/2}\)~keys in the left stack after all insertions are
 over. Clearly,
 \begin{equation*}
-\M{\curvearrowright}{p} = p + 1.
+  \M{\curvearrowright}{p} = p + 1.
 \end{equation*}
 The determination of~\(\M{}{k}\) requires the consideration of only
 two cases: \(k\)~is even or not. When analysing the average cost of
@@ -1516,7 +1516,7 @@ already computed~\(\M{}{p,q}\) in equation~\eqref{eq:Mpq}
          \frac{5}{4}.
 \end{equation*}
 The case \(k=2j+1\) is similarly derived: \(\M{}{2j+1} =
-(j+3)/2\). Hence:
+(j+3)/2\). Hence equation~\eqref{eq:i2wb_2p_orig} becomes:
 \begin{align}
 \M{\fun{i2wb}}{2p}
   &= 1 + \sum_{k=0}^{2p-1}{\M{}{k}} + (p+1)
