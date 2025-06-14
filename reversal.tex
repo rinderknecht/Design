@@ -139,10 +139,10 @@ establish \(\forall x \in T.\pred{CatRev}{\cons{x}{s},t}\):
 & \fun{cat}(\fun{rev}_0(t),\fun{cat}(\fun{rev}_0(s),[x]))\\
 & \equiv
 & \fun{cat}(\fun{cat}(\fun{rev}_0(t),\fun{rev}_0(s)),[x])
-& (\predName{CatAssoc})\\
+& \IH{\predName{CatAssoc}}\\
 & \equiv
 & \fun{cat}(\fun{rev}_0(\fun{cat}(s,t)),[x])
-& (\pred{CatRev}{s,t})\\
+& \IH{\pred{CatRev}{s,t}}\\
 & \xleftarrow{\smash{\delta}}
 & \ufun{rev}_0(\cons{x}{\fun{cat}(s,t)})\\
 & \xleftarrow{\smash{\beta}}
@@ -159,10 +159,10 @@ Let us resume the proof of
 & \fun{rev}_0(\fun{cat}(\fun{rev}_0(s),[x]))\\
 & \equiv
 & \fun{cat}(\fun{rev}_0([x]),\fun{rev}_0(\fun{rev}_0(s)))
-& (\pred{CatRev}{\fun{rev}_0(s),[x]})\\
+& \IH{\pred{CatRev}{\fun{rev}_0(s),[x]})}\\
 & \equiv
 & \fun{cat}(\ufun{rev}_0([x]),s)
-& (\pred{Inv}{s})\\
+& \IH{\pred{Inv}{s}}\\
 & \xrightarrow{\smash{\delta}}
 & \fun{cat}(\fun{cat}(\ufun{rev}_0(\el),[x]),s)\\
 & \xrightarrow{\smash{\gamma}}
@@ -257,10 +257,10 @@ For the latter, let us rewrite \(\fun{rev}_0(\cons{x}{s})\) and
 & \fun{cat}(\fun{rev}_0(s),[x])\\
 & \equiv
 & \fun{cat}(\fun{rev}(s),[x])
-& (\pred{EqRev}{s})\\
+& \IH{\pred{EqRev}{s}}\\
 & \leftrightsquigarrow
 & \fun{rcat}(s,[x])
-& (\text{to be determined})\\
+& \IH{\emph{To be determined.}}\\
 & \xleftarrow{\smash{\eta}}
 & \fun{rcat}(\cons{x}{s},\el)\\
 & \xleftarrow{\smash{\epsilon}}
@@ -304,17 +304,17 @@ T.\pred{RevCat}{\cons{x}{s},t}\):
 & \fun{rcat}(s,\cons{x}{t})\\
 & \equiv
 & \fun{cat}(\fun{rev}(s),\cons{x}{t})
-& (\pred{RevCat}{s,\cons{x}{t}}) \\
+& \IH{\pred{RevCat}{s,\cons{x}{t}}} \\
 & \xleftarrow{\smash{\alpha}}
 & \fun{cat}(\fun{rev}(s),\cons{x}{\ufun{cat}(\el,t)})\\
 & \xleftarrow{\smash{\beta}}
 & \fun{cat}(\fun{rev}(s),\ufun{cat}([x],t))\\
 & \equiv
 & \fun{cat}(\fun{cat}(\fun{rev}(s),[x]),t)
-& (\pred{CatAssoc}{\fun{rev}(s),[x],t})\\
+& \IH{\pred{CatAssoc}{\fun{rev}(s),[x],t}}\\
 & \equiv
 & \fun{cat}(\fun{rcat}(s,[x]),t)
-& (\pred{RevCat}{s,[x]})\\
+& \IH{\pred{RevCat}{s,[x]}}\\
 & \xleftarrow{\smash{\eta}}
 & \fun{cat}(\ufun{rcat}(\cons{x}{s},\el),t)\\
 & \xleftarrow{\smash{\epsilon}}
@@ -424,7 +424,7 @@ Let \(\Call{f(x)}\) be the cost of the call \(f(x)\). Then
 \begin{align*}
 \Call{\fun{cat}(\fun{cat}(s,t),u)}
   &= (\fun{len}(s) + 1) + (\fun{len}(\fun{cat}(s,t)) + 1)\\
-  &= (\fun{len}(s) + 1) + (\fun{len}(s) + \fun{len}(t) + 1) & (\pred{LenCat}{s,t})\\
+  &= (\fun{len}(s) + 1) + (\fun{len}(s) + \fun{len}(t) + 1) & \IH{\pred{LenCat}{s,t}}\\
   &= 2 \cdot \fun{len}(s) + \fun{len}(t) + 2,
 \end{align*}
 assuming \(\pred{LenCat}{s,t} \colon \fun{len}(\fun{cat}(s,t)) =

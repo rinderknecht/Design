@@ -925,7 +925,7 @@ for any term~\(x\). We have:
 & \cons{x}{\fun{cat}(s,\fun{cat}(t,u))}\\
 & \equiv
 & \cons{x}{\fun{cat}(\fun{cat}(s,t),u)}
-& (\pred{CatAssoc}{s,t,u})\\
+& \IH{\pred{CatAssoc}{s,t,u}}\\
 & \xleftarrow{\smash\beta}
 & \ufun{cat}(\cons{x}{\fun{cat}(s,t)},u)\\
 & \xleftarrow{\smash\beta}
