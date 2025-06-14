@@ -1208,9 +1208,13 @@ Equation~\eqref{eq:worst_merge} \vpageref{eq:worst_merge} yields
 \end{equation*}
 Let the difference of two successive terms be \(\Delta_n :=
 \smash[t]{\W{}{n+1}} - \W{}{n}\). If we know \(\Delta_n\), we know
-\(\W{}{n}\) because \(\sum_{k=1}^{n-1}\Delta_k =
+\(\W{}{n}\) because
+\begin{equation*}
+  \sum_{k=1}^{n-1}\Delta_k =
 \sum_{k=1}^{n-1}\W{}{k+1} - \sum_{k=1}^{n-1}\W{}{k} = \W{}{n} -
-\W{}{1} = \W{}{n}\). We remark that
+\W{}{1} = \W{}{n}.
+\end{equation*}
+We remark that
 \begin{itemize}
 
   \item if \(n=2p\), then \(\Delta_{2p} = \Delta_{p} + 1\),
@@ -1590,7 +1594,7 @@ singleton \([4]\) is merged with \([2,6]\), a stack twice as long. The
 imbalance in length is further propagated upwards. The general case is
 better suggested by retaining at each node only the length of the
 associated stack, as shown in \fig~\vref{fig:msort_abs}.
-\begin{figure}
+\begin{figure}[!b]
 \centering
 \subfloat[Merge tree of \({[}7,3,5,1,6,2,4{]}\)\label{fig:bot_up2}]{%
 \includegraphics[bb=58 632 192 721]{bot_up2}}
@@ -1729,7 +1733,7 @@ In all generality, let us set \(n := 2^{e_r} + \dots + 2^{e_1} +
 \geqslant 0\).  We used this decomposition in
 \begin{wrapfigure}[9]{r}[0pt]{0pt}
 \centering
-\includegraphics[bb=71 631 202 707]{msort_gen}
+\includegraphics[bb=71 631 202 720]{msort_gen}
 \caption{\(\sum_{j=0}^{r}2^{e_j}\) keys}
 \label{fig:msort_gen}
 \end{wrapfigure}
