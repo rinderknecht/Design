@@ -7,7 +7,7 @@ desirable: the binary tree should be as balanced\index{binary
   tree!balanced $\sim$} as possible and the choice of visiting
 \begin{wrapfigure}[7]{r}[0pt]{0pt}
 \centering
-\includegraphics[bb=71 661 118 714]{bst_ex}
+\includegraphics[bb=71 661 118 724]{bst_ex}
 \caption{}
 \label{fig:bst_ex}
 \end{wrapfigure}
@@ -1206,18 +1206,19 @@ demonstration later.
 & \equiv &
   \fun{mkl}(\fun{cat}(\fun{rev}_0(s),[x]),\fun{ext}())\\
 & \equiv_0 & \fun{mkl}([x],\fun{mkl}(\fun{rev}_0(s),\fun{ext}()))
-& (\text{Lemma})\\
+& \IH{\text{Lemma}}\\
 & \equiv &
   \fun{mkl}(\el,\fun{insl}(x,\fun{mkl}(\fun{rev}_0(s),\fun{ext}())))\\
 & \equiv &
   \fun{insl}(x,\fun{mkl}(\fun{rev}_0(s),\fun{ext}()))\\
 & \equiv &
   \fun{insl}(x,\fun{mkl}(\fun{rev}_0(s)))\\
-& \equiv & \fun{insl}(x,\ufun{mkr}(s)) & (\pred{RootLeaf\(_0\)}{s}\!)\\
+& \equiv & \fun{insl}(x,\ufun{mkr}(s))
+& \IH{\pred{RootLeaf\(_0\)}{s}}\\
 & \xrightarrow{\smash{\xi}} &
   \fun{insl}(x,\fun{mkr}(s,\fun{ext}()))\\
 & \equiv_1 & \fun{mkr}(s,\ufun{insl}(x,\fun{ext}()))
-& (\text{Lemma})\\
+& \IH{\text{Lemma}}\\
 & \xrightarrow{\smash{\phi}} &
   \fun{mkr}(s,\fun{bst}(x,\fun{ext}(),\fun{ext}()))\\
 & \xleftarrow{\smash{\iota}} &
@@ -1255,7 +1256,7 @@ which is thus the inductive hypothesis, and we prove
 & \equiv &
   \fun{mkl}(\fun{cat}(u,v),\fun{insl}(x,t))\\
 & \equiv_0 & \fun{mkl}(v,\fun{mkl}(u,\fun{insl}(x,t)))
-         & \!\!(\pred{MklCat}{u,v,\fun{inst}(x,t)}\!)\\
+& \IH{\pred{MklCat}{u,v,\fun{inst}(x,t)}}\\
 & \xleftarrow{\smash{\omega}} &
   \fun{mkl}(v,\ufun{mkl}(\cons{x}{u},t)). & \hfill\Box
 \end{array}
@@ -1296,9 +1297,9 @@ the same term:
 & \xrightarrow{\smash{\mu}} &
   \fun{insl}(x,\fun{mkr}(s,\fun{insr}(y,t)))\\
 & \equiv_1 & \fun{mkr}(s,\fun{insl}(x,\fun{insr}(y,t)))
-           & (\pred{MkrInsr}{x,s,\fun{insr}(y,t)}\!)\\
+& \IH{\pred{MkrInsr}{x,s,\fun{insr}(y,t)}}\\
 & \equiv_2 & \fun{mkr}(s,\fun{insr}(y,\fun{insl}(x,t)))
-           & (\text{Lemma})\\
+& \IH{\text{Lemma}}\\
 & \equiv &
   \fun{mkr}(\cons{y}{s},\fun{insl}(x,t)).
 & \hfill\Box
@@ -1339,7 +1340,7 @@ y\) or \(y \succ x\). We have
 \otimes
 & \xrightarrow{\smash{\upsilon}} &
   \fun{bst}(y,\fun{ext}(),\ufun{insl}(x,\fun{ext}()))
-& (x \succ y)\\
+& \IH{x \succ y}\\
 & \xrightarrow{\smash{\phi}} &
   \fun{bst}(y,\fun{ext}(),\fun{bst}(x,\fun{ext}(),\fun{ext}()))\\
 & \xleftarrow{\smash{\epsilon}} &
@@ -1348,7 +1349,7 @@ y\) or \(y \succ x\). We have
   \fun{rotr}(\fun{bst}(x,\ufun{insr}(y,\fun{ext}()),\fun{ext}()))\\
 & \xleftarrow{\smash{\eta}} &
   \ufun{insr}(y,\fun{bst}(x,\fun{ext}(),\fun{ext}()))
-& (x \succ y)\\
+& \IH{x \succ y}\\
 & \xleftarrow{\smash{\phi}} &
   \fun{insr}(y,\ufun{insl}(x,\fun{ext}())).
 \end{array}
@@ -1359,7 +1360,7 @@ y\) or \(y \succ x\). We have
 \begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
 \otimes & \xrightarrow{\smash{\tau}} &
   \fun{bst}(y,\ufun{insl}(x,\fun{ext}()),\fun{ext}())
-& (y \succ x)\\
+& \IH{y \succ x}\\
 & \xrightarrow{\smash{\phi}} &
   \fun{bst}(y,\fun{bst}(x,\fun{ext}(),\fun{ext}()),\fun{ext}())\\
 & \xleftarrow{\smash{\xi}} &
@@ -1368,7 +1369,7 @@ y\) or \(y \succ x\). We have
   \fun{rotl}(\fun{bst}(x,\fun{ext}(),\ufun{insr}(y,\fun{ext}())))\\
 & \xleftarrow{\smash{\theta}} &
   \ufun{insr}(y,\fun{bst}(x,\fun{ext}(),\fun{ext}()))
-& (y \succ x)\\
+& \IH{y \succ x}\\
 & \xleftarrow{\smash{\phi}} &
   \fun{insr}(y,\ufun{insl}(x,\fun{ext}())).
 \end{array}
@@ -1390,7 +1391,7 @@ Two cases arise: either \(a \succ x\) or \(x \succ a\).
 
 \item If \(a \succ x\), then \(\otimes \xrightarrow{\smash{\tau}}
   \fun{insr}(y,\fun{bst}(a,\fun{insl}(x,t_1),t_2)) \; \otimes\). Two
-  subcases reveal themselves: either \(a \succ y\) or \(y \succ a\).
+  subcases manifest: either \(a \succ y\) or \(y \succ a\).
   \begin{itemize}
 
     \item If \(a \succ y\), then
@@ -1398,9 +1399,10 @@ Two cases arise: either \(a \succ x\) or \(x \succ a\).
       \begin{array}{@{}r@{\;}l@{\;}l@{\hspace{-8mm}}r@{}}
         \otimes & \equiv &
         \fun{rotr}(\fun{bst}(a,\fun{insr}(y,\fun{insl}(x,t_1)),t_2))
-        & (a \succ y)\\
+        & \IH{a \succ y}\\
         & \equiv_2 & \fun{rotr}(\fun{bst}(a,\fun{insl}(x,
-        \fun{insr}(y,t_1)),t_2)) & (\pred{Ins}{x,y,t_1})\\
+        \fun{insr}(y,t_1)),t_2))
+        & \IH{\pred{Ins}{x,y,t_1}}\\
         & \equiv & \fun{rotr}(\fun{insl}(x,
         \fun{bst}(a,\fun{insr}(y,t_1),t_2)))\\
         & \equiv & \fun{rotr}(\fun{insl}(x,
@@ -1409,11 +1411,12 @@ Two cases arise: either \(a \succ x\) or \(x \succ a\).
         \fun{rotr}(\fun{insl}(x,\fun{rotl}(\ufun{insr}(y,
         \fun{bst}(a,t_1,t_2)))))\\
         & = & \fun{rotr}(\fun{insl}(x,\fun{rotl}(\fun{insr}(y,t))))
-        & (t=\fun{bst}(a,t_1,t_2))\\
+        & \IH{t=\fun{bst}(a,t_1,t_2)}\\
         & \equiv_3 & \fun{rotr}(\fun{rotl}(\fun{insl}(x,
-        \fun{insr}(y,t)))) & (\text{Lemma})\\
+        \fun{insr}(y,t))))
+        & \IH{\text{Lemma}}\\
         & \equiv & \fun{insl}(x,\fun{insr}(y,t)).
-        & (\fun{rotr}(\fun{rotl}(z)) \equiv z)
+        & \IH{\fun{rotr}(\fun{rotl}(z)) \equiv z}
       \end{array}
       \end{equation*}
       What makes this case of the proof work is that \(a \succ x\) and
@@ -1433,7 +1436,7 @@ Two cases arise: either \(a \succ x\) or \(x \succ a\).
 \begin{array}{@{}r@{\;}l@{\;}l@{\hspace{-8mm}}r@{}}
   \otimes & \xrightarrow{\smash{\theta}} &
   \fun{rotl}(\fun{bst}(a,\fun{insl}(x,t_1),\fun{insr}(y,t_2)))
-  & (y \succ a)\\
+  & \IH{y \succ a}\\
   & \equiv &
   \fun{rotl}(\fun{insl}(x,\fun{bst}(a,t_1,\fun{insr}(y,t_2))))\\
   & \equiv &
@@ -1443,11 +1446,11 @@ Two cases arise: either \(a \succ x\) or \(x \succ a\).
   \fun{rotl}(\fun{insl}(x,\fun{rotr}(\ufun{insr}(y,
   \fun{bst}(a,t_1,t_2)))))\\
   & = & \fun{rotl}(\fun{insl}(x,\fun{rotr}(\fun{insr}(y,t))))
-  & (t=\fun{bst}(a,t_1,t_2))\\
+  & t=\fun{bst}(a,t_1,t_2)\\
   & \equiv_4 & \fun{rotl}(\fun{rotr}(\fun{insl}(x,\fun{insr}(y,t))))
-  & (\text{Lemma})\\
+  & \IH{\text{Lemma}}\\
   & \equiv & \fun{insl}(x,\fun{insr}(y,t)).
-  & (\fun{rotl}(\fun{rotr}(z)) \equiv z)
+  & \IH{\fun{rotl}(\fun{rotr}(z)) \equiv z}
 \end{array}
 \end{equation*}
 Here, there was no need for the inductive hypothesis, because \(a
@@ -1472,7 +1475,7 @@ rotations commute with leaf insertion.
 \begin{array}{@{}r@{\;}l@{\;}l@{\hspace{-9mm}}r@{}}
   \otimes & \equiv & \fun{rotr}(\fun{bst}(a,
   \fun{bst}(a,\fun{insr}(y,t_1),\fun{insl}(x,t_2))))
-  & (a \succ y)\\
+  & \IH{a \succ y}\\
   & \equiv &
   \fun{rotr}(\fun{insl}(x,\fun{bst}(a,\fun{insr}(y,t_1),t_2)))\\
   & \equiv & \fun{rotr}(\fun{insl}(x,
@@ -1481,11 +1484,11 @@ rotations commute with leaf insertion.
   \fun{rotr}(\fun{insl}(x,\fun{rotl}(\ufun{insr}(y,
   \fun{bst}(a,t_1,t_2)))))\\
   & = & \fun{rotr}(\fun{insl}(x,\fun{rotl}(\fun{insr}(y,t))))
-  & (t=\fun{bst}(a,t_1,t_2))\\
+  & \IH{t=\fun{bst}(a,t_1,t_2)}\\
   & \equiv_3 &
   \fun{rotr}(\fun{rotl}(\fun{insl}(x,\fun{insr}(y,t))))\\
   & \equiv & \fun{insl}(x,\fun{insr}(y,t)).
-  & (\fun{rotr}(\fun{rotl}(z)) \equiv z)
+  & \IH{\fun{rotr}(\fun{rotl}(z)) \equiv z}
 \end{array}
 \end{equation*}
 This subcase is similar to the previous one in the sense that the
@@ -1499,14 +1502,16 @@ required in stead of \((\equiv_4)\).
   \otimes & \equiv &
   \fun{rotl}(\fun{bst}(a,t_1,\fun{insr}(y,\fun{insl}(x,t_2))))\\
   & \equiv_2 & \fun{rotl}(\fun{bst}(a,t_1,\fun{insl}(x,
-  \fun{insr}(y,t_2)))) & (\pred{Ins}{x,y,t_2})\\
+  \fun{insr}(y,t_2))))
+  & \IH{\pred{Ins}{x,y,t_2}}\\
   & \equiv &
   \fun{rotl}(\fun{insl}(x,\fun{bst}(a,t_1,\fun{insr}(y,t_2))))\\
   & \equiv_3 & \fun{insl}(x,\fun{rotl}(\fun{bst}(a,t_1,
   \fun{insr}(y,t_2))))\\
   & \xleftarrow{\smash{\theta}}
   & \fun{insl}(x,\ufun{insr}(y,\fun{bst}(a,t_1,t_2)))\\
-  & = & \fun{insl}(x,\fun{insr}(y,t)). & (t=\fun{bst}(a,t_1,t_2))
+  & = & \fun{insl}(x,\fun{insr}(y,t)).
+  & \IH{t=\fun{bst}(a,t_1,t_2)}
 \end{array}
 \end{equation*}
 This is the last subcase. It is similar to the first one, because the
@@ -1582,10 +1587,10 @@ Two cases arise: either \(b \succ x\) or \(x \succ b\).
     \fun{rotl}(\fun{bst}(a,t_1,\fun{bst}(b,t_2,\fun{insl}(x,t_3))))\\
     & \xleftarrow{\smash{\upsilon}} &
     \fun{rotl}(\fun{bst}(a,t_1,\ufun{insl}(x,\fun{bst}(b,t_2,t_3))))
-    & (x \succ b)\\
+    & \IH{x \succ b}\\
     & \xleftarrow{\smash{\upsilon}} &
     \fun{rotl}(\ufun{insl}(x,\fun{bst}(a,t_1,\fun{bst}(b,t_2,t_3))))
-    & (x \succ a)\\
+    & \IH{x \succ a}\\
     & = & \fun{rotl}(\fun{insl}(x,t)). & \hfill\Box
   \end{array}
   \end{equation*}
