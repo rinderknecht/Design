@@ -1681,8 +1681,10 @@ end, the search tree is degenerate, in fact, there are exactly two
 minimum\hyp{}cost trees, whose shapes are those of
 \fig~\vref{fig:tree_stack}. Interestingly, these trees correspond to
 maximum\hyp{}cost trees built using leaf insertions. The first key is
-not compared, so we have \(\OB{\fun{mkr}}{n} = n - 1 \sim
-\OB{\fun{mkl}}{n}/\lg n\).
+not compared, so we have
+\begin{equation*}
+  \OB{\fun{mkr}}{n} = n - 1 \sim \OB{\fun{mkl}}{n}/\lg n.
+\end{equation*}
 
 Perhaps surprisingly, it turns out that finding the maximum number of
 comparisons \(\OW{\fun{mkr}}{n}\)\index{mkr@$\OW{\fun{mkr}}{n}$}
@@ -1784,13 +1786,17 @@ is not \(\fun{del}(y, \fun{bst}(y,t_1,t_2))\),\index{del@\fun{del/2}}
 because we already know that \(x=y\) and we want to avoid a useless
 equality test.
 
-Of course, we could also have taken the maximum of the left subtree
-and this arbitrary asymmetry actually leads deletions followed by at
-least two insertions to trees which are less balanced, in average,
-than if they had been constructed directly only with insertions. This
-phenomenon is difficult to understand and examples are needed to see
-it at work
-\citep{Eppinger_1983,CulbersonMunro_1989,CulbersonEvans_1994,Knuth_1998a,Heyer_2009}.
+Of course, we could also have taken the maximum of the left subtree,
+and this arbitrary asymmetry seems to be the cause of the imbalance,
+in average, of the trees obtained by arbitrarily composing insertions
+and deletions. In other words, the distribution of shapes of the trees
+thus produced differs from the distribution for the trees of same size
+but built only by insertions. Surprisingly, perhaps, it has been
+proved that the shape of the trees made by~\(n\) insertions followed
+by~\(m\) deletions (\(n \geq m\)) \emph{do} have the same distribution
+as for the trees built by \(n-m\) insertions! Those phenomena are
+difficult to understand and examples are needed to see them at play
+\citep{Panny_2010,Eppinger_1983,CulbersonMunro_1989,CulbersonEvans_1994,Knuth_1998a,Heyer_2009}.
 
 Another kind of asymmetry is that deletion is much more complicated to
 program than insertion. This fact has lead some researchers to propose
@@ -1802,11 +1808,10 @@ quite short if the programming language is imperative.
 Another approach to deletion consists in marking the targeted nodes as
 deleted without actually removing them. They are still needed for
 future comparisons but they are not to be considered part of the
-collection of keys implemented by the search tree. As such they are
-alike zombies, neither alive nor dead, or we could talk of lazy
-deletion. More seriously, this requires two kinds of internal nodes,
-\fun{bst/3} and \fun{del/3}.\index{del@\fun{del/3}} This alternative
-design is shown in \fig~\vref{fig:del0}.
+collection of keys implemented by the search tree. We then have lazy
+deletion. It requires two kinds of internal nodes, \fun{bst/3} and
+\fun{del/3}.\index{del@\fun{del/3}} This alternative design is shown
+in \fig~\vref{fig:del0}.
 \begin{figure}[!t]
 \begin{equation*}
 \boxed{
