@@ -608,13 +608,13 @@ As an example, let us consider a counter enumerating the integers
 from~\(0\) to~\(n\) in binary by updating an array containing bits
 \cite[\S{}17.1]{CLRS_2009}. In the worst case, an increment leads to
 inverting all the bits. The number~\(m\) of bits of~\(n\) can be found
-by setting \(n := \sum_{i=0}^{m-1}{b_i2^i}\), where the~\(b_i\) are
-the bits and \(b_{m-1}=1\). By definition of~\(b_{m-1}\), the lower
-bound for~\(n\) is \(2^{m-1}\). The upper bound is attained when all
-the bits are~\(1\), that is, \(2^{m-1} + 2^{m-2} + \ldots +
-2^0\). Let us call~\(S_{m-1}\) that sum. By simplifying the
-  expression \(S_{m-1} = 2 S_{m-1} - S_{m-1}\), we obtain \(S_{m-1} =
-  2^m - 1\). Gathering the bounds, we thus have:
+as follows. Let \(n := \sum_{i=0}^{m-1}{b_i2^i}\), where the~\(b_i\)
+are the bits and \(b_{m-1}=1\). By definition of~\(b_{m-1}\), the
+lower bound for~\(n\) is \(2^{m-1}\). The upper bound is attained when
+all the bits are~\(1\), that is, \(2^{m-1} + 2^{m-2} + \ldots +
+2^0\). Let us call~\(S_{m-1}\) that sum. By simplifying the expression
+\(S_{m-1} = 2 S_{m-1} - S_{m-1}\), we obtain \(S_{m-1} = 2^m -
+1\). Gathering the bounds, we thus have:
 \begin{equation}
 2^{m-1} \leqslant n < 2^m \Rightarrow m - 1 \leqslant \lg n
 < m \Rightarrow m = \floor{\lg n} + 1,
