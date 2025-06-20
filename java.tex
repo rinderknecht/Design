@@ -735,6 +735,29 @@ simply discarded. We need to introduce two auxiliary functions,
 whether the third parameter contains at least two items and whether
 the second contains at least one. The result is shown in
 \fig~\ref{fig:cutr}.
+\begin{figure}
+\begin{equation*}
+\boxed{
+\begin{array}{@{}r@{\;}l@{\;}l@{}}
+\fun{cutr}(s,t,\el)     & \rightarrow
+                        & \fun{mrg}(\fun{tms}(s),\fun{tms}(t));\\
+\fun{cutr}(s,t,\cons{a}{u})
+                        & \rightarrow & \fun{cutr}_0(s,t,u).\\
+\\
+\fun{cutr}_0(s,t,\el)   & \rightarrow
+                        & \fun{mrg}(\fun{tms}(s),\fun{tms}(t));\\
+\fun{cutr}_0(s,t,\cons{b}{u})
+                        & \rightarrow & \fun{cutr}_1(s,t,u).\\
+\\
+\fun{cutr}_1(s,\el,u)   & \rightarrow & \fun{tms}(s);\\
+\fun{cutr}_1(s,\cons{y}{t},u)
+                        & \rightarrow
+                        & \fun{cutr}(\cons{y}{s},t,u).
+\end{array}}
+\end{equation*}
+\caption{Cutting and merging top-down}
+\label{fig:cutr}
+\end{figure}
 
 Note how \(\fun{cutr}_1(s,\el,u) \rightarrow
 \fun{mrg}(\fun{tms}(s),\fun{tms}(\el))\) was simplified using the
@@ -807,27 +830,3 @@ for dispatch. Finally, the \texttt{Main} class might look like
 \end{alltt}
 \index{merge sort!top-down $\sim$!$\sim$ in \Java|)}
 \index{Java@\Java!translation to $\sim$|)}
-
-\begin{figure}[b]
-\begin{equation*}
-\boxed{
-\begin{array}{@{}r@{\;}l@{\;}l@{}}
-\fun{cutr}(s,t,\el)     & \rightarrow
-                        & \fun{mrg}(\fun{tms}(s),\fun{tms}(t));\\
-\fun{cutr}(s,t,\cons{a}{u})
-                        & \rightarrow & \fun{cutr}_0(s,t,u).\\
-\\
-\fun{cutr}_0(s,t,\el)   & \rightarrow
-                        & \fun{mrg}(\fun{tms}(s),\fun{tms}(t));\\
-\fun{cutr}_0(s,t,\cons{b}{u})
-                        & \rightarrow & \fun{cutr}_1(s,t,u).\\
-\\
-\fun{cutr}_1(s,\el,u)   & \rightarrow & \fun{tms}(s);\\
-\fun{cutr}_1(s,\cons{y}{t},u)
-                        & \rightarrow
-                        & \fun{cutr}(\cons{y}{s},t,u).
-\end{array}}
-\end{equation*}
-\caption{Cutting and merging top-down}
-\label{fig:cutr}
-\end{figure}

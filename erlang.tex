@@ -711,7 +711,7 @@ only:
 \begin{equation*}
 ((1 + 2) + 3) + 4
   \eqn{\ref{add_assoc}} (1 + 2) + (3 + 4)
-  \eqn{\ref{add_assoc}} 1 + (2 + (3 + 4)).\hfill\Box
+  \eqn{\ref{add_assoc}} 1 + (2 + (3 + 4)).\qquad\Box
 \end{equation*}
 What about the speed and the memory usage of \erlcode{sum0/1}? It is
 easy to see that each step by means of clauses~\clause{\beta}
@@ -737,8 +737,8 @@ Let us rename \erlcode{sum0/1} as \fun{sum\(_0\)/1} in
 \caption{Summing integers in a stack with \fun{sum\(_0\)/1}}
 \label{fig:sum0}
 \end{figure}
-Consider the abstract syntax trees of the rewritten
-expressions in \fig~\ref{fig:sum0_1234}.
+Consider in \fig~\ref{fig:sum0_1234} the abstract syntax trees of the
+rewritten expressions.
 \begin{figure}
 \centering
 \includegraphics{sum0_1234}
@@ -3378,22 +3378,22 @@ Let us start with the left\hyp{}hand side of
 \erlcode{foldl(\(F\),\(F\)(\(X\),\(A\)),[\(Y\)|\(S\)])}\\
 \;\equiv
    \erlcode{foldl(\(F\),\(F\)(\(Y\),\(F\)(\(X\),\(A\))),\(S\))}
-& \text{(definition of \erlcode{foldl/3})}\\
+& \text{Definition of \erlcode{foldl/3}}\\
 \;\equiv
    \erlcode{foldl(\(F\),\(F\)(\(F\)(\(Y\),\(X\)),\(A\)),\(S\))}
-& \text{(associativity of~\(F\))}\\
+& \text{Associativity of~\(F\)}\\
 \;\equiv
    \erlcode{foldl(\(F\),\(F\)(\(F\)(\(X\),\(Y\)),\(A\)),\(S\))}
-& \text{(symmetry of~\(F\))}\\
+& \text{Symmetry of~\(F\)}\\
 \;\equiv
    \erlcode{\(F\)(\(F\)(\(X\),\(Y\)),foldr(\(F\),\(A\),\(S\)))}
-& \text{(induction hypothesis \(\pred{Fold}{S}\))}\\
+& \text{Induction hypothesis \(\pred{Fold}{S}\)}\\
 \;\equiv
    \erlcode{\(F\)(\(X\),\(F\)(\(Y\),foldr(\(F\),\(A\),\(S\))))}
-& \text{(associativity of~\(F\))}\\
+& \text{Associativity of~\(F\)}\\
 \;\equiv
    \erlcode{\(F\)(\(X\),foldr(\(F\),\(A\),[\(Y\)|\(S\)]))}
-& \text{(definition of \erlcode{foldr/3}).}\hfill\Box
+& \text{Definition of \erlcode{foldr/3}.}\hfill\Box
 \end{array}
 \end{equation*}
 This proves \(\pred{Fold}{\erlcode{[\(Y\)|\(S\)]}}\). The principle of
@@ -3418,19 +3418,19 @@ The previous derivation would read now as follows:
 \erlcode{foldl\_alt(\(F\),\(F\)(\(A\),\(X\)),[\(Y\)|\(S\)])}\\
 \;\equiv
 \erlcode{foldl\_alt(\(F\),\(F\)(\(F\)(\(A\),\(X\)),\(Y\)),\(S\))}
-& \text{(definition)}\\
+& \text{Definition}\\
 \;\equiv
    \erlcode{foldl\_alt(\(F\),\(F\)(\(A\),\(F\)(\(X\),\(Y\))),\(S\))}
-& \text{(associativity of~\(F\))}\\
+& \text{Associativity of~\(F\)}\\
 \;\equiv
    \erlcode{\(F\)(\(F\)(\(X\),\(Y\)),foldr(\(F\),\(A\),\(S\)))},
-& \text{(induction hypothesis \(\pred{Fold}{S})\)}\\
+& \text{Induction hypothesis \(\pred{Fold}{S}\)}\\
 \;\equiv
    \erlcode{\(F\)(\(X\),\(F\)(\(Y\),foldr(\(F\),\(A\),\(S\))))}
-& \text{(associativity of~\(F\))}\\
+& \text{Associativity of~\(F\)}\\
 \;\equiv
    \erlcode{\(F\)(\(X\),foldr(\(F\),\(A\),[\(Y\)|\(S\)]))},
-& \text{(definition of \erlcode{foldr/3}).}\hfill\Box
+& \text{Definition of \erlcode{foldr/3}.}\hfill\Box
 \end{array}
 \end{equation*}
 We see that the symmetry of~\(F\) is not required anymore but in only
@@ -4460,7 +4460,7 @@ Another higher\hyp{}order solution \erlcode{allp0/1} relies on a map
 (see page~\pageref{par:maps}):
 \begin{alltt}
 allp0(   []) -> [];
-allp0([X|S]) -> [[X]|map(\textbf{fun}(T) -> [X|T] \textbf{end},allp0(S))].
+allp0([X|S]) -> [[X]|map(\textbf{fun}(T) -> [X|T] \textbf{end}, allp0(S))].
 \end{alltt}
 We have
 \begin{equation}
