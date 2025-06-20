@@ -41,16 +41,16 @@ For example, it is obvious that all the permutations of \((1,2)\) are
 \((1,2,\boldsymbol{3})\); and from \((2,1)\) to
 \((\boldsymbol{3},2,1)\), \((2,\boldsymbol{3},1)\) and
 \((2,1,\boldsymbol{3})\). If we name~\(p_n\) the number of
-permutations on \(n\)~elements, we draw from this the recurrence \(p_n
-= n \cdot p_{n-1}\), which, with the additional obvious \(p_1 = 1\),
-leads to \({p_n = n!}\), for all \({n > 0}\), exactly as expected. If
-the \(n\)~objects to permute are not \((1,2,\dots,n)\) but, for
-example, \((\textsf{b},\textsf{d},\textsf{a},\textsf{c})\), simply
-associate each of them to their index in the tuple, for example,
-\textsf{b}~is represented by~\(1\), \textsf{d}~by~\(2\),
-\textsf{a}~by~\(3\) and \textsf{c}~by~\(4\), so the tuple is then
-associated to \((1,2,3,4)\) and, for instance, the permutation
-\((4,1,2,3)\) means~\((\textsf{c},\textsf{b},\textsf{d},\textsf{a})\).
+permutations on \(n\)~elements, we then draw the recurrence \(p_n = n
+\cdot p_{n-1}\), which, with \(p_1 = 1\), leads to \({p_n = n!}\), for
+all \({n > 0}\), exactly as expected. If the \(n\)~objects to permute
+are not \((1,2,\dots,n)\) but, for example,
+\((\textsf{b},\textsf{d},\textsf{a},\textsf{c})\), simply associate
+each of them to their index in the tuple, for example, \textsf{b}~is
+represented by~\(1\), \textsf{d}~by~\(2\), \textsf{a}~by~\(3\) and
+\textsf{c}~by~\(4\), so the tuple is then associated to \((1,2,3,4)\)
+and, for instance, the permutation \((4,1,2,3)\)
+means~\((\textsf{c},\textsf{b},\textsf{d},\textsf{a})\).
 
 \paragraph{Factorial}\index{factorial}
 

@@ -27,6 +27,5 @@ bms(N) -> K = N div 2,
             1 -> bms(N-2) + 2*exp2(rho(K)) + nu(K-1) + nu(K)
           end.
 
-tms(0) -> 0;
-tms(1) -> 0;
+tms(0) -> 0; tms(1) -> 0;
 tms(N) -> L = ceiling(log2(N)), N*L - exp2(L) + 1.
