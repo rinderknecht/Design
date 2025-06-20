@@ -2200,7 +2200,7 @@ Since the worst case of \erlcode{isrt\_tf/1} and \erlcode{isrt/1} are
 identical, we can compare their cost in this case,
 for~\(n\geqslant{}0\):
 \begin{equation*}
-\W{\fun{isrt}}{n}     = (n^2 + 3n + 2)/2\quad\text{and}\quad
+\W{\fun{isrt}}{n}     = \frac{1}{2}(n^2 + 3n + 2)\quad\text{and}\quad
 \W{\fun{isrt\_tf}}{n} = 2 \cdot \W{\fun{isrt}}{n} + 3n + 1.
 \end{equation*}
 Let us relate now the best and worst cases for \erlcode{isrt/1} and
