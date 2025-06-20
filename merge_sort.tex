@@ -1249,7 +1249,7 @@ In summary, \(\Delta_0 = 0\) and \(\Delta_n = \Delta_{\floor{n/2}} +
   integer, this implication is true from the same lemma.
 \end{proof}
 Using theorem~\vref{thm:floors}, we deduce \(\Delta_n = m\), with
-\(m\)~being the largest natural number such that \(\floor{n/2^m} =
+\(m\)~being the smallest natural number such that \(\floor{n/2^m} =
 0\). In other words, \(m\)~is the number of bits in the binary
 notation of~\(n\), which is found in equation~\eqref{eq:e_r} to be
 \(\Delta_n = \floor{\lg n} + 1\). Since we already know that \(\W{}{n}
@@ -1393,7 +1393,7 @@ Since \(\pred{H}{2p}\) depends on \(\pred{H}{p}\), and
 \(\pred{H}{p\!+\!1}\), the property \(\pred{H}{n}\), for any \(n>1\),
 transitively depends on \(\pred{H}{2}\) alone, because we are
 iterating divisions by~\(2\). If we write \(\pred{H}{n} \leadsto
-\pred{H}{m}\) to mean `\(\pred{H}{n}\) depends on \(\pred{H}{m}\),' we
+\pred{H}{m}\) to mean `\(\pred{H}{n}\) depends on \(\pred{H}{m}\)', we
 have, for example, \(\pred{H}{2^3} \leadsto \pred{H}{2^2} \leadsto
 \pred{H}{2^1}\); \(\pred{H}{7} \leadsto \pred{H}{3} \leadsto
 \pred{H}{2}\) and \(\pred{H}{7} \leadsto \pred{H}{4} \leadsto

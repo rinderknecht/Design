@@ -73,8 +73,8 @@ the stack:
 But this would be a mistake because there is no natural and necessary
 relationship between the concept of emptiness and the number
 zero. Zero is best understood algebraically as the number noted~\(0\)
-such that \(0 + n = n + 0 = n\), for any number~\(n\). Then, let us
-try the empty stack:
+such that we have \(0 + n = n + 0 = n\), for any number~\(n\). Then,
+let us try the empty stack:
 \begin{equation*}
 \begin{array}{r@{\;}c@{\;}l}
 \fun{mem}(\el,x) & \rightarrow & \el;\\
@@ -703,7 +703,7 @@ determining the cost for every possible pair \((f,l)\), with \(0
   &= \frac{1}{n(n+1)}\sum_{f=0}^{n-1}(3n + 1 - f)(n-f)\\
   &= \frac{n(3n+1)}{n+1} - \frac{4n+1}{n(n+1)}\sum_{f=0}^{n-1}f
      + \frac{1}{n(n+1)}\sum_{f=0}^{n-1}f^2
-  = \frac{4n+2}{3}{n} \sim \frac{4}{3}n,
+  = \frac{4n+2}{3} \sim \frac{4}{3}n,
 \end{align*}
 where \(\sum_{f=0}^{n-1}{f} = n(n-1)/2\) is equation~\eqref{eq:sum_k},
 \vpageref{eq:sum_k}, and the sum of the successive squares is obtained

@@ -966,9 +966,9 @@ right of the original call, until a reference to a value has been
 reached --~here, the integer~\(5\). This process is analogous to
 pushing items on a stack, although a stack containing not only values,
 but also expressions as \(7 + \fun{sum}([5])\), and we name it
-`pushing phase.' This invites us to perform the inverse operation,
+`pushing phase'. This invites us to perform the inverse operation,
 that is, popping the expressions in question, in order to finish the
-evaluation, or `popping phase.'  More precisely, we want to compute
+evaluation, or `popping phase'.  More precisely, we want to compute
 \emph{values} from the trees composing the DAG from right to left, the
 roots of which are considered an item in a special stack, until the
 tree of the original call is reached and associated with its own value
@@ -3096,7 +3096,7 @@ higher\hyp{}order function
 
 \end{enumerate}
 One famous function doing exactly this is called \erlcode{foldl/3} in
-\Erlang, which stands for `fold left,' because once the new
+\Erlang, which stands for `fold left', because once the new
 accumulator for some item has been computed, the prefix of the stack
 up to it can be folded back, as if the stack were written down on a
 sheet of paper, because it is no longer useful. So the name should be
@@ -3162,7 +3162,7 @@ former is to be preferred over the latter if the order of the items is
 not relevant, because \erlcode{map/2} requires a control stack as long
 as the input stack. This leads us quite naturally to introduce another
 higher\hyp{}order function: \erlcode{foldr/3}, meaning `fold from
-right to left,' or \emph{leftward fold}. We expect
+right to left', or \emph{leftward fold}. We expect
 \begin{equation*}
 \erlcode{foldr(\(F\),\(A\),[\(X_1\),\(X_2\),\(\ldots\),\(X_{n}\)])}
 \equiv
@@ -3266,7 +3266,7 @@ traversal of the stack for every call, then \erlcode{sfst/2} can be
 programmed by means of a rightward fold. The usual technique is to
 have an accumulator which is either an atom meaning `not found' or a
 pair with an atom meaning `found' and the rebuilt stack. If the result
-is `not found,' then we just give back the original stack. The
+is `not found', then we just give back the original stack. The
 following function makes a stronger case because it is really
 impossible to express by means of a fold, even inefficiently. It is
 the `complete tail' function:\label{code:ctail}
@@ -3544,7 +3544,7 @@ of the mapping~\(M\) by the binding \(x_1 \mapsto y\), as defined by
 \end{equation*}
 We can check that we return the value associated to the first key
 matching the input, as expected. The empty mapping would be a special
-function returning a special symbol meaning `not found,' like
+function returning a special symbol meaning `not found', like
 \(M_\varnothing(x) = \bot\), for all~\(x\). The mapping containing the
 binding \((1,5)\) would be \(M_\varnothing \mathrel{\oplus} 1 \mapsto
 5\). This is very abstract and independent of any programming
@@ -4212,7 +4212,7 @@ flat0\_k([Y=[\_|\_]|T],K) ->
 \end{alltt}
 Finally, we must put to good use the continuation~\erlcode{K} by
 keeping in mind its meaning: `Call~\erlcode{K} with the value of
-\erlcode{cat(flat0(Y),flat0(T))}.' At this point, we do not know the
+\erlcode{cat(flat0(Y),flat0(T))}'. At this point, we do not know the
 value of this call, so we have to pass~\erlcode{K}
 to \erlcode{cat\_k/3}, which will know that value:
 \begin{alltt}

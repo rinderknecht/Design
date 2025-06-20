@@ -400,7 +400,7 @@ pick internal nodes easily (the root of the first tree) in the
 expected order. An example is given in \fig~\vref{fig:pre3_abcde},
 \begin{figure}[!t]
 \centering
-\includegraphics[bb=71 650 374 713]{pre3_abcde_0} %[... ... ... 723]
+\includegraphics[bb=71 650 374 723]{pre3_abcde_0} %[... ... ... 723]
 \includegraphics[bb=71 668 306 721]{pre3_abcde_1}
 \includegraphics{pre3_abcde_2}
 \caption{A preorder traversal with \fun{pre\(_4\)/1}}
@@ -410,11 +410,10 @@ where the forest is the argument of \fun{pre\(_4\)/1} and the circle
 nodes are the current value of~\(x\) in rule~\(\delta\) of
 \fig~\ref{fig:pre3}.
 
-\par\vskip\baselineskip
+%\par\vskip\baselineskip
 
-\noindent The cost of
-\(\fun{pre}_3(t)\)\index{pre3@\fun{pre\(_3\)/1}}, where the size
-of~\(t\) is~\(n\), is simple:
+The cost of \(\fun{pre}_3(t)\)\index{pre3@\fun{pre\(_3\)/1}}, where
+the size of~\(t\) is~\(n\), is simple:
 \begin{itemize*}
 
   \item rule \clause{\alpha} is used once;
@@ -1726,7 +1725,7 @@ visits the sibling of a node before its children, it is said
 In \fig~\vref{fig:lorder} is shown the \emph{level\hyp{}order
   numbering} of the tree in \fig~\vref{fig:bt_ex3}, more often called
 \emph{breadth numbering}.  \index{binary tree!breadth numbering} (Mind
-the common misspellings `bread numbering' and `breath numbering.')
+the common misspellings `bread numbering' and `breath numbering'.)
 Notice how the numbers increase along downwards path between nodes, as
 in a preorder numbering.
 
@@ -1861,12 +1860,12 @@ minimum when the binary tree is \emph{perfect}\index{binary
 
 % Wrapping figure better declared before a paragraph
 %
-\begin{wrapfigure}[7]{r}[0pt]{0pt}
-% [7] vertical lines
+\begin{wrapfigure}[8]{r}[0pt]{0pt}
+% [8] vertical lines
 % {r} mandatory right placement
 % [0pt] of margin overhang
 \centering
-\includegraphics[bb=62 653 115 721]{zigzag}
+\includegraphics[bb=62 653 115 728]{zigzag} %721]
 \caption{}
 \label{fig:zigzag}
 \end{wrapfigure}
@@ -2867,7 +2866,7 @@ finite word over the alphabet made of the letters~\fun{r}
 such that all its prefixes\index{word factoring!prefix} contain more
 letters~\fun{r} than~\fun{f}, or an equal number. This condition is
 equivalent to the geometrical characterisation `above the abscissa
-axis or reaches it.'  For instance, \fun{rff} is not a Dyck word
+axis or reaches it'.  For instance, \fun{rff} is not a Dyck word
 because the prefix \fun{rff} (actually, the whole word) contains more
 falls than rises, so the associated path ends below the axis. The Dyck
 word corresponding to the Dyck path in \fig~\vref{fig:dyck_path} is

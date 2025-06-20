@@ -1,5 +1,5 @@
 \section{Specifying lexers with \Lex}
- 
+
 Several tools have been built for constructing lexical analysers from
 special\hyp{}purpose notations based on regular expressions. We shall
 now describe one of these tools, named \Lex, which is widely used in
@@ -12,13 +12,13 @@ lexer may be required to perform. We refer to the tool as the
 \begin{center}
 \begin{tabular}{cc|c|cc}
 \cline{3-3}
-  \Lex source 
+  \Lex source
 & \multirow{2}{*}{\Large \(\longrightarrow\)}
 & \Lex
 & \multirow{2}{*}{\Large \(\longrightarrow\)}
 & \multirow{2}{*}{\texttt{lex.yy.c}}\\
   \texttt{lex.l}
-& 
+&
 & compiler\\
   \cline{3-3}
 \\
@@ -28,7 +28,7 @@ lexer may be required to perform. We refer to the tool as the
 & C
 & \multirow{2}{*}{\Large \(\longrightarrow\)}
 & \multirow{2}{*}{\texttt{a.out}}\\
-& 
+&
 & compiler\\
   \cline{3-3}
 \\
@@ -39,7 +39,7 @@ lexer may be required to perform. We refer to the tool as the
 & \multirow{2}{*}{\Large \(\longrightarrow\)}
 & token\\
   stream
-& 
+&
 &
 &
 & stream\\
@@ -48,7 +48,7 @@ lexer may be required to perform. We refer to the tool as the
 \end{center}
 
 \subsection*{\Lex specifications}
- 
+
 A \Lex specification (or source or program) consists of three parts:
 \begin{verbatim}
 declarations
@@ -103,7 +103,7 @@ in the following way:
 
 Let us consider the following excerpt of an example:
 \begin{verbatim}
-%{ /* definitions of constants 
+%{ /* definitions of constants
       LT, LE, EQ, GT, GE, IF, THEN, ELSE, ID, NUM, RELOP */
 %}
 
@@ -157,7 +157,7 @@ The definition of \texttt{num} introduces a few more features. There
 is another metasymbol `\verb+?+' with the obvious meaning. We notice
 the use of a backslash to make a character mean itself instead of
 being interpreted as a metasymbol: `\verb+\.+' means `the dot
-character', while `\verb+.+' (metasymbol) means `any character.' This
+character', while `\verb+.+' (metasymbol) means `any character'. This
 works with any metasymbol.
 
 Note finally that we wrote \verb|[+\-]| because, in this context, the
@@ -168,7 +168,7 @@ double-quotes around it, like \verb+"."+
 
 \subsection*{Translation rules}
 
-The next section contains the translation rules. 
+The next section contains the translation rules.
 \begin{verbatim}
 %%
 {ws}     { /* no action and no return */ }
@@ -198,7 +198,7 @@ the parser (it is defined in \texttt{lex.yy.c}) and is used to pass
 attributes about the token.
 
 \subsection*{User code}
- 
+
 Contrary to our previous presentation, the procedure \texttt{lexeme}
 takes here no argument. This is because the input buffer is directly
 and globally accessed in \Lex through the pointer \texttt{yytext},
@@ -216,7 +216,7 @@ char* lexeme () {
 \end{verbatim}
 
 \subsection*{Longest-prefix match}
- 
+
 If several regular expressions match the input, \Lex chooses the rule
 which matches the most text. This is why the input \verb+if123+ is
 matched, that is, recognised, as an identifier and not as the keyword
