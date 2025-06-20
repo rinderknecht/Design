@@ -70,7 +70,7 @@ is then
  \ident{v}\(\sb{1}\) \texttt{+} \ident{v}\(\sb{2}\)\\
  \> \> \> \> \vbar  \cst{Sub} \(\rightarrow\)
  \ident{v}\(\sb{1}\) \texttt{-} \ident{v}\(\sb{2}\)\\
- \> \> \> \> \vbar \cst{Mult} \(\rightarrow\) 
+ \> \> \> \> \vbar \cst{Mult} \(\rightarrow\)
  \ident{v}\(\sb{1}\) \texttt{*} \ident{v}\(\sb{2}\)\\
  \> \> \> \> \vbar \cst{Div} \(\rightarrow\)
  \ident{v}\(\sb{1}\) \texttt{/} \ident{v}\(\sb{2}\)
@@ -152,7 +152,7 @@ judgements comply with the pattern $\ceval{e}{v}$. Here are the rules:
   \;\TirName{add}
 \and
 \inferrule*[right=sub]
-  {\ceval{e_1}{v_1}\\ \ceval{e_2}{v_2}}  
+  {\ceval{e_1}{v_1}\\ \ceval{e_2}{v_2}}
   {\ceval{\cst{BinOp} \, \lpar\cst{Sub},e_1,e_2\rpar}{v_1 - v_2}}
 \and
 \inferrule*[right=mult]
@@ -161,7 +161,7 @@ judgements comply with the pattern $\ceval{e}{v}$. Here are the rules:
          {v_1 \times v_2}}
 \and
 \inferrule*[right=div]
-  {\ceval{e_1}{v_1}\\ \ceval{e_2}{v_2}}  
+  {\ceval{e_1}{v_1}\\ \ceval{e_2}{v_2}}
   {\ceval{\cst{BinOp} \, \lpar\cst{Div},e_1,e_2\rpar}{v_1 / v_2}}
 \end{mathpar}
 
@@ -172,10 +172,10 @@ consists in matching the patterns given by the conclusions of the
 inference rules, as suggested below:
 \begin{mathpar}
 \inferrule*[right=sub]
-  {\ceval{e_1}{v_1}\\ \ceval{e_2}{v_2}}  
+  {\ceval{e_1}{v_1}\\ \ceval{e_2}{v_2}}
   {\ceval{\cst{BinOp} \, \lpar\cst{Sub},e_1,e_2\rpar}{v_1 - v_2}}
 \end{mathpar}
-which becomes 
+which becomes
 \begin{center}
 \vbar \cst{BinOp}
 \lpar\cst{Sub},\ident{e\(\sb{1}\)},\ident{e\(\sb{2}\)}\rpar{}
@@ -285,25 +285,25 @@ the judgements:
         {v_1 + v_2}}
 \and
 \inferrule*[right=sub]
-  {\eval{\rho}{e_1}{v_1}\\ \eval{\rho}{e_2}{v_2}}  
+  {\eval{\rho}{e_1}{v_1}\\ \eval{\rho}{e_2}{v_2}}
   {\eval{\rho}
         {\cst{BinOp} \, \lpar\cst{Sub},e_1,e_2\rpar}
         {v_1 - v_2}}
 
 \inferrule*[right=mult]
-  {\eval{\rho}{e_1}{v_1}\\ \eval{\rho}{e_2}{v_2}}  
+  {\eval{\rho}{e_1}{v_1}\\ \eval{\rho}{e_2}{v_2}}
   {\eval{\rho}
          {\cst{BinOp} \, \lpar\cst{Mult},e_1,e_2\rpar}
-        {v_1 \times v_2}} 
+        {v_1 \times v_2}}
 \and
 \inferrule*[right=div]
-  {\eval{\rho}{e_1}{v_1}\\ \eval{\rho}{e_2}{v_2}}  
+  {\eval{\rho}{e_1}{v_1}\\ \eval{\rho}{e_2}{v_2}}
   {\eval{\rho}
         {\cst{BinOp} \, \lpar\cst{Div},e_1,e_2\rpar}
         {v_1 / v_2}}
 \and
 \inferrule*[right=let]
-  {\eval{\rho}{e_1}{v_1}\\ 
+  {\eval{\rho}{e_1}{v_1}\\
    \eval{x \mapsto v_1 \oplus \rho}{e_2}{v_2}}
   {\eval{\rho}
         {\cst{Let} \, \lpar{x},e_1,e_2\rpar}
@@ -324,7 +324,7 @@ in a slight modification of the first version:
  \ident{v}\(\sb{1}\) \texttt{+} \ident{v}\(\sb{2}\)\\
  \> \> \> \> \vbar  \cst{Sub} \(\rightarrow\)
  \ident{v}\(\sb{1}\) \texttt{-} \ident{v}\(\sb{2}\)\\
- \> \> \> \> \vbar \cst{Mult} \(\rightarrow\) 
+ \> \> \> \> \vbar \cst{Mult} \(\rightarrow\)
  \ident{v}\(\sb{1}\) \texttt{*} \ident{v}\(\sb{2}\)\\
  \> \> \> \> \vbar \cst{Div} \(\rightarrow\)
  \ident{v}\(\sb{1}\) \texttt{/} \ident{v}\(\sb{2}\)\rpar\\
@@ -374,7 +374,7 @@ itself:
   \ident{y} \equal{} \num{2} \Xin \ident{x} \texttt{+} \ident{y}}}$\\
 = \text{
       \cst{Let} \lpar\str{x},
-         \cst{Const} \num{1}, 
+         \cst{Const} \num{1},
          \cst{Let} \lpar\str{y},
             \cst{Const} \num{2},
             \cst{BinOp} \lpar\cst{Add},
@@ -427,27 +427,27 @@ simplifications:
   {\meval{\rho}{x}{\rho (x)}}\;\TirName{var}
 \and
 \inferrule*[right=add]
-  {\eval{\rho}{e_1}{v_1}\\ 
+  {\eval{\rho}{e_1}{v_1}\\
    \eval{\rho}{e_2}{v_2}}
   {\meval{\rho}{\meta{e}_1 \, \texttt{+} \, \meta{e}_2}{v_1 + v_2}}
 \and
 \inferrule*[right=sub]
-  {\eval{\rho}{e_1}{v_1}\\ 
+  {\eval{\rho}{e_1}{v_1}\\
    \eval{\rho}{e_2}{v_2}}
   {\meval{\rho}{\meta{e}_1 \, \texttt{-} \, \meta{e}_2}{v_1 - v_2}}
 \and
 \inferrule*[right=mult]
-  {\eval{\rho}{e_1}{v_1}\\ 
+  {\eval{\rho}{e_1}{v_1}\\
    \eval{\rho}{e_2}{v_2}}
   {\meval{\rho}{\meta{e}_1 \, \texttt{*} \, \meta{e}_2}{v_1 \times v_2}}
 \and
 \inferrule*[right=div]
-  {\eval{\rho}{e_1}{v_1}\\ 
+  {\eval{\rho}{e_1}{v_1}\\
    \eval{\rho}{e_2}{v_2}}
   {\meval{\rho}{\meta{e}_1 \, \texttt{/} \, \meta{e}_2}{v_1 / v_2}}
 \and
 \inferrule*[right=let]
-  {\eval{\rho}{e_1}{v_1}\\ 
+  {\eval{\rho}{e_1}{v_1}\\
    \eval{x \mapsto v_1 \oplus \rho}{e_2}{v_2}}
   {\meval{\rho}{\Xlet \; x \; \equal \; \meta{e}_1 \; \Xin
   \; \meta{e}_2}{v_2}}
@@ -587,7 +587,7 @@ is, the interpreter.
 \begin{raggedright}
 \Xtype \type{value} \equal \type{int}\textsf{;;}{}\\
 \Xtype \type{error} \equal \cst{DivByZero} \vbar \cst{FreeVar}
-\Xof \type{string}\textsf{;;}{}\\ 
+\Xof \type{string}\textsf{;;}{}\\
 \Xtype \type{result} \equal \cst{Val} \Xof \type{value}
 \vbar \cst{Err} \Xof \type{error}\textsf{;;}{}
 \end{raggedright}
@@ -610,21 +610,21 @@ is, the interpreter.
         {\cst{Err} \, \lpar\cst{FreeVar} \, x\rpar}}
 
 \inferrule*[right=div]
-  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\ 
+  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\
    \eval{\rho}{e_2}{\cst{Val} \, v_2}}
   {\meval{\rho}
          {\meta{e}_1 \, \texttt{/} \, \meta{e}_2}
          {\cst{Val} \, \lpar v_1 \, \texttt{/} \, v_2\rpar}}
 
 \inferrule*[right=mult]
-  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\ 
+  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\
    \eval{\rho}{e_2}{\cst{Val} \, v_2}}
   {\meval{\rho}
         {\meta{e}_1 \, \texttt{*} \, \meta{e}_2}
         {\cst{Val} \, \lpar{v_1 \, \texttt{*} \, v_2\rpar}}}
 
 \inferrule
-  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\ 
+  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\
    \eval{\rho}{e_2}{\cst{Val} \, v_2}}
   {\meval{\rho}
          {\meta{e}_1 \, \texttt{+} \, \meta{e}_2}
@@ -632,8 +632,8 @@ is, the interpreter.
 \;\TirName{add}
 
 \inferrule*[right=sub]
-  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\ 
-   \eval{\rho}{e_2}{\cst{Val} \, v_2}}  
+  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\
+   \eval{\rho}{e_2}{\cst{Val} \, v_2}}
   {\meval{\rho}
          {\meta{e}_1 \, \texttt{-} \, \meta{e}_2}
          {\cst{Val} \, \lpar{v_1 \, \texttt{-} \, v_2}\rpar}}
@@ -648,7 +648,7 @@ is, the interpreter.
 \;\TirName{var}
 
 \inferrule*[right=let]
-  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\ 
+  {\eval{\rho}{e_1}{\cst{Val} \, v_1}\\
    \eval{x \mapsto v_1 \oplus \rho}{e_2}{\cst{Val} \, v_2}}
   {\meval{\rho}{\Xlet \; x \; \equal \; \meta{e}_1 \; \Xin
   \; \meta{e}_2}{\cst{Val} \, v_2}}
@@ -677,7 +677,7 @@ purpose, we cannot say \emph{a priori} which error will be propagated.
 
 For the sake of simplicity, let us use the exceptions of \OCaml to
 implement the propagation of errors, and, thereby, avoid the type
-\type{result}. 
+\type{result}.
 \begin{tabbing}
 \Xexception \cst{Err} \Xof \type{error}\\
 \\
@@ -756,7 +756,7 @@ Let us revisit the example \textsf{\textbf{let} x = 1 \textbf{in}
 \phantom{XXX}
  &=& \mathcal{F} \src{\num{1}} \, \cup \, \mathcal{F} \src{\lpar\Xlet \; \ident{x} \;
      \equal \; \num{2} \; \Xin \; \ident{x}\rpar{} \; \texttt{+}
-    \; \ident{x}} \backslash \{\str{x}\}\\ 
+    \; \ident{x}} \backslash \{\str{x}\}\\
  &=& \varnothing \, \cup \,
      (\mathcal{F} \src{\Xlet \; \ident{x} \; \equal \; \num{2} \;
      \Xin \; \ident{x}} \, \cup \, \mathcal{F} \src{\ident{x}})
@@ -770,7 +770,7 @@ Let us revisit the example \textsf{\textbf{let} x = 1 \textbf{in}
 \end{equation*}
 The expression does not contain any free variable. By definition, such
 an expression is said to be \emph{closed}. Moreover, since the
-expression does not contain any division, we have proved that 
+expression does not contain any division, we have proved that
 no error will occur during evaluation.
 
 \paragraph{Graphical representation of bindings}
@@ -798,7 +798,7 @@ conditional construct with test against zero.
 
   \item The extension to the concrete syntax is
 \begin{verbatim}
-Expression ::=  ... | "ifz" Expression "then" Expression 
+Expression ::=  ... | "ifz" Expression "then" Expression
                       "else" Expression
 \end{verbatim}
 
@@ -844,7 +844,7 @@ corresponding calls, called \emph{applications} in the
 
   \item The concrete syntax is extended like so:
 \begin{verbatim}
-Expression ::= ... 
+Expression ::= ...
              | "fun" ident "->" Expression /* abstraction */
              | Expression Expression       /* application */
 \end{verbatim}
@@ -896,9 +896,9 @@ expression to abstractions and applications, like so:
 \begin{equation*}
 \left\{
 \begin{aligned}
-\mathcal{F} \src{\Xfun \; x \rightarrow \meta{e}} &= 
+\mathcal{F} \src{\Xfun \; x \rightarrow \meta{e}} &=
   \mathcal{F} (e) \backslash \{x\}\\
-\mathcal{F} \src{\meta{e}_1 \, \meta{e}_2} &= 
+\mathcal{F} \src{\meta{e}_1 \, \meta{e}_2} &=
   \mathcal{F} (e_1) \cup \mathcal{F} (e_2)
 \end{aligned}
 \right.
@@ -923,7 +923,7 @@ Let us try first the following semantics for the abstraction:
 \begin{equation*}
 \inferrule*[right=\;\, abs-dyn]
   {}
-  {\meval{\rho} 
+  {\meval{\rho}
          {\Xfun \; x \rightarrow \meta{e}}
          {\src{\Xfun \; x \rightarrow \meta{e}}}}
 \end{equation*}
@@ -948,7 +948,7 @@ The rule \RefTirName{abs-dyn} implies that the programs in
 \begin{tabbing}
 \Xlet \ident{x} \equal \num{1} \Xin\\
 \quad \= \Xlet \ident{f} \equal \Xfun \ident{y} \(\rightarrow\)
-\ident{x} \texttt{+} \ident{y} \Xin\\ 
+\ident{x} \texttt{+} \ident{y} \Xin\\
 \> \Xlet \ident{x} \equal \num{2}\\
 \Xin \underline{\lpar\Xfun \ident{y} \(\rightarrow\) \ident{x} \texttt{+}
 \ident{y}\rpar} \ident{x}
@@ -1194,14 +1194,14 @@ recursive binding, as follows:
   \Xtype \type{expr} \equal \texttt{...} \vbar \cst{LetRec} \Xof
   \type{string} \(\times\) \type{expr} \(\times\) \type{expr}\textsf{;;}
 
-  \medskip 
+  \medskip
 
   \item Syntax analysis\\
   $\src{\Xlet \; \Xrec \;
   x \; \equal \; \meta{e}_1 \; \Xin \; \meta{e}_2}
   = \cst{LetRec} \, \lpar x, e_1, e_2\rpar$
 
-  \medskip 
+  \medskip
 
   \item Free variables\\ $\mathcal{F} \src{\Xlet \;
   \Xrec \; x \; \equal \; \meta{e}_1 \; \Xin \; \meta{e}_2}
@@ -1238,10 +1238,10 @@ from the others:
 The straightforward implementation of the latter rule is
 \begin{tabbing}
  \Xlet \= \Xrec \ident{eval} \ident{env} \ident{e} \equal
- \Xmatch \ident{e} \Xwith \texttt{...} \\ 
+ \Xmatch \ident{e} \Xwith \texttt{...} \\
  \vbar \> \cst{LetRec} \lpar\ident{x},\ident{e}$_1$,\ident{e}$_2$\rpar{}
  $\rightarrow$\\
- \> \quad \Xlet \Xrec \ident{env'} \equal \ident{extend} 
+ \> \quad \Xlet \Xrec \ident{env'} \equal \ident{extend}
  \lpar\ident{x},\ident{v}$_1$\rpar{} \ident{env}\\
  \> \quad \Xand \ident{v}$_1$ \equal \ident{eval} \ident{env'} \ident{e}$_1$\\
  \> \quad \Xin \ident{eval} \ident{env'} \ident{e}$_2$
@@ -1251,11 +1251,11 @@ The straightforward implementation of the latter rule is
 actually have to write:
 \begin{tabbing}
  \Xlet \= \Xrec \ident{eval} \ident{env} \ident{e} \equal
- \Xmatch \ident{e} \Xwith \texttt{...} \\ 
+ \Xmatch \ident{e} \Xwith \texttt{...} \\
  \vbar \> \cst{LetRec}
  \lpar\ident{x},\ident{e}$_1$,\ident{e}$_2$\rpar{} $\rightarrow$\\
  \> \quad \Xlet \Xrec \ident{env'} \equal \underline{\Xfun
- \ident{x} $\rightarrow$} \ident{extend} 
+ \ident{x} $\rightarrow$} \ident{extend}
  \lpar\ident{x}, \ident{v}$_1$\underline{\lpar\rpar}\rpar{} \ident{env} \underline{\ident{x}}\\
  \> \quad \Xand \ident{v}$_1$ \equal \underline{\Xfun \lpar\rpar{}
  $\rightarrow$} \ident{eval} \ident{env'} \ident{e}$_1$\\
@@ -1390,7 +1390,7 @@ premise:
 The rule \RefTirName{let} is
 \begin{mathpar}
 \inferrule*[right=let]
-  {\eval{\rho}{e_1}{v_1}\\ 
+  {\eval{\rho}{e_1}{v_1}\\
    \eval{x \mapsto v_1 \oplus \rho}{e_2}{v_2}}
   {\meval{\rho}{\Xlet \; x \; \equal \; \meta{e}_1 \; \Xin
   \; \meta{e}_2}{v_2}}
@@ -1475,7 +1475,7 @@ denote by \cst{U} in the abstract syntax.
 
   \item Abstract syntax\\
      \Xtype \type{expr} \equal \texttt{...} \vbar \cst{Assign} \Xof
-    \type{string} \(\times\) \type{expr} \vbar \cst{U}\textsf{;;}{} 
+    \type{string} \(\times\) \type{expr} \vbar \cst{U}\textsf{;;}{}
 
   \item Syntax analysis\\
   $\src{x \; \assign \; \meta{e}} = \cst{Assign} \, \lpar{x},
@@ -1490,10 +1490,10 @@ denote by \cst{U} in the abstract syntax.
   We need to revisit our judgement and inference rules and have
   instead $\ieval{\rho}{\sigma}{e}{v}{\sigma'}$, meaning: `Given the
   context made of the environment~$\rho$ and the store~$\sigma$, the
-  evaluation of~$e$ yields the value~$v$ and a new store~$\sigma'$.'
+  evaluation of~$e$ yields the value~$v$ and a new store~$\sigma'$'.
 
 \end{itemize}
-First, here are the simpler inference rules (to contrast with 
+First, here are the simpler inference rules (to contrast with
 \RefTirName{var} above):
 \begin{mathpar}
 \inferrule
@@ -1626,7 +1626,7 @@ the operands:
   {}\;\,\TirName{const}
 \and
 \inferrule
-  {\ieval{\rho}{\sigma}{e_1}{v_1}{\sigma_1}\\ 
+  {\ieval{\rho}{\sigma}{e_1}{v_1}{\sigma_1}\\
    \ieval{\rho}{\sigma_1}{e_2}{v_2}{\sigma_2}}
   {\ieval{\rho}{\sigma}{\src{\meta{e}_1 \, \texttt{+} \, \meta{e}_2}}
          {v_1 + v_2}{\sigma_2}}
@@ -1687,7 +1687,7 @@ The semantics with mutation of the native recursive expressions is as follows.
 \paragraph{Sequences and general iterators}
 
 We can now add to our language the sequence construct, and a general
-iterator. 
+iterator.
 \begin{itemize}
 
   \item Concrete syntax\\
@@ -1697,7 +1697,7 @@ iterator.
 
   \item Abstract syntax\\
      \Xtype \type{expr} \equal \texttt{...} \vbar{} \cst{Seq}
-     \Xof \type{expr} \(\times\) \type{expr} 
+     \Xof \type{expr} \(\times\) \type{expr}
      \vbar{} \cst{While} \Xof \type{expr} \(\times\)
      \type{expr}\textsf{;;}{}
 
@@ -1721,14 +1721,14 @@ The operational semantics is as follows:
      {\rho}
      {\Xlet \; x \; \equal \; \meta{e}_1 \; \Xin \; \meta{e}_2}
      {v}
-  } 
+  }
   {\meval{\rho}{\meta{e}_1\!\texttt{;} \meta{e}_2}{v}}
 \and
 \inferrule[while]
   {f,p \not\in \mathcal{F} (e_2)\\
    x \not\in \mathcal{F} (e_1)\\
    \meval
-     {\rho} 
+     {\rho}
      {\small \Xlet \; \Xrec \; f \; \equal \; \Xfun \; p \rightarrow \Xif \; p
       \lpar\rpar \; \Xthen \; \meta{e}_2\!\texttt{;} f \, p \; \Xelse \;
       \lpar\rpar \; \Xin \; f \lpar\Xfun \; x \rightarrow \meta{e}_1\rpar}

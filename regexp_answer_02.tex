@@ -9,7 +9,7 @@ expressions describing one language.
 
   \item The constraint on the words is that they must be of the shape
     \(a \ldots a\) where the dots stand for `any combination of \(a\)
-    and \(b\).' In other words, one answer is \(a \lparen a \;
+    and \(b\)'. In other words, one answer is \(a \lparen a \;
     \disjM{} \, b\rparen\kleeneM \, a \, \disjM \, a\).
 
   \item This question is very simple since the language of all words
@@ -29,13 +29,13 @@ expressions describing one language.
   \item The words we search contain, at any place, exactly three
     \(a\), so are of the form \(\ldots a \ldots a \ldots a \ldots\),
     where the dots stand for `any letter except \(a\)', \emph{i.e.,} `any
-    number of \(b\).' In other words: \(b\kleeneM a b\kleeneM a
+    number of \(b\)'. In other words: \(b\kleeneM a b\kleeneM a
     b\kleeneM a b\kleeneM\).
 
   \item Because the alphabet contains only two letters, the question
     is equivalent to: 'All words containing the substring
     ab', \emph{i.e.,} the words are of the form \(\ldots ab \ldots\)
-    where the dots stand for `any sequence of \(a\) and \(b\).' It is
+    where the dots stand for `any sequence of \(a\) and \(b\)'. It is
     then easy to understand that a short answer is \(\lparen
     a \, \disjM{} \, b\rparen\kleeneM ab \lparen a \, \disjM{} \,
     b\rparen\kleeneM\).
@@ -53,5 +53,3 @@ expressions describing one language.
     \rparen\kleeneM b\opt\).
 
 \end{enumerate}
-
-

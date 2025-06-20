@@ -59,7 +59,7 @@ Consider the following example:
   \> \vbar{} \textsf{['0'-'9']\texttt{+}} \Xas \ident{n} \> \{ \Tint
      \lpar\ident{int\_of\_string} \ident{n}\rpar{} \}\\
   \> \vbar{} \ident{eof} \> \{ \Teof \}\\
-  \> \vbar{} {\large \_} \Xas \ident{c} \> \{ \ident{raise} 
+  \> \vbar{} {\large \_} \Xas \ident{c} \> \{ \ident{raise}
      \lpar\cst{Illegal\_char} \ident{c} \rpar{} \}
 \end{tabbing}
 The prologue opens the module \textsf{Parser} because it contains the
@@ -206,7 +206,7 @@ functions whose argument is the current depth of nesting.
 \lpar\ident{depth}\texttt{-}\num{1}\rpar{}} \}\\
 \> \underline{\vbar{} \str{/*}} \> \underline{\{ \Xfun \ident{depth}
   \(\rightarrow\) \ident{in\_comment} \ident{lexbuf}
-  \lpar\ident{depth}\texttt{+}\num{1}\rpar{} \}}\\ 
+  \lpar\ident{depth}\texttt{+}\num{1}\rpar{} \}}\\
 \> \vbar{} \ident{eof} \> \{ \ident{raise} \cst{Open\_comment} \}\\
 \> \vbar{} {\LARGE \_} \> \{ \ident{in\_comment} \ident{lexbuf} \}
 \end{tabbing}
@@ -261,7 +261,7 @@ head of the input stream.
     \begin{itemize*}
 
       \item it is withdrawn from the input stream and discarded;
- 
+
       \item the current state becomes the one pointed to by the
         transition;
 
@@ -278,7 +278,7 @@ head of the input stream.
         is emitted;
 
       \item else, an error is signalled (invalid character).
-   
+
     \end{itemize*}
 
 \end{itemize*}
