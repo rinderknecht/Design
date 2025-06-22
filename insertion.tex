@@ -235,7 +235,7 @@ y\). Therefore, one application of \emph{rule~\(\kappa\) removes one
   inversion from the input.} As a corollary, the average number of
 inversions in a random permutation of \(n\)~objects is
 \begin{equation*}
-\belowdisplayskip=-4pt
+%\belowdisplayskip=-4pt
 \sum_{j=0}^{n-1}\frac{1}{j+1}\sum_{i=0}^{j}\len{\kappa^i} =
 \sum_{j=0}^{n-1}\frac{1}{j+1}\cdot\frac{j(j+1)}{2} =
 \frac{1}{2}\sum_{j=0}^{n-1}j =
@@ -244,7 +244,7 @@ inversions in a random permutation of \(n\)~objects is
 \index{permutation!inversion|)}
 
 \paragraph{Exercises}
-\begin{enumerate*}
+\begin{enumerate}
 
   \item A sorting algorithm that preserves the relative order of equal
     keys is said \emph{stable}. Is
@@ -278,7 +278,7 @@ inversions in a random permutation of \(n\)~objects is
     0\). \emph{Hint:} The use of rule~\(\lambda\) implies a comparison
     if, and only if, \(s\)~is not empty.
 
-\end{enumerate*}
+\end{enumerate}
 
 \addcontentsline{toc}{subsection}{Soundness}
 \paragraph{Ordered stacks}
@@ -797,7 +797,7 @@ example, a finger pointing at~\(5\) in the simulated stack
 understood by drawing it with the top facing the \emph{right} side of
 the page:
 \begin{equation*}
-\abovedisplayskip=0pt
+%\abovedisplayskip=0pt
 %\abovedisplayshortskip=0pt
 %\belowdisplayskip=0pt
 \begin{array}{@{}r|c|c|c|ccc|c|c|c|c|l@{}}
@@ -816,7 +816,7 @@ for~\(2\) and then push~\(1\) on the right stack, as, by convention,
 the finger always points to the top of the right stack, where the last
 inserted key is:
 \begin{equation*}
-\abovedisplayskip=0pt
+%\abovedisplayskip=0pt
 \begin{array}{@{}|c|ccc|c|c|c|c|c|c|c|@{}}
   \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{}
 & \multicolumn{1}{c}{} & \multicolumn{1}{c}{\downarrow}\\
@@ -869,18 +869,19 @@ Rule~\(\xi\) introduces the two stacks used for insertion. Rules
 definition. Rule~\(\sigma\) is used to move keys from the right stack
 to the left stack. Rule~\(\tau\) moves them the other
 way. Rule~\(\upsilon\) performs the insertion itself, namely, on top
-of the right stack. \Fig~\vref{fig:i2w2314} shows the evaluation of
-\(\fun{i2w}([2,3,1,4])\), whose trace \index{functional
-  language!evaluation!trace} is then \((\xi)(\upsilon)(\sigma\upsilon)
-(\tau\upsilon)(\sigma^3\upsilon)(\rho^3\pi)\). The number of times
-rule~\(\rho\) is used is the number of keys on the left
-stack after there are no more keys to sort. Rule~\(\pi\) is used once.
-\begin{figure}[h]
+of the right stack. \Fig~\vref{fig:i2w2314}
+\begin{figure}[t]
 \centering
 \includegraphics[bb=71 523 257 721]{i2w2314}
 \caption{\(\fun{i2w}([2,3,1,4]) \twoheadrightarrow [1,2,3,4]\)}
 \label{fig:i2w2314}
 \end{figure}
+shows the evaluation of
+\(\fun{i2w}([2,3,1,4])\), whose trace \index{functional
+  language!evaluation!trace} is then \((\xi)(\upsilon)(\sigma\upsilon)
+(\tau\upsilon)(\sigma^3\upsilon)(\rho^3\pi)\). The number of times
+rule~\(\rho\) is used is the number of keys on the left
+stack after there are no more keys to sort. Rule~\(\pi\) is used once.
 
 \mypar{Extremal costs}
 \index{insertion sort!2-way $\sim$!minimum cost|(}
@@ -958,18 +959,25 @@ keys? To guess what happens, let us insert~\(x_4\) assuming either
   stack, yielding the configuration \([x_4]\) and \([x_2, x_0, x_1,
   x_3]\), so \(x_4 \prec x_2 \prec x_0 \prec x_1 \prec x_3\),
   corresponding to the trace
-  \((\xi)(\upsilon)(\sigma\upsilon)(\tau\upsilon)(\sigma^3\upsilon)
-  (\tau^3\upsilon)(\rho\pi)\), whose length is~\(16\).
+  \begin{equation*}
+    (\xi)(\upsilon)(\sigma\upsilon)(\tau\upsilon)(\sigma^3\upsilon)
+    (\tau^3\upsilon)(\rho\pi),
+  \end{equation*}
+  whose length is~\(16\).
 
 \item If \(x_1 \prec x_2\), we want to insert~\(x_4\) at the bottom of
   the right stack, thus obtaining \([x_2, x_1, x_0, x_3]\) and
   \([x_4]\): \(x_3 \prec x_0 \prec x_1 \prec x_2 \prec x_4\),
-  corresponding to the trace \((\xi)(\upsilon)
+  corresponding to the trace
+  \begin{equation*}
+    (\xi)(\upsilon)
   (\sigma\upsilon)(\sigma\upsilon)(\tau^2\upsilon)(\sigma^4\upsilon)
-  (\rho^4\pi)\), whose length is~\(19\). It is perhaps better
+    (\rho^4\pi),
+  \end{equation*}
+  whose length is~\(19\). It is perhaps better
   visualised by means of oriented edges, revealing a spiral in
   \fig~\vref{fig:spiral}.
-    \begin{figure}
+    \begin{figure}[h]
       \centering
       \includegraphics[bb=71 671 185 716]{a3a0a1a2a4}
       \caption{Worst case for \fun{i2w/1} if \(n=5\) (\(x_1 \prec x_2\))}
@@ -980,9 +988,10 @@ keys? To guess what happens, let us insert~\(x_4\) assuming either
 Therefore, it seems that when the number of keys is odd, having \(x_1
 \prec x_2\) leads to the maximum cost, whilst \(x_2 \prec x_0\) leads
 to the maximum cost when the number of keys is even. Let us determine
-these costs for any~\(n\) and find out which is the greater. Let us
-note \(\W{x_1 \prec x_2}{2p+1}\) the former cost and \(\W{x_2 \prec
-  x_0}{2p}\) the latter.
+these costs for any~\(n\) and find out which is the greater.
+
+Let us note \(\W{x_1 \prec x_2}{2p+1}\) the former cost and \(\W{x_2
+  \prec x_0}{2p}\) the latter.
 \begin{itemize}
 
 \item If \(n = 2p+1\) and \(x_1 \prec x_2\), then the evaluation trace
@@ -1102,19 +1111,19 @@ this discussion about the worst case of \fun{i2w/1}:
   total order \(x_{2p} \prec x_{2p-2} \prec \dots \prec x_0 \prec x_1
   \prec x_3 \prec \dots \prec x_{2p-3} \prec x_{2p-1}\) and
   \(\W{\fun{i2w}}{2p} = 2p^2 + 2p + 2\), that is, \(\W{\fun{i2w}}{n} =
-  n^2/2 + n + 2\).
+  n^2\!/2 + n + 2\).
 
 \item If \(n = 2p+1\), the worst case happens when the keys satisfy
   the order \(x_{2p-1} \prec x_{2p-3} \prec \dots \prec x_3 \prec x_0
   \prec x_1 \prec x_2 \prec \dots \prec x_{2p-2} \prec x_{2p}\) and
   \(\W{\fun{i2w}}{2p+1} = 2p^2 + 4p + 3\), that is, \(\W{\fun{i2w}}{n}
-  = n^2/2 + n + 3/2\).
+  = n^2\!/2 + n + 3/2\).
 
 \end{itemize}
 The first case yields the maximum cost:
 \begin{equation*}
 %\abovedisplayskip=0pt
-\belowdisplayskip=0pt
+%\belowdisplayskip=0pt
   \W{\fun{i2w}}{n} = \frac{1}{2}{n^2} + n + 2 = \W{\fun{isrt}}{n} - n
   + 1 \sim
   \W{\fun{isrt}}{n} \sim \frac{1}{2}{n^2}.
@@ -1132,7 +1141,7 @@ as with \(\M{\fun{isrt}}{n}\), namely, we look for the cost for
 sorting all permutations of \((1,2,\dots,n)\), divided by~\(n!\). The
 insertions are illustrated by the \emph{evaluation
   tree}\index{tree!evaluation $\sim$} in \fig~\ref{fig:2way_unbal},
-\begin{figure}[!b]
+\begin{figure}[t]
 \centering
 \includegraphics{2way_unbal}
 \caption{Sorting \([a,b,c]\) (first argument of \fun{i2w/3} hidden)}
@@ -1142,9 +1151,10 @@ where the keys \(a\), \(b\) and~\(c\) are inserted in this order in a
 stack originally empty, with all possible total orders. Note how all
 permutations are attained exactly once at the external
 nodes\index{tree!node!external $\sim$} (see
-page~\pageref{def:external_node}). For example, \([a,b,c]\) and
-\([c,b,a]\) are external nodes. The total cost is the \emph{external
-  path length}\index{tree!external path
+page~\pageref{def:external_node}).
+
+For example, \([a,b,c]\) and \([c,b,a]\) are external nodes. The total
+cost is the \emph{external path length}\index{tree!external path
   length}\label{external_path_length} of the tree, that is, the sum of
 the lengths of the paths from the root to all the external nodes,
 which is the same as the sum of the lengths of all possible
@@ -1458,8 +1468,9 @@ determining the length of the left stack in the best case. By design,
 if the total number of keys is even, then the two stacks will end up
 containing, before using rule~\clause{\rho}, exactly half of them,
 because the stacks have the same length. If the total is odd, the left
-stack contains the integral part of this number halved. Technically,
-let us note \(\B{\fun{i2wb}}{n}\) the cost of any call
+stack contains the integral part of this number halved.
+
+Technically, let us note \(\B{\fun{i2wb}}{n}\) the cost of any call
 \(\fun{i2wb}(s)\), where the stack~\(s\) contains \(n\)~keys. If \(p
 \geqslant 0\), then
 \begin{equation*}
@@ -1554,10 +1565,13 @@ Let us reuse previous calculations:
 \end{equation*}
 We have \(1 + x < e^x\), for all real \(x \neq 0\). In particular,
 \(x=1/i\), for~\(i>0\) integer, leads to \(1 + 1/i < e^{1/i}\). Both
-sides being positive, we deduce \(\prod_{i=1}^{n}(1+1/i) <
-\prod_{i=1}^{n}{e^{1/i}} \Leftrightarrow n+1 < \exp(H_n)\). Finally,
-\(\ln(n+1) < H_n\). An upper bound of~\(H_n\) can be similarly derived
-by replacing~\(x\) by~\(-1/i\):
+sides being positive, we deduce
+\begin{equation*}
+  \prod_{i=1}^{n}\left(1+\frac{1}{i}\right) <
+  \prod_{i=1}^{n}{e^{1/i}} \Leftrightarrow n+1 < \exp(H_n).
+\end{equation*}
+Finally, \(\ln(n+1) < H_n\). An upper bound of~\(H_n\) can be
+similarly derived by replacing~\(x\) by~\(-1/i\):
 \begin{equation}
 \ln(n+1) < H_n < 1 + \ln n.\label{ineq:Hn}
 \end{equation}

@@ -27,7 +27,7 @@ consecutively repeated items. For example, we might have \(\fun{red}([4,1,2,2,2,
 % [6] vertical lines
 % {r} mandatory right placement (better because of a list)
 \centering
-\includegraphics[bb=71 672 203 721]{red}
+\includegraphics[bb=71 672 203 727]{red} % 721]
 \caption{Reducing}
 \label{fig:red}
 \end{wrapfigure}
@@ -112,7 +112,7 @@ The corresponding directed acyclic graphs are found in
 \end{figure}
 History \([[4,2,1],[2,1],[3,2,1],[2,1],[1],\el]\) is displayed in
 \fig~\ref{fig:history}
-\begin{figure}[!b]
+\begin{figure}
 \centering
 \includegraphics[bb=70 575 247 723]{history}
 \caption{History \([[4,2,1],[2,1],[3,2,1],[2,1],[1],\el]\)}
@@ -182,7 +182,7 @@ studied queueing (see in particular \fig~\vref{fig:enq_deq}), except
 that we choose here a leftwards orientation to mirror the notation for
 stacks, whose tops are laid out on the left of the page. Consider for
 instance the history in \fig~\vref{fig:history1}.
-\begin{figure}[b]
+\begin{figure}
 \centering
 \includegraphics[bb=69 577 300 726,scale=0.9]{history1}
 \caption{$[\ufun{pop}(), \ufun{pop}(), \ufun{push}(4),\ufun{push}(3),
@@ -296,7 +296,7 @@ section~\vref{sec:flattening}. There is still room for improvement if
 the historical line meets the absissa axis, as there is no need to
 visit the updates \emph{before} a pop resulting into an empty version;
 for instance, in \fig~\vref{fig:back2zero},
-\begin{figure}[b]
+\begin{figure}
 \centering
 \includegraphics[bb=69 606 300 726,scale=0.9]{back2zero}
 \caption{Last version $[3]$ found in four steps}
@@ -477,7 +477,7 @@ the new historical line does not cross the absissa axis. We can see in
 \end{equation*}
 All these examples help in guessing the characteristic property for a
 replacement to be valid:
-\begin{itemize}
+\begin{itemize*}
 
   \item the replacements of a pop by a push, a pop by a pop, a push by
     a push are always valid;
@@ -487,7 +487,7 @@ replacement to be valid:
     \(0\)~and~\(k-1\) remains above or reaches without crossing the
     horizontal line of ordinate~\(2\).
 
-\end{itemize}
+\end{itemize*}
 We can divide the algorithm in two phases. First, the update to be
 replaced must be found, but, the difference with \fun{ver\(_4\)/3} is
 that we may need to know if the historical line before reaching the
@@ -564,7 +564,7 @@ for a big\hyp{}step design in \fig~\ref{fig:chg}.
 \end{figure}
 Notice how the length~\(n'\) of the new history is simply passed down
 the inference rules. It can simply be made out:
-\begin{itemize}
+\begin{itemize*}
 
   \item replacing a pop by a pop or a push by a push leaves the
     original length invariant;
@@ -575,7 +575,7 @@ the inference rules. It can simply be made out:
   \item replacing a push by a pop, assuming this is valid, decreases
     the original length by~\(2\).
 
-\end{itemize}
+\end{itemize*}
 This task is up to the new
 function~\fun{rep/3}\index{rep@\fun{rep/3}|(} (\emph{replace}), which
 implements the second phase. The design is to return a pair made of

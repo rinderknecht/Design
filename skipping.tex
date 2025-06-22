@@ -561,25 +561,26 @@ have\index{slst0@$\C{\fun{slst}_0}{n}$}\index{rev@$\C{\fun{rev}}{n}$}
 \(\C{\fun{slst}_0}{n,k} = 1 + \C{\fun{rev}}{n} +
 \C{\fun{sfst}}{n,n-k-1} + \C{\fun{rev}}{n-1} = 3n - k +
 4\). Therefore, we can derive the minimum and
-maximum\index{stack!skipping an item!minimum
-  cost}\index{stack!skipping an item!maximum cost} costs:
+maximum costs:
+\index{stack!skipping an item!minimum cost}
+\index{stack!skipping an item!maximum cost}
 \begin{equation*}
-\abovedisplayskip=0pt
-\belowdisplayskip=0pt
+%\abovedisplayskip=0pt
+%\belowdisplayskip=0pt
 \B{\fun{slst}_0}{n} = \min_{k < n}\{3n+6,3n-k+4\} = 2n + 5,
 \end{equation*}
 when\index{slst@$\B{\fun{slst}_0}{n}$} \(x\)~is last in~\(s\), and
 \begin{equation*}
-\abovedisplayskip=0pt
-\belowdisplayskip=0pt
+%\abovedisplayskip=0pt
+%\belowdisplayskip=0pt
 \W{\fun{slst}_0}{n} = \max_{k < n}\{3n+6,3n-k+4\} = 3n+6,
 \end{equation*}
 when\index{slst@$\W{\fun{slst}_0}{n}$} \(x\)~is missing in~\(s\).  The
 mean cost\index{stack!skipping an item!average
   cost}\index{slst@$\M{\fun{slst}_0}{n}$} when \(x\)~is present is
 \begin{equation*}
-\abovedisplayskip=0pt
-\belowdisplayskip=0pt
+%\abovedisplayskip=0pt
+%\belowdisplayskip=0pt
 \M{\fun{slst}_0}{n} = \frac{1}{n}\sum_{k=0}^{n-1}\C{\fun{slst}_0}{n,k}
                     = \frac{1}{n}\sum_{k=0}^{n-1}(3n - k + 4)
                     = \frac{5n+9}{2} \sim \frac{5}{2}n.
@@ -663,8 +664,8 @@ x_1 < x_2 < \dots < x_p < n\) the positions of the \(p\)~occurrences
 of~\(x\) in~\(s\). The evaluation trace\index{functional
   language!evaluation!trace} is
 \begin{equation*}
-\abovedisplayskip=0pt
-\belowdisplayskip=0pt
+%\abovedisplayskip=0pt
+%\belowdisplayskip=0pt
 \tau^{x_1}
 \cdot
 \prod_{k=2}^{p}(\sigma\chi^{x_k-x_{k-1}-1})(\phi\tau^{x_k-x_{k-1}-1})
@@ -733,7 +734,7 @@ first and the last:
 \end{align}
 
 \paragraph{Exercises}
-\begin{enumerate}
+\begin{enumerate*}
 
   \item Prove that \(\fun{sfst/2} = \fun{sfst\(_0\)/2}\).
     \index{sfst@\fun{sfst/2}}\index{sfst0@\fun{sfst\(_0\)/2}}
@@ -750,4 +751,4 @@ first and the last:
     \fun{slst\(_0\)/2}\index{slst@\fun{slst\(_0\)/2}} with that of
     \fun{slst/2}\index{slst@\fun{slst/2}}.
 
-\end{enumerate}
+\end{enumerate*}
