@@ -188,9 +188,8 @@ to deduce the total cost in this case, we must find a
 which we mean to identify patterns whose costs are easy to calculate
 and which make up any path, or to associate any path to another path
 whose cost is the same but easy to find.
-
 \Fig~\ref{fig:dyck_eq}
-\begin{figure}[!b]
+\begin{figure}
 \centering
 \includegraphics[bb=75 570 508 727,scale=0.7]{dyck_eq}
 \caption{Dyck path equivalent to \fig~\ref{fig:dyck_path}}
@@ -207,9 +206,7 @@ the first fall after it. This brings us down by~\(1\) and the process
 resumes until the abscissas are reached. We call this method
 \emph{rescheduling}\index{Dyck path!rescheduling} because it amounts,
 in operational terms, to reordering subsequences of operations \emph{a
-posteriori}.
-
-For instance, \fig~\vref{fig:rescheduling}
+posteriori}. For instance, \fig~\vref{fig:rescheduling}
 \begin{figure}
 \centering
 \subfloat[Initial\label{fig:initial}]{%
@@ -283,9 +280,8 @@ given in \fig~\ref{fig:meander1},
 \end{figure}
 where the last operation is a dequeueing. The dotted line delineates
 the result of applying the rescheduling we used on Dyck paths. Here,
-the last operation becomes an enqueueing.
-
-Another possibility is shown in \fig~\ref{fig:meander2},
+the last operation becomes an enqueueing. Another possibility is shown
+in \fig~\ref{fig:meander2},
 \begin{figure}[t]
 \centering
 \includegraphics[bb=75 570 480 727,scale=0.82]{meander2}

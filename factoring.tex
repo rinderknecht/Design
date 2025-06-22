@@ -337,7 +337,7 @@ improvement for that case, but would make the case when the text
 contains the pattern the worst: just after rule~\(\tau\), let us add
 \index{word factoring!na\"{\i}ve $\sim$!maximum cost|)}
 \begin{equation*}
-\belowdisplayskip=0pt
+%\belowdisplayskip=0pt
 \fun{pre}([a],[b],p',t',j) \rightarrow \fun{absent}();\index{pre@\fun{pre/5}}
 \end{equation*}
 
@@ -350,8 +350,9 @@ is~\(\breve{a} > 1\). Na\"{\i}ve factoring consists in matching a
 pattern against the prefixes of the suffixes of a text, by decreasing
 lengths. Let~\(\OM{\breve{a}}{m}\) \index{loc@$\OM{\breve{a}}{n}$} be
 the average number of letter comparisons for comparing two words of
-length~\(m\) over the alphabet~\(\breve{a}\). The average number
-\(\OM{\fun{loc}}{m,n}\) of comparisons for na\"{\i}ve factoring is
+length~\(m\) over the alphabet~\(\breve{a}\). TTrehrefore, the average
+number \(\OM{\fun{loc}}{m,n}\) of comparisons for the na\"{\i}ve
+factoring algorithm is
 \begin{equation}
 \OM{\fun{loc}}{m,n} = (n-m+1)\OM{\breve{a}}{m} + \OM{\breve{a}}{m-1},
 \label{eq:loc}
@@ -1089,9 +1090,9 @@ of the pattern has been found).
 \label{fig:metaprog}
 \end{wrapfigure}
 There is a graphical way to represent the contents of the table in
-\fig~\vref{fig:mp_fail} called \emph{deterministic finite automaton}
+\fig~\vref{fig:mp_fail} called a \emph{deterministic finite automaton},
 \index{word factoring!Morris-Pratt!automaton} \index{finite
-  automaton!deterministic $\sim$} and shown in
+  automaton!deterministic $\sim$} and it is shown in
 \fig~\vref{fig:abacabac}.
 \begin{figure}[b]
 \centering
@@ -1099,14 +1100,14 @@ There is a graphical way to represent the contents of the table in
 \caption{Morris-Pratt automaton for the pattern \word{abacabac}}
 \label{fig:abacabac}
 \end{figure}
-We will here only describe informally automata; for a full treatment,
-see \cite{VanLeeuwen_1990c, HopcroftMotwaniUllman_2003,
+We will here only describe informally such automata; for a full
+treatment, see \cite{VanLeeuwen_1990c, HopcroftMotwaniUllman_2003,
   Sakarovitch_2003}. Consider that the circles, called
 \emph{states}\index{states}, contain the values of~\(i\) from the
 table. The edges, called \emph{transitions}\index{transition}, between
 two states are of two kinds: either solid and carrying a letter,
 called \emph{label}\index{label}, or dotted and going backwards. The
-succession of states throughout solid edges make the word
+sequence of states throughout solid edges make the word
 \(x=\word{abacabac}\). The rightmost state is distinguished by a
 double circling because it marks the end of~\(x\). There is a back
 edge between state~\(i\) and~\(j\) only if \(\MPfailure{x}{}{i} = j\).

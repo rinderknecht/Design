@@ -210,9 +210,9 @@ results, thus called an \emph{accumulator}\index{functional
   language!accumulator}. We can see it at work in
 \fig~\vref{fig:rev_321}.
 
-\bigskip
+\par\vskip\baselineskip
 
-Let us prove\label{EqRev} \(\pred{EqRev}{s} \colon
+\noindent Let us prove\label{EqRev} \(\pred{EqRev}{s} \colon
 \fun{rev}_0(s) \equiv
 \fun{rev}(s)\)\index{rev@\fun{rev/1}|(}\index{EqRev@\predName{EqRev}|(}
 by
@@ -245,7 +245,7 @@ structural\index{stack!reversal!equivalence}\index{equivalence!proof
 \end{figure}
 \index{rcat@\fun{rcat/2}|)}
 
-The former is easy:
+\noindent The former is easy:
 \begin{equation*}
   \fun{rev}_0(\el) \xrightarrow{\smash{\gamma}}
   \el \xleftarrow{\smash{\zeta}} \fun{rcat}(\el,\el)
@@ -400,8 +400,8 @@ rule~\clause{\delta} produces a series of calls to
 where \(s = [x_1, x_2, \dots, x_n]\). The cost of all these calls to
 \fun{cat/2}\index{cat@\fun{cat/2}} is thus
 \begin{equation*}
-\abovedisplayskip=4pt
-\belowdisplayskip=4pt
+%\abovedisplayskip=4pt
+%\belowdisplayskip=4pt
  1 + 2 + \dots + (n-1) = \frac{1}{2}n(n-1) \sim \frac{1}{2}n^2,
 \end{equation*}
 because the cost of \(\fun{cat}(s,t)\)\index{cat@\fun{cat/2}} is \(1 +

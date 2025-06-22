@@ -31,7 +31,7 @@ different ways.
 % {r} mandatory right placement
 % [0pt] of margin overhang
 \centering
-\includegraphics[bb=71 646 160 712]{catalan_tree}
+\includegraphics[bb=71 646 160 713]{catalan_tree} % 721]
 \caption{Catalan tree of height~4}
 \label{fig:catalan_tree}
 \end{wrapfigure}
@@ -81,10 +81,10 @@ measure of size in this chapter.
 \hspace*{0pt} % Somehow needed nowadays
 \centering
 \subfloat[Dyck path\label{fig:dyck}]{%
-  \includegraphics[bb=71 634 158 720]{dyck}}
+  \includegraphics[bb=71 634 158 720]{dyck}} % 720]
 \quad
 \subfloat[Catalan tree\label{fig:ctree}]{%
-\includegraphics[bb=65 663 127 721]{ctree}
+\includegraphics[bb=65 663 127 721]{ctree} % 721]
 }
 \caption{Bijection}
 \label{fig:bijection}
@@ -568,8 +568,9 @@ For further reading, we recommend the papers by
 As mentioned earlier, the \emph{height} of a tree is the number of
 edges on a maximal path from the root to a leaf, that is, a node
 without subtrees; for example, we can follow down and count the edges
-connecting the nodes~\((\circ)\) in \fig~\ref{fig:catalan_tree}. A
-tree reduced to a single leaf has height~\(0\).
+connecting the nodes~\((\circ)\) in
+\fig~\vref{fig:catalan_tree}. Accordingly, a tree reduced to a single
+leaf has height~\(0\).
 
 We begin with the key observation that a Catalan tree with \(n\)~edges
 and height~\(h\) is in bijection with a Dyck path of length~\(2n\) and
@@ -600,7 +601,7 @@ rotate the segment from $(0,0)$ to~$A$, and the segment from~$B$
 to~$(n,n)$ by 180$^\circ$. The invariant fall $(A,B)$ now connects the
 rotated segments. This way, what was the apex becomes the origin and
 vice\hyp{}versa, making this a height\hyp{}preserving bijection
-between paths. See \fig~\ref{fig:h_prime}.
+between paths. See \fig~\vref{fig:h_prime}.
 \begin{figure}
 \centering
 \includegraphics{h_prime}

@@ -490,15 +490,6 @@ between two keys \(a_i\)~and~\(a_j\), noted \(a_i?a_j\). Note that
 leaves, in this setting, are internal nodes with two external nodes as
 children.
 
-\begin{wrapfigure}[9]{r}[0pt]{0pt}
-% [9] vertical lines
-% {r} mandatory right placement
-% [0pt] of margin overhang
-\centering
-\includegraphics[bb=71 638 217 723]{red_cmp}
-\caption{Useless \(a_1 > a_3\)}
-\label{fig:red_cmp}
-\end{wrapfigure}
 If \(a_i < a_j\), then this property holds everywhere in the left
 subtree, otherwise \(a_i > a_j\) holds in the right subtree. This tree
 is one possible amongst many: it corresponds to an algorithm which
@@ -506,6 +497,17 @@ starts by comparing \(a_1\)~and~\(a_2\) and there are, of course, many
 other strategies. But it does not contain redundant comparisons: if a
 path from the root to a leaf includes \(a_i < a_j\) and \(a_j < a_k\),
 we do not expect the useless \(a_i < a_k\). \Fig~\vref{fig:red_cmp}
+\begin{figure}
+%\begin{wrapfigure}[8]{r}[0pt]{0pt}
+% [8] vertical lines
+% {r} mandatory right placement
+% [0pt] of margin overhang
+\centering
+\includegraphics[bb=71 638 217 723]{red_cmp} %723]
+\caption{Useless \(a_1 > a_3\)}
+\label{fig:red_cmp}
+%\end{wrapfigure}
+\end{figure}
 shows an excerpt of a comparison tree with such a useless
 comparison. The special external node~\(\bot\) corresponds to no
 permutation because the comparison \(a_1 < a_3\) cannot fail as it is

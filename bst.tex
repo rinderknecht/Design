@@ -4,16 +4,16 @@ Searching for an internal node in a binary tree can be costly because,
 in the worst case, the whole tree must be traversed, for example, in
 preorder or level\hyp{}order. To improve upon this, two situations are
 desirable: the binary tree should be as balanced\index{binary
-  tree!balanced $\sim$} as possible and the choice of visiting
+  tree!balanced $\sim$} as possible and the choice of visiting the
+left or right subtree should be taken only upon examining the contents
+in the root, called \emph{key}\index{key}.
+
 \begin{wrapfigure}[7]{r}[0pt]{0pt}
 \centering
-\includegraphics[bb=71 661 118 724]{bst_ex}
+\includegraphics[bb=71 661 118 724]{bst_ex} %724]
 \caption{}
 \label{fig:bst_ex}
 \end{wrapfigure}
-the left or right subtree should be taken only upon examining the
-contents in the root, called \emph{key}\index{key}.
-
 The simplest solution consists in satisfying the latter condition and
 later see how it fits the former. A \emph{binary search tree}
 \citep{Mahmoud_1992}\index{binary search tree} \(\fun{bst}(x, t_1,
@@ -60,9 +60,12 @@ redefinition of \fun{in/2}\index{in@\fun{in/2}} in
 the stack is sorted increasingly, so the maximum cost is
 \(\W{\fun{ord}}{n} = n\), if \(n > 0\). The best case is manifest when
 the first key is greater than the second, so the minimum cost is
-\(\B{\fun{ord}}{n} = 1\). Summing up: \(\B{\fun{bst}_0}{n} = 1 +
-(2n+2) + 1 = 2n + 4\) and \(\W{\fun{bst}_0}{n} = 1 + (2n+2) + n = 3n +
-3\).
+\(\B{\fun{ord}}{n} = 1\). Summing up:
+\begin{align*}
+  \B{\fun{bst}_0}{n} & = 1 + (2n+2) + 1 = 2n + 4;\\
+  \W{\fun{bst}_0}{n} & = 1 + (2n+2) + n = 3n + 3.
+\end{align*}
+
 
 A better design consists in not constructing the inorder stack and
 only \emph{keeping the smallest key so far}, assuming the traversal is
@@ -114,12 +117,16 @@ information were deemed useful.\index{true@\fun{true/1}}
 
 In the worst case, the original tree is a binary search tree, hence it
 has to be traversed in its entirety. If there are \(n\)~internal
-nodes, the maximum cost is \(\W{\fun{bst}}{n} = 1 + 2n + (n+1) + 1 =
-3n + 3\)\index{bst@$\W{\fun{bst}}{n}$} because each internal node
-triggers one call to \fun{bst\(_1\)/2}\index{bst1@\fun{bst\(_1\)/2}} and, in
-turn, one call to \fun{cmp/3}\index{cmp@\fun{cmp/3}}; also, all the
-\(n+1\) external nodes are visited. Consequently, \(\W{\fun{bst}_0}{n}
-= \W{\fun{bst}}{n}\),\index{bst0@$\W{\fun{bst}_0}{n}$} if \(n > 0\),
+nodes, the maximum cost is
+\begin{equation*}
+  \W{\fun{bst}}{n} = 1 + 2n + (n+1) + 1 = 3n + 3,
+  \index{bst@$\W{\fun{bst}}{n}$}
+\end{equation*}
+because each internal node triggers one call to
+\fun{bst\(_1\)/2}\index{bst1@\fun{bst\(_1\)/2}} and, in turn, one call
+to \fun{cmp/3}\index{cmp@\fun{cmp/3}}; also, all the \(n+1\) external
+nodes are visited. Consequently, \(\W{\fun{bst}_0}{n} =
+\W{\fun{bst}}{n}\),\index{bst0@$\W{\fun{bst}_0}{n}$} if \(n > 0\),
 which is not an improvement. Nevertheless, here, we do not build a
 stack with all the keys, which is a definite gain in terms of memory
 allocation.
@@ -142,8 +149,12 @@ too. Two configurations work:
 where \(x \succcurlyeq y\). (The second tree is the left rotation of
 the first. We have seen \vpageref{par:rotation} that inorder
 traversals are invariant through rotations.) The minimum cost in both
-cases is \(\B{\fun{bst}}{n} = 8\),\index{bst@$\B{\fun{bst}}{n}$} to be
-contrasted with the linear cost \(\B{\fun{bst}_0}{n} = 2n +
+cases is
+\begin{equation*}
+  \B{\fun{bst}}{n} = 8,
+  \index{bst@$\B{\fun{bst}}{n}$}
+\end{equation*}
+to be contrasted with the linear cost \(\B{\fun{bst}_0}{n} = 2n +
 4\)\index{bst0@$\B{\fun{bst}_0}{n}$} due to the inevitable complete
 inorder traversal.
 
@@ -157,7 +168,7 @@ for it in~\(t_2\); otherwise, if \(x \succ y\), we look in~\(t_1\);
 finally, if \(y = x\), we just found it at the root of the given
 tree. The definition of \fun{mem/2} (\emph{membership}) is shown in
 \fig~\vref{fig:mem}.
-\begin{figure}[b]
+\begin{figure}
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}l@{\;}l}
@@ -414,8 +425,8 @@ variant. But the final judgement requires a benchmark.
 As a last note, we may simplify Andersson's program by getting rid of
 the initial emptiness test in \fun{mem\(_1\)/2}.\index{mem1@\fun{mem\(_1\)/2}} What we need to do is
 simply have a candidate be the subtree whose root is the candidate in
-the original program. See \fig~\vref{fig:mem3}
-\begin{figure}[b]
+the original program. See \fig~\vref{fig:mem3},
+\begin{figure}
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}l@{\;}l}
@@ -432,15 +443,15 @@ the original program. See \fig~\vref{fig:mem3}
 \caption{Andersson's search (tree candidate)}
 \label{fig:mem3}
 \end{figure}
-where we have \(\OW{\fun{mem}_3}{n} = \OW{\fun{mem}_1}{n} = n + 1\).
-This version may be preferred only if the programming language used
-for the implementation features \emph{aliases}\index{memory!aliasing}
-in patterns or, equivalently, if the compiler can detect that the term
-\(\fun{bst}(x,t_1,t_2)\) can be shared instead of being duplicated in
-the second rule of \fun{mem\(_4\)/3} (here, we assume that sharing is
-implicit and maximum within a rule).\index{mem4@\fun{mem\(_4\)/3}} For
-additional information on Andersson's variant, read
-\cite{Spuler_1992}.
+where the maximum costs are \(\OW{\fun{mem}_3}{n} =
+\OW{\fun{mem}_1}{n} = n + 1\).  This version may be preferred only if
+the programming language used for the implementation features
+\emph{aliases}\index{memory!aliasing} in patterns or, equivalently, if
+the compiler can detect that the term \(\fun{bst}(x,t_1,t_2)\) can be
+shared instead of being duplicated in the second rule of
+\fun{mem\(_4\)/3} (here, we assume that sharing is implicit and
+maximum within a rule).\index{mem4@\fun{mem\(_4\)/3}} For additional
+information on Andersson's variant, read \cite{Spuler_1992}.
 
 
 \section{Insertion}
@@ -461,7 +472,7 @@ the keys, based on the definition of
 \fig~\vref{fig:mem0}. Alternatively, we can reuse Andersson's lookup,
 as shown in \fig~\vref{fig:insl1}.\index{insl1@\fun{insl/1}}
 
-\bigskip
+\par\vskip\baselineskip
 
 \begin{figure}[h]
 \begin{equation*}
@@ -478,7 +489,7 @@ as shown in \fig~\vref{fig:insl1}.\index{insl1@\fun{insl/1}}
 \label{fig:insl}
 \end{figure}
 
-\bigskip
+\par\vskip\baselineskip
 
 \begin{figure}[h]
 \begin{equation*}
@@ -566,9 +577,9 @@ nodes of~\(t\) are equally likely to grow a leaf containing~\(x\), the
 average cost \(\M{\fun{insl}}{k}\)\index{insl@$\M{\fun{insl}}{k}$} of
 \(\fun{insl}(x,t)\) only depends on the size~\(k\) of the trees:
 \begin{equation}
-\abovedisplayskip=2pt
-\abovedisplayshortskip=2pt
-\belowdisplayskip=4pt
+%\abovedisplayskip=2pt
+%\abovedisplayshortskip=2pt
+%\belowdisplayskip=4pt
 \M{\fun{mkl}}{n} = 2 + \sum_{k=0}^{n-1}\M{\fun{insl}}{k}.
 \label{eq:Mmkl0}
 \end{equation}
@@ -598,8 +609,8 @@ insertion is that of an unsuccessful search:
 Recalling equation~\eqref{eq:Mmems} \vpageref{eq:Mmems},
 equations~\eqref{eq:Mmkl0}, \eqref{eq:n_EIn} and~\eqref{eq:n_plus_EIn}:
 \begin{equation*}
-\abovedisplayskip=2pt
-\belowdisplayskip=0pt
+%\abovedisplayskip=2pt
+%\belowdisplayskip=0pt
 \M{\fun{mem}}{n{\scriptscriptstyle(+)}}
 = 1 + \frac{1}{n}\Expected{I_n}
 = \frac{1}{n}(\M{\fun{mkl}}{n} - 2)
@@ -608,8 +619,8 @@ equations~\eqref{eq:Mmkl0}, \eqref{eq:n_EIn} and~\eqref{eq:n_plus_EIn}:
 \end{equation*}
 Finally, using equation~\eqref{eq:Mmem} \vpageref{eq:Mmem}, we deduce
 \begin{equation*}
-\abovedisplayskip=0pt
-\belowdisplayskip=0pt
+%\abovedisplayskip=0pt
+%\belowdisplayskip=0pt
 \frac{1}{n}\sum_{k=0}^{n-1}\M{\fun{mem}}{k{\scriptscriptstyle (-)}}
 =
 \left(1 + \frac{1}{n}\right)
@@ -617,16 +628,16 @@ Finally, using equation~\eqref{eq:Mmem} \vpageref{eq:Mmem}, we deduce
 \end{equation*}
 Equivalently,
 \begin{equation*}
-\abovedisplayskip=-7pt
-\abovedisplayshortskip=-7pt
+%\abovedisplayskip=-7pt
+%\abovedisplayshortskip=-7pt
 2n + 1 + \sum_{k=0}^{n-1}\M{\fun{mem}}{k{\scriptscriptstyle (-)}}
 = (n+1) \M{\fun{mem}}{n{\scriptscriptstyle (-)}}.
 \end{equation*}
 This recurrence is easy to solve if we subtract its instance when
 \(n-1\):
 \begin{equation*}
-\abovedisplayskip=6pt
-\belowdisplayskip=6pt
+%\abovedisplayskip=6pt
+%\belowdisplayskip=6pt
 2 + \M{\fun{mem}}{n-1{\scriptscriptstyle(-)}} =
 (n+1) \M{\fun{mem}}{n{\scriptscriptstyle (-)}}
 - n \M{\fun{mem}}{n-1{\scriptscriptstyle (-)}}.
@@ -634,16 +645,16 @@ This recurrence is easy to solve if we subtract its instance when
 Noting that \(\M{\fun{mem}}{0{\scriptscriptstyle (-)}} = 1\), the
 equation becomes
 \begin{equation*}
-\abovedisplayskip=0pt
-\belowdisplayskip=0pt
+%\abovedisplayskip=0pt
+%\belowdisplayskip=0pt
 \M{\fun{mem}}{0{\scriptscriptstyle (-)}} = 1,\quad
 \M{\fun{mem}}{n{\scriptscriptstyle (-)}}
 = \M{\fun{mem}}{n-1{\scriptscriptstyle (-)}} + \frac{2}{n+1},
 \end{equation*}
 thus
 \begin{equation}
-\abovedisplayskip=-6pt
-\abovedisplayshortskip=-6pt
+%\abovedisplayskip=-6pt
+%\abovedisplayshortskip=-6pt
 \M{\fun{mem}}{n{\scriptscriptstyle (-)}} =
 1 + 2 \sum_{k=2}^{n+1}\frac{1}{k} = 2H_{n+1} - 1,
 \index{mem@$\M{\fun{mem}}{n{\scriptscriptstyle (-)}}$}
@@ -945,7 +956,7 @@ and left rotation, \fun{rotl/1}\index{rotl@\fun{rotl/1}} (\emph{rotate
   left}),\index{binary tree!rotation} were discussed in
 section~\ref{sec:traversals} \vpageref{par:rotation} and are defined
 in \fig~\vref{fig:rotations}.
-\begin{figure}[b]
+\begin{figure}
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}l@{\;}l}
@@ -961,14 +972,14 @@ in \fig~\vref{fig:rotations}.
 \end{figure}
 Obviously, they commute and are inverses of each other:
 \begin{equation*}
-\abovedisplayskip=5pt
-\belowdisplayskip=5pt
+%\abovedisplayskip=5pt
+%\belowdisplayskip=5pt
 \fun{rotl}(\fun{rotr}(t)) \equiv \fun{rotr}(\fun{rotl}(t)) \equiv t.
 \end{equation*}
 Moreover, and less trivially, they preserve inorder traversals:
 \begin{equation*}
-  \abovedisplayskip=5pt
-  \belowdisplayskip=5pt
+%  \abovedisplayskip=5pt
+%  \belowdisplayskip=5pt
   \fun{in}_3(\fun{rotl}(t)) \equiv \fun{in}_3(\fun{rotr}(t)) \equiv
   \fun{in}_3(t),
 \end{equation*}
@@ -1026,8 +1037,8 @@ is invariant.
 A corollary is that rotations keep invariant the property of being a
 binary search tree (\fig~\vref{fig:bst}):
 \begin{equation*}
-\abovedisplayskip=5pt
-\belowdisplayskip=5pt
+%\abovedisplayskip=5pt
+%\belowdisplayskip=5pt
 \fun{bst}(\fun{rotl}(t)) \equiv \fun{bst}(\fun{rotr}(t)) \equiv \fun{bst}(t).
 \end{equation*}
 Indeed, assuming that \fun{bst/1} is the specification of
@@ -1048,7 +1059,7 @@ equivalent to \(\fun{in}_2(\fun{rotl}(t),\el) \equiv
 Let us consider now an example of root insertion in
 \fig~\vref{fig:insr_ex}, where the tree of \fig~\vref{fig:bst_ex} is
 augmented with~\(7\).
-\begin{figure}[b]
+\begin{figure}
 \centering
 \includegraphics[bb=71 641 406 724]{insr_ex}%[bb=71 645 406 718]
 \caption{Root insertion of \(7\) into \fig~\vref{fig:bst_ex}}
@@ -1080,7 +1091,7 @@ Note that we can avoid creating the temporary internal nodes
 \fun{rotl/1} and \fun{rotr/1} so that they take three arguments
 (\fun{rotl\(_0\)/3} and \fun{rotr\(_0\)/3}), as shown along the new
 version \fun{insr\(_0\)/2} in \fig~\ref{fig:insr0}.
-\begin{figure}[b]
+\begin{figure}
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}l@{\;}l}
@@ -1336,6 +1347,7 @@ y\) or \(y \succ x\). We have
 
   \item If \(x \succ y\), then
 \begin{equation*}
+      \hspace*{-25mm}
 \begin{array}{@{}r@{\;}l@{\;}l@{\quad}r@{}}
 \otimes
 & \xrightarrow{\smash{\upsilon}} &
@@ -1356,8 +1368,9 @@ y\) or \(y \succ x\). We have
 \end{equation*}
 
   \item If \(y \succ x\), then
-\begin{equation*}
-\begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
+    \begin{equation*}
+      \hspace*{-25mm}
+\begin{array}{@{}r@{\;}l@{\;}l@{\quad}r@{}}
 \otimes & \xrightarrow{\smash{\tau}} &
   \fun{bst}(y,\ufun{insl}(x,\fun{ext}()),\fun{ext}())
 & \IH{y \succ x}\\
@@ -1551,35 +1564,46 @@ Two cases arise: either \(b \succ x\) or \(x \succ b\).
   \fun{bst}(b,\fun{insl}(x,\fun{bst}(a,t_1,t_2)),t_3) \; \otimes\).
   Two subcases surface: either \(a \succ x\) or \(x \succ a\).
 
-  \(\begin{array}{@{}r@{\;}l@{\;}l@{}}
-      \text{\;-- If \(a \succ x\), then \(\otimes\)} &
-      \xrightarrow{\smash{\tau}} &
-      \fun{bst}(b,\fun{bst}(a,\fun{insl}(x,t_1),t_2),t_3)\\
-      & \equiv &
-      \fun{rotl}(\fun{bst}(a,\fun{insl}(x,t_1),
-      \fun{bst}(b,t_2,t_3)))\\
-      & \xleftarrow{\smash{\tau}} &
-      \fun{rotl}(\ufun{insl}(x,\fun{bst}(a,t_1,
-      \fun{bst}(b,t_2,t_3))))\\
-      & = & \fun{rotl}(\fun{insl}(x,t)).
-    \end{array}\)
+  \begin{itemize}
+    \item If \(a \succ x\), then
+      \begin{equation*}
+        \hspace*{-32mm}
+        \begin{array}{@{}r@{\;}l@{\;}l@{}}
+          \otimes &
+          \xrightarrow{\smash{\tau}} &
+          \fun{bst}(b,\fun{bst}(a,\fun{insl}(x,t_1),t_2),t_3)\\
+          & \equiv &
+          \fun{rotl}(\fun{bst}(a,\fun{insl}(x,t_1),
+          \fun{bst}(b,t_2,t_3)))\\
+          & \xleftarrow{\smash{\tau}} &
+          \fun{rotl}(\ufun{insl}(x,\fun{bst}(a,t_1,
+          \fun{bst}(b,t_2,t_3))))\\
+          & = & \fun{rotl}(\fun{insl}(x,t)).
+        \end{array}
+      \end{equation*}
 
-    \(\begin{array}{@{}r@{\;}l@{\;}l@{}}
-      \text{\;-- If \(x \succ a\), then \(\otimes\)} &
-      \xrightarrow{\smash{\upsilon}} &
-      \fun{bst}(b,\fun{bst}(a,t_1,\fun{insl}(x,t_2)),t_3)\\
-      & \equiv &
-      \fun{rotl}(\fun{bst}(a,t_1,\fun{bst}(b,\fun{insl}(x,t_2),t_3)))\\
-      & \xleftarrow{\smash{\tau}} &
-      \fun{rotl}(\fun{bst}(a,t_1,\ufun{insl}(x,\fun{bst}(b,t_2,t_3))))\\
-      & \xleftarrow{\smash{\upsilon}} &
-      \fun{rotl}(\ufun{insl}(x,\fun{bst}(a,t_1,\fun{bst}(b,t_2,t_3))))\\
-      & = & \fun{rotl}(\fun{insl}(x,t)).
-      \end{array}\)
+    \item If \(x \succ a\), then
+      \begin{equation*}
+        \hspace*{-32mm}
+        \begin{array}{@{}r@{\;}l@{\;}l@{}}
+          \otimes &
+          \xrightarrow{\smash{\upsilon}} &
+          \fun{bst}(b,\fun{bst}(a,t_1,\fun{insl}(x,t_2)),t_3)\\
+          & \equiv &
+          \fun{rotl}(\fun{bst}(a,t_1,\fun{bst}(b,\fun{insl}(x,t_2),t_3)))\\
+          & \xleftarrow{\smash{\tau}} &
+          \fun{rotl}(\fun{bst}(a,t_1,\ufun{insl}(x,\fun{bst}(b,t_2,t_3))))\\
+          & \xleftarrow{\smash{\upsilon}} &
+          \fun{rotl}(\ufun{insl}(x,\fun{bst}(a,t_1,\fun{bst}(b,t_2,t_3))))\\
+          & = & \fun{rotl}(\fun{insl}(x,t)).
+        \end{array}
+      \end{equation*}
+  \end{itemize}
 
   \item If \(x \succ b\), then the assumption \(b \succ a\) implies
     \(x \succ a\). We have
   \begin{equation*}
+    \hspace*{-25mm}
   \begin{array}{@{}r@{\;}l@{\;}l@{\qquad}r@{}}
     \otimes & \xrightarrow{\smash{\upsilon}} &
     \fun{bst}(b,\fun{bst}(a,t_1,t_2),\fun{insl}(x,t_3))\\
@@ -1705,7 +1729,7 @@ c \sim \frac{1}{2}\OW{\fun{mkl}}{n}.
 
 \paragraph{Exercises}
 
-\begin{enumerate*}
+\begin{enumerate}
 
   \item Prove \(\fun{bst}_0(t) \equiv \fun{bst}(t)\). See definitions of
   \fun{bst\(_0\)/1}\index{bst0@\fun{bst\(_0\)/1}} and
@@ -1731,7 +1755,7 @@ c \sim \frac{1}{2}\OW{\fun{mkl}}{n}.
     \index{pre@\fun{pre/1}} in \fig~\vref{fig:pre}. Is the converse
     true as well?
 
-\end{enumerate*}
+\end{enumerate}
 \index{binary search tree!root insertion|)}
 
 \section{Deletion}
@@ -1748,7 +1772,7 @@ immediate successor or predecessor in inorder, that is, the minimum of
 the right subtree or the maximum of the left subtree.
 
 The definitions for these two phases are found in \fig~\vref{fig:del}.
-\begin{figure}[!b]
+\begin{figure}
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}l@{\;}l}
