@@ -1,4 +1,4 @@
-../LaTeX-build/Makefile
+$HOME/git/LaTeX-build/Makefile
 
 TeX/cpp.tex
 TeX/erlc.tex
