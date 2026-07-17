@@ -50,10 +50,10 @@ non\hyp{}terminal whose defining rule is shown in
 & \multicolumn{1}{c}{\text{Definition}}
 & \multicolumn{1}{c}{\text{Constraint}}\\
 \midrule
-  X \rightarrow \alpha^* 
+  X \rightarrow \alpha^*
 & X \rightarrow \alpha X \mid \varepsilon
 & \neg(\alpha \stackrel{*}{\Rightarrow} \varepsilon)\\
-  X \rightarrow \alpha^+ 
+  X \rightarrow \alpha^+
 & X \rightarrow \alpha \alpha^*
 & \neg(\alpha \stackrel{*}{\Rightarrow} \varepsilon)\\
   X \rightarrow [\alpha]
@@ -265,7 +265,7 @@ the following table:
 \begin{array}{@{}lcl@{}}
 \toprule
   X \rightarrow [\alpha] \beta
-& \textit{becomes} 
+& \textit{becomes}
 & X \rightarrow \alpha \beta \mid \beta\\
   X \rightarrow \alpha^* \beta
 & \textit{becomes}
@@ -638,7 +638,7 @@ nonetheless:
 \textbf{let} string\_of\_kwd = \textbf{function}
   ALL \(\rightarrow\) "ALL" | AUTOMATIC \(\rightarrow\) "AUTOMATIC" | BEGIN \(\rightarrow\) "BEGIN"
 | DEFINITIONS \(\rightarrow\) "DEFINITIONS" | END \(\rightarrow\) "END" | TAGS \(\rightarrow\) "TAGS"
-| EXPLICIT \(\rightarrow\) "EXPLICIT" | EXPORTS \(\rightarrow\) "EXPORTS" | FROM \(\rightarrow\) "FROM" 
+| EXPLICIT \(\rightarrow\) "EXPLICIT" | EXPORTS \(\rightarrow\) "EXPORTS" | FROM \(\rightarrow\) "FROM"
 | EXTENSIBILITY \(\rightarrow\) "EXTENSIBILITY" | IMPLICIT \(\rightarrow\) "IMPLICIT"
 | IMPLIED \(\rightarrow\) "IMPLIED" | IMPORTS \(\rightarrow\) "IMPORTS"
 \end{alltt}
@@ -666,7 +666,7 @@ Note that the constraints and optimisations above apply. We also need
 \begin{alltt}
 \textbf{type} mode = Fail | Abort
 
-\textbf{let} plus p m = \textbf{parser} [< x=p m; y=star (p Fail) >] \(\rightarrow\) x::y 
+\textbf{let} plus p m = \textbf{parser} [< x=p m; y=star (p Fail) >] \(\rightarrow\) x::y
 \end{alltt}
 At the head of a stream pattern, we shall use \texttt{(plus p Fail)},
 otherwise \texttt{(plus p Abort)}. We need an exception to signal
