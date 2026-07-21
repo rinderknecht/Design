@@ -73,9 +73,9 @@ first letter has index~\(0\) \citep{Dijkstra_1982}. If
 \(\ind{x}{2}=\word{p}\). A factor~\(x\) of~\(y\) can be identified by
 the index of~\(\ind{x}{0}\) in~\(y\). The end of the factor can also
 be given; for example, \(x=\word{sit}\) is a factor of
-\(y=\word{curiosity}\) at index~\(6\), written \(\ind{y}{6,8} = x\),
-meaning \(\ind{y}{6} = \ind{x}{0}\), \(\ind{y}{7} = \ind{x}{1}\) and
-\(\ind{y}{8} = \ind{x}{2}\). Given two words \(p\)~and~\(t\),
+\(y=\word{curiosity}\) at index~\(5\), written \(\ind{y}{5,7} = x\),
+meaning \(\ind{y}{5} = \ind{x}{0}\), \(\ind{y}{6} = \ind{x}{1}\) and
+\(\ind{y}{7} = \ind{x}{2}\). Given two words \(p\)~and~\(t\),
 determining whether \(p\)~is a factor of~\(t\) is called
 \emph{factoring~\(p\) in~\(t\)}.
 
@@ -439,17 +439,17 @@ is depicted in \fig~\vref{fig:mp}.
 \end{figure}
 Notice that, contrary to na\"{\i}ve factoring, letters in the text are
 compared in a strictly increasing order (never having to
-backtrack). Consider the complete run in \fig~\vref{fig:mp_ex} where,
-in the end,
+backtrack). Consider a partial run in \fig~\vref{fig:mp_ex}
 \begin{figure}[t]
 \centering
 \includegraphics{mp_ex}
-\caption{Morris\hyp{}Pratt algorithm at work (no match found)}
+\caption{Morris\hyp{}Pratt algorithm at work}
 \label{fig:mp_ex}
 \end{figure}
-\(p\)~is not found to be a factor of~\(t\). As usual, letters on a
-grey background correspond to mismatches. It is clear that
-\(\Border{}{a} = \varepsilon\), for all letters~\(a\).
+where \(p\)~is not found to be a factor of a prefix of~\(t\) (\(t\) is
+longer than shown). As usual, letters on a grey background correspond
+to mismatches. It is clear that \(\Border{}{a} = \varepsilon\), for
+all letters~\(a\).
 
 We now have the choice of finding either \(\Border{}{ay}\) or
 \(\Border{}{ya}\), where \(y\)~is a non\hyp{}empty word. Since we are
@@ -917,8 +917,8 @@ negative:
   \Border{}{\Border{}{\ind{x}{0}} \cdot \ind{x}{1,n-1}}
 = \Border{}{\ind{x}{1,n-1}},
 \end{align*}
-where \((\smash{\eqn{n-1}})\) supposes \(\Border{}{\ind{x}{0,n-2}}
-\cdot \ind{x}{n-1} \nprefeq \ind{x}{0,n-2}\), and
+where the \((\smash{\eqn{k-1}})\) suppose \(\Border{}{\ind{x}{0,k-2}}
+\cdot \ind{x}{k-1} \nprefeq \ind{x}{0,k-2}\), and
 \((\smash{\eqn{i}})\), with \(1 \leqslant i \leqslant n-2\),
 corresponds to \(\Border{}{\ind{x}{0,i}} \cdot \ind{x}{i+1} \prefeq
 \ind{x}{0,i}\). These constraints imply \(\ind{x}{0} = \ind{x}{1} =
