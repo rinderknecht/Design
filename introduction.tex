@@ -748,38 +748,56 @@ infinite sets, like \(\fun{cat}(s,\fun{cat}(t,u)) \equiv
 
 We define a \emph{well\hyp{}founded order}
 \citep{Winskel_1993}\index{induction!well-founded order} on a
-set~\(A\) as being a binary relation \((\succ)\) which does not have
-any \emph{infinite descending chains}\index{induction!infinite
-  descending chain}, to wit, no \(a_0 \succ a_1 \succ \dots\) The
-\emph{well\hyp{}founded induction principle} then states that, for any
-predicate~\(\aleph\),
+set~\(A\) as being a binary relation \((\succ)\) such that it is
+\begin{itemize}
+
+  \item irreflexive: \(\forall x \in A. \neg(x \succ x)\),
+
+  \item transitive: \(\forall x, y, z \in A. x \succ y \,\wedge\, y
+    \succ z \Rightarrow x \succ z\),
+
+  \item and does not have any \emph{infinite descending
+  chains}\index{induction!infinite descending chain}, to wit, there is
+    no \(a_0 \succ a_1 \succ a_2 \succ \dots\)
+
+\end{itemize}
+The \emph{well\hyp{}founded induction principle} then states that, for
+any predicate~\(\aleph\) on a set~\(A\),
 \begin{center}
   \(\forall a \in A.\aleph(a)\) is implied by \(\forall a.(\forall b.a
   \succ b \Rightarrow \aleph(b)) \Rightarrow \aleph(a)\).
 \end{center}
-Because there are no infinite descending chains, any
-subset \(B \subseteq A\) contains minimal elements \(M \subseteq B\),
-that is, there is no \(b \in B\) such that \(a \succ b\), if \(a \in
-M\). In this case, proving by well\hyp{}founded induction degenerates
-into proving \(\aleph(a)\) for all \(a \in M\). When \(A=\mathbb{N}\),
-this principle is called \emph{mathematical (complete) induction}
-\citep{Buck_1963}\index{induction!mathematical
-  $\sim$}. \emph{Structural induction}\index{induction!structural
-  $\sim$} is another particular case where \(t \succ s\) holds if, and
-only if, \(s\)~is a proper
-\emph{subterm}\index{term!subterm}\index{term!proper subterm}
-of~\(t\), namely, the abstract syntax tree of~\(s\) is included in the
-tree of~\(t\) and \(s \neq t\).
+When \(A=\mathbb{N}\), this principle is called \emph{mathematical
+(complete) induction} \citep{Buck_1963}\index{induction!mathematical
+  $\sim$}.
 
-Sometimes, a restricted form is enough. For instance, we can define
-\(\cons{x}{s} \succ s\)\index{cons@\fun{cons/2}}, for any term~\(x\)
-and any stack~\(s \in S\). Both \(x\)~and~\(s\) are \emph{immediate
-  subterms}\index{term!immediate subterm} of
-\(\cons{x}{s}\)\index{cons@\fun{cons/2}}. There is no infinite
-descending chain since \(\el\)~is the unique minimal element of~\(S\):
-no~\(s\) satisfies \(\el \succ s\); so the basis is \(t=\el\) and
-\(\forall t.(\forall s.t \succ s \Rightarrow \aleph(s)) \Rightarrow
-\aleph(t)\) degenerates into \(\aleph(\el)\).
+\emph{Structural induction}\index{induction!structural $\sim$} is
+another particular case where \(t \succ s\) holds if, and only if,
+\(s\)~is a proper \emph{subterm}\index{term!subterm}\index{term!proper
+  subterm} of~\(t\), namely, the abstract syntax tree of~\(s\) is
+included in the tree of~\(t\) and \(s \neq t\).
+
+Sometimes, a restricted form of structural induction is enough. For
+instance, we can define \(\cons{x}{s} \succ
+s\)\index{cons@\fun{cons/2}}, for any term~\(x\) and any stack~\(s \in
+S\). Both \(x\)~and~\(s\) are \emph{immediate
+subterms}\index{term!immediate subterm} of
+\(\cons{x}{s}\)\index{cons@\fun{cons/2}}. (In other words, we
+dispensed with the transitivity axiom.) Because there are no infinite
+descending chains, any subset \(B \subseteq A\) contains minimal
+elements \(M \subseteq B\), that is, there is no \(b \in B\) such that
+\(a \succ b\), if \(a \in M\). In other words,
+\begin{enumerate}
+
+  \item we have to prove \(\aleph(a)\) for all \(a \in M\), the
+    so\hyp{}called \emph{basis}: here, only \(\aleph(\el)\), as
+    \(\el\)~is by construction the unique, minimal stack, and,
+
+  \item assuming the so\hyp{}called \emph{induction hypothesis}
+    \(\aleph(s)\), we must prove \(\aleph(\cons{x}{s})\) for
+    all~\(x\).
+
+\end{enumerate}
 
 \mypar{Termination}
 \label{par:ackermann}
