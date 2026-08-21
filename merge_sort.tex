@@ -678,11 +678,15 @@ number of keys, thus obtaining stacks of lengths \(\floor{n/2}\) and
 \boxed{%
 \begin{array}{r@{\;}l@{\;}l}
 \fun{tms}(\cons{x,y}{t}) & \rightarrow
-                         & \fun{cutr}([x],\cons{y}{t},t);\\
+                         & \cons{x}{\fun{tms}(\cons{y}{t})},\;
+                           \text{if \(y \succcurlyeq x\)};\\
+\fun{tms}(\cons{x,y}{t}) & \rightarrow
+                         & \fun{cutr}([x],\cons{y}{t},t),\;
+                           \text{if \(x \succ y\)};\\
 \fun{tms}(t)             & \rightarrow & t.\\
 \\
 \fun{cutr}(s,\cons{y}{t},\cons{a,b}{u})
-                       & \rightarrow & \fun{cutr}(\cons{y}{s},t,u);\\
+                         & \rightarrow & \fun{cutr}(\cons{y}{s},t,u);\\
 \fun{cutr}(s,t,u)        & \rightarrow
                          & \fun{mrg}(\fun{tms}(s),\fun{tms}(t)).\\
 \\
@@ -704,9 +708,10 @@ of~\(t\) one by one and those of~\(u\) two by two, so when
 \(\fun{cutr}(s,t,\el)\) or \(\fun{cutr}(s,t,[y])\) are reached, we
 know that \(t\)~is the second half of the original stack and \(s\)~is
 the reversed first half (of length \(\floor{n/2}\) if \(n\)~is the
-length of the original stack). In the first rule of~\fun{tms/1}, we
-saved one recursive call to \fun{cutr/3} and some memory by calling
-\(\fun{cutr}([x],\cons{y}{t}, t)\) instead of
+length of the original stack). The first rule of~\fun{tms/1} takes
+advantage of natural, non\hyp{}decreasing runs of keys. In the second
+rule, we saved one recursive call to \fun{cutr/3} and some memory by
+calling \(\fun{cutr}([x],\cons{y}{t}, t)\) instead of
 \(\fun{cutr}(\el,\cons{x,y}{t},\cons{x,y}{t})\). Moreover, this way,
 the second rule implements the two base cases, \(\fun{tms}(\el)\) and
 \(\fun{tms}([y])\). Furthermore, notice that, in the second rule of
@@ -718,8 +723,10 @@ invariant.
 
 %\addcontentsline{toc}{subsection}{Cost}
 
-Since all comparisons are performed by
-\fun{mrg/2}\index{mrg@\fun{mrg/2}}, the definition of
+If the input is already sorted, we obtain the best case. To make the
+analysis more interesting, let us ignore the first clause
+of~\fun{tms/1} and have all comparisons performed by
+\fun{mrg/2}\index{mrg@\fun{mrg/2}}. This new definition of
 \fun{tms/1}\index{tms@\fun{tms/1}} implies that the number of
 comparisons satisfies
 \begin{equation}
