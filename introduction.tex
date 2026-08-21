@@ -884,15 +884,14 @@ analysed some famously involved recursive functions.
 \paragraph{Associativity}
 \label{proof:assoc_cat}
 
-Let us recall the definition~\eqref{def:cat} of the concatenation of two
-stacks:
+The definition~\eqref{def:cat} of the concatenation of stacks was:
 \begin{equation*}
 \fun{cat}(        \el,t) \xrightarrow{\smash{\alpha}} t;\qquad
 \fun{cat}(\cons{x}{s},t) \xrightarrow{\smash{\beta}}
 \cons{x}{\fun{cat}(s,t)}.
 \index{stack!concatenation!definition}
 \end{equation*}
-and let us prove the
+Let us prove the
 associativity\index{stack!concatenation!associativity}
 \index{induction!example} of \fun{cat/2}\index{cat@\fun{cat/2}}, which
 we express formally as
@@ -902,7 +901,7 @@ we express formally as
 \fun{cat}(\fun{cat}(s,t),u)
 \index{CatAssoc@\predName{CatAssoc}|(}
 \end{equation*}
-where \(s\), \(t\) and~\(u\) are stack values.
+for all stack values \(s\), \(t\) and~\(u\).
 
 The goal here is to use the rewrite system as an abstract machine to
 prove a property, with the timely help of the induction
