@@ -725,25 +725,25 @@ using the proper subterm\index{induction!proper subterm order}
 relation on the first parameter of \fun{ins/2}\index{ins@\fun{ins/2}},
 we order the first pair:
 \begin{equation*}
-\fun{ins}(\cons{y}{s},x) \succ \fun{ins}(s,x) \Leftrightarrow
-\cons{y}{s} \succ s.
+\cons{y}{s} \succ s \Rightarrow \fun{ins}(\cons{y}{s},x) \succ \fun{ins}(s,x).
 \end{equation*}
 This is enough to prove that \fun{ins/2} terminates. The second pair
 is similarly oriented:
 \begin{equation*}
-\fun{isrt}(\cons{x}{s}) \succ \fun{isrt}(s) \Leftrightarrow
-\cons{x}{s} \succ s.
+\cons{x}{s} \succ s \Rightarrow \fun{isrt}(\cons{x}{s}) \succ \fun{isrt}(s).
 \end{equation*}
 The third pair is not worth considering after all, because we already
 know that \fun{ins/2} terminates, so the second pair is enough to
 entail the termination of \fun{isrt/1}\index{isrt@\fun{isrt/1}}. In
 other words, since \fun{ins/2} terminates, it can be considered, as
 far as termination analysis is concerned, as a data constructor, so
-the third pair becomes useless:
+the third pair becomes:
 \begin{equation*}
-\fun{isrt}(\cons{x}{s}) \succ \underline{\fun{ins}}(\fun{isrt}(s), x)
-\Leftrightarrow \fun{isrt}(\cons{x}{s}) \succ \fun{isrt}(s)
-\Leftrightarrow \cons{x}{s} \succ s,
+  \cons{x}{s} \succ s
+  \Rightarrow
+  \fun{isrt}(\cons{x}{s}) \succ \fun{isrt}(s)
+  \Rightarrow
+  \fun{isrt}(\cons{x}{s}) \succ \underline{\fun{ins}}(\fun{isrt}(s), x),
 \end{equation*}
 where \(\fun{\ufun{ins}/2}\) stands for
 \fun{ins/2}\index{ins@\fun{ins/2}} considered as a constructor. (We
