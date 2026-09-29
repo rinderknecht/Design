@@ -422,11 +422,11 @@ proof. The difference with the proof of the soundness of
 \fun{cut/2}\index{cut@\fun{cut/2}}, \vpageref{par:cut_sound}, is that,
 due to \TirName{Trans} having two premises, the induction hypothesis
 applies to both of them. Let\index{Sym@\predName{Sym}}
-\(\pred{Sym}{s,t}\colon s \approx t \Rightarrow t \approx s\). We deal
-with an implication here, so let us suppose that \(s \approx t\), that
-is, we have a proof tree~\(\Delta\) whose root is \(s \approx t\), and
-let us establish \(t \approx s\). In the following, we overline
-variables from the inference system.
+\(\pred{Sym}{s,t} \colon s \approx t \Rightarrow t \approx s\). We
+deal with an implication here, so let us suppose that \(s \approx t\),
+that is, we have a proof tree~\(\Delta\) whose root is \(s \approx
+t\), and let us establish \(t \approx s\). In the following, we
+overline variables from the inference system.
 \begin{itemize}
 
   \item If \(\Delta\) ends with \TirName{Pnil}, then \(\el = s = t\),
@@ -526,8 +526,8 @@ lemma\index{InsCmp@\predName{InsCmp}} \(\pred{InsCmp}{s} \colon
     \begin{itemize*}
 
     \item If \(x \prec y\), then \(\fun{ins}(\cons{y}{s},x)
-      \xrightarrow{\smash{\lambda}} \cons{x,y}{s} \approx
-      \cons{x,y}{s}\), by rule~\TirName{Swap}.
+      \xrightarrow{\smash{\lambda}} \cons{x,y}{s}\), and we use
+      \(\pred{Refl}{\cons{x,y}{s}}\).
 
     \item Otherwise, \(y \prec x\) and \(\fun{ins}(\cons{y}{s},x)
       \xrightarrow{\smash{\kappa}} \cons{y}{\fun{ins}(s,x)}\).
@@ -537,8 +537,8 @@ lemma\index{InsCmp@\predName{InsCmp}} \(\pred{InsCmp}{s} \colon
           \cons{y,x}{s}\) by using the induction hypothesis as the
           premise of rule \TirName{Push}.
 
-        \item Furthermore, \TirName{Swap}~yields \(\cons{y,x}{s}
-          \approx \cons{x,y}{s}\).
+        \item Furthermore, \TirName{Swap} and \(\pred{Sym}{s,t}\)
+          yield \(\cons{y,x}{s} \approx \cons{x,y}{s}\).
 
         \item Transitivity of~\((\approx)\) applied to the two last
           statements leads to \(\fun{ins}(\cons{y}{s},x) \approx
