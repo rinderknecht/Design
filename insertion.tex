@@ -400,40 +400,33 @@ As an exception to the convention about tree layouts, proof
 trees\index{tree!proof $\sim$} have their root at the bottom of the
 figure.
 
-We must now prove the \emph{reflexivity} of~\((\approx)\),
-namely\index{Refl@\predName{Refl}|(} \(\pred{Refl}{s} \colon s \approx
-s\), by induction\index{induction!example|(} on the structure of the
-proof. The difference with the proof of the soundness of
-\fun{cut/2}\index{cut@\fun{cut/2}}, \vpageref{par:cut_sound}, is that,
-due to \TirName{Trans} having two premises, the induction hypothesis
-applies to both of them. Also, the theorem is not explicitly an
-implication. First, we start by proving \predName{Refl} on the axioms
-(the leaves of the proof trees) and proceed with the induction on the
-proper inference rules, to wit, reflexivity is conserved while moving
-towards the root of the proof tree.
+We want to prove that \((\approx)\) is an equivalence, that is, a
+binary relation that is reflexive, symmetric and transitive. The
+transitive part is baked into the inference rules, namely
+\TirName{Trans}. Reflexivity\index{Refl@\predName{Refl}|(} is:
+\(\pred{Refl}{s} \colon s \approx s\). It is straightforward by
+induction\index{induction!example|(} on the structure of~\(s\):
 \begin{itemize}
 
-  \item Axiom \TirName{Pnil} proves \(\pred{Refl}{\el}\).
-    Axiom~\TirName{Swap} proves \(\pred{Refl}{\cons{x,x}{s}}\).
+  \item Rule \TirName{Pnil} proves \(\pred{Refl}{\el}\).
 
-  \item Let us assume now that \predName{Refl}~holds for the premise
-    in \TirName{Push}, namely, \(s = t\). Clearly, the conclusion
-    implies \(\pred{Refl}{\cons{x}{s}}\).
-
-  \item Let us assume that \predName{Refl}~holds for the \emph{two}
-    antecedents in \TirName{Push}, that is, \(s=u=t\). The conclusion
-    leads to
-    \(\pred{Refl}{s}\)\index{Refl@\predName{Refl}|)}.\hfill\(\Box\)
+  \item Otherwise, let us assume that \(\pred{Refl}{s}\) holds
+    (induction hypothesis); then the immediate conclusion by rule
+    \TirName{Push} is \(\pred{Refl}{\cons{x}{s}}\). \hfill\(\Box\)
 
 \end{itemize}
 
-Let us prove the \emph{symmetry} of~\((\approx)\) using the same
-technique. Let\index{Sym@\predName{Sym}} \(\pred{Sym}{s,t}\colon s
-\approx t \Rightarrow t \approx s\). We deal with an implication here,
-so let us suppose that \(s \approx t\), that is, we have a proof
-tree~\(\Delta\) whose root is \(s \approx t\), and let us establish
-\(t \approx s\). In the following, we overline variables from the
-inference system.
+Let us prove the \emph{symmetry} of~\((\approx)\) by
+induction\index{induction!example|(} on the structure of the
+proof. The difference with the proof of the soundness of
+\fun{cut/2}\index{cut@\fun{cut/2}}, \vpageref{par:cut_sound}, is that,
+due to \TirName{Trans} having two premises, the induction hypothesis
+applies to both of them. Let\index{Sym@\predName{Sym}}
+\(\pred{Sym}{s,t}\colon s \approx t \Rightarrow t \approx s\). We deal
+with an implication here, so let us suppose that \(s \approx t\), that
+is, we have a proof tree~\(\Delta\) whose root is \(s \approx t\), and
+let us establish \(t \approx s\). In the following, we overline
+variables from the inference system.
 \begin{itemize}
 
   \item If \(\Delta\) ends with \TirName{Pnil}, then \(\el = s = t\),
@@ -532,11 +525,11 @@ lemma\index{InsCmp@\predName{InsCmp}} \(\pred{InsCmp}{s} \colon
     There are two cases to analyse.
     \begin{itemize*}
 
-    \item If \(y \succ x\), then \(\fun{ins}(\cons{y}{s},x)
+    \item If \(x \prec y\), then \(\fun{ins}(\cons{y}{s},x)
       \xrightarrow{\smash{\lambda}} \cons{x,y}{s} \approx
       \cons{x,y}{s}\), by rule~\TirName{Swap}.
 
-    \item Otherwise, \(x \succ y\) and \(\fun{ins}(\cons{y}{s},x)
+    \item Otherwise, \(y \prec x\) and \(\fun{ins}(\cons{y}{s},x)
       \xrightarrow{\smash{\kappa}} \cons{y}{\fun{ins}(s,x)}\).
       \begin{itemize*}
 
@@ -588,13 +581,13 @@ preserves order.
     \noindent Two cases arise from comparing \(x\)~to~\(y\):
     \begin{itemize*}
 
-      \item If \(y \succ x\), then \(H_2\)~implies
+      \item If \(x \prec y\), then \(H_2\)~implies
         \(\pred{Ord}{\cons{x,y}{s}}\), by rule
         \(\TirName{Ord}_2\). Since \(\fun{ins}(\cons{y}{s},x)
         \xrightarrow{\smash{\lambda}} \cons{x,y}{s}\), we have
         \(\pred{Ord}{\fun{ins}(\cons{y}{s},x)}\).
 
-      \item Otherwise, \(x \succ y\) and we derive
+      \item Otherwise, \(y \prec x\) and we derive
         \begin{equation}
           \fun{ins}(\cons{y}{s},x) \xrightarrow{\smash{\kappa}}
           \cons{y}{\fun{ins}(s,x)}.\label{eq:A}
@@ -604,8 +597,8 @@ preserves order.
         \begin{itemize*}
 
         \item If \(s=\el\), then \(\cons{y}{\fun{ins}(s,x)}
-          \xrightarrow{\smash{\lambda}} [y,x]\). Furthermore, \(x
-          \succ y\), \(\TirName{Ord}_1\) and \(\TirName{Ord}_2\) imply
+          \xrightarrow{\smash{\lambda}} [y,x]\). Furthermore, \(y
+          \prec x\), \(\TirName{Ord}_1\) and \(\TirName{Ord}_2\) imply
           \(\pred{Ord}{[y,x]}\), so
           \(\pred{Ord}{\fun{ins}(\cons{y}{s},x)}\).
 
@@ -613,7 +606,7 @@ preserves order.
             that \(s = \cons{z}{t}\).
             \begin{itemize*}
 
-              \item If \(z \succ x\), then
+              \item If \(x \prec z\), then
                 \begin{equation}
                   \cons{y}{\fun{ins}(s,x)} =
                   \cons{y}{\fun{ins}(\cons{z}{t},x)}
@@ -621,8 +614,8 @@ preserves order.
                   \cons{y,x}{s}.\label{eq:C}
                 \end{equation}
                 \(H_0\)~is \(\pred{Ord}{\cons{z}{t}}\), which, with
-                \(z \succ x\) and rule \(\TirName{Ord}_2\), implies
-                \(\pred{Ord}{\cons{x,z}{t}}\). Since~\(x \succ\! y\),
+                \(x \prec z\) and rule \(\TirName{Ord}_2\), implies
+                \(\pred{Ord}{\cons{x,z}{t}}\). Since~\(y \prec x\),
                 another application of~\(\TirName{Ord}_2\) yields
                 \(\pred{Ord}{\cons{y,x,z}{t}}\), that is,
                 \(\pred{Ord}{\cons{y,x}{s}}\). This and
@@ -631,8 +624,7 @@ preserves order.
                 to rewrite~\eqref{eq:A},
                 \(\pred{Ord}{\fun{ins}(\cons{y}{s},x)}\) holds.
 
-              \item The last remaining case to examine is when~\(x
-                \succ z\):
+              \item The last remaining case to examine is when~\(z \prec x\):
                 \begin{equation}
                   \cons{y}{\fun{ins}(s,x)} \!=\!
                   \cons{y}{\fun{ins}(\cons{z}{t},x)}
@@ -641,10 +633,10 @@ preserves order.
                 \end{equation}
                 Hypothesis~\(H_2\) is \(\pred{Ord}{\cons{y,z}{t}}\),
                 which, by means of the inversion lemma of
-                rule~\(\TirName{Ord}_2\), leads to~\(y \succ z\). By
+                rule~\(\TirName{Ord}_2\), leads to~\(y \prec z\). By
                 the last rewrite, hypothesis~\(H_1\) is equivalent to
                 \(\pred{Ord}{\cons{z}{\fun{ins}(t,x)}}\), which,
-                with~\(y \succ z\), enables the use of
+                with~\(y \prec z\), enables the use of
                 rule~\(\TirName{Ord}_2\) again, leading to
                 \(\pred{Ord}{\cons{y,z}{\fun{ins}(t,x)}}\).
                 Rewrite~\eqref{eq:D} then yields
