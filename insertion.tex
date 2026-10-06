@@ -404,8 +404,9 @@ We want to prove that \((\approx)\) is an equivalence, that is, a
 binary relation that is reflexive, symmetric and transitive. The
 transitive part is baked into the inference rules, namely
 \TirName{Trans}. Reflexivity\index{Refl@\predName{Refl}|(} is:
-\(\pred{Refl}{s} \colon s \approx s\). It is straightforward by
-induction\index{induction!example|(} on the structure of~\(s\):
+\(\pred{Refl}{s} \colon s \approx s\).\index{Refl@\predName{Refl}|)}
+It is straightforward by induction\index{induction!example|(} on the
+structure of~\(s\):
 \begin{itemize}
 
   \item Rule \TirName{Pnil} proves \(\pred{Refl}{\el}\).
@@ -413,12 +414,13 @@ induction\index{induction!example|(} on the structure of~\(s\):
   \item Otherwise, let us assume that \(\pred{Refl}{s}\) holds
     (induction hypothesis); then the immediate conclusion by rule
     \TirName{Push} is \(\pred{Refl}{\cons{x}{s}}\). \hfill\(\Box\)
+    \index{induction!example|)}
 
 \end{itemize}
 
 Let us prove the \emph{symmetry} of~\((\approx)\) by
-induction\index{induction!example|(} on the structure of the
-proof. The difference with the proof of the soundness of
+induction\index{induction!example} on the structure of the proof. The
+difference with the proof of the soundness of
 \fun{cut/2}\index{cut@\fun{cut/2}}, \vpageref{par:cut_sound}, is that,
 due to \TirName{Trans} having two premises, the induction hypothesis
 applies to both of them. Let\index{Sym@\predName{Sym}}
@@ -559,7 +561,7 @@ lemma\index{InsCmp@\predName{InsCmp}} \(\pred{InsCmp}{s} \colon
 To complete the soundness proof, we must prove the
 lemma~\(\pred{InsOrd}{s} \colon \pred{Ord}{s} \Rightarrow
 \pred{Ord}{\fun{ins}(s,x)}\) by induction on the
-structure\index{induction!example} of~\(s\), meaning that insertion
+structure\index{induction!example|(} of~\(s\), meaning that insertion
 preserves order.
 
 \begin{itemize*}
