@@ -688,9 +688,8 @@ and~\(t'\)). This function is the one illustrated in
 \fig~\vref{fig:prenum0}. By the way, we should perhaps recall that
 inference systems\index{induction!inference system}, first seen
 \vpageref{par:infsys}, can be eliminated by the introduction of
-auxiliary functions (one for each premise). In this instance, we could
-equivalently write\index{snd@\fun{snd/1}} the program in
-\fig~\vref{fig:npre_bis}.
+auxiliary functions (one for each premise). Here we could equivalently
+write\index{snd@\fun{snd/1}} the \fig~\vref{fig:npre_bis}.
 \begin{figure}
 \begin{equation*}
 %\belowdisplayskip=0pt
@@ -1312,7 +1311,7 @@ right\hyp{}hand side or we get stuck:
 & \ufun{in}(\fun{int}(x,\fun{mir}(t_2),\fun{mir}(t_1)),\el)\\
 & \xrightarrow{\smash{\rho}}
 & \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{in}(\fun{mir}(t_1),\el)})\\
-& \xleftarrow{\smash{\zeta}}
+& \xleftarrow{\smash{\xi}}
 & \fun{in}(\fun{mir}(t_2),\cons{x}{\ufun{in}(\fun{mir}(t_1))})\\
 & \equiv
 & \fun{in}(\fun{mir}(t_2),\cons{x}{\fun{rev}(\ufun{in}(t_1))})
@@ -1657,29 +1656,20 @@ The dual theorem\index{PostMir@\predName{PostMir}} \(\pred{PostMir}{t}
 \index{rev@\fun{rev/1}} can be proved in at least two ways: either we
 design a new proof in the spirit of the proof of \(\pred{PreMir}{t}\),
 or we take advantage of the fact that the theorem is an equivalence
-and we produce equivalent but simpler theorems. Let us do the latter
-and start by considering \(\pred{PreMir}{\fun{mir}(t)}\)
-\index{PreMir@\predName{PreMir}|)} and proceed by finding equivalent
-expressions on both sides of the equivalence, until we reach
-\(\pred{PostMir}{t}\):
+and we produce equivalent but simpler theorems. Let us do the latter:
 \begin{equation*}
-\begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
-          \fun{pre}(\fun{mir}(\fun{mir}(t)))
-& \equiv
-& \fun{rev}(\fun{post}(\fun{mir}(t)))
-& \IH{\pred{PreMir}{\fun{mir}(t)}}\\
-  \fun{pre}(t)
-& \equiv
-& \fun{rev}(\fun{post}(\fun{mir}(t)))
-& \IH{\pred{InvMir}{t}}\\
-  \fun{rev}(\fun{pre}(t))
-& \equiv
-& \fun{rev}(\fun{rev}(\fun{post}(\fun{mir}(t))))\\
-  \fun{rev}(\fun{pre}(t))
-& \equiv
-& \fun{post}(\fun{mir}(t))
-& \IH{\pred{InvRev}{\fun{post}(\fun{mir}(t))}}
-\end{array}
+  \begin{array}{@{}r@{\;}c@{\;}l@{\qquad}r@{}}
+    \fun{post}(\fun{mir}(t))
+    & \equiv
+    & \fun{rev}(\fun{rev}(\fun{post}(\fun{mir}(t)))
+    & \IH{\pred{InvRev}{\fun{post}(\fun{mir}(t))}}\\
+    & \equiv
+    & \fun{rev}(\fun{pre}(\fun{mir}(\fun{mir}(t))))
+    & \IH{\pred{PreMir}{\fun{mir}(t)}}\\
+    & \equiv
+    & \fun{rev}(\fun{pre}(t))
+    & \IH{\pred{InvMir}{t}}
+  \end{array}
 \end{equation*}
 where\index{InvMir@\predName{InvMir}} \(\pred{InvMir}{t} \colon
 \fun{mir}(\fun{mir}(t)) \equiv t\) and\index{InvRev@\predName{InvRev}}
@@ -1690,8 +1680,8 @@ where\index{InvMir@\predName{InvMir}} \(\pred{InvMir}{t} \colon
 \begin{enumerate}
 
   \item Prove the lemma\index{CatPost@\predName{CatPost}}
-  \(\pred{CatPost}{t,s} \colon \fun{cat}(\fun{post}(t,\el),s) \equiv
-  \fun{post}(t,s)\).
+    \(\pred{CatPost}{t,s} \colon \fun{cat}(\fun{post}(t,\el),s) \equiv
+    \fun{post}(t,s)\).
 
   \item Use \fun{rev\(_0\)/1} instead of \fun{rev/1} in
   \(\pred{InMir}{t}\) and \(\pred{PreMir}{t}\). Are the proofs easier?
@@ -2273,7 +2263,7 @@ which could be contrasted with \fig~\vref{fig:bf3}.
 \index{binary tree!level order|)}
 
 \paragraph{Exercises}
-\begin{enumerate*}
+\begin{enumerate}
 
   \item How would you proceed to prove the correctness of
   \fun{bfn/1}?\index{bfn@\fun{bfn/1}}
@@ -2282,7 +2272,7 @@ which could be contrasted with \fig~\vref{fig:bf3}.
   \(n\)~is the size
   of~\(t\).\index{bfn@$\C{\fun{bfn}}{n}$}\index{bfn@\fun{bfn/1}}
 
-\end{enumerate*}
+\end{enumerate}
 
 
 \section{Classic shapes}
