@@ -2727,9 +2727,9 @@ substructure is
 To define rooted paths for the zipper, we need three data
 constructors: one denoting the empty path, \(\fun{top}()\), one
 denoting a turn to the left, \(\fun{left}(x,t,p)\), where \(x\)~is a
-node on the path, \(t\)~is the right subtree of~\(x\), and~\(p\) is
-the rest of the path up to the root, and one constructor denoting a
-turn to the right, \(\fun{right}(x,t,p)\), where \(t\)~is the left
+node on the path, \(t\)~is the right subtree of~\(x\), and \(p\)~is
+the rest of the path up to the root, and one last constructor denoting
+a turn to the right, \(\fun{right}(x,t,p)\), where \(t\)~is the left
 subtree of~\(x\).
 
 Resuming our example above, the zipper is then the pair
@@ -2740,15 +2740,15 @@ equivalently, we turned right when going down), and where \(p_1 :=
 \fun{left}(\fun{a}(), \fun{int}(\fun{g}(), \fun{ext}(), \fun{ext}()),
 \fun{top}())\), meaning that the node~\fun{a} has an unvisited right
 child~\fun{g}, and that it is the root of the whole tree, due to
-\(\fun{top}()\). Note that since \fun{b}~is the first in the path up,
-it is the parent of the slider~\fun{d}.
+\(\fun{top}()\). Note that, since \fun{b}~is first in the path up, it
+is the parent of the slider~\fun{d}.
 
 At the beginning, the original tree~\(t\) is injected into a zipper
 \(\pair{\fun{top}()}{t}\). Then, the operations we want for traversing
-a binary tree on demand are \fun{up/1}\index{up@\fun{up/1}} (go to the
-parent), \fun{left/1}\index{left@\fun{left/1}} (go to the left child),
-\fun{right/1}\index{right@\fun{right/1}} (go to the right child) and
-\fun{sibling/1}\index{sibling@\fun{sibling/1}} (go to the
+a binary tree on demand are \fun{up/2}\index{up@\fun{up/2}} (go to the
+parent), \fun{left/2}\index{left@\fun{left/2}} (go to the left child),
+\fun{right/2}\index{right@\fun{right/2}} (go to the right child) and
+\fun{sibling/2}\index{sibling@\fun{sibling/2}} (go to the
 sibling). All take a zipper as input and all calls evaluate into a
 zipper. After any of these steps is performed, a new
 zipper\index{binary tree!zipper} is assembled as the value of the
@@ -2757,20 +2757,20 @@ call. See \fig~\vref{fig:zip_move}
 \begin{equation*}
 \boxed{
 \begin{array}{r@{\;}c@{\;}l}
-\fun{up}(\pair{\fun{left}(x,t_2,p)}{t_1}) & \rightarrow &
+\fun{up}(\fun{left}(x,t_2,p), t_1) & \rightarrow &
   \pair{p}{\fun{int}(x,t_1,t_2)};\\
-\fun{up}(\pair{\fun{right}(x,t_1,p)}{t_2}) & \rightarrow &
+\fun{up}(\fun{right}(x,t_1,p), t_2) & \rightarrow &
 \pair{p}{\fun{int}(x,t_1,t_2)}.\\
 \\
-\fun{left}(\pair{p}{\fun{int}(x,t_1,t_2)}) & \rightarrow &
+\fun{left}(p, \fun{int}(x,t_1,t_2)) & \rightarrow &
   \pair{\fun{left}(x,t_2,p)}{t_1}.\\
 \\
-\fun{right}(\pair{p}{\fun{int}(x,t_1,t_2)}) & \rightarrow &
+\fun{right}(p, \fun{int}(x,t_1,t_2)) & \rightarrow &
   \pair{\fun{right}(x,t_1,p)}{t_2}.\\
 \\
-\fun{sibling}(\pair{\fun{left}(x,t_2,p)}{t_1}) & \rightarrow &
+\fun{sibling}(\fun{left}(x,t_2,p), t_1) & \rightarrow &
   \pair{\fun{right}(x,t_1,p)}{t_2};\\
-\fun{sibling}(\pair{\fun{right}(x,t_1,p)}{t_2}) & \rightarrow &
+\fun{sibling}(\fun{right}(x,t_1,p), t_2) & \rightarrow &
   \pair{\fun{left}(x,t_2,p)}{t_1}.
 \end{array}}
 \end{equation*}
@@ -2782,20 +2782,20 @@ technique, which is an instance of \emph{Huet's zipper}
 \citep{Huet_1997,Huet_2003}, also allows local editing. This simply
 translates as the replacement of the current tree by another:
 \begin{equation*}
-\fun{graft}(t',\pair{p}{t}) \rightarrow \pair{p}{t'}.
+\fun{prune\_and\_graft}(t',\pair{p}{t}) \rightarrow \pair{p}{t'}.
 \end{equation*}
 If we only want to change the slider, we would use
 \begin{equation*}
-\fun{slider}(x',\pair{p}{\fun{int}(x,t_1,t_2)}) \rightarrow
+\fun{new\_slider}(x',\pair{p}{\fun{int}(x,t_1,t_2)}) \rightarrow
 \pair{p}{\fun{int}(x',t_1,t_2)}.
 \end{equation*}
 If we want to go up to the root and extract the new tree:
 \begin{equation*}
-\fun{zip}(\pair{\fun{top}()}{t}) \rightarrow t;\quad
-\fun{zip}(z) \rightarrow \fun{zip}(\fun{up}(z)).
+\fun{zip}(\fun{top}(), t) \rightarrow t;\quad
+\fun{zip}(p, t) \rightarrow \fun{zip}(\fun{up}(p, t)).
 \end{equation*}
 We do not need a zipper\index{binary tree!zipper} to perform a
-preorder, inorder or postorder traversal, because it is primarily
+preorder, inorder or postorder traversal because it is primarily
 designed to open down and close up paths from the root of a tree, in
 the manner of a zipper\index{binary tree!zipper} in a
 cloth. Nevertheless, if we retain one aspect of its design, namely,
