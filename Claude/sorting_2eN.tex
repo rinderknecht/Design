@@ -1,0 +1,130 @@
+\documentclass[a4paper,11pt,twoside,final]{book}
+
+\usepackage[british]{babel}       % British English
+\usepackage[T1]{fontenc}          % Required for hyphenation and \DJ
+\usepackage{hyphenat}             % \hyp{} is a breakable dash
+\usepackage[dvipsnames]{xcolor}
+\usepackage{amsmath,amssymb,amsthm,stmaryrd}
+\theoremstyle{plain}
+
+\title{Sorting $2^n$ keys}
+\author{Christian Rinderknecht}
+
+\begin{document}
+
+\maketitle
+
+\paragraph{Minimum cost}
+
+Let \(B(\Join,p)\) be the lowest cost of sorting \(2^p\) keys by merging
+them. We have:
+\begin{equation}
+B(\Join, 0) = 0, \qquad B(\Join, p) = p2^{p-1}, \quad \text{for \(p > 0\)}.
+\end{equation}
+
+\paragraph{Maximum cost}
+
+Let \(W(\Join,p)\) be the highest cost of sorting \(2^p\) keys by merging
+them. We have:
+\begin{equation}
+W(\Join, p) = (p-1)2^p + 1, \quad \text{for \(p \geqslant 0\)}.
+\end{equation}
+
+\paragraph{Average cost}
+\label{par:Atms_2p}
+
+Let \(M(\Join, p)\) be the average cost of sorting \(2^p\) keys by merging
+them. The trivial case is \(M(\Join,0) = 0\). We have, for \(p > 0\),
+\begin{align*}
+ M(\Join, p)
+  &= 2^p\sum_{k=0}^{p-1}{\frac{1}{2^k}\left(2^k - 1 + \frac{1}{2^k +
+      1}\right)}\\
+  &= 2^{p}\left(p - \sum_{k=0}^{p-1}{\frac{1}{2^k}}
+     + \sum_{k=0}^{p-1}{\frac{1}{2^k(2^k+1)}}\right)\\
+  &= 2^{p}\left(p - \sum_{k=0}^{p-1}{\frac{1}{2^k}}
+     + \sum_{k=0}^{p-1}\left(\frac{1}{2^k}
+     - \frac{1}{2^k+1}\right)\!\!\right)
+     = p2^p - 2^p \sum_{k=0}^{p-1}\frac{1}{2^k+1}.
+\end{align*}
+Let us work on the sum by splitting it and looking for a limit:
+\begin{equation}
+  \sum_{k=0}^{p-1}\frac{1}{2^k+1} = \sum_{k=0}^q\frac{1}{2^k+1} -
+  \sum_{k=p}^q\frac{1}{2^k+1}, \quad \text{for \(q > p\)}.
+  \label{eq:alpha_conv}
+\end{equation}
+This leads us to consider the convergence of \(\sum_{k \geqslant
+  0}1/(2^k+1)\). We have the obvious bounds \(0 < 1/(2^k+1) < 2^{-k}\), so the
+partial sums~\(\sum_{k=0}^q{1/(2^k+1)}\) are bounded by \(\sum_{k=0}^{q}2^{-k} <
+2\). Moreover, those sums are strictly increasing, as they are made of positive
+terms only, therefore \(\alpha := \sum_{k \geqslant 0}1/(2^k+1)\) exists and
+\(\alpha \leqslant 2\). More precisely:
+\begin{equation*}
+  \alpha
+  = \frac{1}{2^0+1} + \sum_{k \geqslant 1}\frac{1}{2^k+1}
+  = \frac{1}{2} + \sum_{k \geqslant 1}\frac{1}{2^k+1}
+  < \frac{1}{2} + \sum_{k \geqslant 1}\frac{1}{2^k}
+  = \frac{1}{2} + 1 = \frac{3}{2}.
+\end{equation*}
+Borwein (1992) showed that \(\alpha \simeq 1.264500\) is irrational. Since the
+convergence of \(\sum_{k=0}^q{1/(2^k+1)}\) implies that of
+\(\sum_{k=p}^q{1/(2^k+1)}\), we can have \(q \rightarrow \infty\)
+in~\eqref{eq:alpha_conv}:
+\begin{equation*}
+  \sum_{k=0}^{p-1}\frac{1}{2^k+1} = \sum_{k \geqslant 0}\frac{1}{2^k+1} -
+  \sum_{k \geqslant p}\frac{1}{2^k+1}.
+\end{equation*}
+We can then resume our derivation of \(M(\Join, p)\):
+\begin{align}
+ M(\Join, p)
+  &= p2^p - 2^p \sum_{k \geqslant 0}\frac{1}{2^k+1}
+   + 2^p \sum_{k \geqslant p}\frac{1}{2^k+1}\notag\\
+  &= p2^p - 2^p \alpha + \sum_{k \geqslant p}\frac{1}{2^{k-p}+2^{-p}}\notag\\
+  &= p2^p - 2^p \alpha + \sum_{k \geqslant 0}\frac{1}{2^k+2^{-p}}
+   = (p - \alpha) 2^p + r_p,
+\label{eq:Mjoin}
+\end{align}
+where \(r_p := \sum_{k \geqslant 0}1/(2^{k}+2^{-p})\). We have:
+\begin{equation*}
+  \frac{1}{2^k + 2^{-p-1}} - \frac{1}{2^k + 2^{-p}}
+  = \frac{2^{-p-1}}{(2^k + 2^{-p-1})(2^k + 2^{-p})} > 0,
+\end{equation*}
+so we get, by summation,
+\begin{equation*}
+  r_{p+1} - r_p = 2^{-p-1}\sum_{k \geqslant 0}\frac{1}{(2^k + 2^{-p-1})(2^k +
+    2^{-p})} > 0,
+\end{equation*}
+so \(r_p\)~is strictly increasing. Let us now show that \(2\)~is its limit
+and a strict upper bound, by examining the difference:
+\begin{equation*}
+  2 - r_p
+  = \sum_{k \geqslant 0}\left(\frac{1}{2^k} - \frac{1}{2^k + 2^{-p}}\right)
+  = 2^{-p}\sum_{k \geqslant 0}\frac{1}{2^k(2^k + 2^{-p})}
+  \leqslant 2^{-p}\sum_{k \geqslant 0}\frac{1}{4^k}
+  = \frac{4}{3}2^{-p}.
+\end{equation*}
+The series on the left is made of positive terms, so \(0 < 2 - r_p \leqslant
+\tfrac{4}{3}2^{-p}\) and, since \(\tfrac{4}{3}2^{-p} \rightarrow 0\) as \(p \to
+\infty\), we deduce \(r_p \rightarrow 2^{-}\), thus \(M(\Join, p) < (p - \alpha)
+2^p + 2\) for \(p \geqslant 0\). This bound is optimal in the sense that the
+constant~\(2\) cannot be lowered since \(r_p \rightarrow 2^{-}\). Also
+\(M(\Join,p)\) is best approximated by it for sufficiently large values
+of~\(p\): \(M(\Join, p) = (p - \alpha) 2^p + 2 - \theta_p\), with \(0 < \theta_p
+\leqslant \frac{4}{3}2^{-p}\). Now, let us turn our attention to lower
+bounds. We established that \(r_p\) is strictly increasing for \(p \geqslant
+0\), but since we leave aside the trivial case \(p=0\) (sorting one key requires
+no comparison), the greatest lower bound is~\(r_1 = \min_{p \geqslant 1}r_p\):
+\begin{equation*}
+  r_1 = \sum_{k \geqslant 0}\frac{1}{2^k + 2^{-1}}
+  = \sum_{k \geqslant 0}\frac{2}{2^{k+1} + 1}
+  = 2 \sum_{m \geqslant 1}\frac{1}{2^m + 1}
+  = 2\left(\!\alpha - \frac{1}{2^0 + 1}\!\right)
+  = 2\alpha - 1.
+\end{equation*}
+We conclude
+\begin{equation}
+(p - \alpha)2^p + 2\alpha - 1 \leqslant M(\Join,p) < (p-\alpha)2^p + 2, \quad
+  \text{for \(p > 0\),}
+\end{equation}
+where the lower bound is an equality if, and only if, \(p = 1\), and the upper
+bound holds even if \(p = 0\).
+\end{document}
