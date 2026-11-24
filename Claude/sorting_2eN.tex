@@ -7,6 +7,11 @@
 \usepackage{amsmath,amssymb,amsthm,stmaryrd}
 \theoremstyle{plain}
 
+\frenchspacing  % Follow French conventions after a period
+\hfuzz 2pt      % Do not report overhang less than 2pt
+
+\input{macros}
+
 \title{Sorting $2^n$ keys}
 \author{Christian Rinderknecht}
 
@@ -16,27 +21,43 @@
 
 \paragraph{Minimum cost}
 
-Let \(B(\Join,p)\) be the lowest cost of sorting \(2^p\) keys by merging
+Let \(\B{\Join}{p}\) be the lowest cost of sorting \(2^p\) keys by merging
 them. We have:
+\begin{equation*}
+\qquad \B{\Join}{p} = \frac{1}{2}p2^p.
+\end{equation*}
+Equivalently, we can express this now in terms of~\(2^p\) instead of~\(p\), and
+define \(\B{}{n}\) as the lowest cost of sorting~\(n\) keys when \(n\)~is a
+power of two:
 \begin{equation}
-B(\Join, 0) = 0, \qquad B(\Join, p) = p2^{p-1}, \quad \text{for \(p > 0\)}.
+  \quad \B{}{n} = \frac{1}{2} n \lg n, \quad \text{where \(\exists p \in
+    \mathbb{N}.n=2^p\).}
+  \label{eq:best_power}
 \end{equation}
 
 \paragraph{Maximum cost}
 
-Let \(W(\Join,p)\) be the highest cost of sorting \(2^p\) keys by merging
+Let \(\W{\Join}{p}\) be the highest cost of sorting \(2^p\) keys by merging
 them. We have:
+\begin{equation*}
+\W{\Join}{p} = (p-1)2^p + 1, \quad \text{for \(p \geqslant 0\)}.
+\end{equation*}
+Equivalently, we can express this now in terms of~\(2^p\) instead of~\(p\), and
+define \(\B{}{n}\) as the highest cost of sorting~\(n\) keys when \(n\)~is a
+power of two:
 \begin{equation}
-W(\Join, p) = (p-1)2^p + 1, \quad \text{for \(p \geqslant 0\)}.
+  \W{}{n} = n \lg n - n + 1, \quad \text{where \(\exists p \in
+    \mathbb{N}.n=2^p\).}
+  \label{eq:worst_power}
 \end{equation}
 
 \paragraph{Average cost}
 \label{par:Atms_2p}
 
-Let \(M(\Join, p)\) be the average cost of sorting \(2^p\) keys by merging
+Let \(\M{\Join}{p}\) be the average cost of sorting \(2^p\) keys by merging
 them. The trivial case is \(M(\Join,0) = 0\). We have, for \(p > 0\),
 \begin{align*}
- M(\Join, p)
+ \M{\Join}{p}
   &= 2^p\sum_{k=0}^{p-1}{\frac{1}{2^k}\left(2^k - 1 + \frac{1}{2^k +
       1}\right)}\\
   &= 2^{p}\left(p - \sum_{k=0}^{p-1}{\frac{1}{2^k}}
@@ -73,9 +94,9 @@ in~\eqref{eq:alpha_conv}:
   \sum_{k=0}^{p-1}\frac{1}{2^k+1} = \sum_{k \geqslant 0}\frac{1}{2^k+1} -
   \sum_{k \geqslant p}\frac{1}{2^k+1}.
 \end{equation*}
-We can then resume our derivation of \(M(\Join, p)\):
+We can then resume our derivation of \(\M{\Join}{p}\):
 \begin{align}
- M(\Join, p)
+ \M{\Join}{p}
   &= p2^p - 2^p \sum_{k \geqslant 0}\frac{1}{2^k+1}
    + 2^p \sum_{k \geqslant p}\frac{1}{2^k+1}\notag\\
   &= p2^p - 2^p \alpha + \sum_{k \geqslant p}\frac{1}{2^{k-p}+2^{-p}}\notag\\
@@ -104,27 +125,47 @@ and a strict upper bound, by examining the difference:
 \end{equation*}
 The series on the left is made of positive terms, so \(0 < 2 - r_p \leqslant
 \tfrac{4}{3}2^{-p}\) and, since \(\tfrac{4}{3}2^{-p} \rightarrow 0\) as \(p \to
-\infty\), we deduce \(r_p \rightarrow 2^{-}\), thus \(M(\Join, p) < (p - \alpha)
+\infty\), we deduce \(r_p \rightarrow 2^{-}\), thus \(\M{\Join}{p} < (p - \alpha)
 2^p + 2\) for \(p \geqslant 0\). This bound is optimal in the sense that the
 constant~\(2\) cannot be lowered since \(r_p \rightarrow 2^{-}\). Also
-\(M(\Join,p)\) is best approximated by it for sufficiently large values
-of~\(p\): \(M(\Join, p) = (p - \alpha) 2^p + 2 - \theta_p\), with \(0 < \theta_p
-\leqslant \frac{4}{3}2^{-p}\). Now, let us turn our attention to lower
-bounds. We established that \(r_p\) is strictly increasing for \(p \geqslant
-0\), but since we leave aside the trivial case \(p=0\) (sorting one key requires
-no comparison), the greatest lower bound is~\(r_1 = \min_{p \geqslant 1}r_p\):
+\(\M{\Join}{p}\) is best approximated by it for sufficiently large values
+of~\(p\):
 \begin{equation*}
-  r_1 = \sum_{k \geqslant 0}\frac{1}{2^k + 2^{-1}}
-  = \sum_{k \geqslant 0}\frac{2}{2^{k+1} + 1}
-  = 2 \sum_{m \geqslant 1}\frac{1}{2^m + 1}
+  \M{\Join}{p} = (p - \alpha) 2^p + 2 - \theta_p,
+  \quad \text{where \(0 < \theta_p \leqslant \frac{4}{3}2^{-p}\)}.
+\end{equation*}
+Equivalently, we can express this now in terms of~\(2^p\) instead of~\(p\), and
+define \(\M{}{n}\) as the average cost of sorting~\(n\) keys when \(n\)~is a
+power of two:
+\begin{equation*}
+  \M{}{n} = n \lg n - \alpha n + 2 - \theta'_n,
+  \quad \text{where \(0 < \theta'_n \leqslant \frac{4}{3n}\) and \(\exists
+    p \in \mathbb{N}.n=2^p\).}
+\end{equation*}
+Now, let us turn our attention to lower bounds. We established that \(r_p\)~is
+strictly increasing for \(p \geqslant 0\), but since we leave aside the trivial
+case \(p=0\) (sorting two keys require one comparison), the greatest lower bound
+is~\(r_1 = \min_{p \geqslant 1}r_p\):
+\begin{equation*}
+  r_1\!\! = \!\!\sum_{k \geqslant 0}\frac{1}{2^k + 2^{-1}}
+  = \!\sum_{k \geqslant 0}\frac{2}{2^{k+1} + 1}
+  = 2 \!\sum_{m \geqslant 1}\frac{1}{2^m + 1}
   = 2\left(\!\alpha - \frac{1}{2^0 + 1}\!\right)
   = 2\alpha - 1.
 \end{equation*}
-We conclude
-\begin{equation}
-(p - \alpha)2^p + 2\alpha - 1 \leqslant M(\Join,p) < (p-\alpha)2^p + 2, \quad
+Gathering the lower and upper bounds:
+\begin{equation*}
+(p - \alpha)2^p + 2\alpha - 1 \leqslant \M{\Join}{p} < (p-\alpha)2^p + 2, \quad
   \text{for \(p > 0\),}
-\end{equation}
+\end{equation*}
 where the lower bound is an equality if, and only if, \(p = 1\), and the upper
-bound holds even if \(p = 0\).
+bound holds even if \(p = 0\). Equivalently, we can express this now in terms
+of~\(2^p\) instead of~\(p\), and define \(\M{}{n}\) as the average cost of
+sorting~\(n\) keys when \(n\)~is a power of two:
+\begin{equation}
+  n \lg n - \alpha n + 2\alpha - 1 \leqslant \M{}{n} < n \lg n - \alpha n + 2,
+  \quad \text{where \(\exists p \in \mathbb{N}^+.n=2^p\).}
+  \label{ineq:M_join}
+\end{equation}
+
 \end{document}
