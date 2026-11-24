@@ -583,12 +583,21 @@ bottom\hyp{}up and the number of comparisons is a symmetric
 function. Let us note \(\B{\Join}{p}\) the minimum number of
 comparisons to sort \(2^p\)~keys. From equations
 \eqref{eq:cost_power_2} and \eqref{eq:best_merge},
-\begin{equation}
+\begin{equation*}
 %\abovedisplayskip=0pt
 %\belowdisplayskip=0pt
 \B{\Join}{p}
   = 2^{p-1}\!\sum_{k=0}^{p-1}{\frac{1}{2^k}\OB{\fun{mrg}}{2^k,2^k}}
-  = p2^{p-1}.\label{eq:best_power}\index{mrg@$\B{\Join}{n}$}
+  = \frac{1}{2}p2^p.
+  \index{mrg@$\B{\Join}{n}$}
+\end{equation*}
+Equivalently, we can express this now in terms of~\(2^p\) instead of~\(p\), and
+define \(\B{}{n}\) as the lowest cost of sorting~\(n\) keys when \(n\)~is a
+power of two:
+\begin{equation}
+  \B{}{n} = \frac{1}{2} n \lg n, \quad \text{where \(\exists p \in
+    \mathbb{N}.n=2^p\).}
+  \label{eq:best_power}
 \end{equation}
 \index{merge sort!power@$2^n$ keys!minimum cost|)}
 
@@ -600,13 +609,21 @@ merge sort is achieved by making worst cases for all the subtrees, for
 example, \([7,3,5,1,4,8,6,2]\). Let~\(\W{\Join}{p}\) be the maximum
 number of comparisons for sorting \(2^p\)~keys. From equations
 \eqref{eq:cost_power_2}~and~\eqref{eq:worst_merge},
-\begin{equation}
+\begin{equation*}
 %\abovedisplayskip=2pt
 %\belowdisplayskip=0pt
 \W{\Join}{p}
   = 2^{p-1}\!\sum_{k=0}^{p-1}{\frac{1}{2^k}\OW{\fun{mrg}}{2^k,2^k}}
-  = (p-1)2^p + 1.
-\label{eq:worst_power}\index{mrg@$\W{\Join}{n}$}
+  = (p-1)2^p + 1, \quad \text{for \(p \geqslant 0\)}.
+  \index{mrg@$\W{\Join}{n}$}
+\end{equation*}
+Equivalently, we can express this now in terms of~\(2^p\) instead of~\(p\), and
+define \(\B{}{n}\) as the highest cost of sorting~\(n\) keys when \(n\)~is a
+power of two:
+\begin{equation}
+  \W{}{n} = n \lg n - n + 1, \quad \text{where \(\exists p \in
+    \mathbb{N}.n=2^p\).}
+  \label{eq:worst_power}
 \end{equation}
 \index{merge sort!power@$2^n$ keys!maximum cost|)}
 
@@ -629,39 +646,120 @@ and~\eqref{def:cost_mrg} yield
 \OM{\fun{mrg}}{n,n} = 2n - 2 + \frac{2}{n+1}.
 \index{mrg@$\OM{\fun{mrg}}{n,n}$}
 \end{equation*}
-Together with equation \eqref{eq:cost_power_2}, we further draw, for
-\(p > 0\),
+The trivial case is \(\M{\Join}{0} = 0\). For \(p > 0\), with equation
+\eqref{eq:cost_power_2}, we draw
 \begin{align}
 %\abovedisplayskip=0pt
 %\belowdisplayskip=0pt
-\M{\Join}{p}
-  &= 2^{p-1}\sum_{k=0}^{p-1}{\frac{1}{2^k}\OM{\fun{mrg}}{2^k,2^k}}
-  = 2^p\sum_{k=0}^{p-1}{\frac{1}{2^k}\left(2^k - 1 + \frac{1}{2^k +
-      1}\right)}\notag\\
-  &= 2^{p}\left(p - \sum_{k=0}^{p-1}{\frac{1}{2^k}}
+ \M{\Join}{p}
+  &= 2^p\sum_{k=0}^{p-1}{\frac{1}{2^k}\left(2^k - 1 + \frac{1}{2^k +
+      1}\right)}= 2^{p}\left(p - \sum_{k=0}^{p-1}{\frac{1}{2^k}}
      + \sum_{k=0}^{p-1}{\frac{1}{2^k(2^k+1)}}\right)\notag\\
   &= 2^{p}\left(p - \sum_{k=0}^{p-1}{\frac{1}{2^k}}
      + \sum_{k=0}^{p-1}\left(\frac{1}{2^k}
      - \frac{1}{2^k+1}\right)\!\!\right)
-   = p2^p - 2^p \sum_{k=0}^{p-1}\frac{1}{2^k+1}\notag\\
+     = p2^p - 2^p \sum_{k=0}^{p-1}\frac{1}{2^k+1}.
+     \label{eq:Mjoin_temp}
+\end{align}
+Let us work on the sum by splitting it and looking for a limit:
+\begin{equation}
+  \sum_{k=0}^{p-1}\frac{1}{2^k+1} = \sum_{k=0}^q\frac{1}{2^k+1} -
+  \sum_{k=p}^q\frac{1}{2^k+1}, \quad \text{for \(q > p\)}.
+  \label{eq:alpha_conv}
+\end{equation}
+This leads us to consider the convergence of \(\sum_{k \geqslant
+  0}1/(2^k+1)\). We have the obvious bounds \(0 < 1/(2^k+1) < 2^{-k}\), so the
+partial sums~\(\sum_{k=0}^q{1/(2^k+1)}\) are bounded by \(\sum_{k=0}^{q}2^{-k} <
+2\). Moreover, those sums are strictly increasing, as they are made of positive
+terms only, hence \(\alpha := \sum_{k \geqslant 0}1/(2^k+1)\) exists and
+\(\alpha \leqslant 2\). More precisely:
+\begin{equation*}
+  \alpha
+  = \frac{1}{2^0+1} + \sum_{k \geqslant 1}\frac{1}{2^k+1}
+  = \frac{1}{2} + \sum_{k \geqslant 1}\frac{1}{2^k+1}
+  < \frac{1}{2} + \sum_{k \geqslant 1}\frac{1}{2^k}
+  = \frac{1}{2} + 1 = \frac{3}{2}.
+\end{equation*}
+\cite{Borwein_1992} showed that \(\alpha \simeq 1.264500\) is irrational. Since
+the convergence of \(\sum_{k=0}^q{1/(2^k+1)}\) implies that of
+\(\sum_{k=p}^q{1/(2^k+1)}\), we can take the limit \(q \rightarrow \infty\) in
+equation~\eqref{eq:alpha_conv}:
+\begin{equation*}
+  \sum_{k=0}^{p-1}\frac{1}{2^k+1} = \sum_{k \geqslant 0}\frac{1}{2^k+1} -
+  \sum_{k \geqslant p}\frac{1}{2^k+1}.
+\end{equation*}
+We can then resume our derivation~\eqref{eq:Mjoin_temp} of \(\M{\Join}{p}\):
+\begin{align}
+ \M{\Join}{p}
   &= p2^p - 2^p \sum_{k \geqslant 0}\frac{1}{2^k+1}
-     + 2^p \sum_{k \geqslant p}\frac{1}{2^k+1}
-= (p - \alpha) 2^p + \sum_{k \geqslant 0}\frac{1}{2^{k}+2^{-p}},
+   + 2^p \sum_{k \geqslant p}\frac{1}{2^k+1}= p2^p - 2^p \alpha + \sum_{k \geqslant p}\frac{1}{2^{k-p}+2^{-p}}\notag\\
+  &= p2^p - 2^p \alpha + \sum_{k \geqslant 0}\frac{1}{2^k+2^{-p}}
+   = (p - \alpha) 2^p + r_p,
 \label{eq:Mjoin}
 \end{align}
-where \(\alpha := \sum_{k \geqslant 0}\frac{1}{2^k+1} \simeq
-1.264500\) is irrational \citep{Borwein_1992}. Since \(0 < 2^{-p} <
-1\), we have \(1/(2^k + 1) < 1/(2^k+2^{-p}) < 1/2^k\) and we conclude
+where \(r_p := \sum_{k \geqslant 0}1/(2^{k}+2^{-p})\). We have:
+\begin{equation*}
+  \frac{1}{2^k + 2^{-p-1}} - \frac{1}{2^k + 2^{-p}}
+  = \frac{2^{-p-1}}{(2^k + 2^{-p-1})(2^k + 2^{-p})} > 0,
+\end{equation*}
+so we get, by summation over~\(k\) (as we already established convergence):
+\begin{equation*}
+  r_{p+1} - r_p = 2^{-p-1}\sum_{k \geqslant 0}\frac{1}{(2^k + 2^{-p-1})(2^k +
+    2^{-p})} > 0,
+\end{equation*}
+so \(r_p\)~is strictly increasing. Let us now show that \(2\)~is its limit
+and a strict upper bound, by examining the difference
+\begin{align*}
+  2 - r_p
+  &= \sum_{k \geqslant 0}\left(\frac{1}{2^k} - \frac{1}{2^k + 2^{-p}}\right)
+  = 2^{-p}\sum_{k \geqslant 0}\frac{1}{2^k(2^k + 2^{-p})}\\
+  &\leqslant 2^{-p}\sum_{k \geqslant 0}\frac{1}{4^k}
+  = \frac{4}{3}2^{-p}.
+\end{align*}
+The series on the left is made of positive terms, so \(0 < 2 - r_p \leqslant
+\tfrac{4}{3}2^{-p}\) and, since \(\tfrac{4}{3}2^{-p} \rightarrow 0\) as \(p \to
+\infty\), we deduce \(r_p \rightarrow 2^{-}\). So the upper bound on
+\(\M{\Join}{p}\) is optimal in the sense that the constant~\(2\) cannot be
+lowered. Moreover \(\M{\Join}{p}\) is best approximated by it for sufficiently
+large values of~\(p\):
+\begin{equation*}
+  \M{\Join}{p} = (p - \alpha) 2^p + 2 - \theta_p,
+  \quad \text{where \(0 < \theta_p \leqslant \frac{4}{3}2^{-p}\)}.
+\end{equation*}
+Equivalently, we can express this now in terms of~\(2^p\) instead of~\(p\), and
+define \(\M{}{n}\) as the average cost of sorting~\(n\) keys when \(n\)~is a
+power of two:
+\begin{equation*}
+  \M{}{n} = n \lg n - \alpha n + 2 - \theta'_n,
+  \quad \text{where \(0 < \theta'_n \leqslant \frac{4}{3n}\) and \(\exists
+    p \in \mathbb{N}.n=2^p\).}
+\end{equation*}
+Now, let us turn our attention to lower bounds. We established that \(r_p\)~is
+strictly increasing for \(p \geqslant 0\), but since we leave aside the trivial
+case \(p=0\) (sorting two keys require one comparison), the greatest lower bound
+is~\(r_1 = \min_{p \geqslant 1}r_p\):
+\begin{align*}
+  r_1
+  &= \sum_{k \geqslant 0}\frac{1}{2^k + 2^{-1}}
+  = \sum_{k \geqslant 0}\frac{2}{2^{k+1} + 1}
+  = 2 \sum_{m \geqslant 1}\frac{1}{2^m + 1}\\
+  &= 2\left(\!\alpha - \frac{1}{2^0 + 1}\!\right)
+  = 2\alpha - 1.
+\end{align*}
+Gathering the lower and upper bounds:
+\begin{equation*}
+(p - \alpha)2^p + 2\alpha - 1 \leqslant \M{\Join}{p} < (p-\alpha)2^p + 2, \quad
+  \text{for \(p > 0\),}
+\end{equation*}
+where the lower bound is an equality if, and only if, \(p = 1\), and the upper
+bound holds even if \(p = 0\). Equivalently, we can express this now in terms
+of~\(2^p\) instead of~\(p\), and define \(\M{}{n}\) as the average cost of
+sorting~\(n\) keys when \(n\)~is a power of two:
 \begin{equation}
-(p - \alpha)2^p + \alpha < \M{\Join}{p} < (p-\alpha)2^p + 2.
-\label{ineq:M_join}
+  n \lg n - \alpha n + 2\alpha - 1 \leqslant \M{}{n} < n \lg n - \alpha n + 2,
+  \quad \text{where \(\exists p \in \mathbb{N}^+.n=2^p\).}
+  \label{ineq:M_join}
 \end{equation}
-The uniform convergence of the series \(\sum_{k \geqslant
-  0}\frac{1}{2^{k}+2^{-p}}\) allows us to interchange the limits
-on~\(k\) and~\(p\) and deduce that \(\M{\Join}{p} - (p-\alpha)2^p - 2
-\to 0^{-}\), as \(p \to \infty\). In other words,
-\(\M{\Join}{p}\) is best approximated by its upper bound, for
-sufficiently large values of~\(p\).
 \index{merge sort!power@$2^n$ keys!average cost|)}
 \index{merge sort!power@$2^n$ keys|)}
 

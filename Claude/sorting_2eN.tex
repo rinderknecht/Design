@@ -24,13 +24,13 @@
 Let \(\B{\Join}{p}\) be the lowest cost of sorting \(2^p\) keys by merging
 them. We have:
 \begin{equation*}
-\qquad \B{\Join}{p} = \frac{1}{2}p2^p.
+  \B{\Join}{p} = \frac{1}{2}p2^p.
 \end{equation*}
 Equivalently, we can express this now in terms of~\(2^p\) instead of~\(p\), and
 define \(\B{}{n}\) as the lowest cost of sorting~\(n\) keys when \(n\)~is a
 power of two:
 \begin{equation}
-  \quad \B{}{n} = \frac{1}{2} n \lg n, \quad \text{where \(\exists p \in
+  \B{}{n} = \frac{1}{2} n \lg n, \quad \text{where \(\exists p \in
     \mathbb{N}.n=2^p\).}
   \label{eq:best_power}
 \end{equation}
@@ -55,18 +55,18 @@ power of two:
 \label{par:Atms_2p}
 
 Let \(\M{\Join}{p}\) be the average cost of sorting \(2^p\) keys by merging
-them. The trivial case is \(M(\Join,0) = 0\). We have, for \(p > 0\),
-\begin{align*}
+them. The trivial case is \(\M{\Join}{0} = 0\). We have, for \(p > 0\),
+\begin{align}
  \M{\Join}{p}
   &= 2^p\sum_{k=0}^{p-1}{\frac{1}{2^k}\left(2^k - 1 + \frac{1}{2^k +
-      1}\right)}\\
-  &= 2^{p}\left(p - \sum_{k=0}^{p-1}{\frac{1}{2^k}}
-     + \sum_{k=0}^{p-1}{\frac{1}{2^k(2^k+1)}}\right)\\
+      1}\right)}= 2^{p}\left(p - \sum_{k=0}^{p-1}{\frac{1}{2^k}}
+     + \sum_{k=0}^{p-1}{\frac{1}{2^k(2^k+1)}}\right)\notag\\
   &= 2^{p}\left(p - \sum_{k=0}^{p-1}{\frac{1}{2^k}}
      + \sum_{k=0}^{p-1}\left(\frac{1}{2^k}
      - \frac{1}{2^k+1}\right)\!\!\right)
      = p2^p - 2^p \sum_{k=0}^{p-1}\frac{1}{2^k+1}.
-\end{align*}
+     \label{eq:Mjoin_temp}
+\end{align}
 Let us work on the sum by splitting it and looking for a limit:
 \begin{equation}
   \sum_{k=0}^{p-1}\frac{1}{2^k+1} = \sum_{k=0}^q\frac{1}{2^k+1} -
@@ -88,18 +88,17 @@ terms only, therefore \(\alpha := \sum_{k \geqslant 0}1/(2^k+1)\) exists and
 \end{equation*}
 Borwein (1992) showed that \(\alpha \simeq 1.264500\) is irrational. Since the
 convergence of \(\sum_{k=0}^q{1/(2^k+1)}\) implies that of
-\(\sum_{k=p}^q{1/(2^k+1)}\), we can have \(q \rightarrow \infty\)
-in~\eqref{eq:alpha_conv}:
+\(\sum_{k=p}^q{1/(2^k+1)}\), we can take the limit \(q \rightarrow \infty\) in
+equation~\eqref{eq:alpha_conv}:
 \begin{equation*}
   \sum_{k=0}^{p-1}\frac{1}{2^k+1} = \sum_{k \geqslant 0}\frac{1}{2^k+1} -
   \sum_{k \geqslant p}\frac{1}{2^k+1}.
 \end{equation*}
-We can then resume our derivation of \(\M{\Join}{p}\):
+We can then resume our derivation~\eqref{eq:Mjoin_temp} of \(\M{\Join}{p}\):
 \begin{align}
  \M{\Join}{p}
   &= p2^p - 2^p \sum_{k \geqslant 0}\frac{1}{2^k+1}
-   + 2^p \sum_{k \geqslant p}\frac{1}{2^k+1}\notag\\
-  &= p2^p - 2^p \alpha + \sum_{k \geqslant p}\frac{1}{2^{k-p}+2^{-p}}\notag\\
+   + 2^p \sum_{k \geqslant p}\frac{1}{2^k+1}= p2^p - 2^p \alpha + \sum_{k \geqslant p}\frac{1}{2^{k-p}+2^{-p}}\notag\\
   &= p2^p - 2^p \alpha + \sum_{k \geqslant 0}\frac{1}{2^k+2^{-p}}
    = (p - \alpha) 2^p + r_p,
 \label{eq:Mjoin}
@@ -109,13 +108,13 @@ where \(r_p := \sum_{k \geqslant 0}1/(2^{k}+2^{-p})\). We have:
   \frac{1}{2^k + 2^{-p-1}} - \frac{1}{2^k + 2^{-p}}
   = \frac{2^{-p-1}}{(2^k + 2^{-p-1})(2^k + 2^{-p})} > 0,
 \end{equation*}
-so we get, by summation,
+so we get, by summation over~\(k\) (as we already established convergence):
 \begin{equation*}
   r_{p+1} - r_p = 2^{-p-1}\sum_{k \geqslant 0}\frac{1}{(2^k + 2^{-p-1})(2^k +
     2^{-p})} > 0,
 \end{equation*}
 so \(r_p\)~is strictly increasing. Let us now show that \(2\)~is its limit
-and a strict upper bound, by examining the difference:
+and a strict upper bound, by examining the difference
 \begin{equation*}
   2 - r_p
   = \sum_{k \geqslant 0}\left(\frac{1}{2^k} - \frac{1}{2^k + 2^{-p}}\right)
@@ -125,11 +124,10 @@ and a strict upper bound, by examining the difference:
 \end{equation*}
 The series on the left is made of positive terms, so \(0 < 2 - r_p \leqslant
 \tfrac{4}{3}2^{-p}\) and, since \(\tfrac{4}{3}2^{-p} \rightarrow 0\) as \(p \to
-\infty\), we deduce \(r_p \rightarrow 2^{-}\), thus \(\M{\Join}{p} < (p - \alpha)
-2^p + 2\) for \(p \geqslant 0\). This bound is optimal in the sense that the
-constant~\(2\) cannot be lowered since \(r_p \rightarrow 2^{-}\). Also
-\(\M{\Join}{p}\) is best approximated by it for sufficiently large values
-of~\(p\):
+\infty\), we deduce \(r_p \rightarrow 2^{-}\). So the upper bound on
+\(\M{\Join}{p}\) is optimal in the sense that the constant~\(2\) cannot be
+lowered. Moreover \(\M{\Join}{p}\) is best approximated by it for sufficiently
+large values of~\(p\):
 \begin{equation*}
   \M{\Join}{p} = (p - \alpha) 2^p + 2 - \theta_p,
   \quad \text{where \(0 < \theta_p \leqslant \frac{4}{3}2^{-p}\)}.
